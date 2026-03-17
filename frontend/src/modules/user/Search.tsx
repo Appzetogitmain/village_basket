@@ -72,7 +72,7 @@ export default function Search() {
   }, [searchQuery, location?.latitude, location?.longitude]);
 
   return (
-    <div className="pb-24 md:pb-8 bg-white min-h-screen">
+    <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
 
       {/* Search Results */}
       {searchQuery.trim() && (
@@ -122,7 +122,7 @@ export default function Search() {
                 {trendingItems.map((item) => (
                   <div
                     key={item.id || item._id}
-                    className="bg-white rounded-lg border-2 border-green-600 p-3 cursor-pointer hover:shadow-md transition-shadow"
+                    className="bg-white/40 backdrop-blur-sm rounded-lg border-2 border-green-600 p-3 cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => navigate(item.type === 'category' ? `/category/${item.id || item._id}` : `/product/${item.id || item._id}`)}
                   >
                     <div className="w-full h-24 rounded-lg mb-2 overflow-hidden bg-neutral-50 flex items-center justify-center">

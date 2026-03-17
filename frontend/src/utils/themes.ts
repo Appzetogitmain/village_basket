@@ -10,14 +10,14 @@ export interface Theme {
 
 export const themes: Record<string, Theme> = {
   all: {
-    // True Mint Green (Emerald) Theme
-    primary: ['rgb(16, 185, 129)', 'rgb(52, 211, 153)', 'rgb(110, 231, 183)', 'rgb(167, 243, 208)'],
-    secondary: ['rgb(236, 253, 245)', 'rgb(209, 250, 229)', 'rgb(167, 243, 208)'],
-    textColor: '#064e3b',
-    accentColor: '#059669',
-    bannerText: 'FRESH',
-    saleText: 'SALE',
-    headerTextColor: '#065f46',
+    // Indian Village Theme (Terracotta & Marigold)
+    primary: ['rgb(178, 34, 34)', 'rgb(255, 153, 51)', 'rgb(225, 173, 1)', 'rgb(255, 249, 240)'],
+    secondary: ['rgb(255, 249, 240)', 'rgb(255, 247, 224)', 'rgb(255, 237, 211)'],
+    textColor: '#3E2723',
+    accentColor: '#B22222',
+    bannerText: 'DESI',
+    saleText: 'HAAT',
+    headerTextColor: '#3E2723',
   },
   wedding: {
     primary: ['rgb(252, 165, 165)', 'rgb(253, 182, 182)', 'rgb(254, 202, 202)', 'rgb(255, 228, 228)'],

@@ -57,11 +57,11 @@ export default function Wishlist() {
 
   return (
     <div className="pb-24 md:pb-8 bg-white min-h-screen">
-      <div className="px-4 py-4 bg-white border-b border-neutral-200 mb-4 sticky top-0 z-10 flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="p-1">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      <div className="px-4 py-5 bg-[#8B3D28] border-b border-white/10 mb-4 sticky top-0 z-10 flex items-center gap-3 shadow-lg">
+        <button onClick={() => navigate(-1)} className="p-1 text-white hover:bg-white/10 rounded-full transition-colors">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
-        <h1 className="text-xl font-bold text-neutral-900">My Wishlist</h1>
+        <h1 className="text-xl font-bold text-white font-poppins">My Wishlist</h1>
       </div>
 
       <div className="px-4">

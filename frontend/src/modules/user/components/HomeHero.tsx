@@ -11,6 +11,9 @@ import { Category } from '../../../types/domain';
 import { getHeaderCategoriesPublic } from '../../../services/api/headerCategoryService';
 import { getIconByName } from '../../../utils/iconLibrary';
 import homeIcon from '@assets/category/home_v2.png';
+import { useCart } from '../../../context/CartContext';
+import { useAuth } from '../../../context/AuthContext';
+import brandLogo from '@assets/village_basket-removebg-preview.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -279,8 +282,10 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
   };
 
   const { currentTheme } = useThemeContext();
+  const { cart } = useCart();
+  const { isAuthenticated } = useAuth();
   const theme = currentTheme;
-  const heroGradient = `linear-gradient(to bottom right, ${theme.primary[0]}, ${theme.primary[1]}, ${theme.primary[2]})`;
+  // Use theme constant instead of hardcoded yellow gradient background
 
   // Helper to convert RGB to RGBA
   const rgbToRgba = (rgb: string, alpha: number) => {
@@ -290,14 +295,100 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
   return (
     <div
       ref={heroRef}
+      className="bg-transparent paper-texture"
       style={{
-        background: heroGradient,
         paddingBottom: 0,
         marginBottom: 0,
       }}
     >
-      {/* Top section with delivery info and buttons - NOT sticky */}
-      <div>
+      <div
+        className="md:hidden pt-3 pb-4 px-4 shadow-lg relative z-10"
+        style={{
+          backgroundColor: '#8B3D28',
+          borderBottomLeftRadius: '24px',
+          borderBottomRightRadius: '24px'
+        }}
+      >
+        {/* Top Row: Logo, Search, Cart */}
+        <div className="flex items-center justify-between gap-3 mb-3">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <img
+              src={brandLogo}
+              alt="Village Basket"
+              className="h-14 w-auto object-contain filter brightness-125 drop-shadow-lg"
+            />
+          </div>
+
+          {/* Search Bar Pill */}
+          <div className="flex-1">
+            <div
+              onClick={() => navigate('/search')}
+              className="w-full bg-white/20 backdrop-blur-md rounded-lg px-2.5 py-1.5 flex items-center gap-2 border border-white/10 shadow-inner cursor-pointer"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <div className="flex-1 relative h-4 overflow-hidden">
+                {searchSuggestions.map((suggestion, index) => {
+                  const isActive = index === currentSearchIndex;
+                  return (
+                    <div
+                      key={suggestion}
+                      className={`absolute inset-0 flex items-center transition-all duration-500 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                    >
+                      <span className="text-white/90 text-xs truncate">Search &apos;{suggestion}&apos;</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Cart Icon */}
+          <div className="flex-shrink-0">
+            <button
+              onClick={() => navigate('/cart')}
+              className="text-white p-1 relative active:scale-90 transition-transform"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              </svg>
+              {(cart?.itemCount || 0) > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-[#8B3D28] text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center shadow-md">
+                  {cart?.itemCount || 0}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Bottom Row: Full Address Pill */}
+        <div className="px-1">
+          {locationDisplayText && (
+            <div 
+              onClick={() => navigate('/location')}
+              className="flex items-center gap-2 px-4 py-2 active:scale-[0.98] transition-all cursor-pointer w-full"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="white" className="flex-shrink-0">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+              </svg>
+              <span className="text-[12px] text-white font-bold truncate flex-1">
+                {locationDisplayText}
+              </span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-70 flex-shrink-0">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Legacy/Desktop Header - Hidden on Mobile */}
+      <div className="hidden md:block">
         <div ref={topSectionRef} className="px-4 md:px-6 lg:px-8 pt-2 md:pt-3 pb-0">
           <div className="flex items-start justify-between mb-2 md:mb-2">
             {/* Left: Text content */}
@@ -325,84 +416,43 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
         ref={stickyRef}
         className="sticky top-0 z-50"
         style={{
-          ...(scrollProgress >= 0.1 && {
-            background: `linear-gradient(to bottom right,
-              ${rgbToRgba(theme.primary[0], 1 - scrollProgress)},
-              ${rgbToRgba(theme.primary[1], 1 - scrollProgress)},
-              ${rgbToRgba(theme.primary[2], 1 - scrollProgress)}),
-              rgba(255, 255, 255, ${scrollProgress})`,
-            boxShadow: `0 4px 6px -1px rgba(0, 0, 0, ${scrollProgress * 0.1})`,
-            transition: 'background 0.1s ease-out, box-shadow 0.1s ease-out',
-          }),
+          background: scrollProgress >= 0.1 
+            ? `rgba(139, 61, 40, ${Math.min(1, scrollProgress * 1.2)})` 
+            : 'transparent',
+          backdropFilter: scrollProgress >= 0.1 ? `blur(${scrollProgress * 8}px)` : 'none',
+          boxShadow: scrollProgress >= 0.1 ? `0 4px 15px rgba(0, 0, 0, 0.15)` : 'none',
+          transition: 'background 0.3s ease-out, backdrop-filter 0.3s ease-out, box-shadow 0.3s ease-out',
         }}
       >
-        <div className="px-4 md:px-6 lg:px-8 pt-2 md:pt-2 pb-2 md:pb-2">
-          {/* Search Bar */}
+        <div className="px-4 md:px-6 lg:px-8 pt-2 md:pt-2 pb-2 md:pb-2 hidden md:block">
+          {/* Desktop Search Bar Only - Animated Search moved into Top Row for Mobile */}
           <div
             onClick={() => navigate('/search')}
-            className="w-full md:w-auto md:max-w-xl md:mx-auto rounded-xl shadow-lg px-3 py-2 md:px-3 md:py-1.5 flex items-center gap-2 cursor-pointer hover:shadow-xl transition-all duration-300 mb-2 md:mb-1.5 bg-white"
-            style={{
-              backgroundColor: scrollProgress > 0.1 ? `rgba(249, 250, 251, ${scrollProgress})` : 'white',
-              border: scrollProgress > 0.1 ? `1px solid rgba(229, 231, 235, ${scrollProgress})` : 'none',
-            }}
+            className={`w-full md:w-auto md:max-w-xl md:mx-auto rounded-2xl shadow-lg px-3 py-2 md:px-3 md:py-1.5 flex items-center gap-2 cursor-pointer hover:shadow-xl transition-all duration-300 mb-2 md:mb-1.5 ${scrollProgress > 0.5 ? 'bg-white shadow-inner' : 'bg-white'}`}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 md:w-4 md:h-4">
-              <circle cx="11" cy="11" r="8" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" />
-              <path d="m21 21-4.35-4.35" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" className="text-neutral-400">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <div className="flex-1 relative h-4 md:h-4 overflow-hidden">
-              {searchSuggestions.map((suggestion, index) => {
-                const isActive = index === currentSearchIndex;
-                const prevIndex = (currentSearchIndex - 1 + searchSuggestions.length) % searchSuggestions.length;
-                const isPrev = index === prevIndex;
-
-                return (
-                  <div
-                    key={suggestion}
-                    className={`absolute inset-0 flex items-center transition-all duration-500 ${isActive
-                      ? 'translate-y-0 opacity-100'
-                      : isPrev
-                        ? '-translate-y-full opacity-0'
-                        : 'translate-y-full opacity-0'
-                      }`}
-                  >
-                    <span className={`text-xs md:text-xs`} style={{ color: scrollProgress > 0.5 ? '#9ca3af' : '#6b7280' }}>
-                      Search &apos;{suggestion}&apos;
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 md:w-4 md:h-4">
-              <path d="M12 1C13.1 1 14 1.9 14 3C14 4.1 13.1 5 12 5C10.9 5 10 4.1 10 3C10 1.9 10.9 1 12 1Z" fill={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} />
-              <path d="M19 10V17C19 18.1 18.1 19 17 19H7C5.9 19 5 18.1 5 17V10" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12 11V17" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" />
-              <path d="M8 11V17" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" />
-              <path d="M16 11V17" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <span className="text-neutral-400 font-medium text-sm">Search for products...</span>
           </div>
         </div>
 
         {/* Category Tabs Section */}
         <div className="w-full relative" style={{ paddingTop: '12px', paddingBottom: '24px' }}>
           <div className="px-4 md:px-6 lg:px-8 mb-4">
-            <h2 className="text-lg md:text-xl font-bold text-neutral-900 tracking-tight">
+            <h2 className={`text-lg md:text-xl font-bold tracking-tight font-poppins transition-colors ${scrollProgress > 0.5 ? 'text-white' : 'text-village-umber'}`}>
               Popular Categories
             </h2>
           </div>
           <div
             ref={tabsContainerRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide px-4 md:px-6 lg:px-8 md:justify-center scroll-smooth"
+            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide px-4 md:px-6 lg:px-8 md:justify-center scroll-smooth py-4"
           >
 
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
-              const tabColor = isActive
-                ? 'text-neutral-900'
-                : scrollProgress > 0.5
-                  ? 'text-neutral-600'
-                  : 'text-neutral-800';
-
+              
               return (
                 <button
                   key={tab.id}
@@ -418,17 +468,17 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
                   type="button"
                 >
                   <div
-                    className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 ${isActive
-                      ? 'bg-white shadow-[0_0_0_3px_#111827,0_4px_12px_rgba(0,0,0,0.15)] scale-110 z-20'
+                    className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center overflow-hidden transition-all duration-300 ${isActive
+                      ? 'bg-white shadow-[0_0_0_3px_#8B3D28,0_4px_12px_rgba(139,61,40,0.25)] scale-110 z-20'
                       : 'bg-white shadow-md border border-neutral-100 hover:shadow-lg group-hover:scale-105'
                       }`}
                   >
-                    <div className="w-full h-full transition-all duration-300">
+                    <div className="w-full h-full transition-all duration-300 p-1">
                       {tab.icon}
                     </div>
                   </div>
                   <span
-                    className={`text-[10px] md:text-sm text-center font-bold leading-tight max-w-[80px] transition-all duration-300 ${isActive ? 'text-neutral-900 scale-105' : 'text-neutral-500'
+                    className={`text-[10px] md:text-sm text-center font-bold font-poppins leading-tight max-w-[80px] transition-all duration-300 ${isActive ? 'text-[#8B3D28] scale-105' : 'text-village-umber/70'
                       }`}
                   >
                     {tab.label}

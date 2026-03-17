@@ -89,7 +89,7 @@ export default function CategoryTileSection({
 
   return (
     <div className="mb-6 md:mb-8 mt-0 overflow-visible">
-      <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight">
+      <h2 className="text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins">
         {title}
       </h2>
       <div className="px-4 md:px-6 lg:px-8 overflow-visible">
@@ -148,12 +148,12 @@ export default function CategoryTileSection({
                       handleTileClick(tile);
                     }
                   }}
-                  className={`block bg-white rounded-xl shadow-sm border border-neutral-200 hover:shadow-md transition-shadow h-full ${showProductCount ? "px-2.5" : "px-1.5"
+                  className={`block bg-village-cream organic-radius village-card border-none hover:shadow-md transition-shadow h-full ${showProductCount ? "px-2.5 py-2" : "px-1.5"
                     }`}>
                   {/* Image - Single image for non-bestsellers, 2x2 grid for bestsellers */}
                   <div
-                    className={`w-full rounded-lg overflow-hidden ${showProductCount ? "h-32 md:h-36 mb-2" : "aspect-square"
-                      } ${tile.bgColor || "bg-cyan-50"}`}>
+                    className={`w-full organic-radius overflow-hidden ${showProductCount ? "h-32 md:h-36 mb-2" : "aspect-square"
+                      } ${tile.bgColor || "bg-yellow-50"}`}>
                     {hasImages ? (
                       showProductCount ? (
                         // Bestsellers: 2x2 grid
@@ -215,7 +215,7 @@ export default function CategoryTileSection({
 
                   {/* Tile name - inside card only for bestsellers */}
                   {showProductCount && (
-                    <div className="text-[11px] font-semibold text-neutral-900 line-clamp-2 leading-tight text-center w-full block">
+                    <div className="text-[11px] font-bold text-village-umber line-clamp-2 leading-tight text-center w-full block">
                       {tile.name}
                     </div>
                   )}
@@ -224,7 +224,7 @@ export default function CategoryTileSection({
                 {/* Category name - outside card for non-bestsellers */}
                 {!showProductCount && (
                   <div className="mt-1.5 text-center">
-                    <span className="text-xs font-semibold text-neutral-900 line-clamp-2 leading-tight">
+                    <span className="text-xs font-bold text-village-umber line-clamp-2 leading-tight">
                       {tile.name}
                     </span>
                   </div>

@@ -9,26 +9,25 @@ export default function NextDayBookingCard() {
     <div className="mx-4 mt-6 mb-2">
       <div
         onClick={() => navigate("/tomorrow-veg-booking")}
-        className="relative overflow-hidden rounded-2xl p-4 shadow-sm border cursor-pointer flex items-center justify-between transition-all hover:shadow-md"
+        className="relative overflow-hidden organic-radius p-4 shadow-sm border cursor-pointer flex items-center justify-between transition-all hover:shadow-md village-card border-none"
         style={{
-          background: `linear-gradient(to right, ${theme.secondary[0]}, ${theme.secondary[1]})`,
-          borderColor: theme.secondary[2]
+          background: `linear-gradient(to right, #FFF9F0, #FF993315)`,
         }}
       >
         <div className="z-10 flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span
-              className="text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full tracking-wide"
-              style={{ backgroundColor: theme.accentColor }}
+              className="text-white text-[10px] uppercase font-black px-2 py-0.5 organic-radius tracking-wide"
+              style={{ backgroundColor: '#B22222' }}
             >
-              Early Access
+              Gaon Ka Swad
             </span>
           </div>
           <h3
-            className="text-lg font-bold leading-tight mb-1"
-            style={{ color: theme.textColor }}
+            className="text-lg font-black leading-tight mb-1"
+            style={{ color: '#3E2723' }}
           >
-            Book Tomorrow's <br /> Fresh Vegetables Today 🥕
+            Kal Ki Sabzi <br /> Aaj Hi Book Karein 🥕
           </h3>
           <p
             className="text-xs font-medium mb-3 opacity-90"
@@ -37,10 +36,10 @@ export default function NextDayBookingCard() {
             Guaranteed morning delivery
           </p>
           <button
-            className="text-white text-xs font-semibold px-4 py-2 rounded-full shadow-md transition-all active:scale-95"
-            style={{ backgroundColor: theme.accentColor }}
+            className="text-white text-xs font-bold px-6 py-2 organic-radius shadow-md transition-all active:scale-95"
+            style={{ backgroundColor: '#B22222' }}
           >
-            Book Now
+            Abhi Book Karein
           </button>
         </div>
 

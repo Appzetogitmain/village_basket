@@ -31,6 +31,7 @@ interface ProductCardProps {
   onAdd?: (product: Product) => void;
   onDecrease?: (product: Product) => void;
   onIncrease?: (product: Product) => void;
+  className?: string;
 }
 
 
@@ -51,6 +52,7 @@ export default function ProductCard({
   onAdd,
   onDecrease,
   onIncrease,
+  className = '',
 }: ProductCardProps) {
   const navigate = useNavigate();
   const { cart, addToCart, updateQuantity } = useCart();
@@ -273,31 +275,29 @@ export default function ProductCard({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ duration: 0.2 }}
-      className={`${categoryStyle ? 'bg-green-50' : 'bg-white'} rounded-lg shadow-sm overflow-hidden flex flex-col relative`}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.3 }}
+      className={`village-card paper-texture organic-radius overflow-hidden flex flex-col h-full relative ${className}`}
     >
-      <div
+      <div 
         onClick={handleCardClick}
-        className="cursor-pointer flex-1 flex flex-col"
+        className="cursor-pointer relative z-10"
       >
-        <div className={`w-full ${compact ? 'h-32 md:h-40' : categoryStyle ? 'h-28 md:h-36' : 'h-40 md:h-48'} bg-neutral-100 flex items-center justify-center overflow-hidden relative`}>
+        <div className={`organic-image-container w-full ${compact ? 'h-24 md:h-32' : 'h-32 md:h-44'} flex items-center justify-center overflow-hidden relative border-b border-neutral-100 bg-white rounded-t-[20px]`}>
           {product.imageUrl || product.mainImage ? (
             <img
               ref={imageRef}
               src={product.imageUrl || product.mainImage}
               alt={product.name || product.productName || 'Product'}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
               referrerPolicy="no-referrer"
               onError={(e) => {
-                // Hide broken image and show fallback
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
                 const parent = target.parentElement;
                 if (parent && !parent.querySelector('.fallback-icon')) {
                   const fallback = document.createElement('div');
-                  fallback.className = 'w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-4xl fallback-icon';
+                  fallback.className = 'w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-2xl fallback-icon';
                   fallback.textContent = (product.name || product.productName || '?').charAt(0).toUpperCase();
                   parent.appendChild(fallback);
                 }
@@ -309,325 +309,125 @@ export default function ProductCard({
             </div>
           )}
 
-          {categoryStyle && showBadge && discount > 0 && (
-            <div className="absolute top-2 left-2 z-10 bg-green-600 text-white text-[10px] font-semibold px-2 py-0.5 rounded">
-              {discount}% off
+          {/* Discount Badge - Top Left */}
+          {discount > 0 && (
+            <div className="absolute top-1.5 left-1.5 z-20 bg-[#E53935] text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg transform -rotate-3 border border-white/20">
+              {discount}% OFF
             </div>
           )}
 
-          {!categoryStyle && showBadge && (badgeText || discount > 0) && (
-            <Badge
-              variant="destructive"
-              className="absolute top-2 left-2 z-10 text-xs px-2 py-1"
+          {/* Heart Button - Top Right */}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleWishlist(e);
+            }}
+            className="absolute top-1.5 right-1.5 z-20 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all shadow-sm border border-neutral-100"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill={isWishlisted ? "#E53935" : "none"}
+              className={isWishlisted ? "text-red-500" : "text-neutral-400"}
+              xmlns="http://www.w3.org/2000/svg"
             >
-              {badgeText || `${discount}% OFF`}
-            </Badge>
-          )}
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
 
-          {showPackBadge && (
-            <Badge
-              variant="outline"
-              className="absolute top-2 right-2 z-10 text-xs px-2 py-1 font-medium"
-            >
-              {(() => {
+          {/* Rating Badge on Image - Bottom Right */}
+          <div className="absolute bottom-1.5 right-1.5 z-20">
+            <div className="premium-pill px-2 py-0.5 rounded-lg flex items-center gap-1 border border-neutral-100">
+              <span className="text-xs font-black text-neutral-800">{(product.rating || 4.5).toFixed(1)}</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="#F59E0B">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Product Information */}
+      <div 
+        onClick={handleCardClick}
+        className="px-2 pb-1.5 flex-1 flex flex-col cursor-pointer z-10"
+      >
+        <h3 className="text-[13px] md:text-[15px] font-bold text-village-umber line-clamp-1 leading-tight mb-0.5 font-poppins">
+          {product.name || product.productName || ''}
+        </h3>
+
+        <div className="mb-0.5">
+          <span className="text-[10px] md:text-[11px] font-medium text-neutral-400 tracking-wide font-nunito block">
+            Rs {displayPrice}/{(() => {
                 const v = product.variations?.[0];
                 if (!v) return (product.pack || 'Standard').trim();
                 const vName = (v.name || '').trim();
                 const isPlaceholder = !vName || vName.toLowerCase() === 'variation' || vName.toLowerCase() === 'standard';
                 return (isPlaceholder ? (v.value || v.title || vName) : vName).trim() || (product.pack || 'Standard').trim();
               })()}
-            </Badge>
-          )}
-
-          {showHeartIcon && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleWishlist(e);
-              }}
-              className="absolute top-2 right-2 z-30 w-9 h-9 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all shadow-md group/heart"
-              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill={isWishlisted ? "#ef4444" : "none"}
-                xmlns="http://www.w3.org/2000/svg"
-                className={`transition-colors ${isWishlisted ? "text-red-500" : "text-neutral-400 group-hover/heart:text-red-400"}`}
-              >
-                <path
-                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          )}
-
-          {(product.variations?.length || 0) >= 2 && (
-            <div className="absolute bottom-2 left-2 z-10">
-              <span className="text-[10px] font-bold text-neutral-700 bg-white/95 backdrop-blur-sm px-2 py-1 rounded shadow-sm border border-neutral-200">
-                {product.variations?.length} Options
-              </span>
-            </div>
-          )}
+          </span>
         </div>
 
-        {categoryStyle && (
-          <div className="px-2.5 pt-1.5 pb-0">
-            {currentQty === 0 ? (
-              <div className="flex flex-col items-center w-full">
-                <div className="flex justify-center w-full">
-                  <Button
-                    ref={addButtonRef}
-                    variant="outline"
-                    size="sm"
-                    disabled={product.isAvailable === false}
-                    onClick={handleCustomAdd}
-                    className={`w-full border rounded-full font-semibold text-xs h-7 px-3 flex items-center justify-center uppercase tracking-wide ${product.isAvailable === false
-                      ? 'border-neutral-300 text-neutral-400 bg-neutral-50 cursor-not-allowed'
-                      : 'border-green-600 text-green-600 bg-transparent hover:bg-green-50'
-                      }`}
-                  >
-                    {product.isAvailable === false ? 'Out of Range' : 'ADD'}
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-1.5 bg-white border border-green-600 rounded-full px-1.5 py-0.5 h-7 w-full">
-                <Button
-                  variant="default"
-                  size="icon"
-                  onClick={handleCustomDecrease}
-                  className="w-5 h-5 p-0 bg-transparent text-green-600 hover:bg-green-50 shadow-none"
-                  aria-label="Decrease quantity"
-                >
-                  −
-                </Button>
-                <span className="text-xs font-bold text-green-600 min-w-[1rem] text-center">
-                  {currentQty}
-                </span>
-                <Button
-                  variant="default"
-                  size="icon"
-                  disabled={product.isAvailable === false}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleIncrease(e);
-                  }}
-                  className={`w-5 h-5 p-0 bg-transparent text-green-600 shadow-none ${product.isAvailable === false ? 'text-neutral-300 cursor-not-allowed' : 'hover:bg-green-50'
-                    }`}
-                  aria-label="Increase quantity"
-                >
-                  +
-                </Button>
-              </div>
-            )}
+        <div className="flex flex-col mt-auto">
+          <div className="flex items-baseline gap-1 font-nunito">
+            <span className="text-base md:text-xl font-bold text-village-umber">Rs {displayPrice}</span>
           </div>
-        )}
-
-        <div className={`${compact ? 'p-3 md:p-4' : categoryStyle ? 'px-2.5 md:px-3 pt-1.5 md:pt-2 pb-2 md:pb-3' : 'p-4 md:p-5'} flex-1 flex flex-col`}>
-          {categoryStyle ? (
-            // Category Style Layout: Quantity, Name, Time, % off, Price
-            <>
-              {/* 1. Variations/Quantity */}
-              {product.variations && product.variations.length > 0 ? (
-                <div className="flex flex-wrap gap-1 mb-1">
-                  {product.variations.map((v: any, i: number) => {
-                    const vName = (v.name || '').trim();
-                    const isPlaceholder = !vName || vName.toLowerCase() === 'variation' || vName.toLowerCase() === 'standard';
-                    const label = (isPlaceholder ? (v.value || v.title || vName) : vName).trim() || 'Standard';
-                    return (
-                      <span
-                        key={i}
-                        className={`inline-block ${getVariationColor(label)} text-[7px] font-bold px-1 py-0.5 rounded border leading-tight uppercase`}
-                      >
-                        {label}
-                      </span>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="mb-0.5">
-                  <span className="inline-block bg-neutral-100 text-neutral-600 text-[8px] font-bold px-1.5 py-0.5 rounded border border-neutral-200 leading-tight uppercase">
-                    {(product.pack || '').trim() || '1 unit'}
-                  </span>
-                </div>
-              )}
-
-              {/* 2. Name */}
-              <h3 className="text-[10px] font-bold text-neutral-900 mb-0.5 line-clamp-2 leading-tight min-h-[1.75rem] max-h-[1.75rem] overflow-hidden">
-                {product.name || product.productName || ''}
-              </h3>
-
-              {/* 2.5. Rating */}
-              <div className="mb-0.5">
-                <StarRating
-                  rating={(product.rating || (product as any).rating) || 0}
-                  reviewCount={(product.reviews || (product as any).reviewsCount) || 0}
-                  size="sm"
-                  showCount={true}
-                />
-              </div>
-
-              {/* 3. Time */}
-              <p className="text-[9px] text-neutral-600 mb-0.5 flex items-center gap-0.5 leading-tight">
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                  <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                <span>14 MINS</span>
-              </p>
-
-              {/* 4. % OFF */}
-              {discount > 0 && (
-                <p className="text-[9px] font-semibold text-green-600 mb-0.5 leading-tight">
-                  {discount}% OFF
-                </p>
-              )}
-
-              {/* 5. Price with discount */}
-              <div className="mt-auto">
-                <div className="flex items-baseline gap-1 flex-wrap">
-                  <span className="text-[11px] font-bold text-neutral-900 leading-tight">
-                    ₹{displayPrice.toLocaleString('en-IN')}
-                  </span>
-                  {mrp && mrp > displayPrice && (
-                    <span className="text-[8px] text-neutral-500 line-through leading-tight">
-                      ₹{mrp.toLocaleString('en-IN')}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </>
-          ) : (
-            // Non-category style layout (original)
-            <>
-              {product.variations && product.variations.length > 0 ? (
-                <div className={`flex flex-wrap gap-1.5 ${compact ? 'mb-1' : 'mb-2'}`}>
-                  {product.variations.map((v: any, i: number) => {
-                    const vName = (v.name || '').trim();
-                    const isPlaceholder = !vName || vName.toLowerCase() === 'variation' || vName.toLowerCase() === 'standard';
-                    const label = (isPlaceholder ? (v.value || v.title || vName) : vName).trim() || '1 Unit';
-                    return (
-                      <span
-                        key={i}
-                        className={`inline-block ${getVariationColor(label)} text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded border leading-tight uppercase`}
-                      >
-                        {label}
-                      </span>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className={`${compact ? 'mb-0.5' : 'mb-1'}`}>
-                  <span className="inline-block bg-neutral-50 text-neutral-500 text-[10px] md:text-xs px-1.5 py-0.5 rounded border border-neutral-100 font-medium leading-tight">
-                    {(product.pack || '').trim() || '1 Unit'}
-                  </span>
-                </div>
-              )}
-
-              <h3 className={`${compact ? 'text-xs md:text-sm' : 'text-sm md:text-base'} font-semibold text-neutral-900 ${compact ? 'mb-1' : 'mb-2'} line-clamp-2 ${compact ? 'min-h-[2rem]' : 'min-h-[2.5rem]'}`}>
-                {product.name || product.productName || ''}
-              </h3>
-
-              {/* Always show rating */}
-              <div className={`${compact ? 'mb-1' : 'mb-2'}`}>
-                <StarRating
-                  rating={(product.rating || (product as any).rating) || 0}
-                  reviewCount={(product.reviews || (product as any).reviewsCount) || 0}
-                  size={compact ? 'sm' : 'md'}
-                  showCount={true}
-                />
-              </div>
-
-              {showStockInfo && (
-                <p className="text-xs text-green-600 mb-2 font-medium">
-                  Fast delivery
-                </p>
-              )}
-
-              {showVegetarianIcon && (
-                <div className="flex items-center gap-1 mb-2">
-                  <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  </div>
-                  <span className="text-xs text-neutral-600">Vegetarian</span>
-                </div>
-              )}
-
-              <div className="mt-auto mb-2">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-base font-bold text-neutral-900">
-                    ₹{displayPrice}
-                  </span>
-                  {mrp && mrp > displayPrice && (
-                    <span className="text-xs text-neutral-500 line-through">
-                      ₹{mrp}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </>
+          {mrp && mrp > displayPrice && (
+            <span className="text-[9px] md:text-[11px] text-neutral-400 line-through -mt-0.5">
+              ₹{mrp}
+            </span>
           )}
         </div>
       </div>
 
-      {!categoryStyle && (
-        <div className={`${compact ? 'px-3 pb-3' : 'px-4 pb-4'}`}>
-          <div className="mt-auto">
-            {currentQty === 0 ? (
-              <div>
-                <Button
-                  ref={addButtonRef}
-                  variant="outline"
-                  size="sm"
-                  disabled={product.isAvailable === false}
-                  onClick={handleCustomAdd}
-                  className={`w-full border h-8 text-xs font-semibold uppercase tracking-wide ${product.isAvailable === false
-                    ? 'border-neutral-300 text-neutral-400 bg-neutral-50 cursor-not-allowed'
-                    : 'border-green-600 text-green-600 hover:bg-green-50'
-                    }`}
-                >
-                  {product.isAvailable === false ? 'Out of Range' : 'Add'}
-                </Button>
-                <div className="h-4 mt-1">
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-2 bg-white border border-green-600 rounded-full px-2 py-0.5 h-8">
-                <Button
-                  variant="default"
-                  size="icon"
-                  onClick={handleCustomDecrease}
-                  className="w-6 h-6 p-0 bg-transparent text-green-600 hover:bg-green-50 shadow-none"
-                  aria-label="Decrease quantity"
-                >
-                  −
-                </Button>
-                <span className="text-xs font-bold text-green-600 min-w-[1.5rem] text-center">
-                  {currentQty}
-                </span>
-                <Button
-                  variant="default"
-                  size="icon"
-                  disabled={product.isAvailable === false}
-                  onClick={handleIncrease}
-                  className={`w-6 h-6 p-0 bg-transparent text-green-600 shadow-none ${product.isAvailable === false ? 'text-neutral-300 cursor-not-allowed' : 'hover:bg-green-50'
-                    }`}
-                  aria-label="Increase quantity"
-                >
-                  +
-                </Button>
-              </div>
-            )}
+      {/* Action Button Section */}
+      <div className="px-2 pb-2 relative z-20">
+        {inCartQty === 0 ? (
+          <button
+            ref={addButtonRef}
+            disabled={product.isAvailable === false}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (product.variations && product.variations.length > 1) {
+                setIsVariationModalOpen(true);
+              } else {
+                handleAdd(e); // Use handleAdd from existing logic
+              }
+            }}
+            className={`w-full h-8 md:h-10 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-md md:shadow-lg transition-all active:scale-95 flex items-center justify-center font-poppins ${product.isAvailable === false
+                ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed shadow-none'
+                : 'bg-gradient-to-r from-orange-400 to-orange-500 text-white hover:from-orange-500 hover:to-orange-600 border border-orange-300/30'
+              }`}
+          >
+            {product.isAvailable === false ? 'Out of Range' : 'Add'}
+          </button>
+        ) : (
+          <div className="flex items-center justify-between bg-orange-50 px-1 py-0.5 rounded-full border border-orange-200 h-8 md:h-10 shadow-inner">
+            <button
+              onClick={handleCustomDecrease}
+              className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white text-orange-600 flex items-center justify-center font-bold text-lg hover:shadow-sm active:scale-90 transition-all"
+            >
+              −
+            </button>
+            <span className="text-xs md:text-sm font-black text-village-umber">{currentQty}</span>
+            <button
+              onClick={handleIncrease}
+              className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white text-orange-600 flex items-center justify-center font-bold text-lg hover:shadow-sm active:scale-90 transition-all"
+            >
+              +
+            </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <VariationSelectionModal
         product={product}

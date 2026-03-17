@@ -26,10 +26,20 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#34d399', // Emerald-400 (True Mint)
-          dark: '#10b981',    // Emerald-500
+          DEFAULT: '#A54B31', // Authentic Terracotta Red
+          dark: '#8B0000',
         },
-        cream: '#FFF7E0',
+        'village-red': '#A54B31',
+        'village-orange': '#FF9933',
+        'village-green': '#2E7D32',
+        'village-cream': '#FFF9F0',
+        'village-umber': '#3E2723',
+        'village-mustard': '#E1AD01',
+        cream: '#FFF9F0',
+      },
+      fontFamily: {
+        outfit: ['Outfit', 'sans-serif'],
+        nunito: ['Nunito', 'sans-serif'],
       },
     },
   },

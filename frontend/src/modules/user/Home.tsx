@@ -251,7 +251,7 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-white min-h-screen pb-20 md:pb-0" ref={contentRef}>
+    <div className="bg-transparent min-h-screen pb-20 md:pb-0 font-poppins" ref={contentRef}>
       {/* Hero Header with Gradient and Tabs */}
       <HomeHero activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -269,8 +269,7 @@ export default function Home() {
 
       {/* Main content */}
       <div
-        className="-mt-2 pt-1 space-y-5 md:space-y-8 md:pt-4"
-        style={{ backgroundColor: `${theme.secondary[0]}44` }} // 0x44 is ~27% opacity
+        className="pt-1 space-y-5 md:space-y-8 md:pt-4"
       >
 
         {/* Featured This Week Section */}
@@ -297,7 +296,7 @@ export default function Home() {
                 return (
                   <div key={section.id} className="mt-6 mb-6 md:mt-8 md:mb-8">
                     {section.title && (
-                      <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight capitalize">
+                      <h2 className="text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins capitalize">
                         {section.title}
                       </h2>
                     )}
@@ -336,18 +335,18 @@ export default function Home() {
         {/* Bestsellers Section (Dynamic) */}
         {homeData.bestsellers && homeData.bestsellers.length > 0 && (
           <div className="mt-6 mb-6 md:mt-8 md:mb-8">
-            <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight">
+            <h2 className="text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins">
               Bestsellers
             </h2>
             <div className="px-4 md:px-6 lg:px-8">
               <div
-                className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2"
+                className="flex items-stretch gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2"
                 style={{ scrollSnapType: 'x mandatory' }}
               >
                 {homeData.bestsellers.map((product: any) => (
                   <div
                     key={product.id || product._id}
-                    className="flex-shrink-0 w-[140px] md:w-[180px]"
+                    className="flex-shrink-0 w-[130px] md:w-[180px]"
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <ProductCard

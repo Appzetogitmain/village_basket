@@ -23,7 +23,7 @@ export default function Cart() {
         <h2 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2">Your cart is empty</h2>
         <p className="text-neutral-600 mb-6 md:mb-8 md:text-lg">Add some items to get started!</p>
         <Link to="/">
-          <Button variant="default" size="lg" className="md:px-8 md:py-3 md:text-lg">
+          <Button variant="default" size="lg" className="md:px-8 md:py-3 md:text-lg bg-[#8B3D28] hover:bg-[#722F1E] font-black font-poppins uppercase tracking-widest">
             Start Shopping
           </Button>
         </Link>
@@ -34,19 +34,19 @@ export default function Cart() {
   return (
     <div className="pb-4 md:pb-8">
       {/* Header */}
-      <div className="px-4 md:px-6 lg:px-8 py-4 md:py-6 bg-white border-b border-neutral-200 mb-4 md:mb-6 sticky top-0 z-10">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-xl md:text-2xl font-bold text-neutral-900">Your Basket</h1>
+      <div className="px-4 md:px-6 lg:px-8 py-5 bg-[#8B3D28] border-b border-white/10 mb-4 md:mb-6 sticky top-0 z-10 shadow-lg">
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="text-xl md:text-2xl font-bold text-white font-poppins">Your Basket</h1>
           {cart.items.length > 0 && (
             <button
               onClick={clearCart}
-              className="text-sm md:text-base text-red-600 font-medium hover:text-red-700 transition-colors"
+              className="text-sm md:text-base text-white/80 font-bold hover:text-white transition-colors bg-white/10 px-3 py-1 rounded-full"
             >
               Clear All
             </button>
           )}
         </div>
-        <p className="text-xs md:text-sm text-neutral-600">Delivered in {appConfig.estimatedDeliveryTime}</p>
+        <p className="text-[10px] md:text-xs text-white/70 uppercase tracking-widest font-black">Delivered in {appConfig.estimatedDeliveryTime}</p>
       </div>
 
       {/* Cart Items */}
@@ -105,18 +105,18 @@ export default function Cart() {
                       variant="outline"
                       size="icon"
                       onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.variant)}
-                      className="w-8 h-8 md:w-10 md:h-10 p-0 border-neutral-300 text-neutral-600 hover:border-green-600 hover:text-green-600 md:text-lg"
+                      className="w-8 h-8 md:w-10 md:h-10 p-0 border-[#8B3D28]/30 text-[#8B3D28] hover:border-[#8B3D28] hover:bg-[#8B3D28]/5 md:text-lg font-black"
                     >
                       −
                     </Button>
-                    <span className="text-base md:text-lg font-semibold text-neutral-900 min-w-[2rem] md:min-w-[2.5rem] text-center">
+                    <span className="text-base md:text-lg font-black text-[#8B3D28] min-w-[2rem] md:min-w-[2.5rem] text-center font-poppins">
                       {item.quantity}
                     </span>
                     <Button
                       variant="outline"
                       size="icon"
                       onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.variant)}
-                      className="w-8 h-8 md:w-10 md:h-10 p-0 border-neutral-300 text-neutral-600 hover:border-green-600 hover:text-green-600 md:text-lg"
+                      className="w-8 h-8 md:w-10 md:h-10 p-0 border-[#8B3D28]/30 text-[#8B3D28] hover:border-[#8B3D28] hover:bg-[#8B3D28]/5 md:text-lg font-black"
                     >
                       +
                     </Button>
@@ -157,12 +157,12 @@ export default function Cart() {
             </div>
             <div className="flex justify-between text-neutral-700 md:text-base">
               <span>Delivery Charges</span>
-              <span className={`font-medium ${deliveryFee === 0 ? 'text-green-600' : ''}`}>
-                {deliveryFee === 0 ? 'Free' : `₹${deliveryFee.toLocaleString('en-IN')}`}
+              <span className={`font-black font-poppins ${deliveryFee === 0 ? 'text-[#8B3D28]' : ''}`}>
+                {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toLocaleString('en-IN')}`}
               </span>
             </div>
             {cart.total < appConfig.freeDeliveryThreshold && (
-              <div className="text-xs md:text-sm text-green-600 bg-green-50 px-2 py-1 rounded">
+              <div className="text-xs md:text-sm text-[#8B3D28] bg-[#8B3D28]/5 px-2 py-1.5 rounded font-bold font-poppins border border-[#8B3D28]/10">
                 Add ₹{(appConfig.freeDeliveryThreshold - cart.total).toLocaleString('en-IN')} more for free delivery
               </div>
             )}
@@ -178,7 +178,7 @@ export default function Cart() {
               variant="default"
               size="lg"
               onClick={handleCheckout}
-              className="w-full md:py-3 md:text-lg"
+              className="w-full md:py-3 md:text-lg bg-[#8B3D28] hover:bg-[#722F1E] font-black font-poppins uppercase tracking-widest py-4 mt-2"
             >
               Proceed to Checkout
             </Button>

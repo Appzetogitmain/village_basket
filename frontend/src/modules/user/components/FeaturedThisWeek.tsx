@@ -89,13 +89,13 @@ export default function FeaturedThisWeek() {
       <div className="px-4">
         <div className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-4 px-4 scroll-smooth">
           <div className="flex-shrink-0 w-[110px]">
-            <div className="bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-50 border-2 border-yellow-300 rounded-2xl overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-gradient-to-br from-village-cream via-orange-100 to-village-cream border-2 border-village-orange organic-radius overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow">
               <div className="absolute top-0 left-0 right-0 z-20">
                 <div className="bg-gradient-to-r from-red-600 via-orange-500 to-red-600 rounded-b-3xl px-3 py-2 text-center shadow-lg relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
                   <div className="text-white text-[9px] font-black uppercase leading-tight tracking-wider relative z-10">
-                    <div>NEWLY</div>
-                    <div>LAUNCHED</div>
+                    <div>NAYA</div>
+                    <div>MAAL</div>
                   </div>
                 </div>
               </div>
@@ -135,7 +135,7 @@ export default function FeaturedThisWeek() {
           <div className="flex-shrink-0 w-[110px]">
             <Link
               to="/category/snacks"
-              className="block bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 border-2 border-blue-400 rounded-2xl overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow group"
+              className="block bg-gradient-to-br from-village-umber via-village-umber/90 to-village-umber border-2 border-village-orange organic-radius overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow group"
             >
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_white_1px,_transparent_1px)] bg-[length:20px_20px]"></div>
@@ -150,22 +150,22 @@ export default function FeaturedThisWeek() {
               <div className="flex items-center justify-center h-full px-2 relative z-10">
                 <div className="text-center">
                   <div
-                    className="text-yellow-400 text-3xl font-black mb-0.5 transform group-hover:scale-105 transition-transform"
+                    className="text-village-orange text-3xl font-black mb-0.5 transform group-hover:scale-105 transition-transform"
                     style={{
-                      textShadow: '2px 2px 0px #1e3a8a, 3px 3px 6px rgba(0,0,0,0.3)',
+                      textShadow: '2px 2px 0px #3E2723, 3px 3px 6px rgba(0,0,0,0.3)',
                       letterSpacing: '2px'
                     }}
                   >
-                    PRICE
+                    DAAM
                   </div>
                   <div
-                    className="text-red-400 text-3xl font-black transform group-hover:scale-105 transition-transform"
+                    className="text-village-cream text-3xl font-black transform group-hover:scale-105 transition-transform"
                     style={{
-                      textShadow: '2px 2px 0px #1e3a8a, 3px 3px 6px rgba(0,0,0,0.3)',
+                      textShadow: '2px 2px 0px #3E2723, 3px 3px 6px rgba(0,0,0,0.3)',
                       letterSpacing: '2px'
                     }}
                   >
-                    DROP
+                    KAM
                   </div>
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function FeaturedThisWeek() {
           <div className="flex-shrink-0 w-[110px]">
             <Link
               to="/category/biscuits-bakery"
-              className="block bg-gradient-to-br from-red-900 via-red-800 to-red-900 border-2 border-white/30 rounded-2xl overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow group"
+              className="block bg-gradient-to-br from-village-red via-village-red/90 to-village-red border-2 border-village-orange/30 organic-radius overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow group"
             >
               <div className="absolute inset-0 opacity-5">
                 <div className="absolute inset-0 bg-[linear-gradient(45deg,_transparent_25%,_white_25%,_white_50%,_transparent_50%,_transparent_75%,_white_75%,_white)] bg-[length:20px_20px]"></div>
@@ -203,7 +203,7 @@ export default function FeaturedThisWeek() {
           <div className="flex-shrink-0 w-[110px]">
             <Link
               to="/category/fruits-veg"
-              className="block bg-gradient-to-br from-green-600 via-green-500 to-green-600 border-2 border-green-400 rounded-2xl overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow group"
+              className="block bg-gradient-to-br from-village-green via-village-green/90 to-village-green border-2 border-village-cream/50 organic-radius overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow group"
             >
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_white_2px,_transparent_2px)] bg-[length:30px_30px]"></div>

@@ -226,7 +226,7 @@ export default function ProductDetail() {
         <p className="text-gray-600 mb-6 max-w-xs">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-6 py-2 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-colors"
+          className="px-6 py-2 bg-[#8B3D28] text-white rounded-full font-black font-poppins hover:bg-[#722F1E] transition-colors"
         >
           Try Refreshing
         </button>
@@ -512,7 +512,7 @@ export default function ProductDetail() {
                       setTimeout(() => setIsTransitioning(false), 300);
                     }}
                     className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${index === selectedImageIndex
-                      ? "border-green-600 ring-2 ring-green-200"
+                      ? "border-[#8B3D28] ring-2 ring-[#8B3D28]/20"
                       : "border-neutral-200 hover:border-neutral-300"
                       }`}>
                     <img
@@ -581,14 +581,14 @@ export default function ProductDetail() {
                       key={index}
                       onClick={() => setSelectedVariantIndex(index)}
                       disabled={isOutOfStock}
-                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border-2 flex flex-col items-center gap-0.5 min-w-[70px] ${isSelected
-                        ? "border-green-600 bg-green-50 text-green-700 shadow-sm ring-1 ring-green-600/20"
+                      className={`px-3 py-2 rounded-xl text-sm font-black transition-all border-2 flex flex-col items-center gap-0.5 min-w-[70px] font-poppins ${isSelected
+                        ? "border-[#8B3D28] bg-[#8B3D28]/5 text-[#8B3D28] shadow-sm ring-1 ring-[#8B3D28]/20"
                         : isOutOfStock
                           ? "border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed"
-                          : "border-neutral-200 bg-white text-neutral-600 hover:border-green-300 hover:bg-green-50/30"
+                          : "border-neutral-200 bg-white text-neutral-600 hover:border-[#8B3D28]/30 hover:bg-[#8B3D28]/5"
                         }`}>
                       <span className="whitespace-nowrap">{variantTitle}</span>
-                      <span className={`text-[10px] font-bold ${isSelected ? "text-green-600" : "text-neutral-500"}`}>
+                      <span className={`text-[10px] font-black ${isSelected ? "text-[#8B3D28]" : "text-neutral-500"}`}>
                         ₹{calculateProductPrice(product, index).displayPrice}
                       </span>
                       {isOutOfStock && (
@@ -640,7 +640,7 @@ export default function ProductDetail() {
             onClick={() =>
               setIsProductDetailsExpanded(!isProductDetailsExpanded)
             }
-            className="flex items-center gap-0.5 text-sm text-green-600 font-medium">
+            className="flex items-center gap-0.5 text-sm text-[#8B3D28] font-black font-poppins">
             View product details
             <svg
               width="11"

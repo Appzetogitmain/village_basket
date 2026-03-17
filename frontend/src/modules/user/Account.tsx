@@ -80,8 +80,8 @@ export default function Account() {
   // Show login/signup prompt for unregistered users
   if (!user) {
     return (
-      <div className="pb-24 md:pb-8 bg-white min-h-screen">
-        <div className="bg-gradient-to-b from-green-200 via-green-100 to-white pb-6 md:pb-8 pt-12 md:pt-16">
+      <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
+        <div className="bg-gradient-to-b from-green-200/50 via-green-100/30 to-transparent pb-6 md:pb-8 pt-12 md:pt-16">
           <div className="px-4 md:px-6 lg:px-8">
             <button onClick={() => navigate(-1)} className="mb-4 text-neutral-900" aria-label="Back">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -144,11 +144,11 @@ export default function Account() {
   const displayDateOfBirth = profile?.dateOfBirth;
 
   return (
-    <div className="pb-24 md:pb-8 bg-white min-h-screen">
-      <div className="bg-gradient-to-b from-green-200 via-green-100 to-white pb-6 md:pb-8 pt-12 md:pt-16">
-        <div className="px-4 md:px-6 lg:px-8">
-          <button onClick={() => navigate(-1)} className="mb-4 text-neutral-900" aria-label="Back">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+    <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
+      <div className="bg-gradient-to-b from-[#8B3D28] to-[#8B3D28]/80 pb-6 md:pb-8 pt-12 md:pt-16 shadow-lg border-b border-white/10">
+        <div className="px-4 md:px-6 lg:px-8 text-white">
+          <button onClick={() => navigate(-1)} className="mb-4 text-white hover:bg-white/10 p-2 rounded-full transition-colors" aria-label="Back">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
           <div className="flex flex-col items-center mb-4 md:mb-6">
             <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-neutral-200 flex items-center justify-center mb-3 md:mb-4 border-2 border-white shadow-sm">

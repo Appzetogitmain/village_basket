@@ -231,7 +231,7 @@ const AnimatedCheckmark = ({ delay = 0 }) => (
       cy="40"
       r="36"
       fill="none"
-      stroke="#22c55e"
+      stroke="#8B3D28"
       strokeWidth="4"
       initial={{ pathLength: 0, opacity: 0 }}
       animate={{ pathLength: 1, opacity: 1 }}
@@ -240,7 +240,7 @@ const AnimatedCheckmark = ({ delay = 0 }) => (
     <motion.path
       d="M24 40 L35 51 L56 30"
       fill="none"
-      stroke="#22c55e"
+      stroke="#8B3D28"
       strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -315,7 +315,7 @@ const PromoCarousel = () => {
               <p className="text-xs text-gray-600 mt-1">
                 {promos[currentSlide].subtext}
               </p>
-              <button className="text-green-700 font-medium text-sm mt-2 flex items-center gap-1">
+              <button className="text-[#8B3D28] font-black text-sm mt-2 flex items-center gap-1 font-poppins">
                 Apply now <ChevronRightIcon className="w-4 h-4" />
               </button>
             </div>
@@ -332,7 +332,7 @@ const PromoCarousel = () => {
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-green-600 w-4" : "bg-gray-300"
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-[#8B3D28] w-4" : "bg-gray-300"
               }`}
           />
         ))}
@@ -365,8 +365,8 @@ const TipSection = () => {
               setSelectedTip(tip);
               setCustomTip("");
             }}
-            className={`flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all ${selectedTip === tip
-              ? "border-green-600 bg-green-50 text-green-700"
+            className={`flex-1 py-2 px-3 rounded-lg border-2 text-sm font-black transition-all font-poppins ${selectedTip === tip
+              ? "border-[#8B3D28] bg-[#8B3D28]/5 text-[#8B3D28]"
               : "border-gray-200 text-gray-700 hover:border-gray-300"
               }`}
             whileTap={{ scale: 0.95 }}>
@@ -377,8 +377,8 @@ const TipSection = () => {
           onClick={() => {
             setSelectedTip("other");
           }}
-          className={`flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all ${selectedTip === "other"
-            ? "border-green-600 bg-green-50 text-green-700"
+          className={`flex-1 py-2 px-3 rounded-lg border-2 text-sm font-black transition-all font-poppins ${selectedTip === "other"
+            ? "border-[#8B3D28] bg-[#8B3D28]/5 text-[#8B3D28]"
             : "border-gray-200 text-gray-700 hover:border-gray-300"
             }`}
           whileTap={{ scale: 0.95 }}>
@@ -398,7 +398,7 @@ const TipSection = () => {
               placeholder="Enter custom amount"
               value={customTip}
               onChange={(e) => setCustomTip(e.target.value)}
-              className="mt-3 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="mt-3 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
             />
           </motion.div>
         )}
@@ -702,8 +702,8 @@ export default function OrderDetail() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-          <p className="text-sm text-neutral-500">Loading order details...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B3D28]"></div>
+          <p className="text-sm font-bold text-neutral-500 font-poppins">Loading order details...</p>
         </div>
       </div>
     );
@@ -731,22 +731,22 @@ export default function OrderDetail() {
     Received: {
       title: "Order received",
       subtitle: "Order will reach you shortly",
-      color: "bg-green-700",
+      color: "bg-[#8B3D28]",
     },
     Accepted: {
       title: "Preparing your order",
       subtitle: `Arriving in ${estimatedTime} mins`,
-      color: "bg-green-700",
+      color: "bg-[#8B3D28]",
     },
     "On the way": {
       title: "Order picked up",
       subtitle: `Arriving in ${estimatedTime} mins`,
-      color: "bg-green-700",
+      color: "bg-[#8B3D28]",
     },
     Delivered: {
       title: "Order delivered",
       subtitle: "Enjoy your meal!",
-      color: "bg-green-600",
+      color: "bg-[#8B3D28]",
     },
     // Backend status mappings
     Pending: {
@@ -757,7 +757,7 @@ export default function OrderDetail() {
     Processed: {
       title: "Order processed",
       subtitle: "Preparing for delivery",
-      color: "bg-green-700",
+      color: "bg-[#8B3D28]",
     },
     Shipped: {
       title: "Order shipped",
@@ -767,7 +767,7 @@ export default function OrderDetail() {
     "Out for Delivery": {
       title: "Out for delivery",
       subtitle: `Arriving in ${estimatedTime} mins`,
-      color: "bg-green-700",
+      color: "bg-[#8B3D28]",
     },
     Cancelled: {
       title: "Order cancelled",

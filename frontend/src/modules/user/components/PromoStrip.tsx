@@ -568,10 +568,11 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
     <div
       className="relative"
       style={{
-        background: `linear-gradient(to bottom, ${theme.primary[0]}, ${theme.primary[1]}, ${theme.primary[2]}, ${theme.primary[3]}, ${theme.primary[3]})`,
-        paddingTop: "12px",
-        paddingBottom: "0px",
+        background: `linear-gradient(to bottom, #F97316, #EA580C, #C2410C)`,
+        paddingTop: "16px",
+        paddingBottom: "20px",
         marginTop: 0,
+        marginBottom: 0
       }}>
       {/* HOUSEFULL SALE Banner */}
       <div
@@ -652,8 +653,8 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
               className="flex-shrink-0">
               <path
                 d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
-                fill="#FFD700"
-                stroke="#FFA500"
+                fill="#B22222"
+                stroke="#3E2723"
                 strokeWidth="0.5"
               />
             </svg>
@@ -694,8 +695,8 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
               style={{ transform: "scaleX(-1)" }}>
               <path
                 d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
-                fill="#FFD700"
-                stroke="#FFA500"
+                fill="#B22222"
+                stroke="#3E2723"
                 strokeWidth="0.5"
               />
             </svg>
@@ -741,26 +742,28 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
       <div className="px-4 mt-2">
         <div ref={containerRef} className="flex gap-2">
           {/* Crazy Deals Section - Left */}
-          <div className="flex-shrink-0 w-[100px] promo-card">
+          <div className="flex-shrink-0 w-[110px] promo-card h-full">
             <div
-              className="h-full rounded-lg p-1 flex flex-col items-center justify-between relative overflow-hidden"
+              className="h-full rounded-[20px] p-2 flex flex-col items-center justify-between relative overflow-hidden village-card paper-texture border-none shadow-xl"
               style={{
-                background: `radial-gradient(circle at center, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, ${theme.primary[0]}, ${theme.primary[1]}, ${theme.primary[2]})`,
-                minHeight: "110px",
+                background: `linear-gradient(160deg, #BB3229 0%, #7A1D17 100%)`,
+                minHeight: "160px",
               }}>
+              {/* Decorative Village Ornament */}
+              <div className="absolute top-0 left-0 w-full h-1 opacity-20 bg-[radial-gradient(circle,white_20%,transparent_21%)] bg-[length:8px_8px] mt-1"></div>
               {/* CRAZY DEALS - Two lines, bigger */}
               <div className="text-center mb-1.5" style={{ marginTop: "4px" }}>
                 <div
                   className="text-white font-black leading-tight"
                   style={{
-                    fontSize: "13px",
-                    fontFamily: "sans-serif",
-                    textShadow:
-                      "2px 2px 4px rgba(0, 0, 0, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.9)",
-                    letterSpacing: "0.5px",
+                    fontSize: "14px",
+                    fontFamily: "Poppins, sans-serif",
+                    textShadow: "1px 1px 2px rgba(0, 0, 0, 0.5)",
+                    letterSpacing: "0.2px",
+                    textAlign: "center"
                   }}>
                   {crazyDealsTitle.split(" ").map((word, idx) => (
-                    <div key={idx}>{word}</div>
+                    <div key={idx} className="uppercase">{word}</div>
                   ))}
                 </div>
               </div>
@@ -782,17 +785,17 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                     ₹{safeOriginalPrice}
                   </span>
                 </div>
-                {/* Discounted Price - Bright Green Banner */}
+                {/* Discounted Price - Bright Orange Banner */}
                 <div
-                  className="bg-green-500 rounded px-2 inline-block relative -mt-0.5 z-20"
+                  className="bg-village-orange organic-radius px-2 inline-block relative -mt-0.5 z-20"
                   style={{
                     height: "fit-content",
                     lineHeight: "1",
                     paddingTop: "2px",
                     paddingBottom: "2px",
                   }}>
-                  <span className="text-white text-[9px] font-bold leading-none">
-                    ₹{safeDiscountedPrice}
+                  <span className="text-white text-[9px] font-black leading-none uppercase">
+                    MAHO DESI
                   </span>
                 </div>
               </div>
@@ -801,7 +804,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
               <div
                 ref={productNameRef}
                 onClick={handleProductClick}
-                className="text-neutral-900 font-black text-[9px] text-center mb-0.5 cursor-pointer hover:underline line-clamp-2"
+                className="text-white font-bold text-[10px] text-center mb-1.5 cursor-pointer hover:underline line-clamp-2 leading-tight font-poppins opacity-90"
                 title={displayProduct.productName || displayProduct.name}>
                 {displayProduct.productName || displayProduct.name}
               </div>
@@ -810,7 +813,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
               <div
                 ref={productImageRef}
                 className="flex-1 flex items-end justify-center w-full"
-                style={{ minHeight: "50px", maxHeight: "65px" }}>
+                style={{ minHeight: "60px", maxHeight: "80px" }}>
                 <div
                   onClick={handleProductClick}
                   className="w-12 h-16 rounded flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
@@ -868,19 +871,18 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
               const categoryIcons = getCategoryIcons(card.categoryId || "");
 
               return (
-                <div key={`${card.id || 'promo-card'}-${index}`} className="promo-card">
+                <div key={`${card.id || 'promo-card'}-${index}`} className="promo-card h-full">
                   <Link
                     to={card.type === 'product' ? `/product/${card.productId}` : (card.slug || card.categoryId ? `/category/${card.slug || card.categoryId}` : "#")}
-                    className="group rounded-lg transition-all duration-300 hover:shadow-md active:scale-[0.98] h-full flex flex-col overflow-hidden relative"
+                    className="village-card paper-texture border-none group rounded-xl transition-all duration-300 hover:shadow-xl active:scale-[0.98] h-full flex flex-col overflow-hidden relative shadow-md"
                     style={{
-                      minHeight: "90px",
-                      background: "rgba(255, 247, 237, 0.9)", // Very light orange
+                      minHeight: "110px",
                     }}>
                     {/* Green Discount Banner - Only around text, centered at top */}
                     <div
                       className="w-full flex justify-center"
-                      style={{ paddingTop: "0", paddingBottom: "2px" }}>
-                      <div className="bg-green-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded tracking-tight text-center inline-block">
+                      style={{ paddingTop: "0px" }}>
+                      <div className="bg-[#2E7D32] text-white text-[9px] font-black px-2.5 py-1 rounded-b-lg tracking-wider text-center inline-block shadow-md font-poppins uppercase">
                         {card.badge}
                       </div>
                     </div>
@@ -890,11 +892,11 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                       style={{ paddingTop: "2px" }}>
                       {/* Category Title */}
                       <div
-                        className="text-neutral-900 font-bold text-center"
+                        className="text-village-umber font-extrabold text-center font-poppins"
                         style={{
-                          fontSize: "13px",
-                          lineHeight: "1.2",
-                          marginBottom: "6px",
+                          fontSize: "12px",
+                          lineHeight: "1.1",
+                          marginBottom: "4px",
                         }}>
                         {card.title}
                       </div>

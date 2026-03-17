@@ -231,7 +231,7 @@ export default function AddToCartAnimation({
       // Step 1: Scale up with glow
       tl.to(linkRef.current, {
         scale: 1.08,
-        boxShadow: '0 10px 25px rgba(22, 163, 74, 0.4)',
+        boxShadow: '0 10px 25px rgba(139, 61, 40, 0.4)',
         duration: 0.15,
         ease: 'power2.out',
         transformOrigin: 'center center',
@@ -240,7 +240,7 @@ export default function AddToCartAnimation({
         // Step 2: Bounce back
         .to(linkRef.current, {
           scale: 1.0,
-          boxShadow: '0 4px 12px rgba(22, 163, 74, 0.3)',
+          boxShadow: '0 4px 12px rgba(139, 61, 40, 0.3)',
           duration: 0.2,
           ease: 'power2.inOut',
         })
@@ -330,7 +330,7 @@ export default function AddToCartAnimation({
             <Link
               ref={linkRef}
               to={linkTo}
-              className={`bg-gradient-to-r from-green-700 via-green-600 to-green-700 text-white rounded-full shadow-xl shadow-green-900/30 px-3 py-2 flex items-center gap-2 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition-all duration-300 pointer-events-auto border border-green-800/30 backdrop-blur-sm ${pillClassName}`}
+              className={`bg-gradient-to-r from-[#8B3D28] via-[#a64a31] to-[#8B3D28] text-white rounded-full shadow-xl shadow-[#8B3D28]/30 px-3 py-2 flex items-center gap-2 hover:from-[#722F1E] hover:via-[#8B3D28] hover:to-[#722F1E] transition-all duration-300 pointer-events-auto border border-white/10 backdrop-blur-sm ${pillClassName}`}
             >
               {/* Left: Product thumbnails */}
               <div className="flex items-center -space-x-4">
@@ -369,7 +369,7 @@ export default function AddToCartAnimation({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1, duration: 0.3 }}
               >
-                <span className="text-xs font-bold leading-tight drop-shadow-sm">View cart</span>
+                <span className="text-xs font-black font-poppins leading-tight drop-shadow-sm tracking-tight">View cart</span>
                 <span className="text-[10px] opacity-95 leading-tight font-medium">
                   {cart.itemCount} {cart.itemCount === 1 ? 'item' : 'items'}
                 </span>
