@@ -931,7 +931,7 @@ export default function Checkout() {
                   <div className="flex items-center justify-between mt-1.5">
                     <div className="flex items-center gap-1.5 bg-white border-2 border-[#8B3D28] rounded-full px-1.5 py-0.5">
                       <button
-                        onClick={() => updateQuantity(item.product?.id || item.product?._id, item.quantity - 1, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
+                        onClick={() => updateQuantity((item.product?.id || item.product?._id) as string, item.quantity - 1, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
                         className="w-5 h-5 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-[#8B3D28]/10 rounded-full transition-colors text-xs"
                       >
                         −
@@ -939,11 +939,11 @@ export default function Checkout() {
                       <QuantityInput
                         value={item.quantity}
                         min={0}
-                        onChange={(val) => updateQuantity(item.product?.id || item.product?._id, val, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
+                        onChange={(val) => updateQuantity((item.product?.id || item.product?._id) as string, val, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
                         className="text-xs font-bold text-[#8B3D28] w-8 text-center font-poppins bg-transparent border-none focus:outline-none"
                       />
                       <button
-                        onClick={() => updateQuantity(item.product?.id || item.product?._id, item.quantity + 1, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
+                        onClick={() => updateQuantity((item.product?.id || item.product?._id) as string, item.quantity + 1, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
                         className="w-5 h-5 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-[#8B3D28]/10 rounded-full transition-colors text-xs"
                       >
                         +
