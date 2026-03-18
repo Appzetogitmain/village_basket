@@ -313,15 +313,7 @@ export default function ProductCard({
             </div>
           )}
 
-          {/* Rating Badge */}
-          <div className="absolute top-2 right-2 z-10">
-            <div className="bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded-full flex items-center gap-0.5 border border-neutral-100 shadow-sm">
-              <span className="text-[9px] font-black text-village-umber">{(product.rating || 4.5).toFixed(1)}</span>
-              <svg width="8" height="8" viewBox="0 0 24 24" fill="#F59E0B">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z" />
-              </svg>
-            </div>
-          </div>
+
 
           {/* Wishlist Button */}
           <div className="absolute top-2 right-2 z-20">
@@ -401,9 +393,18 @@ export default function ProductCard({
         className="p-3 flex flex-col flex-1 cursor-pointer"
       >
         <div className="flex flex-col gap-0.5 mb-2">
-          <h3 className="text-[11px] md:text-[13px] font-black text-village-umber uppercase tracking-tight line-clamp-1 h-4">
-            {product.name || product.productName || ''}
-          </h3>
+          <div className="flex items-center justify-between gap-1">
+            <h3 className="text-[11px] md:text-[13px] font-black text-village-umber uppercase tracking-tight line-clamp-1 flex-1">
+              {product.name || product.productName || ''}
+            </h3>
+            {/* Rating Display */}
+            <div className="flex items-center gap-0.5 bg-amber-50 px-1 rounded flex-shrink-0">
+               <span className="text-[9px] font-black text-amber-700">{(product.rating || 4.5).toFixed(1)}</span>
+               <svg width="8" height="8" viewBox="0 0 24 24" fill="#F59E0B">
+                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+               </svg>
+            </div>
+          </div>
           <span className="text-[8px] md:text-[10px] font-bold text-neutral-400 uppercase tracking-wider italic">
             Pack: {(() => {
                 const v = product.variations?.[0];

@@ -735,12 +735,12 @@ export default function OrderDetail() {
     },
     Accepted: {
       title: "Preparing your order",
-      subtitle: `Arriving in ${estimatedTime} mins`,
+      subtitle: "",
       color: "bg-[#8B3D28]",
     },
     "On the way": {
       title: "Order picked up",
-      subtitle: `Arriving in ${estimatedTime} mins`,
+      subtitle: "",
       color: "bg-[#8B3D28]",
     },
     Delivered: {
@@ -766,7 +766,7 @@ export default function OrderDetail() {
     },
     "Out for Delivery": {
       title: "Out for delivery",
-      subtitle: `Arriving in ${estimatedTime} mins`,
+      subtitle: "",
       color: "bg-[#8B3D28]",
     },
     Cancelled: {

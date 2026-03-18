@@ -2,13 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useRef, useState, useEffect, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { getTheme } from '../../../utils/themes';
-import { useLocation } from '../../../hooks/useLocation';
+import { useLoading } from '../../../context/LoadingContext';
+import { useLocation as useUserLocation } from '../../../hooks/useLocation';
 import { useThemeContext } from '../../../context/ThemeContext';
 import { appConfig } from '../../../services/configService';
 import { getCategories } from '../../../services/api/customerProductService';
 import { Category } from '../../../types/domain';
 import { getHeaderCategoriesPublic } from '../../../services/api/headerCategoryService';
+import { getHomeContent } from '../../../services/api/customerHomeService';
 import { getIconByName } from '../../../utils/iconLibrary';
 import homeIcon from '@assets/category/home_v2.png';
 import { useCart } from '../../../context/CartContext';
@@ -72,7 +73,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
     fetchHeaderCategories();
   }, []);
   const navigate = useNavigate();
-  const { location: userLocation } = useLocation();
+  const { location: userLocation } = useUserLocation();
   const heroRef = useRef<HTMLDivElement>(null);
   const topSectionRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
@@ -276,6 +277,18 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
     };
   }, [activeTab]);
 
+  const { startRouteLoading } = useLoading();
+
+  const handleSearchClick = () => {
+    // Show premium loader before navigating
+    startRouteLoading();
+    
+    // Smooth transition delay (reduced for speed)
+    setTimeout(() => {
+      navigate('/search');
+    }, 200);
+  };
+
   const handleTabClick = (tabId: string) => {
     onTabChange?.(tabId);
     // Don't scroll - keep page at current position
@@ -323,10 +336,6 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
                 className="h-7 w-auto object-contain brightness-125"
               />
             </div>
-            <div className="flex flex-col">
-              <span className="text-[8px] font-black text-white/50 tracking-widest uppercase leading-none">Fresh</span>
-              <span className="text-xs font-black text-white leading-none">10-15 MINS</span>
-            </div>
           </div>
 
           <button
@@ -346,10 +355,9 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
           </button>
         </div>
 
-        {/* Search Bar Pill */}
         <div className="mb-2.5 relative z-20">
           <div
-            onClick={() => navigate('/search')}
+            onClick={handleSearchClick}
             className="w-full bg-white rounded-xl px-3.5 py-2 flex items-center gap-2.5 shadow-[0_4px_12px_rgba(0,0,0,0.08)] cursor-pointer group active:scale-[0.98] transition-all"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B3D28" strokeWidth="3" strokeLinecap="round">
@@ -368,6 +376,13 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
                   </div>
                 );
               })}
+            </div>
+            {/* Mic Icon for Voice Search Cue */}
+            <div className="text-neutral-400 pl-1 border-l border-neutral-100">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+              </svg>
             </div>
           </div>
         </div>
@@ -398,9 +413,9 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
             {/* Left: Text content */}
             <div className="flex-1 pr-2">
               {/* Service name - small, dark */}
-              <div className="text-neutral-800 font-medium text-[10px] md:text-xs mb-0 leading-tight">Village Basket Quick Commerce</div>
+              
               {/* Delivery time - large, bold, dark grey/black */}
-              <div className="text-neutral-900 font-extrabold text-2xl md:text-xl mb-0 md:mb-0.5 leading-tight">{appConfig.estimatedDeliveryTime}</div>
+              
               {/* Location with dropdown indicator - only show if location is provided */}
               {locationDisplayText && (
                 <div className="text-neutral-700 text-[10px] md:text-xs flex items-center gap-0.5 leading-tight">
@@ -431,14 +446,20 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
         <div className="px-4 md:px-6 lg:px-8 pt-2 md:pt-2 pb-2 md:pb-2 hidden md:block">
           {/* Desktop Search Bar Only - Animated Search moved into Top Row for Mobile */}
           <div
-            onClick={() => navigate('/search')}
+            onClick={handleSearchClick}
             className={`w-full md:w-auto md:max-w-xl md:mx-auto rounded-2xl shadow-lg px-3 py-2 md:px-3 md:py-1.5 flex items-center gap-2 cursor-pointer hover:shadow-xl transition-all duration-300 mb-2 md:mb-1.5 ${scrollProgress > 0.5 ? 'bg-white shadow-inner' : 'bg-white'}`}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" className="text-neutral-400">
               <circle cx="11" cy="11" r="7" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <span className="text-neutral-400 font-medium text-sm">Search for products...</span>
+            <span className="flex-1 text-neutral-400 font-medium text-sm">Search for products...</span>
+            <div className="text-neutral-300 ml-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+              </svg>
+            </div>
           </div>
         </div>
 

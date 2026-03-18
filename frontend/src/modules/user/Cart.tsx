@@ -47,7 +47,7 @@ export default function Cart() {
             </button>
           )}
         </div>
-        <p className="text-[10px] md:text-xs text-white/70 uppercase tracking-widest font-black">Delivered in {appConfig.estimatedDeliveryTime}</p>
+
       </div>
 
       {/* Cart Items */}

@@ -352,43 +352,28 @@ export default function OrderAgain() {
 
                   {/* Product Details */}
                   <div className="p-1.5 flex-1 flex flex-col bg-white">
-                    {/* Product Name */}
-                    <div
-                      onClick={() => navigate(`/product/${product.id}`)}
-                      className="mb-0.5 cursor-pointer"
-                    >
-                      <h3 className="text-[10px] font-bold text-neutral-900 line-clamp-2 leading-tight">
-                        {(() => {
+                    <div className="flex items-start justify-between gap-1 mb-0.5">
+                      <div
+                        onClick={() => navigate(`/product/${product.id}`)}
+                        className="flex-1 min-w-0 cursor-pointer"
+                      >
+                        <h3 className="text-[10px] font-black text-neutral-900 line-clamp-2 leading-tight uppercase">
+                          {(() => {
                           // Remove description suffixes like " - Fresh & Quality Assured", " - Premium Quality", etc.
                           const productName = product.name || product.productName || '';
                           return productName.replace(/\s*-\s*(Fresh|Quality|Assured|Premium|Best|Top|Hygienic|Carefully|Selected).*$/i, '').trim();
                         })()}
-                      </h3>
-                    </div>
-
-                    {/* Rating and Reviews */}
-                    <div className="flex items-center gap-0.5 mb-0.5">
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <svg
-                            key={i}
-                            width="8"
-                            height="8"
-                            viewBox="0 0 24 24"
-                            fill={i < 4 ? '#fbbf24' : '#e5e7eb'}
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                          </svg>
-                        ))}
+                        </h3>
                       </div>
-                      <span className="text-[8px] text-neutral-500">(85)</span>
+                      <div className="flex items-center gap-0.5 flex-shrink-0 bg-amber-50 px-1 rounded shadow-sm border border-amber-100/50">
+                        <span className="text-[8px] font-black text-amber-700">{(product.rating || 4.5).toFixed(1)}</span>
+                        <svg width="6" height="6" viewBox="0 0 24 24" fill="#F59E0B">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+                        </svg>
+                      </div>
                     </div>
 
-                    {/* Delivery Time */}
-                    <div className="text-[9px] text-neutral-600 mb-0.5">
-                      20 MINS
-                    </div>
+                    
 
                     {/* Discount - Blue Text */}
                     {discount > 0 && (

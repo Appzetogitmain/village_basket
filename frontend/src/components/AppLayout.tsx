@@ -248,7 +248,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <header className={`sticky top-0 z-50 bg-[#8B3D28] shadow-lg md:top-[60px] border-b border-white/10 hidden md:block`}>
               {/* Delivery info line */}
               <div className="px-4 md:px-6 lg:px-8 py-1 bg-white/10 text-white text-[9px] uppercase font-black tracking-widest text-center">
-                VILLAGE FRESH GOODS | Delivering in 10–15 mins
+                VILLAGE FRESH GOODS
               </div>
 
               {/* Main Header Row */}
@@ -387,7 +387,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             />
           )}
 
-           {/* Fixed Bottom Navigation - Mobile Only, Premium Floating Design */}
+          {/* Fixed Bottom Navigation - Mobile Only, Premium Floating Design */}
           {showFooter && (
             <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4 pb-4 flex flex-col gap-2 pointer-events-none">
               {/* Restore original FloatingCartPill experience */}
@@ -445,7 +445,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     </svg>
                   </motion.div>
                   <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isCategoriesActive ? 'text-white' : 'text-white/50'}`}>
-                    SHRENI
+                    CATEGORIES
                   </span>
                 </Link>
 

@@ -188,11 +188,6 @@ export default function SpiritualStore() {
                       <span className="text-[8px] text-neutral-500">({(product.reviews || 0).toLocaleString()})</span>
                     </div>
 
-                    {/* Delivery Time */}
-                    <div className="text-[9px] text-neutral-600 mb-0.5">
-                      15 MINS
-                    </div>
-
                     {/* Discount */}
                     {hasDiscount && (
                       <div className="text-[9px] text-blue-600 font-semibold mb-0.5">

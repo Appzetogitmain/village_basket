@@ -877,17 +877,6 @@ export default function Checkout() {
       {/* Main Product Card */}
       <div className="px-4 md:px-6 lg:px-8 py-2 md:py-3 bg-white border-b border-neutral-200">
         <div className="bg-white rounded-lg border border-neutral-200 p-2.5">
-          {/* Delivery info */}
-          <div className="flex items-center gap-1.5 mb-2">
-            <div className="w-5 h-5 rounded-full bg-[#8B3D28] flex items-center justify-center flex-shrink-0">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2" />
-                <path d="M12 6v6l4 2" stroke="white" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </div>
-            <span className="text-xs font-semibold text-neutral-900">Delivery in {appConfig.estimatedDeliveryTime}</span>
-          </div>
-
           <p className="text-[10px] text-neutral-600 mb-2.5">Shipment of {displayCart.itemCount || 0} {(displayCart.itemCount || 0) === 1 ? 'item' : 'items'}</p>
 
           {/* Cart Items */}

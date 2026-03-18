@@ -18,7 +18,7 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const routeLoadingStartTime = useRef<number | null>(Date.now()); // Start timing immediately
   const activeRequests = useRef(0);
   const activeRouteRequests = useRef(1); // Start with 1 to represent initial page load
-  const MINIMUM_LOADING_TIME = 1000; // 1 second
+  const MINIMUM_LOADING_TIME = 500; // 0.5 seconds for snappy transitions
 
   const safetyTimer = useRef<NodeJS.Timeout | null>(null);
   const routeSafetyTimer = useRef<NodeJS.Timeout | null>(null);
