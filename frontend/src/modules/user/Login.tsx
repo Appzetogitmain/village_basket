@@ -127,7 +127,7 @@ export default function Login() {
               <label className="block text-xs font-semibold text-neutral-500 mb-1.5 ml-1">
                 Enter Mobile Number
               </label>
-              <div className="flex items-center bg-white border border-neutral-200 rounded-xl overflow-hidden focus-within:border-orange-500 focus-within:ring-4 focus-within:ring-orange-500/10 transition-all shadow-sm h-12">
+              <div className="flex items-center bg-white border border-neutral-200 rounded-xl overflow-hidden focus-within:border-[#8B3D28] focus-within:ring-4 focus-within:ring-[#8B3D28]/10 transition-all shadow-sm h-12">
                 <div className="pl-3.5 pr-3 h-full flex items-center justify-center bg-neutral-50 border-r border-neutral-100">
                   <span className="text-sm font-bold text-neutral-700">+91</span>
                 </div>
@@ -154,16 +154,14 @@ export default function Login() {
               <button
                 onClick={handleContinue}
                 disabled={mobileNumber.length !== 10 || loading}
-                className={`w-full py-2 sm:py-2.5 rounded-lg font-semibold text-sm transition-colors border px-3 ${mobileNumber.length === 10 && !loading
-                  ? 'bg-orange-50 text-orange-600 border-orange-500 hover:bg-orange-100'
-                  : 'bg-neutral-300 text-neutral-500 cursor-not-allowed border-neutral-300'
+                className={`w-full py-3.5 rounded-xl font-bold text-base transition-all shadow-lg shadow-[#8B3D28]/20 ${mobileNumber.length === 10 && !loading
+                  ? 'bg-[#8B3D28] text-white hover:bg-[#8B3D28]/95'
+                  : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
                   }`}
               >
                 {loading ? 'Calling...' : 'Continue'}
               </button>
             </div>
-
-
           </>
         ) : (
           <>
@@ -172,7 +170,7 @@ export default function Login() {
               <p className="text-xs text-neutral-600 mb-2">
                 Enter the 4-digit OTP sent via voice call to
               </p>
-              <p className="text-xs font-semibold text-neutral-800">+91 {mobileNumber}</p>
+              <p className="text-xs font-semibold text-neutral-800 tracking-wider">+91 {mobileNumber}</p>
             </div>
             <div className="w-full mb-2 px-4 relative z-10 flex justify-center">
               <OTPInput onComplete={handleOTPComplete} disabled={loading} />
@@ -189,14 +187,14 @@ export default function Login() {
                   setError('');
                 }}
                 disabled={loading}
-                className="flex-1 py-2 rounded-lg font-semibold text-xs bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors border border-neutral-300"
+                className="flex-1 py-3 rounded-xl font-bold text-xs bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors border border-neutral-200"
               >
-                Change Number
+                Change
               </button>
               <button
                 onClick={handleContinue}
                 disabled={loading}
-                className="flex-1 py-2 rounded-lg font-semibold text-xs bg-orange-50 text-orange-600 border border-orange-500 hover:bg-orange-100 transition-colors"
+                className="flex-[2] py-3 rounded-xl font-bold text-xs bg-[#8B3D28] text-white hover:bg-[#8B3D28]/95 transition-all shadow-lg shadow-[#8B3D28]/20"
               >
                 {loading ? 'Verifying...' : 'Resend OTP'}
               </button>

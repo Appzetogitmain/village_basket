@@ -28,12 +28,7 @@ export interface IProduct extends Document {
   sku?: string;
   barcode?: string;
 
-  // Next Day Booking
-  nextDay?: {
-    enabled: boolean;
-    price?: number;
-    stock?: number;
-  };
+
 
   // Variations
   variationType?: string; // e.g., 'Size', 'Color', 'Weight'
@@ -195,12 +190,7 @@ const ProductSchema = new Schema<IProduct>(
       trim: true,
     },
 
-    // Next Day Booking
-    nextDay: {
-      enabled: { type: Boolean, default: false },
-      price: { type: Number },
-      stock: { type: Number },
-    },
+
 
     // Variations
     variationType: {

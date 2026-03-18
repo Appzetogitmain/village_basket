@@ -566,396 +566,135 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
 
   return (
     <div
-      className="relative"
+      className="relative overflow-hidden bg-[#893826]"
       style={{
-        background: `linear-gradient(to bottom, #F97316, #EA580C, #C2410C)`,
-        paddingTop: "16px",
-        paddingBottom: "20px",
+        paddingTop: "12px",
+        paddingBottom: "16px",
         marginTop: 0,
         marginBottom: 0
       }}>
-      {/* HOUSEFULL SALE Banner */}
-      <div
-        className="px-4 mb-3 text-center relative"
-        style={{ minHeight: "80px" }}>
-        {/* Snowflakes Container */}
-        <div
-          ref={snowflakesRef}
-          className="absolute inset-0 pointer-events-none overflow-hidden"
-          style={{ top: 0, bottom: "auto", height: "100px" }}>
-          {/* Left side snowflakes */}
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={`left-${i}`}
-              className="snowflake absolute"
-              style={{
-                left: `${5 + (i % 4) * 12}%`,
-                top: `${Math.floor(i / 4) * 30}px`,
-              }}>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                style={{
-                  filter: "drop-shadow(0 0 2px rgba(255, 255, 255, 0.9))",
-                }}>
-                <path
-                  d="M12 1V5M12 19V23M3 12H1M23 12H21M20.5 20.5L18.5 18.5M20.5 3.5L18.5 5.5M3.5 20.5L5.5 18.5M3.5 3.5L5.5 5.5M18.5 18.5L16.5 16.5M18.5 5.5L16.5 7.5M5.5 18.5L7.5 16.5M5.5 5.5L7.5 7.5"
-                  stroke="rgba(255, 255, 255, 1)"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                />
-                <circle cx="12" cy="12" r="1.8" fill="rgba(255, 255, 255, 1)" />
-              </svg>
-            </div>
-          ))}
-          {/* Right side snowflakes */}
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={`right-${i}`}
-              className="snowflake absolute"
-              style={{
-                right: `${5 + (i % 4) * 12}%`,
-                top: `${Math.floor(i / 4) * 30}px`,
-              }}>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                style={{
-                  filter: "drop-shadow(0 0 2px rgba(255, 255, 255, 0.9))",
-                }}>
-                <path
-                  d="M12 1V5M12 19V23M3 12H1M23 12H21M20.5 20.5L18.5 18.5M20.5 3.5L18.5 5.5M3.5 20.5L5.5 18.5M3.5 3.5L5.5 5.5M18.5 18.5L16.5 16.5M18.5 5.5L16.5 7.5M5.5 18.5L7.5 16.5M5.5 5.5L7.5 7.5"
-                  stroke="rgba(255, 255, 255, 1)"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                />
-                <circle cx="12" cy="12" r="1.8" fill="rgba(255, 255, 255, 1)" />
-              </svg>
-            </div>
-          ))}
+      {/* Subtle Texture Overlay */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+      
+      {/* Ultra-Slim Header Ribbon */}
+      <div className="px-4 mb-3 flex items-center justify-between relative z-10">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
+          <h1 className="text-white font-black text-xs tracking-wider uppercase font-poppins">
+            {headingText}
+          </h1>
+          <div className="h-3 w-[1px] bg-white/20"></div>
+          <span className="text-[10px] font-bold text-white/50 uppercase">
+            {saleTextValue}
+          </span>
         </div>
-
-        <div className="relative z-10">
-          <div className="flex items-center justify-center gap-3 mb-0">
-            {/* Left Lightning Bolt */}
-            <svg
-              width="28"
-              height="36"
-              viewBox="0 0 24 30"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="flex-shrink-0">
-              <path
-                d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
-                fill="#B22222"
-                stroke="#3E2723"
-                strokeWidth="0.5"
-              />
-            </svg>
-
-            {/* HOUSEFULL Text */}
-            <h1
-              ref={housefullRef}
-              className="text-3xl font-black text-white"
-              style={
-                {
-                  fontFamily: '"Poppins", sans-serif',
-                  letterSpacing: "1.5px",
-                  lineHeight: "1.1",
-                  textShadow:
-                    `-2px -2px 0 ${theme.accentColor}, 2px -2px 0 ${theme.accentColor}, -2px 2px 0 ${theme.accentColor}, 2px 2px 0 ${theme.accentColor}, ` +
-                    `-2px 0px 0 ${theme.accentColor}, 2px 0px 0 ${theme.accentColor}, 0px -2px 0 ${theme.accentColor}, 0px 2px 0 ${theme.accentColor}, ` +
-                    `-1px -1px 0 ${theme.accentColor}, 1px -1px 0 ${theme.accentColor}, -1px 1px 0 ${theme.accentColor}, 1px 1px 0 ${theme.accentColor}, ` +
-                    "0px 2px 0px rgba(0, 0, 0, 0.8), 0px 4px 0px rgba(0, 0, 0, 0.6), " +
-                    "0px 6px 0px rgba(0, 0, 0, 0.4), 0px 8px 8px rgba(0, 0, 0, 0.3), " +
-                    "2px 2px 2px rgba(0, 0, 0, 0.5)",
-                } as React.CSSProperties
-              }>
-              {headingText.split("").map((letter, index) => (
-                <span key={index} className="housefull-letter inline-block">
-                  {letter}
-                </span>
-              ))}
-            </h1>
-
-            {/* Right Lightning Bolt */}
-            <svg
-              width="28"
-              height="36"
-              viewBox="0 0 24 30"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="flex-shrink-0"
-              style={{ transform: "scaleX(-1)" }}>
-              <path
-                d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
-                fill="#B22222"
-                stroke="#3E2723"
-                strokeWidth="0.5"
-              />
-            </svg>
+        
+        {dateRange && (
+          <div className="px-2 py-0.5 rounded-full bg-white/10 border border-white/10">
+            <span className="text-white/60 text-[8px] font-black uppercase tracking-widest">{dateRange.split('-')[1] || dateRange}</span>
           </div>
-
-          {/* SALE Text */}
-          <div
-            className="flex justify-center mb-0.5"
-            style={{ marginTop: "-3px" }}>
-            <h2
-              ref={saleRef}
-              className="text-xl font-black text-white"
-              style={
-                {
-                  fontFamily: '"Poppins", sans-serif',
-                  letterSpacing: "1.5px",
-                  textShadow:
-                    `-1.5px -1.5px 0 ${theme.accentColor}, 1.5px -1.5px 0 ${theme.accentColor}, -1.5px 1.5px 0 ${theme.accentColor}, 1.5px 1.5px 0 ${theme.accentColor}, ` +
-                    `-1.5px 0px 0 ${theme.accentColor}, 1.5px 0px 0 ${theme.accentColor}, 0px -1.5px 0 ${theme.accentColor}, 0px 1.5px 0 ${theme.accentColor}, ` +
-                    `-1px -1px 0 ${theme.accentColor}, 1px -1px 0 ${theme.accentColor}, -1px 1px 0 ${theme.accentColor}, 1px 1px 0 ${theme.accentColor}, ` +
-                    "0px 2px 0px rgba(0, 0, 0, 0.8), 0px 4px 0px rgba(0, 0, 0, 0.6), " +
-                    "0px 6px 0px rgba(0, 0, 0, 0.4), 0px 8px 8px rgba(0, 0, 0, 0.3), " +
-                    "2px 2px 2px rgba(0, 0, 0, 0.5)",
-                } as React.CSSProperties
-              }>
-              {saleTextValue}
-            </h2>
-          </div>
-
-          {/* Dates */}
-          {dateRange && (
-            <div
-              ref={dateRef}
-              className="font-bold text-xs text-center mt-1"
-              style={{ color: theme.textColor }}>
-              {dateRange}
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Main Content: Crazy Deals + Category Cards */}
-      <div className="px-4 mt-2">
-        <div ref={containerRef} className="flex gap-2">
-          {/* Crazy Deals Section - Left */}
-          <div className="flex-shrink-0 w-[110px] promo-card h-full">
+      {/* Horizontal Scrolling Deals Ribbon */}
+      <div className="relative z-10">
+        <div 
+          ref={containerRef}
+          className="flex gap-2.5 overflow-x-auto px-4 pb-1 scrollbar-hide no-scrollbar"
+        >
+          {/* Featured "Deal of Day" Card */}
+          <div className="flex-shrink-0 w-[140px] promo-card">
             <div
-              className="h-full rounded-[20px] p-2 flex flex-col items-center justify-between relative overflow-hidden village-card paper-texture border-none shadow-xl"
-              style={{
-                background: `linear-gradient(160deg, #BB3229 0%, #7A1D17 100%)`,
-                minHeight: "160px",
-              }}>
-              {/* Decorative Village Ornament */}
-              <div className="absolute top-0 left-0 w-full h-1 opacity-20 bg-[radial-gradient(circle,white_20%,transparent_21%)] bg-[length:8px_8px] mt-1"></div>
-              {/* CRAZY DEALS - Two lines, bigger */}
-              <div className="text-center mb-1.5" style={{ marginTop: "4px" }}>
-                <div
-                  className="text-white font-black leading-tight"
-                  style={{
-                    fontSize: "14px",
-                    fontFamily: "Poppins, sans-serif",
-                    textShadow: "1px 1px 2px rgba(0, 0, 0, 0.5)",
-                    letterSpacing: "0.2px",
-                    textAlign: "center"
-                  }}>
-                  {crazyDealsTitle.split(" ").map((word, idx) => (
-                    <div key={idx} className="uppercase">{word}</div>
-                  ))}
+              onClick={handleProductClick}
+              className="h-[140px] bg-white rounded-[1.5rem] p-3 flex flex-col justify-between relative overflow-hidden shadow-lg active:scale-[0.98] transition-all cursor-pointer border border-white/5"
+            >
+              <div className="flex flex-col">
+                <div className="bg-[#4A7C59] text-white text-[7px] font-black px-1.5 py-0.5 rounded-full inline-block uppercase tracking-tighter mb-1.5 self-start ring-2 ring-[#4A7C59]/10">
+                   {crazyDealsTitle}
+                </div>
+                <div className="text-village-umber font-black text-[10px] leading-tight line-clamp-2 uppercase tracking-tighter">
+                  {displayProduct.productName || displayProduct.name}
                 </div>
               </div>
 
-              {/* Price Banners - Compact */}
-              <div
-                ref={priceContainerRef}
-                className="flex flex-col items-center mb-0.5 relative">
-                {/* Original Price - Darker Gray, Smaller Banner */}
-                <div
-                  className="bg-neutral-600 rounded px-1.5 inline-block relative z-10"
-                  style={{
-                    height: "fit-content",
-                    lineHeight: "1",
-                    paddingTop: "2px",
-                    paddingBottom: "2px",
-                  }}>
-                  <span className="text-white text-[8px] font-medium line-through leading-none">
-                    ₹{safeOriginalPrice}
-                  </span>
-                </div>
-                {/* Discounted Price - Bright Orange Banner */}
-                <div
-                  className="bg-village-orange organic-radius px-2 inline-block relative -mt-0.5 z-20"
-                  style={{
-                    height: "fit-content",
-                    lineHeight: "1",
-                    paddingTop: "2px",
-                    paddingBottom: "2px",
-                  }}>
-                  <span className="text-white text-[9px] font-black leading-none uppercase">
-                    MAHO DESI
-                  </span>
-                </div>
-              </div>
-
-              {/* Product Name - Compact - Clickable */}
-              <div
-                ref={productNameRef}
-                onClick={handleProductClick}
-                className="text-white font-bold text-[10px] text-center mb-1.5 cursor-pointer hover:underline line-clamp-2 leading-tight font-poppins opacity-90"
-                title={displayProduct.productName || displayProduct.name}>
-                {displayProduct.productName || displayProduct.name}
-              </div>
-
-              {/* Product Thumbnail - Bottom Center, sized to container */}
               <div
                 ref={productImageRef}
-                className="flex-1 flex items-end justify-center w-full"
-                style={{ minHeight: "60px", maxHeight: "80px" }}>
-                <div
-                  onClick={handleProductClick}
-                  className="w-12 h-16 rounded flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
-                  style={{ background: "transparent" }}>
+                className="flex items-center justify-center -my-1 mx-auto"
+                style={{ height: "55px", width: "100%" }}>
+                  <div className="absolute w-12 h-12 bg-[#8B3D28]/5 rounded-full blur-xl"></div>
                   {displayProduct.imageUrl ? (
                     <img
                       src={displayProduct.imageUrl}
-                      alt={displayProduct.name}
-                      className="w-full h-full object-contain"
-                      loading="lazy"
-                      decoding="async"
-                      style={{
-                        mixBlendMode: "normal",
-                        backgroundColor: "transparent",
-                      }}
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        // Hide broken image and show fallback
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent && !parent.querySelector('.product-fallback')) {
-                          const fallback = document.createElement('div');
-                          fallback.className = 'product-fallback w-full h-full bg-gradient-to-b from-yellow-100 to-yellow-50 flex items-center justify-center';
-                          const icon = document.createElement('div');
-                          icon.className = 'w-7 h-9 bg-yellow-200 rounded-sm relative';
-                          icon.innerHTML = `
-                            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-blue-400 rounded-full"></div>
-                            <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-white/80"></div>
-                          `;
-                          fallback.appendChild(icon);
-                          parent.appendChild(fallback);
-                        }
-                      }}
+                      alt=""
+                      className="max-w-full max-h-full object-contain drop-shadow-lg relative z-10"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-b from-yellow-100 to-yellow-50 flex items-center justify-center">
-                      <div className="w-7 h-9 bg-yellow-200 rounded-sm relative">
-                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-blue-400 rounded-full"></div>
-                        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/80"></div>
-                      </div>
-                    </div>
+                    <span className="text-2xl relative z-10">📦</span>
                   )}
-                </div>
+              </div>
+
+              <div className="w-full bg-[#8B3D28] rounded-xl py-1 px-2 flex items-center justify-center gap-1.5 shadow-md">
+                <span className="text-white/40 text-[7px] font-black line-through">₹{safeOriginalPrice}</span>
+                <span className="text-white text-[10px] font-black">₹{safeDiscountedPrice}</span>
               </div>
             </div>
           </div>
 
-          {/* Category Cards Grid - Right */}
-          <div className="flex-1 grid grid-cols-2 gap-2">
-            {categoryCards.map((card, index) => {
-              // Use subcategory images from the map if available, otherwise check card.subcategoryImages, then fallback to emoji icons
-              const subcategoryImages = subcategoryImagesMap[card.id] || card.subcategoryImages || [];
-              const hasSubcategoryImages = subcategoryImages.length > 0;
-              const categoryIcons = getCategoryIcons(card.categoryId || "");
+          {/* Regular Promotion Cards */}
+          {categoryCards.map((card, index) => {
+            const subcategoryImages = subcategoryImagesMap[card.id] || card.subcategoryImages || [];
+            const hasSubcategoryImages = subcategoryImages.length > 0;
+            const categoryIcons = getCategoryIcons(card.categoryId || "");
 
-              return (
-                <div key={`${card.id || 'promo-card'}-${index}`} className="promo-card h-full">
-                  <Link
-                    to={card.type === 'product' ? `/product/${card.productId}` : (card.slug || card.categoryId ? `/category/${card.slug || card.categoryId}` : "#")}
-                    className="village-card paper-texture border-none group rounded-xl transition-all duration-300 hover:shadow-xl active:scale-[0.98] h-full flex flex-col overflow-hidden relative shadow-md"
-                    style={{
-                      minHeight: "110px",
-                    }}>
-                    {/* Green Discount Banner - Only around text, centered at top */}
-                    <div
-                      className="w-full flex justify-center"
-                      style={{ paddingTop: "0px" }}>
-                      <div className="bg-[#2E7D32] text-white text-[9px] font-black px-2.5 py-1 rounded-b-lg tracking-wider text-center inline-block shadow-md font-poppins uppercase">
-                        {card.badge}
-                      </div>
+            return (
+              <div key={`${card.id || 'promo'}-${index}`} className="flex-shrink-0 w-[125px] promo-card">
+                <Link
+                  to={card.type === 'product' ? `/product/${card.productId}` : (card.slug || card.categoryId ? `/category/${card.slug || card.categoryId}` : "#")}
+                  className="h-[140px] bg-white rounded-[1.5rem] p-3 flex flex-col overflow-hidden relative shadow-md no-underline group active:scale-[0.98] transition-all"
+                >
+                  <div className="bg-[#4A7C59] text-white text-[7px] font-black px-1.5 py-0.5 rounded-full inline-block uppercase tracking-tighter mb-2 self-start ring-2 ring-[#4A7C59]/10">
+                    {card.badge}
+                  </div>
+
+                  <div className="text-village-umber font-black text-[9px] leading-tight line-clamp-2 uppercase italic tracking-tighter mb-1">
+                    {card.title}
+                  </div>
+
+                  <div className="mt-auto flex items-center justify-center w-full relative h-[55px]">
+                    <div className="absolute inset-x-0 bottom-0 h-[35px] bg-[#8B3D28]/5 rounded-xl"></div>
+                    <div className="flex -space-x-2 relative z-10">
+                      {hasSubcategoryImages
+                        ? subcategoryImages.slice(0, 3).map((imageUrl, idx) => (
+                          <div
+                            key={idx}
+                            className="w-8 h-8 bg-white rounded-full overflow-hidden border-2 border-white shadow-sm"
+                            style={{ zIndex: 3 - idx }}>
+                             <img
+                              src={imageUrl}
+                              alt=""
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = "none";
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  parent.innerHTML =`<div class="w-full h-full flex items-center justify-center text-[10px] font-bold bg-neutral-50">${categoryIcons[idx] || "📦"}</div>`;
+                                }
+                              }}
+                            />
+                          </div>
+                        ))
+                        : categoryIcons.slice(0, 2).map((icon, idx) => (
+                          <div key={idx} className="w-8 h-8 bg-neutral-50 rounded-full border-2 border-white flex items-center justify-center text-[10px]">
+                            {icon}
+                          </div>
+                        ))}
                     </div>
-
-                    <div
-                      className="px-1 pb-1 flex flex-col flex-1 justify-between"
-                      style={{ paddingTop: "2px" }}>
-                      {/* Category Title */}
-                      <div
-                        className="text-village-umber font-extrabold text-center font-poppins"
-                        style={{
-                          fontSize: "12px",
-                          lineHeight: "1.1",
-                          marginBottom: "4px",
-                        }}>
-                        {card.title}
-                      </div>
-
-                      {/* Subcategory Images or Emoji Icons - Horizontal Layout */}
-                      <div
-                        className="flex items-center justify-center gap-1 overflow-hidden"
-                        style={{ marginTop: "auto" }}>
-                        {hasSubcategoryImages
-                          ? // Display subcategory images as small icons
-                          subcategoryImages.slice(0, 4).map((imageUrl, idx) => (
-                            <div
-                              key={idx}
-                              className="flex-shrink-0 bg-white rounded flex items-center justify-center overflow-hidden border border-neutral-200"
-                              style={{ width: "24px", height: "24px" }}>
-                              <img
-                                src={imageUrl}
-                                alt={`Subcategory ${idx + 1}`}
-                                className="w-full h-full object-cover"
-                                loading="lazy"
-                                decoding="async"
-                                onError={(e) => {
-                                  // Fallback to emoji if image fails to load
-                                  const target =
-                                    e.target as HTMLImageElement;
-                                  target.style.display = "none";
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML =
-                                      categoryIcons[idx] || "📦";
-                                    parent.style.fontSize = "18px";
-                                    parent.style.display = "flex";
-                                    parent.style.alignItems = "center";
-                                    parent.style.justifyContent = "center";
-                                  }
-                                }}
-                              />
-                            </div>
-                          ))
-                          : // Fallback to emoji icons if no subcategory images
-                          categoryIcons.slice(0, 4).map((icon, idx) => (
-                            <div
-                              key={idx}
-                              className="flex-shrink-0 bg-transparent rounded flex items-center justify-center overflow-hidden"
-                              style={{
-                                width: "24px",
-                                height: "24px",
-                                fontSize: "18px",
-                              }}>
-                              {icon}
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
+                  </div>
+                </Link>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

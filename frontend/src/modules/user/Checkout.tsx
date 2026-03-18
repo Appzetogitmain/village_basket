@@ -21,7 +21,9 @@ import { getProducts } from '../../services/api/customerProductService';
 import { addToWishlist } from '../../services/api/customerWishlistService';
 import { updateProfile } from '../../services/api/customerService';
 import { calculateProductPrice } from '../../utils/priceUtils';
+import QuantityInput from '../../components/ui/QuantityInput';
 import RazorpayCheckout from '../../components/RazorpayCheckout';
+import ProductCard from '../user/components/ProductCard';
 
 // const STORAGE_KEY = 'saved_address'; // Removed
 
@@ -890,8 +892,8 @@ export default function Checkout() {
 
           {/* Cart Items */}
           <div className="space-y-2.5">
-            {displayItems.filter(item => item.product).map((item) => (
-              <div key={item.product?.id || Math.random()} className="flex gap-2">
+            {displayItems.filter(item => item && item.product).map((item) => (
+              <div key={(item.product?.id || item.product?._id) || Math.random().toString()} className="flex gap-2">
                 {/* Product Image */}
                 <div className="w-12 h-12 bg-neutral-100 rounded-lg flex-shrink-0 overflow-hidden">
                   {item.product?.imageUrl ? (
@@ -929,16 +931,19 @@ export default function Checkout() {
                   <div className="flex items-center justify-between mt-1.5">
                     <div className="flex items-center gap-1.5 bg-white border-2 border-[#8B3D28] rounded-full px-1.5 py-0.5">
                       <button
-                        onClick={() => updateQuantity(item.product?.id, item.quantity - 1, item.variant)}
+                        onClick={() => updateQuantity(item.product?.id || item.product?._id, item.quantity - 1, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
                         className="w-5 h-5 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-[#8B3D28]/10 rounded-full transition-colors text-xs"
                       >
                         −
                       </button>
-                      <span className="text-xs font-bold text-[#8B3D28] min-w-[1.25rem] text-center">
-                        {item.quantity}
-                      </span>
+                      <QuantityInput
+                        value={item.quantity}
+                        min={0}
+                        onChange={(val) => updateQuantity(item.product?.id || item.product?._id, val, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
+                        className="text-xs font-bold text-[#8B3D28] w-8 text-center font-poppins bg-transparent border-none focus:outline-none"
+                      />
                       <button
-                        onClick={() => updateQuantity(item.product?.id, item.quantity + 1, item.variant)}
+                        onClick={() => updateQuantity(item.product?.id || item.product?._id, item.quantity + 1, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
                         className="w-5 h-5 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-[#8B3D28]/10 rounded-full transition-colors text-xs"
                       >
                         +
@@ -973,225 +978,22 @@ export default function Checkout() {
       <div className="px-4 md:px-6 lg:px-8 py-2.5 md:py-3 border-b border-neutral-200">
         <h2 className="text-sm font-semibold text-neutral-900 mb-2">You might also like</h2>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-3" style={{ scrollSnapType: 'x mandatory' }}>
-          {similarProducts.map((product) => {
-            // Get price details
-            const { displayPrice, mrp, discount, hasDiscount } = calculateProductPrice(product);
-
-            // Get quantity in cart
-            const productId = product.id || product._id;
-            const inCartItem = (cart?.items || []).find(item => {
-              const itemProductId = item.product?.id || item.product?._id;
-              return itemProductId === productId;
-            });
-            const inCartQty = inCartItem?.quantity || 0;
-
-            return (
-              <div
-                key={product.id}
-                className="flex-shrink-0 w-[140px]"
-                style={{ scrollSnapAlign: 'start' }}
-              >
-                <div className="bg-white rounded-lg overflow-hidden flex flex-col relative h-full" style={{ boxShadow: '0 1px 1px rgba(0, 0, 0, 0.03)' }}>
-                  {/* Product Image Area */}
-                  <div
-                    onClick={() => navigate(`/product/${product.id || product._id}`)}
-                    className="relative block cursor-pointer"
-                  >
-                    <div className="w-full h-28 bg-neutral-100 flex items-center justify-center overflow-hidden relative">
-                      {product.imageUrl || product.mainImage ? (
-                        <img
-                          src={product.imageUrl || product.mainImage}
-                          alt={product.name || product.productName || 'Product'}
-                          className="w-full h-full object-contain"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent && !parent.querySelector('.fallback-icon')) {
-                              const fallback = document.createElement('div');
-                              fallback.className = 'w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-4xl fallback-icon';
-                              fallback.textContent = (product.name || product.productName || '?').charAt(0).toUpperCase();
-                              parent.appendChild(fallback);
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-4xl">
-                          {(product.name || product.productName || '?').charAt(0).toUpperCase()}
-                        </div>
-                      )}
-
-                      {/* Red Discount Badge - Top Left */}
-                      {discount > 0 && (
-                        <div className="absolute top-1 left-1 z-10 bg-red-600 text-white text-[9px] font-bold px-1 py-0.5 rounded">
-                          {discount}% OFF
-                        </div>
-                      )}
-
-                      {/* Heart Icon - Top Right */}
-                      <WishlistButton
-                        productId={product.id || product._id}
-                        size="sm"
-                        className="top-1 right-1 shadow-sm"
-                      />
-
-                      {/* ADD Button or Quantity Stepper - Overlaid on bottom right of image */}
-                      <div className="absolute bottom-1.5 right-1.5 z-10">
-                        <AnimatePresence mode="wait">
-                          {inCartQty === 0 ? (
-                            <motion.button
-                              key="add-button"
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              transition={{ duration: 0.2 }}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                addToCart(product, e.currentTarget);
-                              }}
-                              className="bg-white/95 backdrop-blur-sm text-[#8B3D28] border-2 border-[#8B3D28] text-[10px] font-black px-2 py-1 rounded shadow-md hover:bg-white transition-colors font-poppins"
-                            >
-                              ADD
-                            </motion.button>
-                          ) : (
-                            <motion.div
-                              key="stepper"
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              transition={{ duration: 0.2 }}
-                              className="flex items-center gap-1 bg-[#8B3D28] rounded px-1.5 py-1 shadow-md"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  updateQuantity(productId, inCartQty - 1);
-                                }}
-                                className="w-4 h-4 flex items-center justify-center text-white font-bold hover:bg-[#722F1E] rounded transition-colors p-0 leading-none"
-                                style={{ lineHeight: 1, fontSize: '14px' }}
-                              >
-                                <span className="relative top-[-1px]">−</span>
-                              </motion.button>
-                              <motion.span
-                                key={inCartQty}
-                                initial={{ scale: 1.2, y: -2 }}
-                                animate={{ scale: 1, y: 0 }}
-                                transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-                                className="text-white font-bold min-w-[0.75rem] text-center"
-                                style={{ fontSize: '12px' }}
-                              >
-                                {inCartQty}
-                              </motion.span>
-                              <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  updateQuantity(productId, inCartQty + 1);
-                                }}
-                                className="w-4 h-4 flex items-center justify-center text-white font-bold hover:bg-[#722F1E] rounded transition-colors p-0 leading-none"
-                                style={{ lineHeight: 1, fontSize: '14px' }}
-                              >
-                                <span className="relative top-[-1px]">+</span>
-                              </motion.button>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Product Details */}
-                  <div className="p-1.5 flex-1 flex flex-col bg-white">
-                    {/* Light Grey Tags */}
-                    <div className="flex gap-0.5 mb-0.5">
-                      <div className="bg-neutral-200 text-neutral-700 text-[8px] font-medium px-1 py-0.5 rounded">
-                        {product.pack || '1 unit'}
-                      </div>
-                      {product.pack && (product.pack.includes('g') || product.pack.includes('kg')) && (
-                        <div className="bg-neutral-200 text-neutral-700 text-[8px] font-medium px-1 py-0.5 rounded">
-                          {product.pack.replace(/[gk]/gi, '').trim()} GSM
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Product Name */}
-                    <div
-                      onClick={() => navigate(`/product/${product.id || product._id}`)}
-                      className="mb-0.5 cursor-pointer"
-                    >
-                      <h3 className="text-[10px] font-bold text-neutral-900 line-clamp-2 leading-tight">
-                        {product.name || product.productName || 'Product'}
-                      </h3>
-                    </div>
-
-                    {/* Rating and Reviews */}
-                    <div className="flex items-center gap-0.5 mb-0.5">
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <svg
-                            key={i}
-                            width="8"
-                            height="8"
-                            viewBox="0 0 24 24"
-                            fill={i < 4 ? '#fbbf24' : '#e5e7eb'}
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                          </svg>
-                        ))}
-                      </div>
-                      <span className="text-[8px] text-neutral-500">(85)</span>
-                    </div>
-
-                    {/* Delivery Time */}
-                    <div className="text-[9px] text-neutral-600 mb-0.5">
-                      20 MINS
-                    </div>
-
-                    {/* Discount - Blue Text */}
-                    {discount > 0 && (
-                      <div className="text-[9px] text-blue-600 font-semibold mb-0.5">
-                        {discount}% OFF
-                      </div>
-                    )}
-
-                    {/* Price */}
-                    <div className="mb-1">
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-[13px] font-bold text-neutral-900">
-                          ₹{(displayPrice || 0).toLocaleString('en-IN')}
-                        </span>
-                        {hasDiscount && (
-                          <span className="text-[10px] text-neutral-400 line-through">
-                            ₹{(mrp || 0).toLocaleString('en-IN')}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Bottom Link */}
-                    <div
-                      onClick={() => navigate(`/category/${product.categoryId || product.category || 'all'}`)}
-                      className="w-full bg-[#8B3D28]/10 text-[#8B3D28] text-[8px] font-black py-0.5 rounded-lg flex items-center justify-between px-1 hover:bg-[#8B3D28]/20 transition-colors mt-auto cursor-pointer font-poppins"
-                    >
-                      <span>See more like this</span>
-                      <div className="flex items-center gap-0.5">
-                        <div className="w-px h-2 bg-[#8B3D28]/30"></div>
-                        <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M0 0L8 4L0 8Z" fill="#8B3D28" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {similarProducts.map((p) => (
+            <div
+              key={p.id || p._id}
+              className="flex-shrink-0 w-36"
+              style={{ scrollSnapAlign: 'start' }}
+            >
+              <ProductCard
+                product={p}
+                compact={true}
+                showBadge={true}
+                showHeartIcon={true}
+                categoryStyle={true}
+                className="!bg-white !shadow-none !border-neutral-100"
+              />
+            </div>
+          ))}
         </div>
       </div>
 

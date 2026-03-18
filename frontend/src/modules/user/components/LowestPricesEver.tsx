@@ -49,134 +49,135 @@ const ProductCard = memo(({
   let productName = product.name || product.productName || '';
   // Remove common description patterns like " - Fresh & Quality Assured", " - Premium Quality", etc.
   productName = productName.replace(/\s*-\s*(Fresh|Quality|Assured|Premium|Best|Top|Hygienic|Carefully|Selected).*$/i, '').trim();
-  const displayName = truncateText(productName, 60);
+  const displayName = truncateText(productName, 40);
 
   return (
     <div
-      className="flex-shrink-0 w-[125px] md:w-[140px]"
+      className="flex-shrink-0 w-[140px] md:w-[155px]"
       style={{ scrollSnapAlign: 'start' }}
     >
       <div
+        className="village-card white-paper-texture organic-radius overflow-hidden flex flex-col relative h-full bg-white shadow-[0_8px_16px_rgba(0,0,0,0.06)] border border-neutral-100/50 transition-all hover:shadow-xl active:scale-[0.98]"
         onClick={() => navigate(`/product/${product.id}`)}
-        className="village-card paper-texture organic-radius border-none overflow-hidden flex flex-col relative h-full max-h-full cursor-pointer transition-transform active:scale-[0.98]"
       >
-        <div className="relative block">
-          <div className="w-full h-24 md:h-28 bg-white flex items-center justify-center overflow-hidden relative rounded-t-[20px] border-b border-neutral-100">
-            {product.imageUrl ? (
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-4xl">
-                {(product.name || product.productName || '?').charAt(0).toUpperCase()}
-              </div>
-            )}
-
-            {discount > 0 && (
-              <div className="absolute top-1 left-1 z-10 bg-village-red text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md transform -rotate-12">
-                {discount}% OFF
-              </div>
-            )}
-
-            {/* Rating Badge on Image */}
-            <div className="absolute bottom-1 right-1">
-              <div className="premium-pill px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                <span className="text-[10px] font-bold text-neutral-800">{(product.rating || 4.5).toFixed(1)}</span>
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="#F59E0B" className="flex-shrink-0">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Heart Icon - Top Right */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleWishlist(e);
-              }}
-              className="absolute top-1 right-1 z-30 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill={isWishlisted ? "#ef4444" : "none"}
-                className={isWishlisted ? "text-red-500" : "text-neutral-400"}
-              >
-                <path
-                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-
-          </div>
-        </div>
-
-        {/* Product Details */}
-        <div className="p-2 flex-1 flex flex-col items-start gap-1">
-          <h3 className="text-[11px] font-bold text-village-umber line-clamp-2 leading-tight min-h-[1.5rem] max-h-[1.5rem] overflow-hidden">
-            {displayName}
-          </h3>
-          <div className="text-[9px] font-medium text-neutral-500">
-            Rs {displayPrice}/{product.pack || 'Unit'}
-          </div>
-          <div className="mt-0.5 flex flex-col">
-            <span className="text-sm font-black text-village-umber">Rs {displayPrice}</span>
-            {hasDiscount && (
-              <span className="text-[9px] text-neutral-400 line-through">₹{mrp}</span>
-            )}
-          </div>
-        </div>
-
-        {/* Action Button */}
-        <div className="px-1.5 pb-2">
-          {inCartQty === 0 ? (
-            <button
-              ref={addButtonRef}
-              disabled={product.isAvailable === false}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (product.variations && product.variations.length > 1) {
-                  setIsVariationModalOpen(true);
-                } else {
-                  onAddToCart(product, e.currentTarget);
-                }
-              }}
-              className={`w-full h-8 organic-radius text-[10px] font-bold shadow-md transition-all active:scale-95 ${product.isAvailable === false
-                ? 'bg-neutral-200 text-neutral-400'
-                : 'bg-orange-500 text-white hover:bg-orange-600'
-                }`}
-            >
-              {product.isAvailable === false ? 'Out' : 'Add'}
-            </button>
+        {/* Image Section */}
+        <div className="relative w-full aspect-square bg-gradient-to-b from-neutral-50 to-white flex items-center justify-center p-2">
+          {product.imageUrl ? (
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="w-full h-full object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
+            />
           ) : (
-            <div className="flex items-center justify-between bg-orange-50 px-0.5 py-0.5 rounded-full border border-orange-200 h-7 md:h-8 shadow-inner">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUpdateQuantity(product.id, inCartQty - 1);
-                }}
-                className="w-6 h-6 rounded-full bg-white text-orange-600 flex items-center justify-center p-0"
-              >−</button>
-              <span className="text-[11px] font-bold text-orange-600">{inCartQty}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUpdateQuantity(product.id, inCartQty + 1);
-                }}
-                className="w-6 h-6 rounded-full bg-white text-orange-600 flex items-center justify-center p-0"
-              >+</button>
+            <div className="w-full h-full flex items-center justify-center bg-neutral-50 text-neutral-300 text-3xl font-black">
+              {(product.name || product.productName || '?').charAt(0).toUpperCase()}
             </div>
           )}
+
+          {/* Discount Badge */}
+          {discount > 0 && (
+            <div className="absolute top-2 left-0 z-10 bg-[#4A7C59] text-white text-[8px] font-black px-2 py-0.5 rounded-r-full shadow-sm">
+              {discount}% OFF
+            </div>
+          )}
+
+          {/* Rating Badge */}
+          <div className="absolute top-2 right-2 z-10">
+            <div className="bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded-full flex items-center gap-0.5 border border-neutral-100 shadow-sm">
+              <span className="text-[8px] font-black text-village-umber">{(product.rating || 4.5).toFixed(1)}</span>
+              <svg width="7" height="7" viewBox="0 0 24 24" fill="#F59E0B">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Wishlist Button */}
+          <div className="absolute bottom-2 right-2 z-20">
+             <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleWishlist(e);
+                }}
+                className="w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center border border-neutral-50 active:scale-90 transition-transform"
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill={isWishlisted ? "#ef4444" : "none"}
+                  className={isWishlisted ? "text-red-500" : "text-neutral-400"}
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+             </button>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="p-3 flex flex-col flex-1">
+          <div className="flex flex-col gap-0.5 mb-2">
+            <h3 className="text-[10px] font-black text-village-umber uppercase tracking-tight line-clamp-1 h-3.5">
+              {displayName}
+            </h3>
+            <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-wider italic">
+              Pack: {product.pack || 'Standard'}
+            </span>
+          </div>
+
+          <div className="mt-auto flex flex-col pt-1">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-sm font-black text-village-umber">₹{displayPrice}</span>
+              {hasDiscount && (
+                <span className="text-[8px] text-neutral-400 line-through font-bold">₹{mrp}</span>
+              )}
+            </div>
+            
+            <div className="mt-2">
+              {inCartQty === 0 ? (
+                <button
+                  ref={addButtonRef}
+                  disabled={product.isAvailable === false}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (product.variations && product.variations.length > 1) {
+                      setIsVariationModalOpen(true);
+                    } else {
+                      onAddToCart(product, e.currentTarget);
+                    }
+                  }}
+                  className={`w-full h-8 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 ${
+                    product.isAvailable === false
+                    ? 'bg-neutral-100 text-neutral-400'
+                    : 'bg-[#4A7C59] text-white hover:bg-[#3D664A] shadow-[#4A7C59]/20'
+                  }`}
+                >
+                  {product.isAvailable === false ? 'Out' : 'Add'}
+                </button>
+              ) : (
+                <div className="flex items-center justify-between bg-[#8B3D28]/5 rounded-xl border border-[#8B3D28]/10 h-8 px-1 shadow-inner">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUpdateQuantity(product.id, inCartQty - 1);
+                    }}
+                    className="w-6 h-6 rounded-lg bg-white text-[#8B3D28] shadow-sm flex items-center justify-center font-bold"
+                  >−</button>
+                   <span className="text-[11px] font-black text-[#8B3D28] w-8 text-center">{inCartQty}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUpdateQuantity(product.id, inCartQty + 1);
+                    }}
+                    className="w-6 h-6 rounded-lg bg-[#8B3D28] text-white shadow-md flex items-center justify-center font-bold"
+                  >+</button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <VariationSelectionModal
@@ -315,99 +316,54 @@ export default function LowestPricesEver({ activeTab = 'all', products: adminPro
 
   return (
     <div
-      className="relative"
+      className="relative overflow-hidden"
       style={{
-        background: `linear-gradient(to bottom, ${theme.primary[3]}, ${theme.primary[3]}, ${theme.secondary[1]}, ${theme.secondary[2]})`,
-        marginTop: '0px', // No gap for seamless blend
-        paddingTop: '12px',
-        paddingBottom: '16px',
+        background: '#FFF9F5',
+        paddingTop: '32px',
+        paddingBottom: '24px',
       }}
     >
-      {/* White Zip/Scalloped Divider at Top - Upward-pointing semicircles */}
-      <div className="absolute top-0 left-0 right-0" style={{ height: '30px', zIndex: 10, opacity: 0.95 }}>
-        <svg
-          viewBox="0 0 1200 30"
-          preserveAspectRatio="none"
-          className="w-full h-full"
-          style={{ display: 'block' }}
-        >
-          {/* White scalloped pattern with upward semicircles - clearly visible */}
-          <path
-            d="M0,30 L0,15
-               Q25,0 50,15
-               T100,15
-               T150,15
-               T200,15
-               T250,15
-               T300,15
-               T350,15
-               T400,15
-               T450,15
-               T500,15
-               T550,15
-               T600,15
-               T650,15
-               T700,15
-               T750,15
-               T800,15
-               T850,15
-               T900,15
-               T950,15
-               T1000,15
-               T1050,15
-               T1100,15
-               T1150,15
-               L1200,15
-               L1200,30 Z"
-            fill="white"
-            stroke="white"
-            strokeWidth="0"
-          />
+      {/* Paper Texture Overlay */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+
+      {/* Decorative Wavy Border at Top */}
+      <div className="absolute top-0 left-0 right-0 h-4 bg-white/40">
+        <svg viewBox="0 0 1200 24" preserveAspectRatio="none" className="w-full h-full fill-white">
+          <path d="M0,0 C150,24 400,24 600,0 C800,24 1050,24 1200,0 L1200,24 L0,24 Z" />
         </svg>
       </div>
 
-      {/* LOWEST PRICES EVER Banner */}
-      <div className="px-4 relative z-10" style={{ marginTop: '30px', marginBottom: '12px' }} data-section="lowest-prices">
-        <div className="flex items-center justify-center gap-2 mb-1">
-          {/* Left horizontal line */}
-          <div className="flex-1 h-px bg-neutral-300"></div>
-
-          <h2
-            className="font-black text-center whitespace-nowrap"
-            style={{
-              fontFamily: '"Poppins", sans-serif',
-              fontSize: '28px',
-              color: '#8B3D28',
-              opacity: fontLoaded ? 1 : 0,
-              transition: 'opacity 0.2s ease-in',
-              textShadow:
-                '-1.5px -1.5px 0 white, 1.5px -1.5px 0 white, -1.5px 1.5px 0 white, 1.5px 1.5px 0 white, ' +
-                '-1.5px 0px 0 white, 1.5px 0px 0 white, 0px -1.5px 0 white, 0px 1.5px 0 white, ' +
-                '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white, ' +
-                '3px 3px 4px rgba(0, 0, 0, 0.5), ' +
-                '2px 2px 3px rgba(0, 0, 0, 0.6), ' +
-                '1px 1px 2px rgba(0, 0, 0, 0.7), ' +
-                '0px 2px 1px rgba(0, 0, 0, 0.4)',
-              letterSpacing: '0.8px',
-              fontWeight: 900,
-              lineHeight: '1.1',
-              transform: 'perspective(500px) rotateX(2deg) rotateY(-1deg)',
-              transformStyle: 'preserve-3d',
-            } as React.CSSProperties}
-          >
-            LOWEST PRICES EVER
-          </h2>
-
-          {/* Right horizontal line */}
-          <div className="flex-1 h-px bg-neutral-300"></div>
+      {/* Premium Banner Section */}
+      <div className="px-4 relative z-10 flex flex-col items-center mb-6">
+        <div className="flex items-center justify-center gap-3 mb-1">
+          <div className="h-[1px] w-8 bg-[#8B3D28]/20"></div>
+          <span className="text-[10px] font-black text-[#4A7C59] tracking-[0.2em] uppercase">Special Curated Deal</span>
+          <div className="h-[1px] w-8 bg-[#8B3D28]/20"></div>
         </div>
+        
+        <h2
+          className="text-center italic"
+          style={{
+            fontFamily: '"Outfit", sans-serif',
+            fontSize: '32px',
+            color: '#8B3D28',
+            fontStyle: 'italic',
+            fontWeight: 900,
+            lineHeight: '1',
+            letterSpacing: '-0.02em'
+          }}
+        >
+          LOWEST PRICES EVER
+        </h2>
+        
+        <div className="mt-2 h-1 w-12 bg-[#8B3D28] rounded-full opacity-20"></div>
       </div>
 
-      {/* Horizontal Scrollable Product Cards */}
+      {/* Horizontal Scroll Carousel */}
       <div
         ref={scrollContainerRef}
-        className="flex items-stretch gap-2 overflow-x-auto scrollbar-hide px-4 py-2"
-        style={{ scrollSnapType: 'x mandatory' }}
+        className="flex items-stretch gap-3 overflow-x-auto scrollbar-hide px-4 pb-4 no-scrollbar"
+        style={{ scrollSnapType: 'x proximity' }}
       >
         {discountedProducts.map((product) => {
           const cartQuantity = cartItemsMap.get(product.id) || 0;
@@ -422,6 +378,9 @@ export default function LowestPricesEver({ activeTab = 'all', products: adminPro
           );
         })}
       </div>
+      
+      {/* Bottom fade shadow for depth */}
+      <div className="h-4 bg-gradient-to-b from-[#FFF9F5] to-transparent pointer-events-none"></div>
     </div>
   );
 }

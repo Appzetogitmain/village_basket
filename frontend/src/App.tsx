@@ -23,7 +23,6 @@ import { initializePushNotifications, setupForegroundNotificationHandler } from 
 
 // Critical routes - load immediately (Home, Cart, Checkout)
 import Home from "./modules/user/Home";
-import Cart from "./modules/user/Cart";
 import Checkout from "./modules/user/Checkout";
 import CheckoutAddress from "./modules/user/CheckoutAddress";
 import ProductDetail from "./modules/user/ProductDetail";
@@ -38,7 +37,6 @@ const Categories = lazy(() => import("./modules/user/Categories"));
 const Category = lazy(() => import("./modules/user/Category"));
 const Invoice = lazy(() => import("./modules/user/Invoice"));
 const Login = lazy(() => import("./modules/user/Login"));
-const TomorrowVegBooking = lazy(() => import("./modules/user/TomorrowVegBooking"));
 
 const AboutUs = lazy(() => import("./modules/user/AboutUs"));
 const FAQ = lazy(() => import("./modules/user/FAQ"));
@@ -78,7 +76,6 @@ const DeliverySignUp = lazy(() => import("./modules/delivery/pages/DeliverySignU
 const SellerLayout = lazy(() => import("./modules/seller/components/SellerLayout"));
 const SellerDashboard = lazy(() => import("./modules/seller/pages/SellerDashboard"));
 const SellerOrders = lazy(() => import("./modules/seller/pages/SellerOrders"));
-const SellerNextDayOrders = lazy(() => import("./modules/seller/pages/SellerNextDayOrders"));
 const SellerOrderDetail = lazy(() => import("./modules/seller/pages/SellerOrderDetail"));
 const SellerCategory = lazy(() => import("./modules/seller/pages/SellerCategory"));
 const SellerSubCategory = lazy(() => import("./modules/seller/pages/SellerSubCategory"));
@@ -122,7 +119,6 @@ const AdminSystemUser = lazy(() => import("./modules/admin/pages/AdminSystemUser
 const AdminUsers = lazy(() => import("./modules/admin/pages/AdminUsers"));
 const AdminFAQ = lazy(() => import("./modules/admin/pages/AdminFAQ"));
 const AdminHomeSection = lazy(() => import("./modules/admin/pages/AdminHomeSection"));
-const AdminNextDaySections = lazy(() => import("./modules/admin/pages/AdminNextDaySections"));
 const AdminBestsellerCards = lazy(() => import("./modules/admin/pages/AdminBestsellerCards"));
 const AdminPromoStrip = lazy(() => import("./modules/admin/pages/AdminPromoStrip"));
 const AdminLowestPrices = lazy(() => import("./modules/admin/pages/AdminLowestPrices"));
@@ -286,7 +282,6 @@ function App() {
                                       <Route path="" element={<SellerDashboard />} />
                                       <Route path="orders" element={<SellerOrders />} />
                                       <Route path="orders/:id" element={<SellerOrderDetail />} />
-                                      <Route path="next-day-orders" element={<SellerNextDayOrders />} />
                                       <Route path="category" element={<SellerCategory />} />
                                       <Route path="subcategory" element={<SellerSubCategory />} />
                                       <Route path="product/add" element={<SellerAddProduct />} />
@@ -319,7 +314,6 @@ function App() {
                                         <Route path="profile" element={<AdminProfile />} />
                                         <Route path="catalog-manager" element={<AdminCatalogManager />} />
                                         <Route path="catalog/sections" element={<AdminHomeSection />} />
-                                        <Route path="next-day-sections" element={<AdminNextDaySections />} />
                                         <Route path="category" element={<AdminCategory />} />
                                         <Route path="category/header" element={<AdminHeaderCategory />} />
                                         <Route path="subcategory" element={<AdminSubCategory />} />
@@ -403,7 +397,6 @@ function App() {
                                     <Route path="/checkout/address" element={<CheckoutAddress />} />
                                     <Route path="/product/:id" element={<ProductDetail />} />
                                     <Route path="/invoice/:id" element={<Invoice />} />
-                                    <Route path="/cart" element={<Cart />} />
                                     <Route path="/addresses" element={<Addresses />} />
                                     <Route path="/store/:slug" element={<StorePage />} />
                                     <Route path="/store/spiritual" element={<SpiritualStore />} />
@@ -414,7 +407,6 @@ function App() {
                                     <Route path="/store/fashion-basics" element={<FashionStore />} />
                                     <Route path="/store/toy" element={<ToyStore />} />
                                     <Route path="/store/hobby" element={<HobbyStore />} />
-                                    <Route path="/tomorrow-veg-booking" element={<TomorrowVegBooking />} />
                                     <Route path="/rewards" element={<UserRewards />} />
                                   </Routes>
                                 </Suspense>

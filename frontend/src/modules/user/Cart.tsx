@@ -3,6 +3,7 @@ import { useCart } from '../../context/CartContext';
 import Button from '../../components/ui/button';
 import { appConfig } from '../../services/configService';
 import { calculateProductPrice } from '../../utils/priceUtils';
+import QuantityInput from '../../components/ui/QuantityInput';
 
 export default function Cart() {
   const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
@@ -109,9 +110,11 @@ export default function Cart() {
                     >
                       −
                     </Button>
-                    <span className="text-base md:text-lg font-black text-[#8B3D28] min-w-[2rem] md:min-w-[2.5rem] text-center font-poppins">
-                      {item.quantity}
-                    </span>
+                     <QuantityInput
+                      value={item.quantity}
+                      onChange={(val) => updateQuantity(item.product.id, val, item.variant)}
+                      className="text-base md:text-lg font-black text-[#8B3D28] w-12 md:w-16 text-center font-poppins bg-transparent border-none focus:outline-none"
+                    />
                     <Button
                       variant="outline"
                       size="icon"

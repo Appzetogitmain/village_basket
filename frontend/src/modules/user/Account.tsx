@@ -81,33 +81,35 @@ export default function Account() {
   if (!user) {
     return (
       <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
-        <div className="bg-gradient-to-b from-green-200/50 via-green-100/30 to-transparent pb-6 md:pb-8 pt-12 md:pt-16">
-          <div className="px-4 md:px-6 lg:px-8">
-            <button onClick={() => navigate(-1)} className="mb-4 text-neutral-900" aria-label="Back">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        <div className="bg-gradient-to-b from-[#8B3D28]/10 via-[#8B3D28]/5 to-transparent pb-6 md:pb-8 pt-12 md:pt-16 relative">
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="px-4 md:px-6 lg:px-8 relative z-10">
+            <button onClick={() => navigate(-1)} className="mb-4 text-[#8B3D28] hover:bg-[#8B3D28]/10 p-2 rounded-full transition-colors" aria-label="Back">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </button>
             <div className="flex flex-col items-center mb-4 md:mb-6">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-neutral-200 flex items-center justify-center mb-3 md:mb-4 border-2 border-white shadow-sm">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-neutral-500 md:w-12 md:h-12">
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-neutral-100 flex items-center justify-center mb-3 md:mb-4 border-2 border-[#8B3D28]/20 shadow-sm relative overflow-hidden">
+                <div className="absolute inset-0 bg-[#8B3D28]/5"></div>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-[#8B3D28]/60 md:w-12 md:h-12 relative z-10">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <h1 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2">Welcome!</h1>
-              <p className="text-sm md:text-base text-neutral-600 text-center px-4">
+              <h1 className="text-2xl md:text-3xl font-black text-[#8B3D28] mb-2 font-poppins tracking-tight">Welcome!</h1>
+              <p className="text-sm md:text-base text-[#8B3D28]/70 text-center px-8 font-medium max-w-xs">
                 Login to access your profile, orders, and more
               </p>
             </div>
           </div>
         </div>
 
-        <div className="px-4 md:px-6 lg:px-8 mt-6">
-          <div className="max-w-md mx-auto space-y-3">
+        <div className="px-6 md:px-8 mt-6">
+          <div className="max-w-md mx-auto">
             <button
               onClick={() => navigate('/login')}
-              className="w-full py-3.5 rounded-lg font-semibold text-base bg-teal-600 text-white hover:bg-teal-700 transition-colors shadow-lg shadow-teal-500/20"
+              className="w-full py-4 rounded-xl font-bold text-base bg-[#8B3D28] text-white hover:bg-[#8B3D28]/95 transition-all shadow-xl shadow-[#8B3D28]/20 active:scale-[0.98] uppercase tracking-wider"
             >
-              Login
+              Login / Signup
             </button>
           </div>
         </div>

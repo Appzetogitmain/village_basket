@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import HomeHero from "./components/HomeHero";
 
 import PromoStrip from "./components/PromoStrip";
-import NextDayBookingCard from "./components/NextDayBookingCard";
 import LowestPricesEver from "./components/LowestPricesEver";
 import CategoryTileSection from "./components/CategoryTileSection";
 import FeaturedThisWeek from "./components/FeaturedThisWeek";
@@ -251,26 +250,37 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-transparent min-h-screen pb-20 md:pb-0 font-poppins" ref={contentRef}>
+    <div className="bg-transparent min-h-screen pb-32 md:pb-8 font-poppins relative" ref={contentRef}>
+      {/* Page Texture Overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+
       {/* Hero Header with Gradient and Tabs */}
       <HomeHero activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Promo Strip */}
-      <PromoStrip activeTab={activeTab} />
-
-      {/* Next Day Vegetable Booking Card */}
-      <NextDayBookingCard />
+      <div className="relative z-10">
+        <PromoStrip activeTab={activeTab} />
+      </div>
 
       {/* LOWEST PRICES EVER Section */}
-      <LowestPricesEver activeTab={activeTab} products={homeData.lowestPrices} />
+      <div className="bg-gradient-to-b from-white to-transparent pt-2 relative z-10">
+        <LowestPricesEver activeTab={activeTab} products={homeData.lowestPrices} />
+      </div>
 
       {/* BESTSELLER CARDS (2x2 Grid) */}
-      <BestsellerCards cards={homeData.bestsellerCards} />
+      <div className="relative z-10 bg-[#4A7C59]/5 py-4 my-6 border-y border-[#4A7C59]/10">
+        <BestsellerCards cards={homeData.bestsellerCards} />
+        {/* Subtle Leaf Pattern or Slogan could go here */}
+        <div className="px-4 md:px-8 -mt-2 mb-2">
+            <div className="h-1 w-20 bg-[#4A7C59] rounded-full opacity-20"></div>
+        </div>
+      </div>
 
       {/* Main content */}
       <div
-        className="pt-1 space-y-5 md:space-y-8 md:pt-4"
+        className="pt-1 space-y-6 md:space-y-10 md:pt-4 relative z-10"
       >
+
 
         {/* Featured This Week Section */}
         {/* <FeaturedThisWeek /> */}

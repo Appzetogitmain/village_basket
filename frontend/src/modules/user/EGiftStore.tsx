@@ -233,7 +233,7 @@ export default function EGiftStore() {
                               −
                             </Button>
                           </motion.div>
-                          <motion.span
+                           <motion.span
                             key={inCartQty}
                             initial={{ scale: 1.2, y: -4 }}
                             animate={{ scale: 1, y: 0 }}

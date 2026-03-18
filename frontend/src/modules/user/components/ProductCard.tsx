@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { useRef, useEffect, useState } from 'react';
 import { Product } from '../../../types/domain';
@@ -13,6 +13,8 @@ import StarRating from '../../../components/ui/StarRating';
 import { calculateProductPrice } from '../../../utils/priceUtils';
 import { getVariationColor } from '../../../utils/variationUtils';
 import VariationSelectionModal from './VariationSelectionModal';
+import QuantityInput from '../../../components/ui/QuantityInput';
+
 
 interface ProductCardProps {
   product: Product;
@@ -198,7 +200,10 @@ export default function ProductCard({
     isOperationPendingRef.current = true;
 
     try {
-      await updateQuantity(((product as any).id || product._id) as string, inCartQty - 1);
+      const productId = ((product as any).id || product._id) as string;
+      const variant = product.variations && product.variations.length > 0 ? String(product.variations[0]._id || product.variations[0].name || product.variations[0].title) : undefined;
+      const variantTitle = product.variations && product.variations.length > 0 ? String(product.variations[0].name || product.variations[0].title || product.variations[0].value) : (product.pack || undefined);
+      await updateQuantity(productId, inCartQty - 1, variant, variantTitle);
     } finally {
       // Reset the flag after the operation truly completes
       isOperationPendingRef.current = false;
@@ -232,7 +237,10 @@ export default function ProductCard({
         return;
       }
       if (inCartQty > 0) {
-        await updateQuantity(((product as any).id || product._id) as string, inCartQty + 1);
+        const productId = ((product as any).id || product._id) as string;
+        const variant = product.variations && product.variations.length > 0 ? String(product.variations[0]._id || product.variations[0].name || product.variations[0].title) : undefined;
+        const variantTitle = product.variations && product.variations.length > 0 ? String(product.variations[0].name || product.variations[0].title || product.variations[0].value) : (product.pack || undefined);
+        await updateQuantity(productId, inCartQty + 1, variant, variantTitle);
       } else {
         await addToCart(product, addButtonRef.current);
       }
@@ -277,96 +285,127 @@ export default function ProductCard({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
-      className={`village-card paper-texture organic-radius overflow-hidden flex flex-col h-full relative ${className}`}
+      className={`village-card white-paper-texture organic-radius overflow-hidden flex flex-col relative h-full bg-white shadow-[0_8px_16px_rgba(0,0,0,0.06)] border border-neutral-100/50 transition-all hover:shadow-xl active:scale-[0.98] ${className}`}
     >
       <div 
         onClick={handleCardClick}
-        className="cursor-pointer relative z-10"
+        className="cursor-pointer relative"
       >
-        <div className={`organic-image-container w-full ${compact ? 'h-24 md:h-32' : 'h-32 md:h-44'} flex items-center justify-center overflow-hidden relative border-b border-neutral-100 bg-white rounded-t-[20px]`}>
+        <div className={`relative w-full ${compact ? 'aspect-square p-2' : 'h-32 md:h-44 p-3'} bg-gradient-to-b from-neutral-50 to-white flex items-center justify-center overflow-hidden rounded-t-[20px]`}>
           {product.imageUrl || product.mainImage ? (
             <img
               ref={imageRef}
               src={product.imageUrl || product.mainImage}
               alt={product.name || product.productName || 'Product'}
-              className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
               referrerPolicy="no-referrer"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const parent = target.parentElement;
-                if (parent && !parent.querySelector('.fallback-icon')) {
-                  const fallback = document.createElement('div');
-                  fallback.className = 'w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-2xl fallback-icon';
-                  fallback.textContent = (product.name || product.productName || '?').charAt(0).toUpperCase();
-                  parent.appendChild(fallback);
-                }
-              }}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-4xl">
+            <div className="w-full h-full flex items-center justify-center bg-neutral-50 text-neutral-300 text-3xl font-black">
               {(product.name || product.productName || '?').charAt(0).toUpperCase()}
             </div>
           )}
 
-          {/* Discount Badge - Top Left */}
+          {/* Discount Badge */}
           {discount > 0 && (
-            <div className="absolute top-1.5 left-1.5 z-20 bg-[#E53935] text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg transform -rotate-3 border border-white/20">
+            <div className={`absolute top-2 left-0 z-10 ${categoryStyle ? 'bg-red-600' : 'bg-[#4A7C59]'} text-white text-[8px] md:text-[9px] font-black px-2 py-0.5 rounded-r-sm shadow-sm`}>
               {discount}% OFF
             </div>
           )}
 
-          {/* Heart Button - Top Right */}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              toggleWishlist(e);
-            }}
-            className="absolute top-1.5 right-1.5 z-20 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all shadow-sm border border-neutral-100"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill={isWishlisted ? "#E53935" : "none"}
-              className={isWishlisted ? "text-red-500" : "text-neutral-400"}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-
-          {/* Rating Badge on Image - Bottom Right */}
-          <div className="absolute bottom-1.5 right-1.5 z-20">
-            <div className="premium-pill px-2 py-0.5 rounded-lg flex items-center gap-1 border border-neutral-100">
-              <span className="text-xs font-black text-neutral-800">{(product.rating || 4.5).toFixed(1)}</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="#F59E0B">
+          {/* Rating Badge */}
+          <div className="absolute top-2 right-2 z-10">
+            <div className="bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded-full flex items-center gap-0.5 border border-neutral-100 shadow-sm">
+              <span className="text-[9px] font-black text-village-umber">{(product.rating || 4.5).toFixed(1)}</span>
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="#F59E0B">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z" />
               </svg>
             </div>
           </div>
+
+          {/* Wishlist Button */}
+          <div className="absolute top-2 right-2 z-20">
+             <button
+                onClick={toggleWishlist}
+                className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center border border-neutral-100/50 active:scale-90 transition-transform"
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill={isWishlisted ? "#ef4444" : "none"}
+                  className={isWishlisted ? "text-red-500" : "text-neutral-400"}
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+             </button>
+          </div>
+
+          {/* ADD Button Overlay for Category Style */}
+          {categoryStyle && (
+            <div className="absolute bottom-2 right-2 z-20">
+              <AnimatePresence mode="wait">
+                {inCartQty === 0 ? (
+                  <motion.button
+                    key="add-overlay"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    ref={addButtonRef}
+                    disabled={product.isAvailable === false}
+                    onClick={handleCustomAdd}
+                    className="bg-white/95 backdrop-blur-sm text-[#8B3D28] border-2 border-[#8B3D28] text-[10px] font-black px-3 py-1 rounded shadow-md hover:bg-white transition-colors uppercase tracking-wider"
+                  >
+                    Add
+                  </motion.button>
+                ) : (
+                  <motion.div
+                    key="stepper-overlay"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="flex items-center gap-1 bg-[#8B3D28] rounded px-1.5 py-1 shadow-md"
+                  >
+                    <button
+                      onClick={handleCustomDecrease}
+                      className="w-4 h-4 flex items-center justify-center text-white font-bold text-lg active:scale-90 transition-transform leading-none"
+                    >−</button>
+                     <QuantityInput
+                      value={currentQty}
+                      min={0}
+                      onChange={(val) => {
+                        const productId = ((product as any).id || product._id) as string;
+                        const variant = product.variations && product.variations.length > 0 ? String(product.variations[0]._id || product.variations[0].name || product.variations[0].title) : undefined;
+                        const variantTitle = product.variations && product.variations.length > 0 ? String(product.variations[0].name || product.variations[0].title || product.variations[0].value) : (product.pack || undefined);
+                        updateQuantity(productId, val, variant, variantTitle);
+                      }}
+                      className="text-white font-bold w-6 text-center bg-transparent border-none focus:outline-none text-xs"
+                    />
+                    <button
+                      onClick={handleIncrease}
+                      className="w-4 h-4 flex items-center justify-center text-white font-bold text-lg active:scale-90 transition-transform leading-none"
+                    >+</button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Product Information */}
+      {/* Product Content */}
       <div 
         onClick={handleCardClick}
-        className="px-2 pb-1.5 flex-1 flex flex-col cursor-pointer z-10"
+        className="p-3 flex flex-col flex-1 cursor-pointer"
       >
-        <h3 className="text-[13px] md:text-[15px] font-bold text-village-umber line-clamp-1 leading-tight mb-0.5 font-poppins">
-          {product.name || product.productName || ''}
-        </h3>
-
-        <div className="mb-0.5">
-          <span className="text-[10px] md:text-[11px] font-medium text-neutral-400 tracking-wide font-nunito block">
-            Rs {displayPrice}/{(() => {
+        <div className="flex flex-col gap-0.5 mb-2">
+          <h3 className="text-[11px] md:text-[13px] font-black text-village-umber uppercase tracking-tight line-clamp-1 h-4">
+            {product.name || product.productName || ''}
+          </h3>
+          <span className="text-[8px] md:text-[10px] font-bold text-neutral-400 uppercase tracking-wider italic">
+            Pack: {(() => {
                 const v = product.variations?.[0];
                 if (!v) return (product.pack || 'Standard').trim();
                 const vName = (v.name || '').trim();
@@ -376,57 +415,55 @@ export default function ProductCard({
           </span>
         </div>
 
-        <div className="flex flex-col mt-auto">
-          <div className="flex items-baseline gap-1 font-nunito">
-            <span className="text-base md:text-xl font-bold text-village-umber">Rs {displayPrice}</span>
+        <div className="mt-auto flex flex-col pt-1">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-sm md:text-base font-black text-village-umber">₹{displayPrice}</span>
+            {mrp && mrp > displayPrice && (
+              <span className="text-[9px] md:text-[10px] text-neutral-400 line-through font-bold">₹{mrp}</span>
+            )}
           </div>
-          {mrp && mrp > displayPrice && (
-            <span className="text-[9px] md:text-[11px] text-neutral-400 line-through -mt-0.5">
-              ₹{mrp}
-            </span>
+          
+          {!categoryStyle && (
+            <div className="mt-3">
+              {inCartQty === 0 ? (
+                <button
+                  ref={addButtonRef}
+                  disabled={product.isAvailable === false}
+                  onClick={handleCustomAdd}
+                  className={`w-full h-8 md:h-10 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 ${
+                    product.isAvailable === false
+                    ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed uppercase'
+                    : 'bg-[#4A7C59] text-white hover:bg-[#3D664A] shadow-[#4A7C59]/20 translate-z-0'
+                  }`}
+                >
+                  {product.isAvailable === false ? 'Out' : 'Add'}
+                </button>
+              ) : (
+                <div className="flex items-center justify-between bg-[#8B3D28]/5 rounded-xl border border-[#8B3D28]/10 h-8 md:h-10 px-1 shadow-inner">
+                  <button
+                    onClick={handleCustomDecrease}
+                    className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-white text-[#8B3D28] shadow-sm flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
+                  >−</button>
+                   <QuantityInput
+                    value={currentQty}
+                    min={0}
+                    onChange={(val) => {
+                      const productId = ((product as any).id || product._id) as string;
+                      const variant = product.variations && product.variations.length > 0 ? String(product.variations[0]._id || product.variations[0].name || product.variations[0].title) : undefined;
+                      const variantTitle = product.variations && product.variations.length > 0 ? String(product.variations[0].name || product.variations[0].title || product.variations[0].value) : (product.pack || undefined);
+                      updateQuantity(productId, val, variant, variantTitle);
+                    }}
+                    className="text-[11px] md:text-sm font-black text-[#8B3D28] w-8 text-center bg-transparent border-none focus:outline-none"
+                  />
+                  <button
+                    onClick={handleIncrease}
+                    className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-[#8B3D28] text-white shadow-md flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
+                  >+</button>
+                </div>
+              )}
+            </div>
           )}
         </div>
-      </div>
-
-      {/* Action Button Section */}
-      <div className="px-2 pb-2 relative z-20">
-        {inCartQty === 0 ? (
-          <button
-            ref={addButtonRef}
-            disabled={product.isAvailable === false}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (product.variations && product.variations.length > 1) {
-                setIsVariationModalOpen(true);
-              } else {
-                handleAdd(e); // Use handleAdd from existing logic
-              }
-            }}
-            className={`w-full h-8 md:h-10 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-md md:shadow-lg transition-all active:scale-95 flex items-center justify-center font-poppins ${product.isAvailable === false
-                ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed shadow-none'
-                : 'bg-gradient-to-r from-orange-400 to-orange-500 text-white hover:from-orange-500 hover:to-orange-600 border border-orange-300/30'
-              }`}
-          >
-            {product.isAvailable === false ? 'Out of Range' : 'Add'}
-          </button>
-        ) : (
-          <div className="flex items-center justify-between bg-orange-50 px-1 py-0.5 rounded-full border border-orange-200 h-8 md:h-10 shadow-inner">
-            <button
-              onClick={handleCustomDecrease}
-              className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white text-orange-600 flex items-center justify-center font-bold text-lg hover:shadow-sm active:scale-90 transition-all"
-            >
-              −
-            </button>
-            <span className="text-xs md:text-sm font-black text-village-umber">{currentQty}</span>
-            <button
-              onClick={handleIncrease}
-              className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white text-orange-600 flex items-center justify-center font-bold text-lg hover:shadow-sm active:scale-90 transition-all"
-            >
-              +
-            </button>
-          </div>
-        )}
       </div>
 
       <VariationSelectionModal

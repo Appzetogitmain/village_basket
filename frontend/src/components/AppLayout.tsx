@@ -5,7 +5,8 @@ import FloatingCartPill from './FloatingCartPill';
 import { useLocation as useLocationContext } from '../hooks/useLocation';
 import LocationPermissionRequest from './LocationPermissionRequest';
 import { useThemeContext } from '../context/ThemeContext';
-import brandLogo from '../assets/village_basket-removebg-preview.png';
+import { useCart } from '../context/CartContext';
+import brandLogo from '@assets/village_basket-removebg-preview.png';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -23,6 +24,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [showLocationRequest, setShowLocationRequest] = useState(false);
   const [showLocationChangeModal, setShowLocationChangeModal] = useState(false);
   const { currentTheme } = useThemeContext();
+  const { cart } = useCart();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -126,11 +128,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const isProductDetailPage = location.pathname.startsWith('/product/');
   const isSearchPage = location.pathname === '/search';
   const isCheckoutPage = location.pathname === '/checkout' || location.pathname.startsWith('/checkout/');
-  const isCartPage = location.pathname === '/cart';
-  const isTomorrowBookingPage = location.pathname === '/tomorrow-veg-booking';
-  const showHeader = !isCheckoutPage && !isCartPage;
+  const isHomePage = location.pathname === '/' || location.pathname === '/user/home';
+  const showHeader = !isCheckoutPage;
   const showSearchBar = isSearchPage;
-  const showFooter = !isCheckoutPage && !isProductDetailPage && !isTomorrowBookingPage;
+  const showFooter = !isCheckoutPage && !isProductDetailPage;
 
   return (
     <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
@@ -145,7 +146,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               {/* Subtle Decorative Warli Pattern (Top Edge) */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-30"></div>
               <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
-              
+
               {/* Home */}
               <Link
                 to="/"
@@ -242,12 +243,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </nav>
           )}
 
-          {/* Sticky Header - Show on search page and other non-home pages, excluding account page */}
+          {/* Sticky Header - Global Desktop Header, Hidden on Mobile */}
           {showHeader && (
-            <header className="sticky top-0 z-50 bg-[#8B3D28] shadow-lg md:top-[60px] border-b border-white/10">
+            <header className={`sticky top-0 z-50 bg-[#8B3D28] shadow-lg md:top-[60px] border-b border-white/10 hidden md:block`}>
               {/* Delivery info line */}
               <div className="px-4 md:px-6 lg:px-8 py-1 bg-white/10 text-white text-[9px] uppercase font-black tracking-widest text-center">
-                 VILLAGE FRESH GOODS | Delivering in 10–15 mins
+                VILLAGE FRESH GOODS | Delivering in 10–15 mins
               </div>
 
               {/* Main Header Row */}
@@ -277,7 +278,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-4">
-                  <button 
+                  <button
                     onClick={() => navigate('/search')}
                     className="md:hidden text-white p-1 hover:bg-white/10 rounded-full transition-colors"
                   >
@@ -286,8 +287,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       <line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
                   </button>
-                  <button 
-                    onClick={() => navigate('/cart')}
+                  <button
+                    onClick={() => navigate('/checkout')}
                     className="text-white p-1 hover:bg-white/10 rounded-full transition-colors relative"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -296,7 +297,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       <path d="M16 10a4 4 0 01-8 0" />
                     </svg>
                   </button>
-                  <button 
+                  <button
                     onClick={() => navigate('/account')}
                     className="hidden md:flex text-white p-1 hover:bg-white/10 rounded-full transition-colors"
                   >
@@ -386,216 +387,82 @@ export default function AppLayout({ children }: AppLayoutProps) {
             />
           )}
 
-          {/* Fixed Bottom Navigation - Mobile Only, Hidden on checkout pages */}
+           {/* Fixed Bottom Navigation - Mobile Only, Premium Floating Design */}
           {showFooter && (
-            <nav
-              className="fixed bottom-0 left-0 right-0 shadow-[0_-8px_20px_rgba(0,0,0,0.15)] z-50 md:hidden pb-safe"
-              style={{ 
-                height: '68px', 
-                borderTopLeftRadius: '24px', 
-                borderTopRightRadius: '24px',
-                backgroundColor: '#8B3D28',
-                opacity: 1
-              }}
-            >
-              <div className="flex justify-around items-center h-full px-2">
+            <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4 pb-4 flex flex-col gap-2 pointer-events-none">
+              {/* Restore original FloatingCartPill experience */}
+              <div className="pointer-events-auto">
+                <FloatingCartPill />
+              </div>
+
+              <motion.nav
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="pointer-events-auto h-[54px] bg-[#8B3D28]/95 backdrop-blur-md rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.3)] border border-white/10 flex items-center justify-around px-2 relative"
+              >
                 {/* Home */}
-                <motion.div
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.1 }}
-                  className="flex-1 h-full"
-                >
-                  <Link
-                    to="/"
-                    className="flex flex-col items-center justify-center h-full relative"
-                  >
-                    <div className="flex flex-col items-center justify-center relative">
-                      <motion.svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        animate={isActive('/') ? {
-                          scale: [1, 1.1, 1],
-                        } : {}}
-                      >
-                        <path 
-                          d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" 
-                          stroke={isActive('/') ? '#FFCC00' : '#FFFFFF'} 
-                          strokeWidth="2.5" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          fill={isActive('/') ? '#FFCC00' : 'none'} 
-                          fillOpacity={isActive('/') ? '0.2' : '0'}
-                        />
-                      </motion.svg>
-                    </div>
-                    <span className={`text-[10px] mt-1.5 font-black font-poppins uppercase tracking-wider ${isActive('/') ? 'text-[#FFCC00]' : 'text-white'}`}>
-                      HOME
-                    </span>
-                  </Link>
-                </motion.div>
+                <Link to="/" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
+                  <motion.div animate={{ scale: isActive('/') ? 1.1 : 1, y: isActive('/') ? -1 : 0 }} transition={{ duration: 0.2 }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/') ? 'white' : 'none'} stroke={isActive('/') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9.5L12 3l9 6.5V20c0 1-1 2-2 2H5c-1 0-2-1-2-2V9.5z" />
+                      <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                  </motion.div>
+                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/') ? 'text-white' : 'text-white/50'}`}>
+                    HOME
+                  </span>
+                </Link>
 
-                {/* Order Again */}
-                <motion.div
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.1 }}
-                  className="flex-1 h-full"
-                >
-                  <Link
-                    to="/order-again"
-                    className="flex flex-col items-center justify-center h-full relative"
-                  >
-                    <div className="flex flex-col items-center justify-center relative">
-                      <motion.svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        animate={isActive('/order-again') ? {
-                          scale: [1, 1.1, 1],
-                        } : {}}
-                      >
-                        <path 
-                          d="M3 9h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm3 0V7a6 6 0 1112 0v2" 
-                          stroke={isActive('/order-again') ? '#FFCC00' : '#FFFFFF'} 
-                          strokeWidth="2.5" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          fill={isActive('/order-again') ? '#FFCC00' : 'none'} 
-                          fillOpacity={isActive('/order-again') ? '0.2' : '0'}
-                        />
-                      </motion.svg>
-                    </div>
-                    <span className={`text-[10px] mt-1.5 font-black font-poppins uppercase tracking-wider ${isActive('/order-again') ? 'text-[#FFCC00]' : 'text-white'}`}>
-                      ORDERS
-                    </span>
-                  </Link>
-                </motion.div>
-
-                {/* Tomorrow */}
-                <motion.div
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.1 }}
-                  className="flex-1 h-full"
-                >
-                  <Link
-                    to="/tomorrow-veg-booking"
-                    className="flex flex-col items-center justify-center h-full relative"
-                  >
-                    <div className="flex flex-col items-center justify-center relative">
-                      <motion.svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        animate={isActive('/tomorrow-veg-booking') ? {
-                          scale: [1, 1.1, 1],
-                        } : {}}
-                      >
-                        <path 
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" 
-                          stroke={isActive('/tomorrow-veg-booking') ? '#FFCC00' : '#FFFFFF'} 
-                          strokeWidth="2.5" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          fill={isActive('/tomorrow-veg-booking') ? '#FFCC00' : 'none'} 
-                          fillOpacity={isActive('/tomorrow-veg-booking') ? '0.2' : '0'}
-                        />
-                      </motion.svg>
-                    </div>
-                    <span className={`text-[10px] mt-1.5 font-black font-poppins uppercase tracking-wider ${isActive('/tomorrow-veg-booking') ? 'text-[#FFCC00]' : 'text-white'}`}>
-                      TOMORROW
-                    </span>
-                  </Link>
-                </motion.div>
+                {/* Orders */}
+                <Link to="/order-again" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
+                  <motion.div animate={{ scale: isActive('/order-again') ? 1.1 : 1, y: isActive('/order-again') ? -1 : 0 }} transition={{ duration: 0.2 }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/order-again') ? 'white' : 'none'} stroke={isActive('/order-again') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
+                      <line x1="3" y1="6" x2="21" y2="6" />
+                      <path d="M16 10a4 4 0 01-8 0" />
+                    </svg>
+                  </motion.div>
+                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/order-again') ? 'text-white' : 'text-white/50'}`}>
+                    ORDERS
+                  </span>
+                </Link>
 
                 {/* Categories */}
-                <motion.div
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.1 }}
-                  className="flex-1 h-full"
-                >
-                  <Link
-                    to="/categories"
-                    className="flex flex-col items-center justify-center h-full relative"
+                <Link to="/categories" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
+                  <motion.div
+                    animate={{
+                      scale: isCategoriesActive ? 1.1 : 1,
+                      y: isCategoriesActive ? -1 : 0,
+                      rotate: categoriesRotation
+                    }}
+                    transition={{ duration: 0.4 }}
                   >
-                    <div className="flex flex-col items-center justify-center relative">
-                      <motion.svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        animate={{
-                          rotate: categoriesRotation,
-                          scale: (isActive('/categories') || location.pathname.startsWith('/category/')) ? 1.1 : 1
-                        }}
-                        transition={{
-                          duration: 0.5,
-                          ease: "easeInOut"
-                        }}
-                        style={{ transformOrigin: 'center' }}
-                      >
-                        <path 
-                          d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" 
-                          stroke={(isActive('/categories') || location.pathname.startsWith('/category/')) ? '#FFCC00' : '#FFFFFF'} 
-                          strokeWidth="2.5" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          fill={(isActive('/categories') || location.pathname.startsWith('/category/')) ? '#FFCC00' : 'none'} 
-                          fillOpacity={(isActive('/categories') || location.pathname.startsWith('/category/')) ? '0.2' : '0'}
-                        />
-                      </motion.svg>
-                    </div>
-                    <span className={`text-[10px] mt-1.5 font-black font-poppins uppercase tracking-wider ${(isActive('/categories') || location.pathname.startsWith('/category/')) ? 'text-[#FFCC00]' : 'text-white'}`}>
-                      SHRENI
-                    </span>
-                  </Link>
-                </motion.div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isCategoriesActive ? 'white' : 'none'} stroke={isCategoriesActive ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7" />
+                      <rect x="14" y="3" width="7" height="7" />
+                      <rect x="14" y="14" width="7" height="7" />
+                      <rect x="3" y="14" width="7" height="7" />
+                    </svg>
+                  </motion.div>
+                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isCategoriesActive ? 'text-white' : 'text-white/50'}`}>
+                    SHRENI
+                  </span>
+                </Link>
 
                 {/* Profile */}
-                <motion.div
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.1 }}
-                  className="flex-1 h-full"
-                >
-                  <Link
-                    to="/account"
-                    className="flex flex-col items-center justify-center h-full relative"
-                  >
-                    <div className="flex flex-col items-center justify-center relative">
-                      <motion.svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        animate={isActive('/account') ? {
-                          scale: [1, 1.1, 1]
-                        } : {}}
-                      >
-                        <path 
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.418 0-8 2.239-8 5v2h16v-2c0-2.761-3.582-5-8-5z" 
-                          stroke={isActive('/account') ? '#FFCC00' : '#FFFFFF'} 
-                          strokeWidth="2.5" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          fill={isActive('/account') ? '#FFCC00' : 'none'} 
-                          fillOpacity={isActive('/account') ? '0.2' : '0'}
-                        />
-                      </motion.svg>
-                    </div>
-                    <span className={`text-[10px] mt-1.5 font-black font-poppins uppercase tracking-wider ${isActive('/account') ? 'text-[#FFCC00]' : 'text-white'}`}>
-                      ACCOUNT
-                    </span>
-                  </Link>
-                </motion.div>
-              </div>
-            </nav>
+                <Link to="/account" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
+                  <motion.div animate={{ scale: isActive('/account') ? 1.1 : 1, y: isActive('/account') ? -1 : 0 }} transition={{ duration: 0.2 }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/account') ? 'white' : 'none'} stroke={isActive('/account') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  </motion.div>
+                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/account') ? 'text-white' : 'text-white/50'}`}>
+                    ACCOUNT
+                  </span>
+                </Link>
+              </motion.nav>
+            </div>
           )}
         </div>
       </div>

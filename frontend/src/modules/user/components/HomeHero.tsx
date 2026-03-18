@@ -302,88 +302,92 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
       }}
     >
       <div
-        className="md:hidden pt-3 pb-4 px-4 shadow-lg relative z-10"
+        className="md:hidden pt-3 pb-3 px-4 relative z-10 overflow-hidden"
         style={{
           backgroundColor: '#8B3D28',
           borderBottomLeftRadius: '24px',
-          borderBottomRightRadius: '24px'
+          borderBottomRightRadius: '24px',
+          boxShadow: '0 8px 25px rgba(139, 61, 40, 0.25)'
         }}
       >
-        {/* Top Row: Logo, Search, Cart */}
-        <div className="flex items-center justify-between gap-3 mb-3">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <img
-              src={brandLogo}
-              alt="Village Basket"
-              className="h-14 w-auto object-contain filter brightness-125 drop-shadow-lg"
-            />
-          </div>
+        {/* Decorative Warli Pattern Overlay */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
 
-          {/* Search Bar Pill */}
-          <div className="flex-1">
-            <div
-              onClick={() => navigate('/search')}
-              className="w-full bg-white/20 backdrop-blur-md rounded-lg px-2.5 py-1.5 flex items-center gap-2 border border-white/10 shadow-inner cursor-pointer"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                <circle cx="11" cy="11" r="7" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <div className="flex-1 relative h-4 overflow-hidden">
-                {searchSuggestions.map((suggestion, index) => {
-                  const isActive = index === currentSearchIndex;
-                  return (
-                    <div
-                      key={suggestion}
-                      className={`absolute inset-0 flex items-center transition-all duration-500 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
-                    >
-                      <span className="text-white/90 text-xs truncate">Search &apos;{suggestion}&apos;</span>
-                    </div>
-                  );
-                })}
-              </div>
+        {/* Top Row: Logo & Cart */}
+        <div className="flex items-center justify-between mb-2.5 relative z-20">
+          <div className="flex items-center gap-2">
+            <div className="bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/20">
+              <img
+                src={brandLogo}
+                alt="Village Basket"
+                className="h-7 w-auto object-contain brightness-125"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[8px] font-black text-white/50 tracking-widest uppercase leading-none">Fresh</span>
+              <span className="text-xs font-black text-white leading-none">10-15 MINS</span>
             </div>
           </div>
 
-          {/* Cart Icon */}
-          <div className="flex-shrink-0">
-            <button
-              onClick={() => navigate('/cart')}
-              className="text-white p-1 relative active:scale-90 transition-transform"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="9" cy="21" r="1" />
-                <circle cx="20" cy="21" r="1" />
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-              </svg>
-              {(cart?.itemCount || 0) > 0 && (
-                <span className="absolute -top-1 -right-1 bg-white text-[#8B3D28] text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center shadow-md">
-                  {cart?.itemCount || 0}
-                </span>
-              )}
-            </button>
+          <button
+            onClick={() => navigate('/checkout')}
+            className="w-8 h-8 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white relative active:scale-90 transition-transform"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
+              <path d="M3 6h18" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            {(cart?.itemCount || 0) > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#4A7C59] text-white text-[8px] font-black rounded-md min-w-[14px] h-[14px] px-1 flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
+                {cart?.itemCount || 0}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Search Bar Pill */}
+        <div className="mb-2.5 relative z-20">
+          <div
+            onClick={() => navigate('/search')}
+            className="w-full bg-white rounded-xl px-3.5 py-2 flex items-center gap-2.5 shadow-[0_4px_12px_rgba(0,0,0,0.08)] cursor-pointer group active:scale-[0.98] transition-all"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B3D28" strokeWidth="3" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <div className="flex-1 relative h-4 overflow-hidden">
+              {searchSuggestions.map((suggestion, index) => {
+                const isActive = index === currentSearchIndex;
+                return (
+                  <div
+                    key={suggestion}
+                    className={`absolute inset-0 flex items-center transition-all duration-500 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                  >
+                    <span className="text-neutral-400 text-[12px] font-bold">Search &quot;{suggestion}&quot;</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Bottom Row: Full Address Pill */}
-        <div className="px-1">
-          {locationDisplayText && (
-            <div 
-              onClick={() => navigate('/location')}
-              className="flex items-center gap-2 px-4 py-2 active:scale-[0.98] transition-all cursor-pointer w-full"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="white" className="flex-shrink-0">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
-              </svg>
-              <span className="text-[12px] text-white font-bold truncate flex-1">
-                {locationDisplayText}
-              </span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-70 flex-shrink-0">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            </div>
-          )}
+        {/* Delivery Address Pill */}
+        <div 
+          onClick={() => navigate('/location')}
+          className="flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2.5 py-1.5 border border-white/5 active:scale-[0.98] transition-all cursor-pointer relative z-20"
+        >
+          <div className="w-4 h-4 rounded-full bg-[#4A7C59] flex items-center justify-center shadow-sm">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+            </svg>
+          </div>
+          <span className="text-[9px] text-white/80 font-black truncate flex-1 uppercase tracking-tight">
+            {locationDisplayText || 'Set delivery location'}
+          </span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-30">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
         </div>
       </div>
 
