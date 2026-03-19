@@ -102,7 +102,7 @@ export default function StorePage() {
     };
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-transparent">
             {/* Store Banner */}
             <div className="relative w-full aspect-[2/1] bg-neutral-100 overflow-hidden">
                 {bannerImage && !imageError ? (

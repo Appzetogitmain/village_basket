@@ -33,7 +33,7 @@ export default function ToyStore() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       <div className="relative w-full">
         <img
           src="/assets/shopbystore/toy.jpg"

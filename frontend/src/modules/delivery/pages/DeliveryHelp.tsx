@@ -62,7 +62,7 @@ export default function DeliveryHelp() {
 
   if (loading) {
     return (
-        <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center p-8">
+        <div className="min-h-screen bg-transparent flex flex-col items-center justify-center p-8">
           <div className="w-10 h-10 border-4 border-stone-200 border-t-[#8B3D28] rounded-full animate-spin mb-4"></div>
           <p className="text-[10px] font-black text-stone-300 uppercase tracking-widest text-center">Contacting Fleet Command...</p>
         </div>
@@ -70,7 +70,7 @@ export default function DeliveryHelp() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-24 font-poppins relative">
+    <div className="min-h-screen bg-transparent pb-24 font-poppins relative">
       <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
 
       {/* Local Header */}

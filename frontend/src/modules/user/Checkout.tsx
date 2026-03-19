@@ -196,7 +196,7 @@ export default function Checkout() {
 
   if (cartLoading || ((cart?.items?.length || 0) === 0 && !showOrderSuccess)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
         <div className="flex flex-col items-center">
           <div className="w-12 h-12 border-4 border-[#8B3D28] border-t-transparent rounded-full animate-spin mb-4"></div>
           <p className="text-sm font-bold text-neutral-600 font-poppins">
@@ -499,7 +499,7 @@ export default function Checkout() {
 
   return (
     <div
-      className="bg-white min-h-screen flex flex-col opacity-100"
+      className="bg-transparent min-h-screen flex flex-col opacity-100"
       style={{ opacity: 1, height: '1250px' }}
     >
 

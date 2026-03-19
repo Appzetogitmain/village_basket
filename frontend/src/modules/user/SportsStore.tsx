@@ -33,7 +33,7 @@ export default function SportsStore() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       <div className="relative w-full">
         <img
           src="/assets/shopbystore/sports.jpg"
@@ -154,116 +154,115 @@ export default function SportsStore() {
                         </svg>
                       </div>
                     </div>
-                      <span className="text-[8px] text-neutral-500">({(product.reviews || 0).toLocaleString()})</span>
+                    <span className="text-[8px] text-neutral-500">({(product.reviews || 0).toLocaleString()})</span>
+                  </div>
+
+                  {hasDiscount && (
+                    <div className="text-[9px] text-blue-600 font-semibold mb-0.5">
+                      {discount}% OFF
                     </div>
+                  )}
 
-                    {hasDiscount && (
-                      <div className="text-[9px] text-blue-600 font-semibold mb-0.5">
-                        {discount}% OFF
-                      </div>
-                    )}
-
-                    <div className="mb-1">
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-[13px] font-bold text-neutral-900">
-                          ₹{displayPrice.toLocaleString('en-IN')}
+                  <div className="mb-1">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-[13px] font-bold text-neutral-900">
+                        ₹{displayPrice.toLocaleString('en-IN')}
+                      </span>
+                      {hasDiscount && (
+                        <span className="text-[10px] text-neutral-400 line-through">
+                          ₹{mrp.toLocaleString('en-IN')}
                         </span>
-                        {hasDiscount && (
-                          <span className="text-[10px] text-neutral-400 line-through">
-                            ₹{mrp.toLocaleString('en-IN')}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
+                  </div>
 
-                    <AnimatePresence mode="wait">
-                      {inCartQty === 0 ? (
-                        <motion.div
-                          key="add-button"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{ duration: 0.2 }}
-                          className="flex justify-center w-full"
+                  <AnimatePresence mode="wait">
+                    {inCartQty === 0 ? (
+                      <motion.div
+                        key="add-button"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex justify-center w-full"
+                      >
+                        <Button
+                          variant="outline"
+                          size="default"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(product);
+                          }}
+                          className="w-full border-2 border-green-600 text-green-600 bg-transparent hover:bg-green-50 rounded-full font-semibold text-[10px] h-7 px-2"
                         >
+                          ADD
+                        </Button>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="stepper"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex items-center justify-center gap-1.5 bg-white border-2 border-green-600 rounded-full px-1.5 py-1 w-full"
+                      >
+                        <motion.div whileTap={{ scale: 0.9 }}>
                           <Button
-                            variant="outline"
-                            size="default"
+                            variant="default"
+                            size="icon"
                             onClick={(e) => {
                               e.stopPropagation();
-                              addToCart(product);
+                              updateQuantity(product.id, inCartQty - 1);
                             }}
-                            className="w-full border-2 border-green-600 text-green-600 bg-transparent hover:bg-green-50 rounded-full font-semibold text-[10px] h-7 px-2"
+                            className="w-6 h-6 p-0 text-xs"
+                            aria-label="Decrease quantity"
                           >
-                            ADD
+                            −
                           </Button>
                         </motion.div>
-                      ) : (
-                        <motion.div
-                          key="stepper"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{ duration: 0.2 }}
-                          className="flex items-center justify-center gap-1.5 bg-white border-2 border-green-600 rounded-full px-1.5 py-1 w-full"
+                        <motion.span
+                          key={inCartQty}
+                          initial={{ scale: 1.2, y: -4 }}
+                          animate={{ scale: 1, y: 0 }}
+                          transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                          className="text-xs font-bold text-green-600 min-w-[1rem] text-center"
                         >
-                          <motion.div whileTap={{ scale: 0.9 }}>
-                            <Button
-                              variant="default"
-                              size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                updateQuantity(product.id, inCartQty - 1);
-                              }}
-                              className="w-6 h-6 p-0 text-xs"
-                              aria-label="Decrease quantity"
-                            >
-                              −
-                            </Button>
-                          </motion.div>
-                           <motion.span
-                            key={inCartQty}
-                            initial={{ scale: 1.2, y: -4 }}
-                            animate={{ scale: 1, y: 0 }}
-                            transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-                            className="text-xs font-bold text-green-600 min-w-[1rem] text-center"
+                          {inCartQty}
+                        </motion.span>
+                        <motion.div whileTap={{ scale: 0.9 }}>
+                          <Button
+                            variant="default"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateQuantity(product.id, inCartQty + 1);
+                            }}
+                            className="w-6 h-6 p-0 text-xs"
+                            aria-label="Increase quantity"
                           >
-                            {inCartQty}
-                          </motion.span>
-                          <motion.div whileTap={{ scale: 0.9 }}>
-                            <Button
-                              variant="default"
-                              size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                updateQuantity(product.id, inCartQty + 1);
-                              }}
-                              className="w-6 h-6 p-0 text-xs"
-                              aria-label="Increase quantity"
-                            >
-                              +
-                            </Button>
-                          </motion.div>
+                            +
+                          </Button>
                         </motion.div>
-                      )}
-                    </AnimatePresence>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                    <Link
-                      to={`/category/sports`}
-                      className="w-full bg-green-100 text-green-700 text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 hover:bg-green-200 transition-colors mt-1"
-                    >
-                      <span>See more like this</span>
-                      <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0 0L8 4L0 8Z" fill="#16a34a" />
-                      </svg>
-                    </Link>
-                  </div>
+                  <Link
+                    to={`/category/sports`}
+                    className="w-full bg-green-100 text-green-700 text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 hover:bg-green-200 transition-colors mt-1"
+                  >
+                    <span>See more like this</span>
+                    <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0 0L8 4L0 8Z" fill="#16a34a" />
+                    </svg>
+                  </Link>
                 </motion.div>
               );
             })}
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }

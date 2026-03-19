@@ -257,7 +257,7 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white px-4 md:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-transparent px-4 md:px-6 lg:px-8">
         <div className="text-center">
           <p className="text-lg md:text-xl font-semibold text-neutral-900 mb-4">
             Product not found
@@ -298,7 +298,7 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-transparent pb-24">
       {/* Header with back button and action icons */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
         <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-3 md:py-4">

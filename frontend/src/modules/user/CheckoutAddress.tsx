@@ -273,7 +273,7 @@ export default function CheckoutAddress() {
     address.pincode.trim().length >= 6;
 
   return (
-    <div className="pb-24 bg-white min-h-screen">
+    <div className="pb-24 bg-transparent min-h-screen">
       {/* Header */}
       <div className="sticky top-0 z-50 bg-white border-b border-neutral-200">
         <div className="px-4 py-2 flex items-center justify-between">

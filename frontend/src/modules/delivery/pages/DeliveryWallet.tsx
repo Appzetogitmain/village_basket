@@ -119,7 +119,7 @@ export default function DeliveryWallet() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-24 font-poppins relative">
+    <div className="min-h-screen bg-transparent pb-24 font-poppins relative">
       <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
 
       {/* Local Header */}

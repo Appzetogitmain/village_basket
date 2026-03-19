@@ -700,7 +700,7 @@ export default function OrderDetail() {
 
   if (loading && !order) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B3D28]"></div>
           <p className="text-sm font-bold text-neutral-500 font-poppins">Loading order details...</p>
@@ -711,7 +711,7 @@ export default function OrderDetail() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
+      <div className="min-h-screen bg-transparent p-4">
         <div className="max-w-lg mx-auto text-center py-20">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-4">
             Order Not Found
@@ -784,7 +784,7 @@ export default function OrderDetail() {
   const currentStatus = statusConfig[orderStatus] || statusConfig["Received"];
 
   return (
-    <div className="pb-24 min-h-screen bg-stone-50">
+    <div className="pb-24 min-h-screen bg-transparent">
       {/* Status Header - Main Navigation & Tracking Info */}
       <motion.div
         className={`${currentStatus.color} text-white sticky top-0 z-40 shadow-sm`}

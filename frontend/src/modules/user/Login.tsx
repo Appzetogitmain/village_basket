@@ -77,7 +77,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#EBF5FF] flex flex-col items-center relative overflow-hidden font-poppins h-screen">
+    <div className="min-h-screen bg-transparent flex flex-col items-center relative overflow-hidden font-poppins h-screen">
       {loading && <VillageLoader />}
       {/* 1. Background Grid - Large Product Cards exactly like the image */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-80 p-2">

@@ -23,7 +23,7 @@ const DailyServiceCheckout: React.FC = () => {
 
   if (dailyServiceCart.length === 0) {
     return (
-      <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center p-6 text-center">
         <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center text-4xl mb-4 border border-stone-100">
           🧺
         </div>
@@ -58,7 +58,7 @@ const DailyServiceCheckout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-32">
+    <div className="min-h-screen bg-transparent pb-32">
       {/* Header */}
       <div className="bg-white border-b border-stone-100 px-4 py-4 sticky top-0 z-30 shadow-sm flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="p-1 text-village-umber">

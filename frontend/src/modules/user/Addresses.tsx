@@ -40,7 +40,7 @@ export default function Addresses() {
     };
 
     return (
-        <div className="pb-24 md:pb-8 bg-white min-h-screen">
+        <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
             <div className="px-4 py-4 bg-white border-b border-neutral-200 mb-4 sticky top-0 z-10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <button onClick={() => navigate(-1)} className="p-1">

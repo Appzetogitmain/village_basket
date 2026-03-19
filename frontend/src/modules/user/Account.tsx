@@ -129,7 +129,7 @@ export default function Account() {
 
   if (loading) {
     return (
-      <div className="pb-24 md:pb-8 bg-white min-h-screen flex items-center justify-center">
+      <div className="pb-24 md:pb-8 bg-transparent min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
           <p className="text-neutral-600">Loading profile...</p>
@@ -140,7 +140,7 @@ export default function Account() {
 
   if (error && !profile) {
     return (
-      <div className="pb-24 md:pb-8 bg-white min-h-screen flex items-center justify-center">
+      <div className="pb-24 md:pb-8 bg-transparent min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button onClick={() => navigate(-1)} className="px-4 py-2 bg-teal-600 text-white rounded">

@@ -114,7 +114,7 @@ export default function AddressBook() {
   );
 
   return (
-    <div className="min-h-screen bg-white md:bg-neutral-50 pb-24 md:pb-10">
+    <div className="min-h-screen bg-transparent pb-24 md:pb-10">
       <div className="sticky top-0 z-10 bg-white border-b border-neutral-200 px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}

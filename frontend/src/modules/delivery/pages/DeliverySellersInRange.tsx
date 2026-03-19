@@ -46,7 +46,7 @@ export default function DeliverySellersInRange() {
 
   if (!isOnline) {
     return (
-      <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center pb-24 px-6 font-poppins relative">
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center pb-24 px-6 font-poppins relative">
         <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
         
         <div className="village-card paper-texture organic-radius p-8 bg-white shadow-2xl border-none flex flex-col items-center text-center max-w-xs relative z-10 scale-95 opacity-90 animate-in fade-in zoom-in duration-300">
@@ -67,7 +67,7 @@ export default function DeliverySellersInRange() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-24 font-poppins relative">
+    <div className="min-h-screen bg-transparent pb-24 font-poppins relative">
       <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
 
       {/* Local Header */}

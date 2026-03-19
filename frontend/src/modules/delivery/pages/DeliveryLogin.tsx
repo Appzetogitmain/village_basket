@@ -77,7 +77,16 @@ export default function DeliveryLogin() {
 
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-stone-50 flex flex-col items-center justify-center px-6 relative font-poppins">
+    <div 
+      className="h-screen w-screen overflow-hidden flex flex-col items-center justify-center px-6 relative font-poppins"
+      style={{
+        backgroundColor: 'var(--village-cream, #FAF7F2)',
+        backgroundImage: `linear-gradient(rgba(250, 247, 242, 0.88), rgba(250, 247, 242, 0.88)), url('/assets/delivery_bg_pattern.png')`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: '320px',
+        backgroundAttachment: 'fixed',
+      }}
+    >
       {/* Village Loader Overlay */}
       {loading && <VillageLoader />}
 

@@ -33,7 +33,7 @@ export default function PharmaStore() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       {/* Pharma Store Banner */}
       <div className="relative w-full">
         <img
