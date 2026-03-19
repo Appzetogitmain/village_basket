@@ -209,7 +209,7 @@ export default function SellerStockManagement() {
             </div>
 
             {/* Content Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
+            <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
                 <div className="p-4 border-b border-neutral-100 font-medium text-neutral-700">
                     View Stock Management
                 </div>
@@ -222,7 +222,7 @@ export default function SellerStockManagement() {
                             <select
                                 value={categoryFilter}
                                 onChange={(e) => setCategoryFilter(e.target.value)}
-                                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
                             >
                                 <option value="All Category">All Category</option>
                                 {categories.map(cat => (
@@ -235,7 +235,7 @@ export default function SellerStockManagement() {
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
                             >
                                 <option value="All Products">All Products</option>
                                 <option value="Published">Published</option>
@@ -247,7 +247,7 @@ export default function SellerStockManagement() {
                             <select
                                 value={stockFilter}
                                 onChange={(e) => setStockFilter(e.target.value)}
-                                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
                             >
                                 <option value="All Products">All Products</option>
                                 <option value="In Stock">In Stock</option>
@@ -261,7 +261,7 @@ export default function SellerStockManagement() {
                             <select
                                 value={rowsPerPage}
                                 onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
                             >
                                 <option value={10}>10</option>
                                 <option value={20}>20</option>
@@ -295,7 +295,7 @@ export default function SellerStockManagement() {
                                 link.click();
                                 document.body.removeChild(link);
                             }}
-                            className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
+                            className="bg-[#4A7C59] hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
                         >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -311,7 +311,7 @@ export default function SellerStockManagement() {
                             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">Search:</span>
                             <input
                                 type="text"
-                                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-teal-500 w-48"
+                                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#4A7C59] w-48"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder=""
@@ -324,7 +324,7 @@ export default function SellerStockManagement() {
                 <div className="overflow-x-auto flex-1">
                     <table className="w-full text-left border-collapse border border-neutral-200">
                         <thead>
-                            <tr className="bg-neutral-50 text-xs font-bold text-neutral-800">
+                            <tr className="bg-white/40 text-xs font-bold text-neutral-800">
                                 <th
                                     className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
                                     onClick={() => handleSort('variationId')}
@@ -383,13 +383,13 @@ export default function SellerStockManagement() {
                         </thead>
                         <tbody>
                             {filteredItems.map((item) => (
-                                <tr key={item.variationId} className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700">
+                                <tr key={item.variationId} className="hover:bg-white/40 transition-colors text-sm text-neutral-700">
                                     <td className="p-4 align-middle border border-neutral-200 text-xs font-mono">{item.variationId}</td>
                                     <td className="p-4 align-middle border border-neutral-200 text-xs font-mono">{item.productId}</td>
                                     <td className="p-4 align-middle border border-neutral-200 font-medium">{item.name}</td>
                                     <td className="p-4 align-middle border border-neutral-200">{item.seller}</td>
                                     <td className="p-4 border border-neutral-200">
-                                        <div className="w-16 h-12 bg-white border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
+                                        <div className="w-16 h-12 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
                                             <img
                                                 src={item.image}
                                                 alt={item.name}
@@ -405,7 +405,7 @@ export default function SellerStockManagement() {
                                         <div className="flex items-center gap-2">
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.stock === 0
                                                 ? 'bg-red-50 text-red-600'
-                                                : 'bg-green-50 text-green-600'
+                                                : 'bg-green-50 text-[#4A7C59]'
                                                 }`}>
                                                 {item.stock}
                                             </span>
@@ -417,7 +417,7 @@ export default function SellerStockManagement() {
                                                 type="number"
                                                 min="0"
                                                 defaultValue={item.stock}
-                                                className="w-20 px-2 py-1 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-teal-500 outline-none"
+                                                className="w-20 px-2 py-1 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-[#4A7C59] outline-none"
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
                                                         const val = parseInt((e.target as HTMLInputElement).value);
@@ -436,7 +436,7 @@ export default function SellerStockManagement() {
                                                         handleStockUpdate(item.productId, item.variationId, val);
                                                     }
                                                 }}
-                                                className="p-1.5 bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors disabled:bg-neutral-300"
+                                                className="p-1.5 bg-[#4A7C59] text-white rounded hover:bg-teal-700 transition-colors disabled:bg-neutral-300"
                                                 title="Update Stock"
                                             >
                                                 {updatingStock === item.variationId ? (
@@ -474,8 +474,8 @@ export default function SellerStockManagement() {
                             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                             disabled={currentPage === 1}
                             className={`p-2 border border-teal-600 rounded ${currentPage === 1
-                                ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                : 'text-teal-600 hover:bg-teal-50'
+                                ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                                : 'text-[#4A7C59] hover:bg-teal-50'
                                 }`}
                             aria-label="Previous page"
                         >
@@ -488,8 +488,8 @@ export default function SellerStockManagement() {
                                 key={page}
                                 onClick={() => setCurrentPage(page)}
                                 className={`px-3 py-1.5 border border-teal-600 rounded font-medium text-sm ${currentPage === page
-                                    ? 'bg-teal-600 text-white'
-                                    : 'text-teal-600 hover:bg-teal-50'
+                                    ? 'bg-[#4A7C59] text-white'
+                                    : 'text-[#4A7C59] hover:bg-teal-50'
                                     }`}
                             >
                                 {page}
@@ -499,8 +499,8 @@ export default function SellerStockManagement() {
                             onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                             disabled={currentPage === totalPages}
                             className={`p-2 border border-teal-600 rounded ${currentPage === totalPages
-                                ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                : 'text-teal-600 hover:bg-teal-50'
+                                ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                                : 'text-[#4A7C59] hover:bg-teal-50'
                                 }`}
                             aria-label="Next page"
                         >
@@ -514,3 +514,5 @@ export default function SellerStockManagement() {
         </div>
     );
 }
+
+

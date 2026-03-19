@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getReturnRequests, ReturnRequest, GetReturnRequestsParams } from '../../../services/api/returnService';
 
@@ -77,7 +77,7 @@ export default function SellerReturnRequest() {
 
     const SortIcon = ({ column }: { column: string }) => (
         <span className="text-neutral-300 text-[10px]">
-            {sortColumn === column ? (sortDirection === 'asc' ? 'â†‘' : 'â†“') : 'â‡…'}
+            {sortColumn === column ? (sortDirection === 'asc' ? '↑' : '↓') : '⇅'}
         </span>
     );
 
@@ -87,13 +87,13 @@ export default function SellerReturnRequest() {
     };
 
     return (
-        <div className="flex flex-col h-full min-h-screen bg-neutral-50">
+        <div className="flex flex-col h-full min-h-screen bg-white/40">
             {/* Top Navigation/Header */}
-            <div className="bg-white border-b border-neutral-200 px-4 sm:px-6 py-4">
+            <div className="bg-white/90 backdrop-blur-md border-white/20 border-b border-neutral-200 px-4 sm:px-6 py-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <h1 className="text-2xl font-semibold text-neutral-900">Return Request</h1>
+                    <h1 className="text-xl font-black text-village-umber uppercase tracking-tight">Return Request</h1>
                     <div className="flex items-center gap-2 text-sm">
-                        <Link to="/seller" className="text-blue-600 hover:text-blue-700">
+                        <Link to="/seller" className="text-[#4A7C59] hover:text-[#3a6346] font-medium">
                             Home
                         </Link>
                         <span className="text-neutral-400">/</span>
@@ -104,9 +104,9 @@ export default function SellerReturnRequest() {
 
             {/* Content Card */}
             <div className="flex-1 p-4 sm:p-6">
-                <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col">
+                <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 flex flex-col">
                     {/* Section Header - Green Banner */}
-                    <div className="bg-green-600 text-white px-4 sm:px-6 py-3 rounded-t-lg">
+                    <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3 rounded-t-lg">
                         <h2 className="text-lg sm:text-xl font-semibold">View Return Request</h2>
                     </div>
 
@@ -122,7 +122,7 @@ export default function SellerReturnRequest() {
                                         type="text"
                                         value={fromDate && toDate ? `${fromDate} - ${toDate}` : ''}
                                         placeholder="Select date range"
-                                        className="pl-10 pr-3 py-2 bg-white border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-green-500 focus:outline-none w-full sm:w-64"
+                                        className="pl-10 pr-3 py-2 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none w-full sm:w-64"
                                         readOnly
                                     />
                                     <svg
@@ -156,7 +156,7 @@ export default function SellerReturnRequest() {
                                 <select
                                     value={statusFilter}
                                     onChange={(e) => setStatusFilter(e.target.value)}
-                                    className="px-3 py-2 bg-white border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-green-500 focus:outline-none cursor-pointer"
+                                    className="px-3 py-2 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
                                 >
                                     <option value="All Status">All Status</option>
                                     <option value="Pending">Pending</option>
@@ -178,7 +178,7 @@ export default function SellerReturnRequest() {
                                         setRowsPerPage(Number(e.target.value));
                                         setCurrentPage(1);
                                     }}
-                                    className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none cursor-pointer"
+                                    className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
                                 >
                                     <option value={10}>10</option>
                                     <option value={20}>20</option>
@@ -215,7 +215,7 @@ export default function SellerReturnRequest() {
                                     link.click();
                                     document.body.removeChild(link);
                                 }}
-                                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
+                                className="bg-[#4A7C59] hover:bg-[#3a6346] text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -233,7 +233,7 @@ export default function SellerReturnRequest() {
                                 <span className="absolute left-2 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">Search:</span>
                                 <input
                                     type="text"
-                                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-green-500 w-full sm:w-48"
+                                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#4A7C59] w-full sm:w-48"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder=""
@@ -259,7 +259,7 @@ export default function SellerReturnRequest() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse border border-neutral-200">
                                 <thead>
-                                    <tr className="bg-neutral-50 text-xs font-bold text-neutral-800">
+                                    <tr className="bg-white/40 text-xs font-bold text-neutral-800">
                                         <th
                                             className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
                                             onClick={() => handleSort('orderItemId')}
@@ -357,22 +357,22 @@ export default function SellerReturnRequest() {
                                         </tr>
                                     ) : (
                                         displayedRequests.map((request, index) => (
-                                            <tr key={index} className="hover:bg-neutral-50">
+                                            <tr key={index} className="hover:bg-white/40">
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.orderItemId}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.product}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.variant}</td>
-                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">₹{request.price.toFixed(2)}</td>
-                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">₹{request.discPrice.toFixed(2)}</td>
+                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">?{request.price.toFixed(2)}</td>
+                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">?{request.discPrice.toFixed(2)}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.quantity}</td>
-                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">₹{request.total.toFixed(2)}</td>
+                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">?{request.total.toFixed(2)}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.status}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.date}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">
                                                     <button
                                                         onClick={() => {
-                                                            alert(`Return Request Details:\n\nOrder Item ID: ${request.orderItemId}\nProduct: ${request.product}\nVariant: ${request.variant}\nPrice: ₹${request.price.toFixed(2)}\nDiscounted Price: ₹${request.discPrice.toFixed(2)}\nQuantity: ${request.quantity}\nTotal: ₹${request.total.toFixed(2)}\nStatus: ${request.status}\nDate: ${request.date}`);
+                                                            alert(`Return Request Details:\n\nOrder Item ID: ${request.orderItemId}\nProduct: ${request.product}\nVariant: ${request.variant}\nPrice: ?${request.price.toFixed(2)}\nDiscounted Price: ?${request.discPrice.toFixed(2)}\nQuantity: ${request.quantity}\nTotal: ?${request.total.toFixed(2)}\nStatus: ${request.status}\nDate: ${request.date}`);
                                                         }}
-                                                        className="text-green-600 hover:text-green-700 text-xs font-medium transition-colors"
+                                                        className="text-[#4A7C59] hover:text-[#3a6346] text-xs font-medium transition-colors"
                                                     >
                                                         View
                                                     </button>
@@ -415,14 +415,16 @@ export default function SellerReturnRequest() {
             </div>
 
             {/* Footer */}
-            <footer className="px-4 sm:px-6 py-4 text-center bg-white border-t border-neutral-200">
+            <footer className="px-4 sm:px-6 py-4 text-center bg-white/90 backdrop-blur-md border-white/20 border-t border-neutral-200">
                 <p className="text-xs sm:text-sm text-neutral-600">
-                    Copyright Â© 2025. Developed By{' '}
-                    <span className="font-semibold text-teal-600">Village Basket</span>
+                    Copyright © 2025. Developed By{' '}
+                    <span className="font-semibold text-[#4A7C59]">Village Basket</span>
                 </p>
             </footer>
         </div>
     );
 }
+
+
 
 

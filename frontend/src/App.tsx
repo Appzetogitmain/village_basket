@@ -11,6 +11,7 @@ import { LoadingProvider } from "./context/LoadingContext";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import DailyServiceBasketBar from './modules/user/components/DailyServiceBasketBar';
+
 import { AxiosLoadingInterceptor } from "./context/AxiosLoadingInterceptor";
 import IconLoader from "./components/loaders/IconLoader";
 import ContentLoader from "./components/loaders/ContentLoader";
@@ -29,6 +30,7 @@ import Home from "./modules/user/Home";
 import Checkout from "./modules/user/Checkout";
 import Wishlist from './modules/user/Wishlist';
 import DailyServiceCheckout from './modules/user/DailyServiceCheckout';
+
 import CheckoutAddress from "./modules/user/CheckoutAddress";
 import ProductDetail from "./modules/user/ProductDetail";
 
@@ -109,6 +111,7 @@ const AdminSellerTransaction = lazy(() => import("./modules/admin/pages/AdminSel
 const AdminStockManagement = lazy(() => import("./modules/admin/pages/AdminStockManagement"));
 const AdminSubcategoryOrder = lazy(() => import("./modules/admin/pages/AdminSubcategoryOrder"));
 const AdminManageSellerList = lazy(() => import("./modules/admin/pages/AdminManageSellerList"));
+const AdminSellerTransactionDetail = lazy(() => import("./modules/admin/pages/AdminSellerTransaction"));
 const AdminCoupon = lazy(() => import("./modules/admin/pages/AdminCoupon"));
 const AdminNotification = lazy(() => import("./modules/admin/pages/AdminNotification"));
 const AdminSellerLocation = lazy(() => import("./modules/admin/pages/AdminSellerLocation"));
@@ -168,8 +171,8 @@ function App() {
       <LoadingProvider>
         <AxiosLoadingInterceptor>
           <SubscriptionProvider>
-            <AuthProvider>
-              <ThemeProvider>
+          <AuthProvider>
+            <ThemeProvider>
               <LocationProvider>
                 <WishlistProvider>
                 <ToastProvider>
@@ -332,6 +335,7 @@ function App() {
                                         <Route path="product/edit/:id" element={<SellerAddProduct />} />
                                         <Route path="manage-seller/list" element={<AdminManageSellerList />} />
                                         <Route path="manage-seller/transaction" element={<AdminSellerTransaction />} />
+                                        <Route path="manage-seller/transaction/:id" element={<AdminSellerTransactionDetail />} />
                                         <Route path="delivery-boy/manage" element={<AdminManageDeliveryBoy />} />
                                         <Route path="delivery-boy/fund-transfer" element={<AdminFundTransfer />} />
                                         <Route path="delivery-boy/cash-collection" element={<AdminCashCollection />} />

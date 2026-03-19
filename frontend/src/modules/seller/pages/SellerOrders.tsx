@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getOrders, Order, GetOrdersParams } from '../../../services/api/orderService';
 
@@ -138,7 +138,7 @@ export default function SellerOrders() {
   return (
     <div className="space-y-4 sm:space-y-6 -mx-3 sm:-mx-4 md:-mx-6 -mt-3 sm:-mt-4 md:-mt-6">
       {/* Header Section */}
-      <div className="bg-white border-b border-neutral-200 px-3 sm:px-4 md:px-6 py-3 sm:py-4">
+      <div className="bg-white/90 backdrop-blur-md border-white/20 border-b border-neutral-200 px-3 sm:px-4 md:px-6 py-3 sm:py-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
           {/* Page Title */}
           <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Orders List</h1>
@@ -157,9 +157,9 @@ export default function SellerOrders() {
       {/* Main Content */}
       <div className="px-3 sm:px-4 md:px-6">
         {/* White Card Container */}
-        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
           {/* Green Banner */}
-          <div className="bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-t-lg">
+          <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-t-lg">
             <h2 className="text-base sm:text-lg font-semibold">View Order List</h2>
           </div>
 
@@ -220,7 +220,7 @@ export default function SellerOrders() {
                     setStatus(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#4A7C59] focus:border-[#4A7C59]"
                 >
                   <option>All Status</option>
                   <option>Pending</option>
@@ -239,7 +239,7 @@ export default function SellerOrders() {
                     setEntriesPerPage(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#4A7C59] focus:border-[#4A7C59]"
                 >
                   <option>10</option>
                   <option>25</option>
@@ -260,7 +260,7 @@ export default function SellerOrders() {
                     setSearchQuery(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="flex-1 w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                  className="flex-1 w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#4A7C59] focus:border-[#4A7C59]"
                   placeholder="Search by Order ID, Status, or Amount"
                 />
               </div>
@@ -269,7 +269,7 @@ export default function SellerOrders() {
               <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto">
                 <button
                   onClick={handleExport}
-                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded text-xs sm:text-sm font-medium transition-colors w-full sm:w-auto"
+                  className="flex items-center justify-center gap-2 bg-[#4A7C59] hover:bg-[#3a6346] text-white px-3 sm:px-4 py-2 rounded text-xs sm:text-sm font-medium transition-colors w-full sm:w-auto"
                 >
                   <svg
                     width="16"
@@ -325,7 +325,7 @@ export default function SellerOrders() {
           {!loading && !error && (
             <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6 px-3 sm:px-4 md:px-6">
               <table className="w-full min-w-[600px]">
-                <thead className="bg-neutral-50 border-b border-neutral-200">
+                <thead className="bg-white/40 border-b border-neutral-200">
                   <tr>
                     <th className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
                       <button
@@ -339,7 +339,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'orderId' ? 'text-green-600' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'orderId' ? 'text-[#4A7C59]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -368,7 +368,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'deliveryDate' ? 'text-green-600' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'deliveryDate' ? 'text-[#4A7C59]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -397,7 +397,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'orderDate' ? 'text-green-600' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'orderDate' ? 'text-[#4A7C59]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -426,7 +426,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'status' ? 'text-green-600' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'status' ? 'text-[#4A7C59]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -455,7 +455,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'amount' ? 'text-green-600' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'amount' ? 'text-[#4A7C59]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -477,7 +477,7 @@ export default function SellerOrders() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-neutral-200">
+                <tbody className="bg-white/90 backdrop-blur-md border-white/20 divide-y divide-neutral-200">
                   {paginatedOrders.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-3 sm:px-4 md:px-6 py-8 sm:py-12 text-center text-xs sm:text-sm text-neutral-500">
@@ -486,7 +486,7 @@ export default function SellerOrders() {
                     </tr>
                   ) : (
                     paginatedOrders.map((order) => (
-                      <tr key={order.id} className="hover:bg-neutral-50 transition-colors">
+                      <tr key={order.id} className="hover:bg-white/40 transition-colors">
                         <td className="px-3 sm:px-4 md:px-6 py-3 text-xs sm:text-sm text-neutral-900">
                           {order.orderId}
                         </td>
@@ -502,12 +502,12 @@ export default function SellerOrders() {
                           </span>
                         </td>
                         <td className="px-3 sm:px-4 md:px-6 py-3 text-xs sm:text-sm text-neutral-900 font-medium">
-                          ₹{order.amount.toFixed(2)}
+                          ?{order.amount.toFixed(2)}
                         </td>
                         <td className="px-3 sm:px-4 md:px-6 py-3">
                           <button
                             onClick={() => navigate(`/seller/orders/${order.id}`)}
-                            className="text-green-600 hover:text-green-700 text-xs sm:text-sm font-medium transition-colors"
+                            className="text-[#4A7C59] hover:text-[#3a6346] text-xs sm:text-sm font-medium transition-colors"
                           >
                             View
                           </button>
@@ -530,8 +530,8 @@ export default function SellerOrders() {
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
                 className={`p-2 border border-neutral-300 rounded transition-colors ${currentPage === 1
-                  ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                  : 'text-neutral-700 hover:bg-neutral-50'
+                  ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                  : 'text-neutral-700 hover:bg-white/40'
                   }`}
                 aria-label="Previous page"
               >
@@ -555,8 +555,8 @@ export default function SellerOrders() {
                 onClick={handleNextPage}
                 disabled={currentPage >= totalPages}
                 className={`p-2 border border-neutral-300 rounded transition-colors ${currentPage >= totalPages
-                  ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                  : 'text-neutral-700 hover:bg-neutral-50'
+                  ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                  : 'text-neutral-700 hover:bg-white/40'
                   }`}
                 aria-label="Next page"
               >
@@ -584,7 +584,7 @@ export default function SellerOrders() {
       {/* Footer */}
       <footer className="px-3 sm:px-4 md:px-6 text-center py-4 sm:py-6">
         <p className="text-xs sm:text-sm text-neutral-600">
-          Copyright Â© 2025. Developed By{' '}
+          Copyright © 2025. Developed By{' '}
           <Link to="/seller" className="text-blue-600 hover:text-blue-700">
             Village Basket
           </Link>
@@ -593,5 +593,7 @@ export default function SellerOrders() {
     </div>
   );
 }
+
+
 
 

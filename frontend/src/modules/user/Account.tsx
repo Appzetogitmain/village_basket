@@ -180,19 +180,17 @@ export default function Account() {
       {/* Tabs */}
       <div className="px-4 -mt-6 mb-6">
         <div className="flex bg-white rounded-2xl p-1.5 border border-stone-100 shadow-xl max-w-md mx-auto">
-          <button 
+          <button
             onClick={() => setActiveTab('profile')}
-            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-              activeTab === 'profile' ? 'bg-village-umber text-white shadow-md' : 'text-stone-400'
-            }`}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'profile' ? 'bg-village-umber text-white shadow-md' : 'text-stone-400'
+              }`}
           >
             My Profile
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('subscriptions')}
-            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-              activeTab === 'subscriptions' ? 'bg-village-green text-white shadow-md' : 'text-stone-400'
-            }`}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'subscriptions' ? 'bg-village-green text-white shadow-md' : 'text-stone-400'
+              }`}
           >
             Daily Service
           </button>
@@ -304,8 +302,8 @@ export default function Account() {
           <div className="fixed inset-0 z-[60] bg-stone-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setShowGstModal(false)} />
           <div className="fixed inset-x-0 bottom-0 z-[70] animate-in slide-in-from-bottom duration-500 ease-out p-4">
             <div className="bg-white rounded-[32px] shadow-2xl max-w-lg mx-auto p-8 relative">
-              <button 
-                onClick={() => setShowGstModal(false)} 
+              <button
+                onClick={() => setShowGstModal(false)}
                 className="absolute top-4 right-4 w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 hover:bg-stone-200 transition-colors"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -317,16 +315,16 @@ export default function Account() {
                 <h3 className="text-xl font-black text-village-umber mb-2 uppercase tracking-tight">Add GST Details</h3>
                 <p className="text-xs text-stone-400 mb-8 px-4 font-medium leading-relaxed">Save your business details to receive a GST-ready invoice on your village purchases.</p>
                 <form onSubmit={handleGstSubmit} className="space-y-4">
-                  <input 
-                    type="text" 
-                    value={gstNumber} 
-                    onChange={(e) => setGstNumber(e.target.value)} 
-                    placeholder="Enter GST Number" 
-                    className="w-full rounded-2xl border-2 border-stone-100 px-6 py-4 text-sm font-bold text-village-umber placeholder:text-stone-300 focus:outline-none focus:border-village-umber/20 transition-all bg-stone-50/30" 
+                  <input
+                    type="text"
+                    value={gstNumber}
+                    onChange={(e) => setGstNumber(e.target.value)}
+                    placeholder="Enter GST Number"
+                    className="w-full rounded-2xl border-2 border-stone-100 px-6 py-4 text-sm font-bold text-village-umber placeholder:text-stone-300 focus:outline-none focus:border-village-umber/20 transition-all bg-stone-50/30"
                   />
-                  <button 
-                    type="submit" 
-                    disabled={!gstNumber.trim()} 
+                  <button
+                    type="submit"
+                    disabled={!gstNumber.trim()}
                     className="w-full rounded-2xl bg-village-umber text-white font-black py-4 hover:shadow-xl disabled:opacity-30 disabled:shadow-none transition-all shadow-lg shadow-village-umber/20 uppercase tracking-widest text-xs"
                   >
                     Save Details

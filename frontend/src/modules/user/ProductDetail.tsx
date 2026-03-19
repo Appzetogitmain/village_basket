@@ -38,11 +38,11 @@ export default function ProductDetail() {
   const [isSubscriptionMode, setIsSubscriptionMode] = useState(false);
   const { showToast } = useToast();
   const { isAuthenticated } = useAuth();
-  const { 
-    dailyServiceCart, 
-    addToDailyServiceCart, 
+  const {
+    dailyServiceCart,
+    addToDailyServiceCart,
     updateDailyServiceCartQuantity,
-    calculateTotalPrice 
+    calculateTotalPrice
   } = useSubscription();
   const [product, setProduct] = useState<any>(null);
   const [similarProducts, setSimilarProducts] = useState<any[]>([]);
@@ -225,7 +225,7 @@ export default function ProductDetail() {
   const inCartQty = cartItem?.quantity || 0;
 
   const currentProductId = product?.id || product?._id;
-  const dailyCartItem = product 
+  const dailyCartItem = product
     ? dailyServiceCart.find(item => item.productId === currentProductId && item.variantId === selectedVariant?._id)
     : null;
   const isDailyInCart = !!dailyCartItem;
@@ -654,10 +654,10 @@ export default function ProductDetail() {
           </button>
 
           {/* Daily Service Selection */}
-          <DailyServiceSelector 
-             isSubscriptionMode={isSubscriptionMode}
-             onModeToggle={setIsSubscriptionMode}
-             dailyPrice={variantPrice}
+          <DailyServiceSelector
+            isSubscriptionMode={isSubscriptionMode}
+            onModeToggle={setIsSubscriptionMode}
+            dailyPrice={variantPrice}
           />
         </div>
 
@@ -1079,129 +1079,129 @@ export default function ProductDetail() {
           {/* Right side - Add to cart button or Quantity Stepper */}
           <div className="flex items-center">
             <AnimatePresence mode="wait">
-                  {isSubscriptionMode ? (
-                    !isDailyInCart ? (
-                      <motion.button
-                        key="add-daily"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        onClick={() => {
-                          if (!isAuthenticated) {
-                            navigate('/login', { state: { from: routerLocation.pathname } });
-                            return;
-                          }
-                          
-                          addToDailyServiceCart({
-                            productId: product.id || product._id,
-                            productName: product.name,
-                            productImage: currentImage,
-                            variantId: selectedVariant?._id,
-                            variantName: variantTitle,
-                            quantity: 1,
-                            pricePerDay: variantPrice,
-                          });
-                          showToast(`Added to Daily Service Basket!`, 'success');
-                        }}
-                        className="px-5 h-9 bg-village-green text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-village-green/20 active:scale-95 transition-all"
-                      >
-                        Add to Daily Basket
-                      </motion.button>
-                    ) : (
-                      <motion.div
-                        key="daily-stepper"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        className="flex items-center gap-2.5 bg-village-green/5 border border-village-green/10 rounded-xl px-1.5 py-1 h-9 shadow-inner"
-                      >
-                        <motion.button
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => updateDailyServiceCartQuantity(currentProductId, dailyInCartQty - 1, selectedVariant?._id)}
-                          className="w-6 h-6 flex items-center justify-center text-village-green font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-village-green/10 p-0 leading-none text-sm bg-white"
-                        >
-                          <span>−</span>
-                        </motion.button>
-                        <motion.span
-                          key={dailyInCartQty}
-                          initial={{ scale: 1.2, y: -2 }}
-                          animate={{ scale: 1, y: 0 }}
-                          className="text-xs font-black text-village-green min-w-[1.25rem] text-center"
-                        >
-                          {dailyInCartQty}
-                        </motion.span>
-                        <motion.button
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => updateDailyServiceCartQuantity(currentProductId, dailyInCartQty + 1, selectedVariant?._id)}
-                          className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-green"
-                        >
-                          <span>+</span>
-                        </motion.button>
-                      </motion.div>
-                    )
-                  ) : inCartQty === 0 ? (
-                    <motion.div
-                      key="add-button"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="flex items-center"
+              {isSubscriptionMode ? (
+                !isDailyInCart ? (
+                  <motion.button
+                    key="add-daily"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        navigate('/login', { state: { from: routerLocation.pathname } });
+                        return;
+                      }
+
+                      addToDailyServiceCart({
+                        productId: product.id || product._id,
+                        productName: product.name,
+                        productImage: currentImage,
+                        variantId: selectedVariant?._id,
+                        variantName: variantTitle,
+                        quantity: 1,
+                        pricePerDay: variantPrice,
+                      });
+                      showToast(`Added to Daily Service Basket!`, 'success');
+                    }}
+                    className="px-5 h-9 bg-village-green text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-village-green/20 active:scale-95 transition-all"
+                  >
+                    Add to Daily Basket
+                  </motion.button>
+                ) : (
+                  <motion.div
+                    key="daily-stepper"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="flex items-center gap-2.5 bg-village-green/5 border border-village-green/10 rounded-xl px-1.5 py-1 h-9 shadow-inner"
+                  >
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => updateDailyServiceCartQuantity(currentProductId, dailyInCartQty - 1, selectedVariant?._id)}
+                      className="w-6 h-6 flex items-center justify-center text-village-green font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-village-green/10 p-0 leading-none text-sm bg-white"
                     >
-                      <button
-                        ref={addButtonRef}
-                        onClick={handleAddToCart}
-                        disabled={!isAvailableAtLocation || (!isVariantAvailable && variantStock !== 0)}
-                        className={`px-6 h-9 text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg transition-all active:scale-95 ${!isAvailableAtLocation || (!isVariantAvailable && variantStock !== 0)
-                          ? "bg-neutral-100 text-neutral-400 cursor-not-allowed opacity-50"
-                          : "bg-[#4A7C59] text-white hover:bg-[#3D664A] shadow-lg shadow-village-green/10"
-                          }`}
-                      >
-                        {!isAvailableAtLocation
-                          ? "Unavailable"
-                          : !isVariantAvailable && variantStock !== 0
-                            ? "Out of Stock"
-                            : "Add to cart"}
-                      </button>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="stepper"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="flex items-center gap-2.5 bg-stone-50 border border-stone-200/50 rounded-xl px-1.5 py-1 h-9 shadow-inner">
-                      <motion.button
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => {
-                          const productId = product.id || product._id;
-                          const variantId = selectedVariant?._id;
-                          updateQuantity(productId, inCartQty - 1, variantId, variantTitle);
-                        }}
-                        className="w-6 h-6 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-stone-200/50 p-0 leading-none text-sm bg-white"
-                      >
-                        <span>−</span>
-                      </motion.button>
-                       <motion.span
-                        key={inCartQty}
-                        initial={{ scale: 1.2, y: -2 }}
-                        animate={{ scale: 1, y: 0 }}
-                        className="text-xs font-black text-village-umber min-w-[1.25rem] text-center"
-                      >
-                        {inCartQty}
-                      </motion.span>
-                      <motion.button
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => {
-                          const productId = product.id || product._id;
-                          const variantId = selectedVariant?._id;
-                          updateQuantity(productId, inCartQty + 1, variantId, variantTitle);
-                        }}
-                        className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-umber"
-                      >
-                        <span>+</span>
-                      </motion.button>
-                    </motion.div>
-                  )}
+                      <span>−</span>
+                    </motion.button>
+                    <motion.span
+                      key={dailyInCartQty}
+                      initial={{ scale: 1.2, y: -2 }}
+                      animate={{ scale: 1, y: 0 }}
+                      className="text-xs font-black text-village-green min-w-[1.25rem] text-center"
+                    >
+                      {dailyInCartQty}
+                    </motion.span>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => updateDailyServiceCartQuantity(currentProductId, dailyInCartQty + 1, selectedVariant?._id)}
+                      className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-green"
+                    >
+                      <span>+</span>
+                    </motion.button>
+                  </motion.div>
+                )
+              ) : inCartQty === 0 ? (
+                <motion.div
+                  key="add-button"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="flex items-center"
+                >
+                  <button
+                    ref={addButtonRef}
+                    onClick={handleAddToCart}
+                    disabled={!isAvailableAtLocation || (!isVariantAvailable && variantStock !== 0)}
+                    className={`px-6 h-9 text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg transition-all active:scale-95 ${!isAvailableAtLocation || (!isVariantAvailable && variantStock !== 0)
+                      ? "bg-neutral-100 text-neutral-400 cursor-not-allowed opacity-50"
+                      : "bg-[#4A7C59] text-white hover:bg-[#3D664A] shadow-lg shadow-village-green/10"
+                      }`}
+                  >
+                    {!isAvailableAtLocation
+                      ? "Unavailable"
+                      : !isVariantAvailable && variantStock !== 0
+                        ? "Out of Stock"
+                        : "Add to cart"}
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="stepper"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="flex items-center gap-2.5 bg-stone-50 border border-stone-200/50 rounded-xl px-1.5 py-1 h-9 shadow-inner">
+                  <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                      const productId = product.id || product._id;
+                      const variantId = selectedVariant?._id;
+                      updateQuantity(productId, inCartQty - 1, variantId, variantTitle);
+                    }}
+                    className="w-6 h-6 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-stone-200/50 p-0 leading-none text-sm bg-white"
+                  >
+                    <span>−</span>
+                  </motion.button>
+                  <motion.span
+                    key={inCartQty}
+                    initial={{ scale: 1.2, y: -2 }}
+                    animate={{ scale: 1, y: 0 }}
+                    className="text-xs font-black text-village-umber min-w-[1.25rem] text-center"
+                  >
+                    {inCartQty}
+                  </motion.span>
+                  <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                      const productId = product.id || product._id;
+                      const variantId = selectedVariant?._id;
+                      updateQuantity(productId, inCartQty + 1, variantId, variantTitle);
+                    }}
+                    className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-umber"
+                  >
+                    <span>+</span>
+                  </motion.button>
+                </motion.div>
+              )}
             </AnimatePresence>
           </div>
         </div>

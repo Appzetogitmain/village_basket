@@ -240,7 +240,7 @@ export default function SellerDashboard() {
 
   if (error || !stats) {
     return (
-      <div className="p-8 text-center text-red-500 bg-white rounded-lg shadow-sm border border-neutral-200">
+      <div className="p-8 text-center text-red-500 bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200">
         {error || 'Stats not available'}
       </div>
     );
@@ -249,26 +249,27 @@ export default function SellerDashboard() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header with Shop Status Toggle */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-lg shadow-sm border border-neutral-200 gap-4 sm:gap-0">
-        <div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/80 backdrop-blur-md p-3 sm:p-4 rounded-2xl shadow-sm border border-white gap-4 sm:gap-0 overflow-hidden relative">
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <div className="relative z-10">
           <h1 className="text-xl font-bold text-gray-800">Dashboard</h1>
           <p className="text-sm text-gray-500">Overview of your store performance</p>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-          <span className={`text-sm font-medium ${isShopOpen ? 'text-green-600' : 'text-red-500'}`}>
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start relative z-10">
+          <span className={`text-[13px] font-bold tracking-wide uppercase ${isShopOpen ? 'text-[#4A7C59]' : 'text-red-500'}`}>
             {isShopOpen ? 'Shop is Live' : 'Shop is Closed'}
           </span>
           <button
             onClick={handleToggleShop}
             disabled={statusLoading}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
-              isShopOpen ? 'bg-teal-600' : 'bg-gray-200'
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:ring-offset-2 ${
+              isShopOpen ? 'bg-[#4A7C59]' : 'bg-gray-300'
             } ${statusLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           >
             <span
               className={`${
                 isShopOpen ? 'translate-x-6' : 'translate-x-1'
-              } inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ease-in-out`}
+              } inline-block h-4 w-4 transform rounded-full bg-white/90 backdrop-blur-md border-white/20 transition-transform duration-200 ease-in-out`}
             />
           </button>
         </div>
@@ -298,11 +299,11 @@ export default function SellerDashboard() {
         <AlertCard icon={lowStockIcon} title="Product low on Stock" value={stats.lowStockProducts} accentColor="#eab308" />
       </div>
 
-      {/* View New Orders Table Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-        {/* Teal Header Bar */}
-        <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
-          <h2 className="text-base sm:text-lg font-semibold">View New Orders</h2>
+      {/* Recent Orders Section */}
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white p-3 sm:p-4 md:p-5 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <div className="relative z-10">
+          <h2 className="text-base sm:text-lg md:text-xl font-bold text-neutral-900 mb-3 sm:mb-4">New Orders</h2>
         </div>
 
         {/* Show Entries Control */}
@@ -317,7 +318,7 @@ export default function SellerDashboard() {
                 setEntriesPerPage(Math.max(1, Math.min(100, value)));
                 setCurrentPage(1);
               }}
-              className="w-16 px-2 py-1 border border-neutral-300 rounded text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+              className="w-16 px-2 py-1 border border-neutral-300 rounded text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#4A7C59] focus:border-teal-500"
               min="1"
               max="100"
             />
@@ -328,7 +329,7 @@ export default function SellerDashboard() {
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[600px]">
-            <thead className="bg-neutral-50 border-b border-neutral-200">
+            <thead className="bg-white/40 border-b border-neutral-200">
               <tr>
                 <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
                   ID
@@ -419,9 +420,9 @@ export default function SellerDashboard() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-neutral-200">
+            <tbody className="bg-white/90 backdrop-blur-md border-white/20 divide-y divide-neutral-200">
               {displayedOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-neutral-50">
+                <tr key={order.id} className="hover:bg-white/40">
                   <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">{order.id}</td>
                   <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">{order.orderDate}</td>
                   <td className="px-4 sm:px-6 py-3">
@@ -433,7 +434,7 @@ export default function SellerDashboard() {
                   <td className="px-4 sm:px-6 py-3">
                     <button
                       onClick={() => navigate(`/seller/orders/${order.id}`)}
-                      className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded transition-colors"
+                      className="bg-[#4A7C59] hover:bg-teal-700 text-white p-2 rounded transition-colors"
                       aria-label="View order details"
                     >
                       <svg
@@ -478,8 +479,8 @@ export default function SellerDashboard() {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
               className={`p-2 border border-neutral-300 rounded ${currentPage === 1
-                ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                : 'text-neutral-700 hover:bg-neutral-50'
+                ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                : 'text-neutral-700 hover:bg-white/40'
                 }`}
               aria-label="Previous page"
             >
@@ -503,8 +504,8 @@ export default function SellerDashboard() {
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
               className={`p-2 border border-neutral-300 rounded ${currentPage === totalPages
-                ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                : 'text-neutral-700 hover:bg-neutral-50'
+                ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                : 'text-neutral-700 hover:bg-white/40'
                 }`}
               aria-label="Next page"
             >
@@ -530,4 +531,6 @@ export default function SellerDashboard() {
     </div>
   );
 }
+
+
 

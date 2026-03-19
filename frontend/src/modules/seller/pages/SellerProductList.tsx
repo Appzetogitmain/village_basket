@@ -284,7 +284,7 @@ export default function SellerProductList() {
       </div>
 
       {/* Content Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
+      <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
         <div className="p-4 border-b border-neutral-100 font-medium text-neutral-700">
           View Product List
         </div>
@@ -299,7 +299,7 @@ export default function SellerProductList() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer">
                 <option value="All Category">All Category</option>
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
@@ -315,7 +315,7 @@ export default function SellerProductList() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer">
                 <option value="All Products">All Products</option>
                 <option value="Published">Published</option>
                 <option value="Unpublished">Unpublished</option>
@@ -328,7 +328,7 @@ export default function SellerProductList() {
               <select
                 value={stockFilter}
                 onChange={(e) => setStockFilter(e.target.value)}
-                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer">
                 <option value="All Products">All Products</option>
                 <option value="In Stock">In Stock</option>
                 <option value="Out of Stock">Out of Stock</option>
@@ -341,7 +341,7 @@ export default function SellerProductList() {
               <select
                 value={rowsPerPage}
                 onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer">
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
@@ -392,7 +392,7 @@ export default function SellerProductList() {
                 link.click();
                 document.body.removeChild(link);
               }}
-              className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors">
+              className="bg-[#4A7C59] hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors">
               <svg
                 width="16"
                 height="16"
@@ -426,7 +426,7 @@ export default function SellerProductList() {
               </span>
               <input
                 type="text"
-                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-teal-500 w-48"
+                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#4A7C59] w-48"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder=""
@@ -449,7 +449,7 @@ export default function SellerProductList() {
             <p>{error}</p>
             <button
               onClick={fetchProducts}
-              className="mt-4 px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700">
+              className="mt-4 px-4 py-2 bg-[#4A7C59] text-white rounded hover:bg-teal-700">
               Retry
             </button>
           </div>
@@ -460,7 +460,7 @@ export default function SellerProductList() {
         <div className="overflow-x-auto flex-1">
           <table className="w-full text-left border-collapse border border-neutral-200">
             <thead>
-              <tr className="bg-neutral-50 text-xs font-bold text-neutral-800">
+              <tr className="bg-white/40 text-xs font-bold text-neutral-800">
                 <th className="p-4 w-16 border border-neutral-200">
                   <div className="flex items-center justify-between">
                     Product Id
@@ -555,7 +555,7 @@ export default function SellerProductList() {
                 return (
                   <tr
                     key={`${variation.productId}-${variation.variationId}`}
-                    className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700">
+                    className="hover:bg-white/40 transition-colors text-sm text-neutral-700">
                     <td className="p-4 align-middle border border-neutral-200">
                       <div className="flex items-center gap-2">
                         {isFirstVariation && hasMultipleVariations && (
@@ -594,7 +594,7 @@ export default function SellerProductList() {
                       {variation.sellerName}
                     </td>
                     <td className="p-4 border border-neutral-200">
-                      <div className="w-16 h-12 bg-white border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
+                      <div className="w-16 h-12 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
                         <img
                           src={variation.productImage}
                           alt={variation.productName}
@@ -699,8 +699,8 @@ export default function SellerProductList() {
               disabled={currentPage === 1}
               className={`p-2 border border-teal-600 rounded ${
                 currentPage === 1
-                  ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                  : "text-teal-600 hover:bg-teal-50"
+                  ? "text-neutral-400 cursor-not-allowed bg-white/40"
+                  : "text-[#4A7C59] hover:bg-teal-50"
               }`}
               aria-label="Previous page">
               <svg
@@ -725,8 +725,8 @@ export default function SellerProductList() {
                   onClick={() => setCurrentPage(page)}
                   className={`px-3 py-1.5 border border-teal-600 rounded font-medium text-sm ${
                     currentPage === page
-                      ? "bg-teal-600 text-white"
-                      : "text-teal-600 hover:bg-teal-50"
+                      ? "bg-[#4A7C59] text-white"
+                      : "text-[#4A7C59] hover:bg-teal-50"
                   }`}>
                   {page}
                 </button>
@@ -739,8 +739,8 @@ export default function SellerProductList() {
               disabled={currentPage === displayTotalPages}
               className={`p-2 border border-teal-600 rounded ${
                 currentPage === displayTotalPages
-                  ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                  : "text-teal-600 hover:bg-teal-50"
+                  ? "text-neutral-400 cursor-not-allowed bg-white/40"
+                  : "text-[#4A7C59] hover:bg-teal-50"
               }`}
               aria-label="Next page">
               <svg
@@ -765,3 +765,4 @@ export default function SellerProductList() {
     </div>
   );
 }
+

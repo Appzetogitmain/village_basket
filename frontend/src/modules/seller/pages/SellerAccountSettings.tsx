@@ -169,7 +169,7 @@ const SellerAccountSettings = () => {
 
     if (loading && !sellerData.sellerName) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-neutral-50">
+            <div className="flex items-center justify-center min-h-screen bg-white/40">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
             </div>
         );
@@ -215,14 +215,14 @@ const SellerAccountSettings = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50/50">
+        <div className="min-h-screen">
             {/* Header Section */}
-            <div className="bg-white border-b border-gray-200">
+            <div className="bg-white/90 backdrop-blur-md border-b border-village-umber/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Settings</h1>
-                            <p className="mt-1 text-sm text-gray-500">Manage your store preferences and profile details</p>
+                            <h1 className="text-xl font-black text-village-umber uppercase tracking-tight">Settings</h1>
+                            <p className="mt-1 text-sm text-neutral-500">Manage your store preferences and profile details</p>
                         </div>
                         <motion.button
                             whileHover={{ scale: 1.02 }}
@@ -230,7 +230,7 @@ const SellerAccountSettings = () => {
                             onClick={() => setIsEditing(!isEditing)}
                             className={`px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 shadow-sm flex items-center gap-2 ${isEditing
                                 ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-                                : 'bg-teal-600 text-white hover:bg-teal-700 hover:shadow-md'
+                                : 'bg-[#4A7C59] text-white hover:bg-teal-700 hover:shadow-md'
                                 }`}
                         >
                             {isEditing ? (
@@ -253,17 +253,17 @@ const SellerAccountSettings = () => {
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar Navigation */}
                     <nav className="w-full lg:w-64 flex-shrink-0 space-y-1">
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2">
+                        <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-neutral-200 p-2">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === tab.id
-                                        ? 'bg-teal-50 text-teal-700 shadow-sm ring-1 ring-teal-200'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                    className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-black uppercase tracking-wider rounded-lg transition-all duration-200 ${activeTab === tab.id
+                                        ? 'bg-[#4A7C59]/10 text-[#4A7C59] shadow-sm ring-1 ring-[#4A7C59]/20'
+                                        : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
                                         }`}
                                 >
-                                    <span className={`${activeTab === tab.id ? 'text-teal-600' : 'text-gray-400'}`}>
+                                    <span className={`${activeTab === tab.id ? 'text-[#4A7C59]' : 'text-neutral-400'}`}>
                                         {tab.icon}
                                     </span>
                                     {tab.label}
@@ -272,19 +272,20 @@ const SellerAccountSettings = () => {
                         </div>
 
                         {/* Status Card */}
-                        <div className="mt-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="text-xs font-semibold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded">
+                        <div className="mt-6 bg-gradient-to-br from-[#4A7C59] to-[#3D664A] rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -translate-y-6 translate-x-6"></div>
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded">
                                     Account Status
                                 </span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold">
+                                <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-sm font-black">
                                     {sellerData.sellerName?.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <p className="font-medium">{sellerData.sellerName}</p>
-                                    <p className="text-xs text-indigo-100 uppercase">{sellerData.status || 'Active'}</p>
+                                    <p className="font-bold text-sm">{sellerData.sellerName}</p>
+                                    <p className="text-[10px] text-white/70 uppercase font-bold tracking-widest">{sellerData.status || 'Active'}</p>
                                 </div>
                             </div>
                         </div>
@@ -314,18 +315,18 @@ const SellerAccountSettings = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
                                     transition={{ duration: 0.2 }}
-                                    className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+                                    className="bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-neutral-200 overflow-hidden"
                                 >
                                     <div className="p-6 md:p-8">
                                         {activeTab === 'profile' && (
                                             <div className="space-y-8">
-                                                <div className="flex flex-col sm:flex-row items-center gap-6 pb-8 border-b border-gray-100">
+                                                <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-neutral-100">
                                                     <div className="relative group">
                                                         <div className="absolute inset-0 bg-gradient-to-tr from-teal-500 to-emerald-500 rounded-full blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
                                                         <img
                                                             src={sellerData.profile || 'https://placehold.co/150'}
                                                             alt="Profile"
-                                                            className="relative w-32 h-32 rounded-full object-cover border-4 border-white shadow-md bg-white"
+                                                            className="relative w-32 h-32 rounded-full object-cover border-4 border-white shadow-md bg-white/90 backdrop-blur-md border-white/20"
                                                         />
                                                         {isEditing && (
                                                             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm z-10">
@@ -337,39 +338,39 @@ const SellerAccountSettings = () => {
                                                         )}
                                                     </div>
                                                     <div className="text-center sm:text-left">
-                                                        <h3 className="text-2xl font-bold text-gray-900">{sellerData.sellerName || 'Seller Name'}</h3>
-                                                        <p className="text-gray-500 font-medium">{sellerData.email}</p>
-                                                        <p className="text-xs text-gray-400 mt-1">Member since {new Date().getFullYear()}</p>
+                                                        <h3 className="text-xl font-black text-village-umber">{sellerData.sellerName || 'Seller Name'}</h3>
+                                                        <p className="text-neutral-500 text-sm">{sellerData.email}</p>
+                                                        <p className="text-xs text-neutral-400 mt-1">Member since {new Date().getFullYear()}</p>
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                     <InputGroup label="Full Name" name="sellerName" value={sellerData.sellerName} onChange={handleInputChange} disabled={!isEditing} autoComplete="name" />
                                                     <InputGroup label="Email Address" name="email" value={sellerData.email} onChange={handleInputChange} disabled={!isEditing} type="email" autoComplete="email" />
                                                     <InputGroup label="Mobile Number" name="mobile" value={sellerData.mobile} onChange={handleInputChange} disabled={!isEditing} type="tel" autoComplete="tel" />
 
                                                     <div className="space-y-1.5">
-                                                        <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
+                                                        <label className="text-xs font-black text-neutral-700 uppercase tracking-wider ml-1">Password</label>
                                                         <div className="relative">
                                                             <input
                                                                 type="password"
                                                                 autoComplete="new-password"
                                                                 placeholder="••••••••"
                                                                 disabled={!isEditing}
-                                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all placeholder:text-gray-300"
+                                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all placeholder:text-gray-300"
                                                             />
                                                         </div>
                                                         {isEditing && <p className="text-xs text-gray-400 ml-1">Leave blank to keep current password</p>}
                                                     </div>
                                                 </div>
 
-                                                <div className="mt-6 pt-6 border-t border-gray-100">
-                                                    <h4 className="text-sm font-semibold text-gray-700 mb-4">Notification Settings</h4>
+                                                <div className="mt-4 pt-4 border-t border-neutral-100">
+                                                    <h4 className="text-xs font-black text-neutral-700 uppercase tracking-wider mb-3">Notification Settings</h4>
                                                     <button
                                                         type="button"
                                                         onClick={handleTestNotification}
                                                         disabled={testNotifLoading}
-                                                        className="flex items-center gap-2 px-4 py-2 border border-teal-600 text-teal-600 hover:bg-teal-50 font-medium rounded-lg transition-all disabled:opacity-50"
+                                                        className="flex items-center gap-2 px-4 py-2 border border-teal-600 text-[#4A7C59] hover:bg-teal-50 font-medium rounded-lg transition-all disabled:opacity-50"
                                                     >
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -377,7 +378,7 @@ const SellerAccountSettings = () => {
                                                         </svg>
                                                         {testNotifLoading ? 'Sending Test...' : 'Send Test Notification'}
                                                     </button>
-                                                    <p className="mt-2 text-xs text-gray-400">
+                                                    <p className="mt-2 text-xs text-neutral-400">
                                                         Test if push notifications are working correctly on this device.
                                                     </p>
                                                 </div>
@@ -386,9 +387,9 @@ const SellerAccountSettings = () => {
 
                                         {activeTab === 'store' && (
                                             <div className="space-y-8">
-                                                <div className="flex flex-col sm:flex-row items-center gap-6 pb-8 border-b border-gray-100">
+                                                <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-neutral-100">
                                                     <div className="relative group flex-shrink-0">
-                                                        <div className="w-24 h-24 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden">
+                                                        <div className="w-20 h-20 rounded-xl bg-neutral-50 border border-neutral-200 flex items-center justify-center overflow-hidden">
                                                             <img
                                                                 src={sellerData.logo || 'https://placehold.co/100'}
                                                                 alt="Store Logo"
@@ -402,27 +403,27 @@ const SellerAccountSettings = () => {
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <h3 className="text-xl font-bold text-gray-900">{sellerData.storeName || 'Store Name'}</h3>
+                                                        <h3 className="text-lg font-black text-village-umber">{sellerData.storeName || 'Store Name'}</h3>
                                                         <div className="flex items-center gap-2 mt-1">
-                                                            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-100 text-teal-700 uppercase tracking-wide">
+                                                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#4A7C59]/10 text-[#4A7C59] uppercase tracking-widest">
                                                                 {sellerData.category || 'Category'}
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                     <InputGroup label="Store Name" name="storeName" value={sellerData.storeName} onChange={handleInputChange} disabled={!isEditing} />
 
                                                     <div className="space-y-1.5">
-                                                        <label className="text-sm font-semibold text-gray-700 ml-1">Store Category</label>
+                                                        <label className="text-xs font-black text-neutral-700 ml-1 uppercase tracking-wider">Store Category</label>
                                                         <div className="relative">
                                                             <select
                                                                 name="category"
                                                                 value={sellerData.category}
                                                                 onChange={handleInputChange}
                                                                 disabled={!isEditing}
-                                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all appearance-none bg-white"
+                                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all appearance-none bg-white/90 backdrop-blur-md border-white/20"
                                                             >
                                                                 <option value="">Select Category</option>
                                                                 {categories.map(cat => (
@@ -436,7 +437,7 @@ const SellerAccountSettings = () => {
                                                     </div>
 
                                                     <div className="md:col-span-2 space-y-1.5">
-                                                        <label className="text-sm font-semibold text-gray-700 ml-1">
+                                                        <label className="text-xs font-black text-neutral-700 ml-1 uppercase tracking-wider">
                                                             Store Location <span className="text-red-500">*</span>
                                                         </label>
                                                         {isEditing ? (
@@ -459,7 +460,7 @@ const SellerAccountSettings = () => {
                                                                 />
                                                                 <div className="mt-4 animate-fadeIn">
                                                                     <p className="text-sm font-medium text-neutral-700 mb-2">
-                                                                        Exact Location <span className="text-teal-600 text-xs font-normal">(Move the map to place the pin on your store's entrance)</span>
+                                                                        Exact Location <span className="text-[#4A7C59] text-xs font-normal">(Move the map to place the pin on your store's entrance)</span>
                                                                     </p>
                                                                     <LocationPickerMap
                                                                         initialLat={parseFloat(sellerData.latitude) || 26.9124}
@@ -491,7 +492,7 @@ const SellerAccountSettings = () => {
                                                     <InputGroup label="City" name="city" value={sellerData.city} onChange={handleInputChange} disabled={!isEditing} />
 
                                                     <div className="space-y-1.5">
-                                                        <label className="text-sm font-semibold text-gray-700 ml-1">
+                                                        <label className="text-xs font-black text-neutral-700 ml-1 uppercase tracking-wider">
                                                             Service Radius (KM) <span className="text-red-500">*</span>
                                                         </label>
                                                         <select
@@ -499,7 +500,7 @@ const SellerAccountSettings = () => {
                                                             value={sellerData.serviceRadiusKm}
                                                             onChange={handleInputChange}
                                                             disabled={!isEditing}
-                                                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all appearance-none bg-white"
+                                                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all appearance-none bg-white/90 backdrop-blur-md border-white/20"
                                                         >
                                                             <option value="1">1 km</option>
                                                             <option value="2">2 km</option>
@@ -509,7 +510,7 @@ const SellerAccountSettings = () => {
                                                             <option value="50">50 km</option>
                                                         </select>
                                                         {isEditing && (
-                                                            <p className="mt-1 text-xs text-gray-500">
+                                                            <p className="mt-1 text-xs text-neutral-400">
                                                                 Products will be shown to users within this radius from your store location
                                                             </p>
                                                         )}
@@ -522,8 +523,8 @@ const SellerAccountSettings = () => {
                                         {activeTab === 'branding' && (
                                             <div className="space-y-8">
                                                 <div className="space-y-3">
-                                                    <label className="text-sm font-semibold text-gray-700 ml-1">Store Banner</label>
-                                                    <div className="relative group rounded-xl overflow-hidden bg-gray-100 border-2 border-dashed border-gray-300 aspect-[21/9] transition-all hover:border-teal-300">
+                                                    <label className="text-xs font-black text-neutral-700 ml-1 uppercase tracking-wider">Store Banner</label>
+                                                    <div className="relative group rounded-xl overflow-hidden bg-neutral-100 border-2 border-dashed border-neutral-300 aspect-[21/9] transition-all hover:border-[#4A7C59]">
                                                         <img
                                                             src={sellerData.storeBanner || 'https://placehold.co/1200x400?text=Store+Banner'}
                                                             alt="Store Banner"
@@ -537,13 +538,13 @@ const SellerAccountSettings = () => {
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <p className="text-xs text-gray-500 ml-1">Recommended size: 1200x400px. Supports JPG, PNG.</p>
+                                                    <p className="text-xs text-neutral-400 ml-1">Recommended size: 1200x400px. Supports JPG, PNG.</p>
                                                 </div>
 
                                                 <div className="space-y-3">
                                                     <div className="flex justify-between items-end">
-                                                        <label className="text-sm font-semibold text-gray-700 ml-1">Store Description</label>
-                                                        <span className="text-xs text-gray-400">Displayed on your store page</span>
+                                                        <label className="text-xs font-black text-neutral-700 ml-1 uppercase tracking-wider">Store Description</label>
+                                                        <span className="text-xs text-neutral-400">Displayed on your store page</span>
                                                     </div>
                                                     <textarea
                                                         name="storeDescription"
@@ -552,7 +553,7 @@ const SellerAccountSettings = () => {
                                                         disabled={!isEditing}
                                                         rows={6}
                                                         placeholder="Tell customers about your store, specialty, and heritage..."
-                                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all resize-none leading-relaxed"
+                                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all resize-none leading-relaxed"
                                                     />
                                                 </div>
                                             </div>
@@ -561,13 +562,13 @@ const SellerAccountSettings = () => {
                                         {activeTab === 'bank' && (
                                             <div className="space-y-10">
                                                 <section>
-                                                    <div className="flex items-center gap-3 mb-6">
-                                                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
-                                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="p-2 bg-[#4A7C59]/10 text-[#4A7C59] rounded-lg">
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                                                         </div>
-                                                        <h4 className="text-lg font-bold text-gray-900">Bank Details</h4>
+                                                        <h4 className="text-base font-black text-village-umber">Bank Details</h4>
                                                     </div>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-neutral-50/50 p-5 rounded-xl border border-neutral-100">
                                                         <InputGroup label="Account Holder Name" name="accountName" value={sellerData.accountName} onChange={handleInputChange} disabled={!isEditing} />
                                                         <InputGroup label="Bank Name" name="bankName" value={sellerData.bankName} onChange={handleInputChange} disabled={!isEditing} />
                                                         <InputGroup label="Account Number" name="accountNumber" value={sellerData.accountNumber} onChange={handleInputChange} disabled={!isEditing} />
@@ -576,13 +577,13 @@ const SellerAccountSettings = () => {
                                                 </section>
 
                                                 <section>
-                                                    <div className="flex items-center gap-3 mb-6">
-                                                        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="p-2 bg-[#4A7C59]/10 text-[#4A7C59] rounded-lg">
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                                         </div>
-                                                        <h4 className="text-lg font-bold text-gray-900">Tax Information</h4>
+                                                        <h4 className="text-base font-black text-village-umber">Tax Information</h4>
                                                     </div>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-neutral-50/50 p-5 rounded-xl border border-neutral-100">
                                                         <InputGroup label="PAN Card Number" name="panCard" value={sellerData.panCard} onChange={handleInputChange} disabled={!isEditing} />
                                                         <InputGroup label="Tax Number (GST)" name="taxNumber" value={sellerData.taxNumber} onChange={handleInputChange} disabled={!isEditing} />
                                                     </div>
@@ -595,12 +596,12 @@ const SellerAccountSettings = () => {
                                         <motion.div
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            className="px-8 py-5 bg-gray-50 border-t border-gray-200 flex justify-end gap-4"
+                                            className="px-8 py-5 bg-neutral-50 border-t border-neutral-100 flex justify-end gap-4"
                                         >
                                             <button
                                                 type="button"
                                                 onClick={() => setIsEditing(false)}
-                                                className="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 transition-all"
+                                                className="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-white/90 backdrop-blur-md border-white/20 hover:shadow-sm border border-transparent hover:border-gray-200 transition-all"
                                             >
                                                 Cancel
                                             </button>
@@ -631,7 +632,7 @@ const SellerAccountSettings = () => {
 const InputGroup = ({ label, name, value, onChange, disabled, type = "text", placeholder = "", autoComplete }: any) => (
 
     <div className="space-y-1.5">
-        <label className="text-sm font-semibold text-gray-700 ml-1">{label}</label>
+        <label className="text-xs font-black text-neutral-700 ml-1 uppercase tracking-wider">{label}</label>
         <input
             type={type}
             name={name}
@@ -640,11 +641,12 @@ const InputGroup = ({ label, name, value, onChange, disabled, type = "text", pla
             disabled={disabled}
             placeholder={placeholder}
             autoComplete={autoComplete}
-            className={`w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all ${disabled ? 'bg-gray-50/50 text-gray-500 cursor-default' : 'bg-white'
+            className={`w-full px-4 py-2.5 rounded-lg border border-neutral-200 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-[#4A7C59] outline-none transition-all text-sm ${disabled ? 'bg-neutral-50/80 text-neutral-500 cursor-default' : 'bg-white'
 
-                }`}
+            }`}
         />
     </div>
 );
 
 export default SellerAccountSettings;
+
