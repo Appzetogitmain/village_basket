@@ -10,6 +10,7 @@ import {
     AdminEarning
 } from '../../../services/api/admin/adminWalletService';
 import AdminWithdrawals from './AdminWithdrawals';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 // Icons
 const WalletIcon = ({ className }: { className?: string }) => (
@@ -382,14 +383,7 @@ function TabButton({ active, onClick, label, icon: Icon, badge }: any) {
     );
 }
 
-function LoadingSpinner() {
-    return (
-        <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        </div>
-    );
-}
-
+// Local EmptyState component
 function EmptyState({ message }: { message: string }) {
     return (
         <div className="flex flex-col items-center justify-center py-12 text-gray-400">

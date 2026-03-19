@@ -1,8 +1,28 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import DeliveryHeader from '../components/DeliveryHeader';
-import DeliveryBottomNav from '../components/DeliveryBottomNav';
 import { getTodayOrders } from '../../../services/api/delivery/deliveryService';
+import VillageLoader from '../../../components/VillageLoader';
+
+// Icons
+const Icons = {
+    ChevronLeft: ({ size = 20, className = "" }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <path d="M15 18l-6-6 6-6" />
+        </svg>
+    ),
+    Package: ({ size = 20, className = "" }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <path d="M21 7.5L12 3L3 7.5v9l9 4.5l9-4.5v-9z" />
+            <path d="M3 7.5l9 4.5l9-4.5" />
+            <path d="M12 12v9" />
+        </svg>
+    ),
+    Navigation: ({ size = 16, className = "" }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <polygon points="3 11 22 2 13 21 11 13 3 11" />
+        </svg>
+    )
+};
 
 export default function DeliveryOrders() {
   const navigate = useNavigate();
@@ -25,100 +45,110 @@ export default function DeliveryOrders() {
     fetchOrders();
   }, []);
 
-  const getStatusColor = (status: string) => {
+  const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'Pending':
-        return 'bg-orange-100 text-orange-700';
-      case 'Ready for pickup':
-        return 'bg-yellow-100 text-yellow-700';
       case 'Picked up':
-        return 'bg-indigo-100 text-indigo-700';
-      case 'Out for delivery':
-        return 'bg-blue-100 text-blue-700';
       case 'Delivered':
-        return 'bg-green-100 text-green-700';
+        return 'bg-[#4A7C59]/10 text-[#4A7C59]';
+      case 'Out for Delivery':
+      case 'Ready for pickup':
+        return 'bg-[#8B3D28]/10 text-[#8B3D28]';
       case 'Cancelled':
-        return 'bg-red-100 text-red-700';
+        return 'bg-red-50 text-red-400';
       default:
-        return 'bg-neutral-100 text-neutral-700';
+        return 'bg-stone-100 text-stone-400';
     }
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-neutral-100 flex items-center justify-center pb-20">
-        <p className="text-neutral-500">Loading orders...</p>
-        <DeliveryBottomNav />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-neutral-100 flex items-center justify-center pb-20">
-        <p className="text-red-500">{error}</p>
-        <DeliveryBottomNav />
-      </div>
-    );
+    return <VillageLoader />;
   }
 
   return (
-    <div className="min-h-screen bg-neutral-100 pb-20">
-      <DeliveryHeader />
-      <div className="px-4 py-4">
-        <h2 className="text-neutral-900 text-xl font-semibold mb-4">Orders</h2>
+    <div className="min-h-screen bg-stone-50 pb-20 font-poppins relative">
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+
+      {/* Local Header */}
+      <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <button
+              onClick={() => navigate(-1)}
+              className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
+          >
+              <Icons.ChevronLeft size={20} />
+          </button>
+          <div className="ml-2 flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">Logistics</span>
+              <span className="font-black text-[12px] text-white tracking-wide mt-1">Today's Active Drops</span>
+          </div>
+      </div>
+
+      <div className="px-6 py-6 relative z-10">
         {orders.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {orders.map((order) => (
               <div
                 key={order.id}
                 onClick={() => navigate(`/delivery/orders/${order.id}`)}
-                className="bg-white rounded-xl p-4 shadow-sm border border-neutral-200 cursor-pointer active:scale-[0.99] transition-all hover:shadow-md"
+                className="village-card paper-texture organic-radius p-5 border-none shadow-sm cursor-pointer active:scale-[0.98] transition-all group relative overflow-hidden"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <p className="text-neutral-900 font-semibold text-sm mb-1">{order.orderId}</p>
-                    <p className="text-neutral-600 text-xs mb-1">{order.customerName}</p>
-                    <p className="text-neutral-500 text-xs">{order.customerPhone}</p>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex flex-col">
+                    <p className="text-[11px] font-black text-village-umber uppercase tracking-tight mb-0.5">{order.orderId ? `#${order.orderId.slice(-8)}` : 'N/A'}</p>
+                    <p className="text-stone-400 text-[9px] font-black uppercase tracking-widest">{order.customerName}</p>
                   </div>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}
+                    className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest leading-none ${getStatusStyle(order.status)}`}
                   >
                     {order.status}
                   </span>
                 </div>
-                <div className="border-t border-neutral-200 pt-3 mt-3">
-                  <p className="text-neutral-600 text-xs mb-2 line-clamp-2">{order.address}</p>
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-neutral-500 text-xs">
-                      {order.items.length} item{order.items.length > 1 ? 's' : ''}
-                    </p>
-                    <p className="text-neutral-900 font-bold">₹ {order.totalAmount}</p>
-                  </div>
-                  {order.estimatedDeliveryTime && (
-                    <p className="text-neutral-500 text-xs">
-                      ETA: {order.estimatedDeliveryTime} {order.distance && `• ${order.distance}`}
-                    </p>
-                  )}
-                  <p className="text-neutral-400 text-xs mt-2">
-                    {new Date(order.createdAt).toLocaleString('en-IN', {
-                      day: 'numeric',
-                      month: 'short',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </p>
+
+                <div className="flex items-center gap-3 mb-4 p-3 bg-stone-50/50 rounded-2xl border border-stone-100/50">
+                    <div className="w-8 h-8 rounded-xl bg-stone-100 flex items-center justify-center text-[#8B3D28]/30">
+                        <Icons.Navigation size={14} />
+                    </div>
+                    <p className="text-village-umber text-[10px] font-black leading-tight line-clamp-1 opacity-70">{order.address}</p>
                 </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-dashed border-stone-100">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[10px] font-black text-stone-300">₹</span>
+                    <p className="text-village-umber text-sm font-black tracking-tighter">{order.totalAmount}</p>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="flex -space-x-2">
+                        {[1,2].map(i => (
+                            <div key={i} className="w-5 h-5 rounded-lg bg-stone-100 border-2 border-white ring-1 ring-stone-50 shadow-sm flex items-center justify-center">
+                                <Icons.Package size={10} className="text-[#8B3D28]/30" />
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-stone-400 text-[8px] font-black uppercase tracking-widest">
+                      {order.items.length} Parcel Content{order.items.length > 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
+
+                {order.estimatedDeliveryTime && (
+                   <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden pointer-events-none opacity-5">
+                       <Icons.Package size={100} className="text-[#8B3D28] -mr-10 -mt-10" />
+                   </div>
+                )}
               </div>
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-xl p-8 min-h-[400px] flex items-center justify-center shadow-sm border border-neutral-200">
-            <p className="text-neutral-500 text-sm">No orders yet</p>
+          <div className="village-card paper-texture organic-radius p-10 min-h-[300px] border-none shadow-sm flex flex-col items-center justify-center text-center">
+            <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mb-6 text-stone-100">
+                <Icons.Package size={32} />
+            </div>
+            <p className="text-stone-300 text-[10px] font-black uppercase tracking-[0.2em]">No Manifest Records</p>
+            <p className="text-stone-200 text-[8px] font-bold uppercase tracking-widest mt-2">Active runs will appear here</p>
           </div>
         )}
       </div>
-      <DeliveryBottomNav />
     </div>
   );
 }

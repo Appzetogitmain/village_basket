@@ -1,8 +1,9 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import DashboardCard from "../components/DashboardCard";
 import OrderChart from "../components/OrderChart";
 import SalesLineChart from "../components/SalesLineChart";
 import GaugeChart from "../components/GaugeChart";
+import VillageLoader from "../../../components/VillageLoader";
 import ErrorBoundary from "../../../components/ErrorBoundary";
 import { useAuth } from "../../../context/AuthContext";
 import {
@@ -385,14 +386,7 @@ export default function AdminDashboard() {
 
   // Loading state
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mb-4"></div>
-          <p className="text-neutral-600">Loading dashboard data...</p>
-        </div>
-      </div>
-    );
+    return <VillageLoader message="Loading dashboard data..." />;
   }
 
   // Error state

@@ -9,6 +9,7 @@ import snacksIcon from '@assets/category/Snacks & Munchies.png';
 import breadIcon from '/assets/product-britannia-bread.jpg';
 import riceIcon from '@assets/category/Atta, Rice & Dal.png';
 import drinksIcon from '@assets/category/Cold Drinks & Juices.png';
+import VillageLoader from '../../components/VillageLoader';
 
 // Final Mascot path
 const GENERATED_MASCOT = '/assets/login/mascot.png';
@@ -77,6 +78,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#EBF5FF] flex flex-col items-center relative overflow-hidden font-poppins h-screen">
+      {loading && <VillageLoader />}
       {/* 1. Background Grid - Large Product Cards exactly like the image */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-80 p-2">
         <div className="grid grid-cols-3 gap-4 md:gap-8 transform -rotate-1 translate-y-[-10%] scale-110">

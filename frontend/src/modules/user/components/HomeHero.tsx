@@ -280,13 +280,8 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
   const { startRouteLoading } = useLoading();
 
   const handleSearchClick = () => {
-    // Show premium loader before navigating
-    startRouteLoading();
-    
-    // Smooth transition delay (reduced for speed)
-    setTimeout(() => {
-      navigate('/search');
-    }, 200);
+    // Navigate directly - the global useRouteLoader hook handles the transition animation
+    navigate('/search');
   };
 
   const handleTabClick = (tabId: string) => {

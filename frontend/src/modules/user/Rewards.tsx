@@ -3,7 +3,8 @@ import api from "../../services/api/config";
 import { useToast } from "../../context/ToastContext";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import IconLoader from "../../components/loaders/IconLoader"; // Assuming this exists
+import IconLoader from "../../components/loaders/IconLoader";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Rewards() {
   const { showToast } = useToast();
@@ -49,141 +50,176 @@ export default function Rewards() {
 
   const handleRedeem = async (itemId: string, requiredCoins: number) => {
     if (coins < requiredCoins) {
-      showToast("You don't have enough coins for this reward!", "error");
+      showToast("You don't have enough coins!", "error");
       return;
     }
 
-    if (!window.confirm("Are you sure you want to redeem this reward?")) return;
+    if (!window.confirm("Redeem this reward?")) return;
 
     try {
       const res = await api.post(`/customer/rewards/redeem/${itemId}`);
       if (res.data.success) {
-        showToast(res.data.message, "success");
+        showToast("Reward redeemed successfully!", "success");
         setCoins(res.data.data.coinsRemaining);
-        // Refresh data to update stock & history
         fetchData();
       }
     } catch (error: any) {
-      showToast(error.response?.data?.message || "Failed to redeem reward", "error");
+      showToast(error.response?.data?.message || "Failed to redeem", "error");
     }
   };
 
   if (loading) return <IconLoader forceShow />;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16 md:mt-24">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-teal-500 to-green-500 rounded-2xl p-8 mb-8 text-white shadow-lg flex flex-col md:flex-row items-center justify-between">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold mb-2">My Rewards</h1>
-          <p className="text-teal-50 text-lg">Earn 1 coin for every successful delivery!</p>
-        </div>
-        <div className="mt-6 md:mt-0 flex flex-col items-center bg-white/20 px-8 py-6 rounded-xl backdrop-blur-sm border border-white/30">
-          <span className="text-teal-50 text-sm font-semibold uppercase tracking-wider mb-1">Coin Balance</span>
-          <div className="flex items-center gap-2">
-            <span className="text-4xl">🪙</span>
-            <span className="text-5xl font-black">{coins}</span>
+    <div className="pb-24">
+      {/* Premium Village Header - Compact */}
+      <div className="px-4 py-4 bg-[#8B3D28] border-b border-white/10 mb-4 sticky top-0 z-20 flex items-center gap-3 shadow-lg">
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <button onClick={() => navigate(-1)} className="p-1.5 text-white hover:bg-white/10 rounded-full transition-all active:scale-95 z-10">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+        </button>
+        <h1 className="text-sm font-black text-white uppercase tracking-[0.2em] font-poppins z-10">Village Rewards</h1>
+      </div>
+
+      <div className="px-4">
+        {/* Compact Balance Banner */}
+        <div className="village-card paper-texture organic-radius p-4 mb-6 relative overflow-hidden bg-[#4A7C59] border-none shadow-[0_8px_20px_rgba(74,124,89,0.2)]">
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="flex flex-col">
+              <h2 className="text-[10px] font-black text[#8B3D28]/70 uppercase tracking-widest mb-1">Your Earnings</h2>
+              <p className="text-[11px] text-[#8B3D28]/90 font-bold leading-tight max-w-[140px]">Earn 1 coin for every successful delivery!</p>
+            </div>
+            <div className="flex flex-col items-center bg-white/15 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20">
+              <span className="text-[8px] font-black text-[#8B3D28] uppercase tracking-tighter mb-1 opacity-70">Coin Balance</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm">🪙</span>
+                <span className="text-2xl font-black text-[#8B3D28] leading-none">{coins}</span>
+              </div>
+            </div>
           </div>
+          {/* Decorative coin vectors in background */}
+          <div className="absolute -bottom-4 -left-4 text-white/5 text-6xl rotate-12 select-none pointer-events-none">🪙</div>
+          <div className="absolute -top-4 -right-2 text-white/10 text-4xl rotate-45 select-none pointer-events-none">🪙</div>
         </div>
-      </div>
 
-      {/* Tabs */}
-      <div className="flex space-x-4 border-b border-gray-200 mb-8 pb-4">
-        <button
-          onClick={() => setActiveTab("rewards")}
-          className={`pb-2 px-4 font-semibold text-lg transition-colors ${activeTab === 'rewards' ? 'text-teal-600 border-b-2 border-teal-600' : 'text-gray-500 hover:text-gray-800'}`}
-        >
-          Available Rewards
-        </button>
-        <button
-          onClick={() => setActiveTab("history")}
-          className={`pb-2 px-4 font-semibold text-lg transition-colors ${activeTab === 'history' ? 'text-teal-600 border-b-2 border-teal-600' : 'text-gray-500 hover:text-gray-800'}`}
-        >
-          History
-        </button>
-      </div>
-
-      {activeTab === "rewards" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {items.map((item) => (
-            <div key={item._id} className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 overflow-hidden flex flex-col">
-              <div className="h-48 w-full bg-gray-50 relative p-4 flex items-center justify-center">
-                {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.name} className="h-full w-full object-contain" />
-                ) : (
-                  <span className="text-6xl">🎁</span>
-                )}
-                <div className="absolute top-4 right-4 bg-teal-600 text-white font-bold px-3 py-1 rounded-full text-sm shadow-md flex items-center gap-1">
-                  <span>🪙</span> {item.coinsRequired}
-                </div>
-              </div>
-              <div className="p-5 flex flex-col flex-1">
-                <h3 className="text-lg font-bold text-gray-900 mb-1">{item.name}</h3>
-                <p className="text-gray-500 text-sm mb-4 line-clamp-2 min-h-[40px]">{item.description}</p>
-                <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-gray-400">{item.stock} left in stock</span>
-                  <button
-                    onClick={() => handleRedeem(item._id, item.coinsRequired)}
-                    disabled={coins < item.coinsRequired}
-                    className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${coins >= item.coinsRequired
-                      ? 'bg-teal-600 text-white hover:bg-teal-700 shadow-sm'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      }`}
-                  >
-                    Redeem
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-          {items.length === 0 && (
-            <div className="col-span-full py-12 text-center bg-gray-50 rounded-2xl border border-gray-200">
-              <span className="text-4xl mb-4 block">😢</span>
-              <h3 className="text-xl font-bold text-gray-700 mb-1">No Rewards Available</h3>
-              <p className="text-gray-500">Check back later for exciting rewards!</p>
-            </div>
-          )}
+        {/* Compact Tabs */}
+        <div className="flex gap-2 mb-6 p-1 bg-village-umber/5 rounded-xl border border-village-umber/5">
+          <button
+            onClick={() => setActiveTab("rewards")}
+            className={`flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+              activeTab === 'rewards' 
+              ? 'bg-[#8B3D28] text-white shadow-md' 
+              : 'text-village-umber/50 hover:bg-white/50'
+            }`}
+          >
+            Available Rewards
+          </button>
+          <button
+            onClick={() => setActiveTab("history")}
+            className={`flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+              activeTab === 'history' 
+              ? 'bg-[#8B3D28] text-white shadow-md' 
+              : 'text-village-umber/50 hover:bg-white/50'
+            }`}
+          >
+            History
+          </button>
         </div>
-      )}
 
-      {activeTab === "history" && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          {redemptions.length > 0 ? (
-            <div className="divide-y divide-gray-100">
-              {redemptions.map((order) => (
-                <div key={order._id} className="p-6 flex flex-col sm:flex-row items-center justify-between gap-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <img
-                      src={order.rewardItem?.imageUrl || "https://placehold.co/100x100?text=Gift"}
-                      alt=""
-                      className="w-16 h-16 rounded-xl object-contain bg-gray-50"
-                    />
-                    <div>
-                      <h4 className="font-bold text-gray-900">{order.rewardItem?.name || "Deleted Item"}</h4>
-                      <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
-                        <span className="font-semibold text-red-500">-🪙 {order.coinsSpent}</span>
-                        <span>•</span>
-                        <span>{new Date(order.orderDate).toLocaleDateString()}</span>
-                      </div>
+        <AnimatePresence mode="wait">
+          {activeTab === "rewards" ? (
+            <motion.div 
+              key="rewards-tab"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="grid grid-cols-2 gap-3"
+            >
+              {items.map((item) => (
+                <div key={item._id} className="village-card paper-texture organic-radius overflow-hidden flex flex-col bg-white shadow-sm border border-neutral-100/50">
+                  <div className="aspect-[4/3] w-full bg-neutral-50 relative p-3 flex items-center justify-center">
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt={item.name} className="h-full w-full object-contain drop-shadow-md" />
+                    ) : (
+                      <span className="text-3xl">🎁</span>
+                    )}
+                    <div className="absolute top-1.5 right-1.5 bg-[#4A7C59] text-white font-black px-2 py-0.5 rounded-full text-[9px] shadow-sm flex items-center gap-1">
+                      <span>🪙</span> {item.coinsRequired}
                     </div>
                   </div>
-                  <div className={`px-4 py-2 rounded-full text-sm font-bold capitalize w-full sm:w-auto text-center ${order.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                    order.status === 'Fulfilled' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>
-                    {order.status}
+                  <div className="p-2.5 flex flex-col flex-1">
+                    <h3 className="text-[11px] font-black text-village-umber uppercase tracking-tight line-clamp-1 mb-0.5">{item.name}</h3>
+                    <p className="text-[9px] font-bold text-neutral-400 italic line-clamp-2 min-h-[22px] mb-2">{item.description}</p>
+                    
+                    <div className="mt-auto flex items-center justify-between gap-2">
+                       <span className="text-[7px] font-black text-neutral-300 uppercase shrink-0">{item.stock} LEFT</span>
+                       <button
+                        onClick={() => handleRedeem(item._id, item.coinsRequired)}
+                        disabled={coins < item.coinsRequired}
+                        className={`h-7 px-3 rounded-lg font-black text-[9px] uppercase tracking-widest transition-all active:scale-95 ${
+                          coins >= item.coinsRequired
+                          ? 'bg-[#4A7C59] text-white shadow-md shadow-[#4A7C59]/20'
+                          : 'bg-neutral-100 text-neutral-300 cursor-not-allowed'
+                        }`}
+                      >
+                        Redeem
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
-            </div>
+              {items.length === 0 && (
+                <div className="col-span-full py-10 text-center village-card paper-texture organic-radius border-dashed border-neutral-300 bg-neutral-50/50">
+                  <span className="text-2xl mb-2 block">🍂</span>
+                  <h3 className="text-[11px] font-black text-village-umber uppercase opacity-60">No Rewards Yet</h3>
+                </div>
+              )}
+            </motion.div>
           ) : (
-            <div className="py-16 text-center">
-              <span className="text-4xl mb-4 block">🛒</span>
-              <h3 className="text-xl font-bold text-gray-700 mb-1">No History Yet</h3>
-              <p className="text-gray-500">You haven't redeemed any rewards yet.</p>
-            </div>
+            <motion.div 
+              key="history-tab"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex flex-col gap-2"
+            >
+              {redemptions.length > 0 ? (
+                redemptions.map((order) => (
+                  <div key={order._id} className="village-card paper-texture organic-radius p-3 flex items-center gap-3 bg-white hover:bg-neutral-50 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-neutral-50 flex-shrink-0 flex items-center justify-center p-1.5 border border-neutral-100">
+                      <img
+                        src={order.rewardItem?.imageUrl || "https://placehold.co/100x100?text=Gift"}
+                        alt=""
+                        className="w-full h-full object-contain opacity-80"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-[10px] font-black text-village-umber uppercase tracking-tight truncate">{order.rewardItem?.name || "Deleted Item"}</h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[9px] font-black text-red-500">- 🪙 {order.coinsSpent}</span>
+                        <span className="text-[9px] text-neutral-300">•</span>
+                        <span className="text-[9px] font-bold text-neutral-400">{new Date(order.orderDate).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <div className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${
+                      order.status === 'Pending' ? 'bg-amber-100 text-amber-700' :
+                      order.status === 'Fulfilled' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {order.status}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-12 text-center village-card paper-texture organic-radius bg-neutral-50/50">
+                  <span className="text-2xl mb-2 block">📜</span>
+                  <h3 className="text-[11px] font-black text-village-umber uppercase opacity-40">No History</h3>
+                </div>
+              )}
+            </motion.div>
           )}
-        </div>
-      )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
+

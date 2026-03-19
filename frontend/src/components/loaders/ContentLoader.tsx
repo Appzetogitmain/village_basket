@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Lottie from 'lottie-react';
+import { useLoading } from '../../context/LoadingContext';
 
 const ContentLoader: React.FC = () => {
+  const { isRouteLoading } = useLoading();
   const [animationData, setAnimationData] = useState<any>(null);
 
   useEffect(() => {
@@ -10,6 +12,8 @@ const ContentLoader: React.FC = () => {
       .then(data => setAnimationData(data))
       .catch(err => console.error('Failed to load animation:', err));
   }, []);
+
+  if (isRouteLoading) return null;
 
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20">

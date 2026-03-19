@@ -6,7 +6,7 @@ import PromoStrip from "./components/PromoStrip";
 import LowestPricesEver from "./components/LowestPricesEver";
 import CategoryTileSection from "./components/CategoryTileSection";
 import FeaturedThisWeek from "./components/FeaturedThisWeek";
-import BestsellerCards from "./components/BestsellerCards";
+// Bestseller section removed for cleaner layout
 import ProductCard from "./components/ProductCard";
 import { getHomeContent } from "../../services/api/customerHomeService";
 import { getHeaderCategoriesPublic } from "../../services/api/headerCategoryService";
@@ -267,14 +267,8 @@ export default function Home() {
         <LowestPricesEver activeTab={activeTab} products={homeData.lowestPrices} />
       </div>
 
-      {/* BESTSELLER CARDS (2x2 Grid) */}
-      <div className="relative z-10 bg-[#4A7C59]/5 py-4 my-6 border-y border-[#4A7C59]/10">
-        <BestsellerCards cards={homeData.bestsellerCards} />
-        {/* Subtle Leaf Pattern or Slogan could go here */}
-        <div className="px-4 md:px-8 -mt-2 mb-2">
-            <div className="h-1 w-20 bg-[#4A7C59] rounded-full opacity-20"></div>
-        </div>
-      </div>
+      {/* Dynamic spacing between hero sections */}
+      <div className="h-4 relative z-10"></div>
 
       {/* Main content */}
       <div
@@ -395,17 +389,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Shop by Store Section */}
-        {homeData.shops && homeData.shops.length > 0 && (
-          <div className="mt-6 mb-10 md:mb-16">
-            <CategoryTileSection
-              title="Shop by Store"
-              tiles={homeData.shops}
-              columns={4}
-              showProductCount={false}
-            />
-          </div>
-        )}
+        {/* Shop by Store Section removed for cleaner UI */}
       </div>
     </div>
   );

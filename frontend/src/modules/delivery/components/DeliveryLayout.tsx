@@ -38,8 +38,11 @@ function DeliveryLayoutContent({ children }: DeliveryLayoutContentProps) {
   }, [setUserName]);
 
   return (
-    <div className={`flex flex-col min-h-screen bg-neutral-100 transition-all duration-300 ${!isOnline ? 'grayscale' : ''}`}>
-      <main className="flex-1 overflow-y-auto scrollbar-hide pb-20">
+    <div className={`flex flex-col min-h-screen bg-stone-50 transition-all duration-300 font-poppins`}>
+      {/* Texture Overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      
+      <main className={`flex-1 overflow-y-auto scrollbar-hide pb-20 relative z-10 transition-all ${!isOnline ? 'opacity-80' : ''}`}>
         {children}
       </main>
       <DeliveryBottomNav />

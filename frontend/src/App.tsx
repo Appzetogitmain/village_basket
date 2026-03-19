@@ -8,6 +8,9 @@ import { LocationProvider } from "./context/LocationContext";
 import { ToastProvider } from "./context/ToastContext";
 
 import { LoadingProvider } from "./context/LoadingContext";
+import { SubscriptionProvider } from "./context/SubscriptionContext";
+import { WishlistProvider } from "./context/WishlistContext";
+import DailyServiceBasketBar from './modules/user/components/DailyServiceBasketBar';
 import { AxiosLoadingInterceptor } from "./context/AxiosLoadingInterceptor";
 import IconLoader from "./components/loaders/IconLoader";
 import ContentLoader from "./components/loaders/ContentLoader";
@@ -24,6 +27,8 @@ import { initializePushNotifications, setupForegroundNotificationHandler } from 
 // Critical routes - load immediately (Home, Cart, Checkout)
 import Home from "./modules/user/Home";
 import Checkout from "./modules/user/Checkout";
+import Wishlist from './modules/user/Wishlist';
+import DailyServiceCheckout from './modules/user/DailyServiceCheckout';
 import CheckoutAddress from "./modules/user/CheckoutAddress";
 import ProductDetail from "./modules/user/ProductDetail";
 
@@ -40,7 +45,6 @@ const Login = lazy(() => import("./modules/user/Login"));
 
 const AboutUs = lazy(() => import("./modules/user/AboutUs"));
 const FAQ = lazy(() => import("./modules/user/FAQ"));
-const Wishlist = lazy(() => import("./modules/user/Wishlist"));
 const Addresses = lazy(() => import("./modules/user/Addresses"));
 const AddressBook = lazy(() => import("./modules/user/AddressBook"));
 const SpiritualStore = lazy(() => import("./modules/user/SpiritualStore"));
@@ -163,12 +167,12 @@ function App() {
     <ErrorBoundary>
       <LoadingProvider>
         <AxiosLoadingInterceptor>
-          <IconLoader />
-          <AuthProvider>
-            <ThemeProvider>
+          <SubscriptionProvider>
+            <AuthProvider>
+              <ThemeProvider>
               <LocationProvider>
+                <WishlistProvider>
                 <ToastProvider>
-
                   <CartProvider>
                     <OrdersProvider>
                       <BrowserRouter
@@ -176,6 +180,8 @@ function App() {
                           v7_startTransition: true,
                           v7_relativeSplatPath: true,
                         }}>
+                        <DailyServiceBasketBar />
+                        <IconLoader />
                         <RouteLoaderTrigger />
                         <Routes>
                           {/* Public Routes */}
@@ -183,7 +189,7 @@ function App() {
                             path="/login"
                             element={
                               <PublicRoute>
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <Login />
                                 </Suspense>
                               </PublicRoute>
@@ -194,7 +200,7 @@ function App() {
                             path="/seller/login"
                             element={
                               <PublicRoute userType="Seller">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <SellerLogin />
                                 </Suspense>
                               </PublicRoute>
@@ -204,7 +210,7 @@ function App() {
                             path="/seller/signup"
                             element={
                               <PublicRoute userType="Seller">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <SellerSignUp />
                                 </Suspense>
                               </PublicRoute>
@@ -214,7 +220,7 @@ function App() {
                             path="/delivery/login"
                             element={
                               <PublicRoute userType="Delivery">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <DeliveryLogin />
                                 </Suspense>
                               </PublicRoute>
@@ -224,7 +230,7 @@ function App() {
                             path="/delivery/signup"
                             element={
                               <PublicRoute userType="Delivery">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <DeliverySignUp />
                                 </Suspense>
                               </PublicRoute>
@@ -234,7 +240,7 @@ function App() {
                             path="/admin/login"
                             element={
                               <PublicRoute userType="Admin">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <AdminLogin />
                                 </Suspense>
                               </PublicRoute>
@@ -246,7 +252,7 @@ function App() {
                             path="/delivery/*"
                             element={
                               <ProtectedRoute requiredUserType="Delivery" redirectTo="/delivery/login">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <DeliveryLayout>
                                     <Routes>
                                       <Route path="" element={<DeliveryDashboard />} />
@@ -276,7 +282,7 @@ function App() {
                             path="/seller/*"
                             element={
                               <ProtectedRoute requiredUserType="Seller" redirectTo="/seller/login">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <SellerLayout>
                                     <Routes>
                                       <Route path="" element={<SellerDashboard />} />
@@ -306,7 +312,7 @@ function App() {
                             path="/admin/*"
                             element={
                               <ProtectedRoute requiredUserType="Admin" redirectTo="/admin/login">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <AdminLayout>
                                     <Suspense fallback={<ContentLoader />}>
                                       <Routes>
@@ -378,7 +384,7 @@ function App() {
                             path="/*"
                             element={
                               <AppLayout>
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <Routes>
                                     <Route path="/" element={<Home />} />
                                     <Route path="/user/home" element={<Home />} />
@@ -389,7 +395,8 @@ function App() {
                                     <Route path="/account" element={<Account />} />
                                     <Route path="/about-us" element={<AboutUs />} />
                                     <Route path="/faq" element={<FAQ />} />
-                                    <Route path="/wishlist" element={<Wishlist />} />
+                                    <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+                            <Route path="/daily-service/checkout" element={<ProtectedRoute><DailyServiceCheckout /></ProtectedRoute>} />
                                     <Route path="/categories" element={<Categories />} />
                                     <Route path="/category/:id" element={<Category />} />
                                     <Route path="/address-book" element={<AddressBook />} />
@@ -418,10 +425,12 @@ function App() {
                     </OrdersProvider>
                   </CartProvider>
                 </ToastProvider>
+                </WishlistProvider>
               </LocationProvider>
 
             </ThemeProvider>
-          </AuthProvider>
+            </AuthProvider>
+          </SubscriptionProvider>
         </AxiosLoadingInterceptor>
       </LoadingProvider>
     </ErrorBoundary>

@@ -4,23 +4,19 @@ export default function DeliveryBottomNav() {
   const location = useLocation();
   
   const isActive = (path: string) => location.pathname === path;
+  const activeColor = '#8B3D28'; // Terracotta
+  const inactiveColor = '#A8A29E'; // Stone-400
 
   const navItems = [
     {
       path: '/delivery',
       label: 'Home',
       icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Grid of 9 squares */}
-          <rect x="3" y="3" width="6" height="6" fill={isActive('/delivery') ? '#f97316' : '#9ca3af'} />
-          <rect x="11" y="3" width="6" height="6" fill={isActive('/delivery') ? '#f97316' : '#9ca3af'} />
-          <rect x="19" y="3" width="2" height="6" fill={isActive('/delivery') ? '#f97316' : '#9ca3af'} />
-          <rect x="3" y="11" width="6" height="6" fill={isActive('/delivery') ? '#f97316' : '#9ca3af'} />
-          <rect x="11" y="11" width="6" height="6" fill={isActive('/delivery') ? '#f97316' : '#9ca3af'} />
-          <rect x="19" y="11" width="2" height="6" fill={isActive('/delivery') ? '#f97316' : '#9ca3af'} />
-          <rect x="3" y="19" width="6" height="2" fill={isActive('/delivery') ? '#f97316' : '#9ca3af'} />
-          <rect x="11" y="19" width="6" height="2" fill={isActive('/delivery') ? '#f97316' : '#9ca3af'} />
-          <rect x="19" y="19" width="2" height="2" fill={isActive('/delivery') ? '#f97316' : '#9ca3af'} />
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" fill={isActive('/delivery') ? activeColor : inactiveColor} fillOpacity={isActive('/delivery') ? '1' : '0.4'} />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" fill={isActive('/delivery') ? activeColor : inactiveColor} fillOpacity={isActive('/delivery') ? '1' : '0.4'} />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" fill={isActive('/delivery') ? activeColor : inactiveColor} fillOpacity={isActive('/delivery') ? '1' : '0.4'} />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" fill={isActive('/delivery') ? activeColor : inactiveColor} fillOpacity={isActive('/delivery') ? '1' : '0.4'} />
         </svg>
       ),
     },
@@ -28,41 +24,34 @@ export default function DeliveryBottomNav() {
       path: '/delivery/orders',
       label: 'Orders',
       icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Delivery truck with speed lines */}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M2 17H4L5 12H19L20 17H22M2 17C2 18.1046 2.89543 19 4 19C5.10457 19 6 18.1046 6 17M2 17C2 15.8954 2.89543 15 4 15C5.10457 15 6 15.8954 6 17M22 17C22 18.1046 21.1046 19 20 19C18.8954 19 18 18.1046 18 17M22 17C22 15.8954 21.1046 15 20 15C18.8954 15 18 15.8954 18 17M6 17H18M5 12L4 7H2M20 12L21 7H22"
-            stroke={isActive('/delivery/orders') ? '#f97316' : '#9ca3af'}
-            strokeWidth="2"
+            stroke={isActive('/delivery/orders') ? activeColor : inactiveColor}
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            fill="none"
           />
-          {/* Speed lines */}
-          <path d="M8 10H10M12 10H14" stroke={isActive('/delivery/orders') ? '#f97316' : '#9ca3af'} strokeWidth="2" strokeLinecap="round" fill="none" />
         </svg>
       ),
     },
     {
       path: '/delivery/notifications',
-      label: 'Notification',
+      label: 'Notice',
       icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M18 8A6 6 0 0 0 6 8C6 11.3137 4 14 4 14H20C20 14 18 11.3137 18 8Z"
-            stroke={isActive('/delivery/notifications') ? '#f97316' : '#9ca3af'}
-            strokeWidth="2"
+            stroke={isActive('/delivery/notifications') ? activeColor : inactiveColor}
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            fill="none"
           />
           <path
-            d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
-            stroke={isActive('/delivery/notifications') ? '#f97316' : '#9ca3af'}
-            strokeWidth="2"
+            d="M10.27 21C10.4458 21.3031 10.6982 21.5547 11.0018 21.7295C11.3054 21.9044 11.6496 21.9965 12 21.9965C12.3504 21.9965 12.6946 21.9044 12.9982 21.7295C13.3019 21.5547 13.5542 21.3031 13.73 21"
+            stroke={isActive('/delivery/notifications') ? activeColor : inactiveColor}
+            strokeWidth="2.5"
             strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
           />
         </svg>
       ),
@@ -71,14 +60,13 @@ export default function DeliveryBottomNav() {
       path: '/delivery/menu',
       label: 'Menu',
       icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M3 12H21M3 6H21M3 18H21"
-            stroke={isActive('/delivery/menu') ? '#f97316' : '#9ca3af'}
-            strokeWidth="2"
+            stroke={isActive('/delivery/menu') ? activeColor : inactiveColor}
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            fill="none"
           />
         </svg>
       ),
@@ -86,20 +74,20 @@ export default function DeliveryBottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200/10 shadow-[0_-2px_4px_rgba(0,0,0,0.05)] z-50">
-      <div className="flex justify-around items-center h-16">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/70 backdrop-blur-lg border-t border-village-umber/5 shadow-[0_-4px_12px_rgba(0,0,0,0.03)] z-50">
+      <div className="flex justify-around items-center h-14 pb-env-bottom">
         {navItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}
-            className="flex flex-col items-center justify-center flex-1 h-full"
+            className="flex flex-col items-center justify-center flex-1 h-full transition-all active:scale-90"
           >
-            <div className={`${isActive(item.path) ? 'text-neutral-700' : 'text-neutral-500'}`}>
+            <div className="mb-0.5">
               {item.icon}
             </div>
             <span
-              className={`text-xs mt-0.5 ${
-                isActive(item.path) ? 'text-neutral-700 font-medium' : 'text-neutral-500 font-medium'
+              className={`text-[9px] font-black uppercase tracking-tight ${
+                isActive(item.path) ? 'text-[#8B3D28]' : 'text-stone-400'
               }`}
             >
               {item.label}

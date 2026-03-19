@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DashboardCard from '../components/DashboardCard';
 import OrderChart from '../components/OrderChart';
 import AlertCard from '../components/AlertCard';
+import VillageLoader from '../../../components/VillageLoader';
 import { getSellerDashboardStats, DashboardStats, NewOrder } from '../../../services/api/dashboardService';
 import { getSellerProfile, toggleShopStatus } from '../../../services/api/auth/sellerAuthService';
 
@@ -234,11 +235,7 @@ export default function SellerDashboard() {
   );
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-      </div>
-    );
+    return <VillageLoader message="Loading dashboard data..." />;
   }
 
   if (error || !stats) {

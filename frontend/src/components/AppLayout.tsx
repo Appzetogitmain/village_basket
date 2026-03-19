@@ -127,7 +127,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const isProductDetailPage = location.pathname.startsWith('/product/');
   const isSearchPage = location.pathname === '/search';
-  const isCheckoutPage = location.pathname === '/checkout' || location.pathname.startsWith('/checkout/');
+  const isCheckoutPage = location.pathname === '/checkout' || location.pathname.startsWith('/checkout/') || location.pathname === '/daily-service/checkout' || location.pathname.startsWith('/daily-service/checkout');
   const isHomePage = location.pathname === '/' || location.pathname === '/user/home';
   const showHeader = !isCheckoutPage;
   const showSearchBar = isSearchPage;

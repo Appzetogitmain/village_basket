@@ -18,7 +18,7 @@ import { appConfig } from '../../services/configService';
 import { getAddresses, updateAddress } from '../../services/api/customerAddressService';
 import GoogleMapsLocationPicker from '../../components/GoogleMapsLocationPicker';
 import { getProducts } from '../../services/api/customerProductService';
-import { addToWishlist } from '../../services/api/customerWishlistService';
+import { useWishlist } from '../../context/WishlistContext';
 import { updateProfile } from '../../services/api/customerService';
 import { calculateProductPrice } from '../../utils/priceUtils';
 import QuantityInput from '../../components/ui/QuantityInput';
@@ -36,6 +36,7 @@ export default function Checkout() {
   const { location: userLocation } = useLocationContext();
   const { showToast: showGlobalToast } = useToast();
   const { user, updateUser } = useAuth();
+  const { addToWishlist: contextAddToWishlist } = useWishlist();
   const navigate = useNavigate();
   const [tipAmount, setTipAmount] = useState<number | null>(null);
   const [customTipAmount, setCustomTipAmount] = useState<number>(0);
@@ -299,24 +300,18 @@ export default function Checkout() {
 
   const handleMoveToWishlist = async (product: any) => {
     if (!product?.id && !product?._id) return;
-
     const productId = product.id || product._id;
 
     try {
-      if (!userLocation?.latitude || !userLocation?.longitude) {
-        showGlobalToast('Location is required to move items to wishlist', 'error');
-        return;
-      }
-
-      // Add to wishlist
-      await addToWishlist(productId, userLocation.latitude, userLocation.longitude);
+      // Add to wishlist using context
+      await contextAddToWishlist(productId);
       // Remove from cart
       await removeFromCart(productId);
       // Show success message
       showGlobalToast('Item moved to wishlist');
     } catch (error: any) {
       console.error('Failed to move to wishlist:', error);
-      const msg = error.response?.data?.message || 'Failed to move item to wishlist';
+      const msg = error.message || 'Failed to move item to wishlist';
       showGlobalToast(msg, 'error');
     }
   };

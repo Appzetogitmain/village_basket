@@ -7,6 +7,7 @@ import { Product } from '../../types/domain';
 import { useLocation } from '../../hooks/useLocation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLoading } from '../../context/LoadingContext';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function Search() {
   const navigate = useNavigate();
@@ -229,7 +230,7 @@ export default function Search() {
         <>
           {contentLoading && (
             <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+              <LoadingSpinner size="md" className="text-village-green" />
             </div>
           )}
 
