@@ -302,8 +302,10 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
           <div className="flex items-start justify-between mb-2 md:mb-2">
             {/* Left: Text content */}
             <div className="flex-1 pr-2">
-              {/* Service name - small, dark */}
-              <div className="text-neutral-800 font-medium text-[10px] md:text-xs mb-0 leading-tight">Village Basket Quick Commerce</div>
+              {/* Service name & Logo */}
+              <div className="mb-0.5 flex flex-col items-start gap-1">
+                <img src="/assets/village_basket-removebg-preview.png" alt="Village Basket" className="h-[38px] md:h-[46px] object-contain" />
+              </div>
               {/* Delivery time - large, bold, dark grey/black */}
               <div className="text-neutral-900 font-extrabold text-2xl md:text-xl mb-0 md:mb-0.5 leading-tight">{appConfig.estimatedDeliveryTime}</div>
               {/* Location with dropdown indicator - only show if location is provided */}
