@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getOrderDetails, updateOrderStatus, getSellerLocationsForOrder, sendDeliveryOtp, verifyDeliveryOtp, updateDeliveryLocation, checkSellerProximity, confirmSellerPickup, checkCustomerProximity } from '../../../services/api/delivery/deliveryService';
 import deliveryIcon from '@assets/deliveryboy/deliveryIcon.png';
 import GoogleMapsTracking from '../../../components/GoogleMapsTracking';
+import VillageLoader from '../../../components/VillageLoader';
 
 // Helper to get delivery icon URL (works in both dev and production)
 const getDeliveryIconUrl = () => {
@@ -476,11 +477,7 @@ export default function DeliveryOrderDetail() {
 
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-neutral-100 flex items-center justify-center">
-                <p className="text-neutral-500">Loading order...</p>
-            </div>
-        );
+        return <VillageLoader message="Analyzing Manifest" />;
     }
 
     if (error || !order) {
@@ -542,23 +539,29 @@ export default function DeliveryOrderDetail() {
     const hasValidCustomerLocation = !!(customerLat && customerLng && customerLat !== 0 && customerLng !== 0);
 
     return (
-        <div className="min-h-screen bg-neutral-50 pb-32 relative">
+        <div className="min-h-screen bg-transparent pb-32 relative font-poppins">
+            {/* Texture Overlay */}
+            <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
 
             {/* Top Bar with Back Button */}
-            <div className="sticky top-0 z-20 bg-white border-b border-neutral-100 px-4 py-3 flex items-center shadow-sm">
+            <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden">
+                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
                 <button
                     onClick={() => navigate(-1)}
-                    className="p-2 -ml-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-colors"
+                    className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
                 >
-                    <Icons.ChevronLeft size={24} />
+                    <Icons.ChevronLeft size={20} />
                 </button>
-                <span className="ml-2 font-semibold text-lg text-neutral-800">Order Details</span>
+                <div className="ml-2 flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">Order Tracking</span>
+                    <span className="font-black text-[12px] text-white tracking-wide mt-1">Details & Transit</span>
+                </div>
 
                 <div className="ml-auto">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                        order.status === 'Picked up' ? 'bg-indigo-100 text-indigo-700' :
-                            order.status === 'Ready for pickup' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-orange-100 text-orange-700'
+                    <span className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest shadow-sm ring-1 ring-white/20 ${order.status === 'Delivered' ? 'bg-[#4A7C59] text-white' :
+                        order.status === 'Picked up' ? 'bg-indigo-600 text-white' :
+                            order.status === 'Ready for pickup' ? 'bg-amber-500 text-white' :
+                                'bg-orange-500 text-white'
                         }`}>
                         {order.status}
                     </span>
@@ -567,75 +570,81 @@ export default function DeliveryOrderDetail() {
 
             {/* Location Error Warning */}
             {locationError && (
-                <div className="mx-4 mt-4 bg-red-50 border border-red-100 rounded-xl p-4 flex items-start gap-3">
-                    <Icons.AlertTriangle size={20} className="text-red-500 shrink-0 mt-0.5" />
+                <div className="mx-4 mt-4 bg-red-50 organic-radius p-3 flex items-start gap-3 border border-red-100 relative z-10 shadow-sm">
+                    <Icons.AlertTriangle size={16} className="text-red-500 shrink-0 mt-0.5" />
                     <div>
-                        <p className="text-sm font-medium text-red-800">Location Access Required</p>
-                        <p className="text-xs text-red-600 mt-0.5">{locationError}</p>
+                        <p className="text-[9px] font-black text-red-800 uppercase tracking-widest">Maps Error</p>
+                        <p className="text-[9px] font-bold text-red-600 mt-0.5 leading-relaxed">{locationError}</p>
                     </div>
                 </div>
             )}
 
             {/* Google Maps View - Shared Component for Parity */}
             {isMapVisible && (
-                <GoogleMapsTracking
-                    sellerLocations={
-                        (order.status === 'Out for Delivery' || order.status === 'Picked up')
-                            ? []  // Hide seller markers when delivering to customer
-                            : sellerLocations.map(s => ({
-                                lat: s.latitude,
-                                lng: s.longitude,
-                                name: s.storeName
-                            }))
-                    }
-                    customerLocation={{
-                        lat: order.deliveryAddress?.latitude || order.address?.latitude || 0,
-                        lng: order.deliveryAddress?.longitude || order.address?.longitude || 0
-                    }}
-                    deliveryLocation={deliveryBoyLocation || undefined}
-                    isTracking={!!deliveryBoyLocation}
-                    showRoute={!!deliveryBoyLocation && (
-                        ((order.status === 'Picked up' || order.status === 'Out for Delivery') && hasValidCustomerLocation) ||
-                        (sellerLocations.length > 0 && order.status !== 'Delivered' && order.status !== 'Picked up' && order.status !== 'Out for Delivery')
-                    )}
-                    routeOrigin={deliveryBoyLocation || undefined}
-                    routeDestination={
-                        order.status === 'Picked up' || order.status === 'Out for Delivery'
-                            ? (hasValidCustomerLocation ? {
-                                lat: customerLat!,
-                                lng: customerLng!
-                            } : undefined)
-                            : sellerLocations.length > 0
-                                ? { lat: sellerLocations[sellerLocations.length - 1].latitude, lng: sellerLocations[sellerLocations.length - 1].longitude }
-                                : undefined
-                    }
-                    routeWaypoints={
-                        order.status === 'Picked up' || order.status === 'Out for Delivery'
-                            ? []
-                            : sellerLocations.length > 1
-                                ? sellerLocations.slice(0, -1).map(s => ({ lat: s.latitude, lng: s.longitude }))
-                                : []
-                    }
-                    destinationName={
-                        order.status === 'Picked up' || order.status === 'Out for Delivery'
-                            ? order.address?.split(',')[0]
-                            : sellerLocations.length > 0
-                                ? sellerLocations[0].storeName
-                                : undefined
-                    }
-                    onRouteInfoUpdate={setRouteInfo}
-                    lastUpdate={lastUpdate}
-                />
+                <div className="mx-4 mt-4 organic-radius overflow-hidden shadow-lg border-2 border-white relative z-10">
+                    <GoogleMapsTracking
+                        sellerLocations={
+                            (order.status === 'Out for Delivery' || order.status === 'Picked up')
+                                ? []  // Hide seller markers when delivering to customer
+                                : sellerLocations.map(s => ({
+                                    lat: s.latitude,
+                                    lng: s.longitude,
+                                    name: s.storeName
+                                }))
+                        }
+                        customerLocation={{
+                            lat: order.deliveryAddress?.latitude || order.address?.latitude || 0,
+                            lng: order.deliveryAddress?.longitude || order.address?.longitude || 0
+                        }}
+                        deliveryLocation={deliveryBoyLocation || undefined}
+                        isTracking={!!deliveryBoyLocation}
+                        showRoute={!!deliveryBoyLocation && (
+                            ((order.status === 'Picked up' || order.status === 'Out for Delivery') && hasValidCustomerLocation) ||
+                            (sellerLocations.length > 0 && order.status !== 'Delivered' && order.status !== 'Picked up' && order.status !== 'Out for Delivery')
+                        )}
+                        routeOrigin={deliveryBoyLocation || undefined}
+                        routeDestination={
+                            order.status === 'Picked up' || order.status === 'Out for Delivery'
+                                ? (hasValidCustomerLocation ? {
+                                    lat: customerLat!,
+                                    lng: customerLng!
+                                } : undefined)
+                                : sellerLocations.length > 0
+                                    ? { lat: sellerLocations[sellerLocations.length - 1].latitude, lng: sellerLocations[sellerLocations.length - 1].longitude }
+                                    : undefined
+                        }
+                        routeWaypoints={
+                            order.status === 'Picked up' || order.status === 'Out for Delivery'
+                                ? []
+                                : sellerLocations.length > 1
+                                    ? sellerLocations.slice(0, -1).map(s => ({ lat: s.latitude, lng: s.longitude }))
+                                    : []
+                        }
+                        destinationName={
+                            order.status === 'Picked up' || order.status === 'Out for Delivery'
+                                ? order.address?.split(',')[0]
+                                : sellerLocations.length > 0
+                                    ? sellerLocations[0].storeName
+                                    : undefined
+                        }
+                        onRouteInfoUpdate={setRouteInfo}
+                        lastUpdate={lastUpdate}
+                    />
+                </div>
             )}
 
             {/* Seller Locations Card with Pickup Buttons (before all sellers picked up) */}
             {showSellerLocations && sellerLocations.length > 0 && (
-                <div className="p-4">
-                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100">
-                        <h3 className="font-semibold text-neutral-900 mb-4 flex items-center gap-2">
-                            <Icons.Store size={18} className="text-neutral-500" />
-                            Seller Pickup Locations
-                        </h3>
+                <div className="p-4 relative z-10">
+                    <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm">
+                        <div className="flex items-baseline justify-between mb-4">
+                            <h3 className="text-village-umber text-[10px] font-black uppercase tracking-[0.2em] opacity-80 flex items-center gap-2">
+                                <Icons.Store size={14} className="text-[#8B3D28]/40" />
+                                Collection Points
+                            </h3>
+                            <div className="h-[2px] w-12 bg-village-umber/5 rounded-full"></div>
+                        </div>
+
                         <div className="space-y-3">
                             {sellerLocations.map((seller: any, idx: number) => {
                                 const isPickedUp = order?.sellerPickups?.some(
@@ -647,25 +656,28 @@ export default function DeliveryOrderDetail() {
                                 const isLoading = pickupLoading[seller.sellerId] || false;
 
                                 return (
-                                    <div key={idx} className="p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                                    <div key={idx} className={`p-3.5 organic-radius transition-all ${isPickedUp ? 'bg-[#4A7C59]/5 border border-[#4A7C59]/10' : 'bg-stone-50 border border-stone-100'}`}>
                                         <div className="flex items-start justify-between mb-3">
                                             <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <p className="font-semibold text-neutral-900">{seller.storeName}</p>
+                                                <div className="flex items-center gap-2 mb-1.5">
+                                                    <p className="text-[11px] font-black text-village-umber uppercase tracking-tight leading-none">{seller.storeName}</p>
                                                     {isPickedUp && (
-                                                        <span className="flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                                                            <Icons.CheckCircle size={12} />
-                                                            Picked Up
+                                                        <span className="flex items-center gap-1 px-1.5 py-0.5 bg-[#4A7C59]/10 text-[#4A7C59] rounded-lg text-[8px] font-black uppercase tracking-widest">
+                                                            <Icons.CheckCircle size={10} />
+                                                            Picked
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="text-sm text-neutral-600">{seller.address}, {seller.city}</p>
+                                                <p className="text-[9px] font-bold text-stone-400 line-clamp-1">{seller.address}, {seller.city}</p>
                                                 {distance !== undefined && (
-                                                    <p className={`text-xs mt-1 font-medium ${withinRange ? 'text-green-600' :
-                                                            distance < 1000 ? 'text-yellow-600' : 'text-red-600'
-                                                        }`}>
-                                                        {distance < 1000 ? `${distance}m away` : `${(distance / 1000).toFixed(1)}km away`}
-                                                    </p>
+                                                    <div className="flex items-center gap-1.5 mt-2">
+                                                        <div className={`w-1 h-1 rounded-full ${withinRange ? 'bg-[#4A7C59]' : 'bg-stone-300'}`}></div>
+                                                        <p className={`text-[8px] font-black uppercase tracking-widest ${withinRange ? 'text-[#4A7C59]' :
+                                                                distance < 1000 ? 'text-amber-600' : 'text-stone-400'
+                                                            }`}>
+                                                            {distance < 1000 ? `${distance}M DISTANCE` : `${(distance / 1000).toFixed(1)}KM DISTANCE`}
+                                                        </p>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -674,12 +686,12 @@ export default function DeliveryOrderDetail() {
                                             <button
                                                 onClick={() => handleSellerPickup(seller.sellerId)}
                                                 disabled={!withinRange || isLoading}
-                                                className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-all ${withinRange && !isLoading
-                                                        ? 'bg-green-600 text-white hover:bg-green-700 active:scale-[0.98]'
-                                                        : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                                                className={`w-full py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all ${withinRange && !isLoading
+                                                        ? 'bg-[#4A7C59] text-white shadow-lg shadow-[#4A7C59]/20 active:scale-[0.98]'
+                                                        : 'bg-stone-200 text-stone-400 cursor-not-allowed'
                                                     }`}
                                             >
-                                                {isLoading ? 'Confirming...' : withinRange ? 'Confirm Pickup' : 'Move within 500m to pickup'}
+                                                {isLoading ? 'Wait...' : withinRange ? 'Confirm Collection' : 'Move Closer to Confirm'}
                                             </button>
                                         )}
                                     </div>
@@ -690,42 +702,42 @@ export default function DeliveryOrderDetail() {
                 </div>
             )}
 
-            <div className="p-4 space-y-4 max-w-lg mx-auto">
+            <div className="p-4 space-y-4 max-w-lg mx-auto relative z-10">
 
                 {/* Status Stepper Card */}
                 {currentStatusIndex !== -1 && (
-                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100">
-                        <div className="flex justify-between items-start mb-6">
-                            <div>
-                                <p className="text-neutral-500 text-xs font-medium uppercase tracking-wider mb-1">Process</p>
-                                <h2 className="text-lg font-bold text-neutral-900">Order Progress</h2>
-                            </div>
+                    <div className="village-card paper-texture organic-radius p-5 border-none shadow-sm">
+                        <div className="flex items-baseline justify-between mb-6">
+                            <h2 className="text-village-umber text-[10px] font-black uppercase tracking-[0.2em] opacity-80">
+                                Transit Flow
+                            </h2>
+                            <div className="h-[2px] w-12 bg-village-umber/5 rounded-full"></div>
                         </div>
 
-                        {/* Status Progress Bar */}
-                        <div className="relative">
-                            <div className="flex justify-between mb-2 relative z-10">
+                        {/* Status Progress Bar - Village Themed */}
+                        <div className="relative pt-2 pb-1 px-1">
+                            <div className="flex justify-between mb-4 relative z-10">
                                 {statusFlow.map((step, idx) => (
                                     <div key={idx} className="flex flex-col items-center flex-1">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 ${idx <= currentStatusIndex
-                                            ? 'bg-blue-600 border-blue-600 text-white'
-                                            : 'bg-white border-neutral-200 text-neutral-300'
+                                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center text-[10px] font-black border-2 transition-all duration-500 transform ${idx === currentStatusIndex ? 'scale-110 shadow-lg shadow-[#8B3D28]/20' : ''} ${idx <= currentStatusIndex
+                                            ? 'bg-[#8B3D28] border-[#8B3D28] text-white'
+                                            : 'bg-white border-stone-100 text-stone-200'
                                             }`}>
-                                            {idx <= currentStatusIndex ? <Icons.CheckCircle size={14} /> : idx + 1}
+                                            {idx < currentStatusIndex ? <Icons.CheckCircle size={14} /> : idx + 1}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                             {/* Connecting Line */}
-                            <div className="absolute top-4 left-0 w-full h-0.5 bg-neutral-100 -z-0">
+                            <div className="absolute top-[1.2rem] left-8 right-8 h-1 bg-stone-100/50 rounded-full -z-0">
                                 <div
-                                    className="h-full bg-blue-600 transition-all duration-500"
+                                    className="h-full bg-[#8B3D28] transition-all duration-700 rounded-full"
                                     style={{ width: `${(currentStatusIndex / (statusFlow.length - 1)) * 100}%` }}
                                 ></div>
                             </div>
-                            <div className="flex justify-between text-[10px] text-neutral-500 font-medium mt-2">
+                            <div className="flex justify-between text-[7px] font-black text-stone-400 uppercase tracking-tighter mt-1 px-1">
                                 {statusFlow.map((step, idx) => (
-                                    <span key={idx} className={`text-center flex-1 transition-colors ${idx === currentStatusIndex ? 'text-blue-600 font-bold' : ''}`}>
+                                    <span key={idx} className={`text-center flex-1 transition-colors px-1 ${idx === currentStatusIndex ? 'text-[#8B3D28]' : ''}`}>
                                         {step === 'Ready for pickup' ? 'Ready' : step}
                                     </span>
                                 ))}
@@ -736,37 +748,45 @@ export default function DeliveryOrderDetail() {
 
 
                 {/* Customer Details */}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100">
-                    <h3 className="font-semibold text-neutral-900 mb-4 flex items-center gap-2">
-                        <Icons.User size={18} className="text-neutral-500" />
-                        Customer Details
-                    </h3>
+                <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm">
+                     <div className="flex items-baseline justify-between mb-4">
+                        <h3 className="text-village-umber text-[10px] font-black uppercase tracking-[0.2em] opacity-80 flex items-center gap-2">
+                            <Icons.User size={14} className="text-[#8B3D28]/40" />
+                            Delivery Contact
+                        </h3>
+                        <div className="h-[2px] w-12 bg-village-umber/5 rounded-full"></div>
+                    </div>
+
                     <div className="space-y-4">
-                        <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 text-blue-600">
-                                <Icons.User size={20} />
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-2xl bg-[#8B3D28]/5 flex items-center justify-center flex-shrink-0 text-[#8B3D28]">
+                                <Icons.User size={18} />
                             </div>
-                            <div>
-                                <p className="font-medium text-neutral-900">{order.customerName}</p>
-                                <p className="text-sm text-neutral-500">Customer</p>
+                            <div className="flex flex-col">
+                                <p className="text-[11px] font-black text-village-umber uppercase tracking-tight leading-none">{order.customerName}</p>
+                                <span className="text-[8px] font-bold text-stone-400 uppercase tracking-widest mt-1.5">Recipient</span>
                             </div>
                             <button
                                 onClick={() => window.open(`tel:${order.customerPhone}`, '_system')}
-                                className="ml-auto p-3 bg-green-500 text-white rounded-full hover:bg-green-600 shadow-md transition-transform hover:scale-105 active:scale-95"
+                                className="ml-auto w-10 h-10 bg-[#4A7C59] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-[#4A7C59]/30 transition-all hover:bg-[#3D664A] active:scale-90"
                             >
-                                <Icons.Phone size={20} />
+                                <Icons.Phone size={18} />
                             </button>
                         </div>
-                        <div className="flex items-start gap-3 pt-3 border-t border-neutral-50">
-                            <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0 text-orange-600">
-                                <Icons.MapPin size={20} />
+                        
+                        <div className="bg-stone-50/50 p-3 rounded-2xl border border-stone-100 flex gap-3">
+                             <div className="p-2 bg-stone-100 rounded-xl flex items-center justify-center text-[#8B3D28]/60 self-start">
+                                <Icons.MapPin size={16} />
                             </div>
-                            <div>
-                                <p className="text-sm text-neutral-600 leading-relaxed font-medium">{order.address}</p>
+                            <div className="flex flex-col flex-1">
+                                <p className="text-[10px] font-bold text-stone-500 leading-relaxed italic">"{order.address}"</p>
                                 {order.distance && (
-                                    <span className="inline-block mt-1 text-xs px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-md">
-                                        {order.distance} away
-                                    </span>
+                                    <div className="flex items-center gap-1.5 mt-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+                                        <span className="text-[8px] font-black text-stone-400 uppercase tracking-widest">
+                                            {order.distance} from shop
+                                        </span>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -775,15 +795,16 @@ export default function DeliveryOrderDetail() {
 
                 {/* Delivery Earning Card - Show only if delivered or has earning */}
                 {(order.status === 'Delivered' || (order.deliveryEarning && order.deliveryEarning > 0)) && (
-                    <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-5 shadow-sm text-white mb-4">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <p className="text-green-100 text-xs font-medium mb-1">Your Earning</p>
-                                <h3 className="text-2xl font-bold">₹ {order.deliveryEarning?.toFixed(2) || '0.00'}</h3>
+                    <div className="bg-gradient-to-br from-[#4A7C59] to-[#3D664A] organic-radius p-4 shadow-lg shadow-[#4A7C59]/20 text-white relative overflow-hidden group">
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                        <div className="flex justify-between items-center relative z-10">
+                            <div className="flex flex-col">
+                                <p className="text-white/60 text-[8px] font-black uppercase tracking-[0.2em] mb-1">Your payout</p>
+                                <h3 className="text-2xl font-black tracking-tighter">₹ {order.deliveryEarning?.toFixed(2) || '0.00'}</h3>
                             </div>
-                            <div className="bg-white/20 p-2 rounded-lg">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm border border-white/10">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </div>
                         </div>
@@ -791,45 +812,47 @@ export default function DeliveryOrderDetail() {
                 )}
 
                 {/* Order Items */}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-semibold text-neutral-900 flex items-center gap-2">
-                            <Icons.ShoppingBag size={18} className="text-neutral-500" />
-                            Order Summary
+                <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm">
+                    <div className="flex items-baseline justify-between mb-4">
+                        <h3 className="text-village-umber text-[10px] font-black uppercase tracking-[0.2em] opacity-80 flex items-center gap-2">
+                            <Icons.ShoppingBag size={14} className="text-[#8B3D28]/40" />
+                            Parcel Contents
                         </h3>
-                        <span className="text-xs font-medium text-neutral-500 px-2 py-1 bg-neutral-100 rounded-md">
-                            {order.items?.length || 0} Items
+                        <span className="text-[8px] font-black text-stone-400 uppercase tracking-widest px-2 py-0.5 bg-stone-100 rounded-lg">
+                            {order.items?.length || 0} Pieces
                         </span>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                         {order.items?.map((item: any, idx: number) => (
-                            <div key={idx} className="flex justify-between items-center py-2 border-b border-neutral-50 last:border-0">
+                            <div key={idx} className="flex justify-between items-center py-2 border-b border-stone-50/50 last:border-0">
                                 <div className="flex items-center gap-3">
-                                    <span className="w-6 h-6 rounded bg-neutral-100 flex items-center justify-center text-xs font-bold text-neutral-600">{item.quantity}x</span>
-                                    <span className="text-sm text-neutral-700 font-medium">{item.name}</span>
+                                    <div className="w-6 h-6 rounded-lg bg-stone-100 flex items-center justify-center text-[9px] font-black text-village-umber">
+                                        {item.quantity}
+                                    </div>
+                                    <span className="text-[11px] font-black text-village-umber uppercase tracking-tight">{item.name}</span>
                                 </div>
-                                <span className="text-sm font-semibold text-neutral-900">₹{item.price * item.quantity}</span>
+                                <span className="text-[11px] font-black text-village-umber">₹{item.price * item.quantity}</span>
                             </div>
                         ))}
                     </div>
-                    <div className="mt-4 pt-4 border-t border-dashed border-neutral-200 flex justify-between items-center">
-                        <span className="font-semibold text-neutral-700">Total Amount</span>
-                        <span className="text-xl font-bold text-neutral-900">₹{order.totalAmount}</span>
+                    <div className="mt-4 pt-4 border-t border-dashed border-stone-200 flex justify-between items-center">
+                        <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Grand Total</span>
+                        <span className="text-[16px] font-black text-village-umber tracking-tighter">₹{order.totalAmount}</span>
                     </div>
                 </div>
 
                 {/* Order Info */}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100 mb-20">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-3 bg-neutral-50 rounded-lg">
-                            <p className="text-xs text-neutral-500 mb-1">Order ID</p>
-                            <p className="text-sm font-bold text-neutral-900">{order.orderId}</p>
+                <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm mb-28">
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="p-3 bg-stone-50 rounded-2xl border border-stone-100">
+                            <p className="text-[8px] font-black text-stone-400 uppercase tracking-widest mb-1">Package ID</p>
+                            <p className="text-[10px] font-black text-village-umber uppercase">{order.orderId?.slice(-8) || "N/A"}</p>
                         </div>
-                        <div className="p-3 bg-neutral-50 rounded-lg">
-                            <p className="text-xs text-neutral-500 mb-1">Order Date</p>
-                            <p className="text-sm font-bold text-neutral-900">
-                                {new Date(order.createdAt).toLocaleDateString()}
+                        <div className="p-3 bg-stone-50 rounded-2xl border border-stone-100">
+                            <p className="text-[8px] font-black text-stone-400 uppercase tracking-widest mb-1">Lodged On</p>
+                            <p className="text-[10px] font-black text-village-umber uppercase">
+                                {new Date(order.createdAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
                             </p>
                         </div>
                     </div>
@@ -839,44 +862,47 @@ export default function DeliveryOrderDetail() {
 
             {/* Customer Delivery OTP Section (only when order is Out for Delivery) */}
             {order.status === 'Out for Delivery' && (
-                <div className="fixed bottom-24 left-6 right-6 z-30">
-                    <div className="bg-white rounded-2xl p-4 shadow-2xl border border-neutral-200">
-                        <p className="text-sm font-semibold text-neutral-900 mb-3">Customer Delivery OTP</p>
+                <div className="fixed bottom-24 left-4 right-4 z-40">
+                    <div className="village-card paper-texture organic-radius p-5 shadow-2xl border-none ring-1 ring-[#8B3D28]/10">
+                        <div className="flex items-center justify-between mb-4">
+                             <div className="flex flex-col">
+                                <p className="text-[#8B3D28] text-[10px] font-black uppercase tracking-[0.2em]">Secure Handover</p>
+                                <p className="text-stone-400 text-[8px] font-bold uppercase tracking-widest mt-1">Confirm OTP with Recipient</p>
+                             </div>
+                             {customerProximity && (
+                                <div className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${customerProximity.withinRange ? 'bg-[#4A7C59]/10 text-[#4A7C59]' : 'bg-red-50 text-red-400'}`}>
+                                    {customerProximity.distance < 1000 ? `${customerProximity.distance}M` : `${(customerProximity.distance / 1000).toFixed(1)}KM`}
+                                </div>
+                             )}
+                        </div>
 
-                        {/* Distance indicator */}
-                        {customerProximity && (
-                            <p className={`text-xs mb-2 font-medium ${customerProximity.withinRange ? 'text-green-600' :
-                                    customerProximity.distance < 1000 ? 'text-yellow-600' : 'text-red-600'
-                                }`}>
-                                {customerProximity.distance < 1000
-                                    ? `${customerProximity.distance}m from customer`
-                                    : `${(customerProximity.distance / 1000).toFixed(1)}km from customer`}
-                            </p>
-                        )}
-
-                        {/* 4-digit OTP Input - Always visible but disabled until OTP is sent */}
-                        <input
-                            type="text"
-                            value={otpValue}
-                            onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                            placeholder="Enter 4-digit OTP"
-                            disabled={!showOtpInput}
-                            className={`w-full px-4 py-3 border rounded-xl text-lg font-semibold text-center mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${showOtpInput ? 'border-neutral-300 bg-white' : 'border-neutral-200 bg-neutral-100 text-neutral-400'
+                        {/* 4-digit OTP Input */}
+                        <div className="flex justify-center gap-3 mb-5">
+                            <input
+                                type="text"
+                                value={otpValue}
+                                onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                placeholder="----"
+                                disabled={!showOtpInput}
+                                className={`w-full max-w-[180px] px-6 py-3.5 rounded-2xl text-[20px] font-black text-center tracking-[0.5em] focus:outline-none transition-all shadow-inner ${showOtpInput 
+                                    ? 'bg-stone-50 border-2 border-[#8B3D28]/20 text-village-umber' 
+                                    : 'bg-stone-100 border-2 border-stone-200 text-stone-300 shadow-none'
                                 }`}
-                            maxLength={4}
-                        />
+                                maxLength={4}
+                            />
+                        </div>
 
                         <div className="flex gap-3">
                             {!showOtpInput ? (
                                 <button
                                     onClick={handleSendOtp}
                                     disabled={!getOtpEnabled || otpSending}
-                                    className={`flex-1 py-3 rounded-xl font-semibold transition-all ${getOtpEnabled && !otpSending
-                                            ? 'bg-green-600 text-white hover:bg-green-700 active:scale-[0.98]'
-                                            : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                                    className={`flex-1 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all ${getOtpEnabled && !otpSending
+                                            ? 'bg-[#8B3D28] text-white shadow-lg shadow-[#8B3D28]/20 active:scale-[0.98]'
+                                            : 'bg-stone-200 text-stone-400 cursor-not-allowed'
                                         }`}
                                 >
-                                    {otpSending ? 'Sending...' : getOtpEnabled ? 'Get OTP' : 'Move within 500m to get OTP'}
+                                    {otpSending ? 'Sending...' : getOtpEnabled ? 'Generate OTP' : 'Arrive at Location'}
                                 </button>
                             ) : (
                                 <>
@@ -885,16 +911,18 @@ export default function DeliveryOrderDetail() {
                                             setShowOtpInput(false);
                                             setOtpValue('');
                                         }}
-                                        className="flex-1 py-3 rounded-xl bg-neutral-200 text-neutral-700 font-semibold hover:bg-neutral-300 transition-colors"
+                                        className="w-14 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center hover:bg-stone-200 transition-all active:scale-95"
                                     >
-                                        Cancel
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                            <path d="M18 6L6 18M6 6l12 12" />
+                                        </svg>
                                     </button>
                                     <button
                                         onClick={handleVerifyOtp}
-                                        className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
+                                        className="flex-1 py-3.5 rounded-2xl bg-[#4A7C59] text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-[#4A7C59]/20 hover:bg-[#3D664A] transition-all active:scale-95 disabled:bg-stone-200 disabled:text-stone-400 disabled:shadow-none"
                                         disabled={otpVerifying || otpValue.length !== 4}
                                     >
-                                        {otpVerifying ? 'Verifying...' : 'Verify OTP'}
+                                        {otpVerifying ? 'Verifying...' : 'Complete Delivery'}
                                     </button>
                                 </>
                             )}
@@ -903,22 +931,22 @@ export default function DeliveryOrderDetail() {
                 </div>
             )}
 
-            {/* Floating Glassmorphic Action Button Dock - Order Taken button or status update */}
-            {/* Hide this button when order is "Out for Delivery" because OTP section is shown instead */}
+            {/* Floating Action Button Dock */}
             {nextStatus && order.status !== 'Picked up' && order.status !== 'Out for Delivery' && !showOtpInput && (
-                <div className="fixed bottom-24 left-6 right-6 z-30">
+                <div className="fixed bottom-24 left-4 right-4 z-40">
                     <button
                         onClick={() => handleStatusChange(nextStatus)}
-                        className="w-full py-4 rounded-2xl bg-black/75 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] text-white font-bold text-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden group"
+                        className="w-full py-4 rounded-2xl bg-[#8B3D28] shadow-2xl shadow-[#8B3D28]/30 text-white font-black text-[11px] uppercase tracking-[0.25em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden relative group"
                         disabled={loading}
                     >
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
                         <span className="relative z-10">
-                            {loading ? 'Updating...' : nextStatus === 'Picked up' ? 'Order Taken' : `Mark as ${nextStatus}`}
+                            {loading ? 'Processing...' : nextStatus === 'Picked up' ? 'Mark Package Taken' : `Proceed to ${nextStatus}`}
                         </span>
-                        {!loading && <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center relative z-10 group-hover:bg-white/30 transition-colors">
-                            <Icons.ChevronLeft className="rotate-180" size={18} />
+                        {!loading && <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center relative z-10 transition-all group-hover:bg-white/30">
+                            <Icons.ChevronLeft className="rotate-180" size={14} />
                         </div>}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
                     </button>
                 </div>
             )}

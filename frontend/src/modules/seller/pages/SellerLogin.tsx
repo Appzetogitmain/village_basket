@@ -4,6 +4,7 @@ import { sendOTP, verifyOTP } from '../../../services/api/auth/sellerAuthService
 import OTPInput from '../../../components/OTPInput';
 import { useAuth } from '../../../context/AuthContext';
 import villageBasketLogo from '@assets/village_basket-removebg-preview.png';
+import VillageLoader from '../../../components/VillageLoader';
 
 export default function SellerLogin() {
   const navigate = useNavigate();
@@ -81,28 +82,37 @@ export default function SellerLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-green-50 flex flex-col items-center justify-center px-4 py-8">
+    <div 
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-8 font-poppins relative"
+      style={{
+        backgroundColor: 'var(--village-cream, #FAF7F2)',
+      }}
+    >
+      {/* Texture Overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+
+      {loading && <VillageLoader />}
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-neutral-50 transition-colors"
+        className="absolute top-4 left-4 z-20 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md shadow-sm border border-village-umber/10 flex items-center justify-center text-village-umber hover:bg-white/90 transition-colors"
         aria-label="Back"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
 
       {/* Login Card */}
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white overflow-hidden relative z-10">
         {/* Header Section */}
-        <div className="relative pt-8 pb-6 px-6 text-center bg-gradient-to-br from-green-500 to-green-600 overflow-hidden">
+        <div className="relative pt-8 pb-6 px-6 text-center bg-gradient-to-br from-village-green to-[#3D664A] overflow-hidden">
           {/* Decorative Circles */}
           <div className="absolute -top-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
           <div className="absolute top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
 
           <div className="relative z-10 flex flex-col items-center">
-            <div className="w-28 h-28 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-2 flex items-center justify-center mb-4 border border-green-400/30 transform hover:scale-105 transition-transform duration-300">
+            <div className="w-20 h-20 bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg p-2.5 flex items-center justify-center mb-4 border border-white/20 transform hover:scale-105 transition-transform duration-300">
               <img
                 src={villageBasketLogo}
                 alt="Village Basket"
@@ -110,11 +120,11 @@ export default function SellerLogin() {
               />
             </div>
 
-            <h1 className="text-2xl font-bold text-white mb-1 tracking-tight drop-shadow-sm">
+            <h1 className="text-xl font-black text-white mb-1 uppercase tracking-tight drop-shadow-sm">
               Seller Login
             </h1>
-            <p className="text-green-50 text-sm font-medium bg-green-700/30 px-3 py-1 rounded-full border border-green-400/20">
-              Access your seller dashboard
+            <p className="text-white/80 text-[10px] font-bold uppercase tracking-widest bg-black/10 px-3 py-1 rounded-full border border-white/10">
+              Merchant Dashboard
             </p>
           </div>
         </div>
@@ -128,8 +138,8 @@ export default function SellerLogin() {
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   Mobile Number
                 </label>
-                <div className="flex items-center bg-white border border-neutral-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-200 transition-all">
-                  <div className="px-3 py-2.5 text-sm font-medium text-neutral-600 border-r border-neutral-300 bg-neutral-50">
+                <div className="flex items-center bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-200 transition-all">
+                  <div className="px-3 py-2.5 text-sm font-medium text-neutral-600 border-r border-neutral-300 bg-white/40">
                     +91
                   </div>
                   <input
@@ -154,7 +164,7 @@ export default function SellerLogin() {
                 onClick={handleMobileLogin}
                 disabled={mobileNumber.length !== 10 || loading}
                 className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${mobileNumber.length === 10 && !loading
-                  ? 'bg-teal-600 text-white hover:bg-teal-700 shadow-md'
+                  ? 'bg-[#4A7C59] text-white hover:bg-teal-700 shadow-md'
                   : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
                   }`}
               >
@@ -211,7 +221,7 @@ export default function SellerLogin() {
                     }
                   }}
                   disabled={loading}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#4A7C59] text-white hover:bg-teal-700 transition-colors"
                 >
                   {loading ? 'Sending...' : 'Resend OTP'}
                 </button>
@@ -229,7 +239,7 @@ export default function SellerLogin() {
               Don't have a seller account?{' '}
               <button
                 onClick={() => navigate('/seller/signup')}
-                className="text-teal-600 hover:text-teal-700 font-semibold"
+                className="text-[#4A7C59] hover:text-teal-700 font-semibold"
               >
                 Sign Up
               </button>
@@ -245,5 +255,6 @@ export default function SellerLogin() {
     </div>
   );
 }
+
 
 

@@ -8,6 +8,10 @@ import { LocationProvider } from "./context/LocationContext";
 import { ToastProvider } from "./context/ToastContext";
 
 import { LoadingProvider } from "./context/LoadingContext";
+import { SubscriptionProvider } from "./context/SubscriptionContext";
+import { WishlistProvider } from "./context/WishlistContext";
+import DailyServiceBasketBar from './modules/user/components/DailyServiceBasketBar';
+
 import { AxiosLoadingInterceptor } from "./context/AxiosLoadingInterceptor";
 import IconLoader from "./components/loaders/IconLoader";
 import ContentLoader from "./components/loaders/ContentLoader";
@@ -23,8 +27,10 @@ import { initializePushNotifications, setupForegroundNotificationHandler } from 
 
 // Critical routes - load immediately (Home, Cart, Checkout)
 import Home from "./modules/user/Home";
-import Cart from "./modules/user/Cart";
 import Checkout from "./modules/user/Checkout";
+import Wishlist from './modules/user/Wishlist';
+import DailyServiceCheckout from './modules/user/DailyServiceCheckout';
+
 import CheckoutAddress from "./modules/user/CheckoutAddress";
 import ProductDetail from "./modules/user/ProductDetail";
 
@@ -38,11 +44,9 @@ const Categories = lazy(() => import("./modules/user/Categories"));
 const Category = lazy(() => import("./modules/user/Category"));
 const Invoice = lazy(() => import("./modules/user/Invoice"));
 const Login = lazy(() => import("./modules/user/Login"));
-const TomorrowVegBooking = lazy(() => import("./modules/user/TomorrowVegBooking"));
 
 const AboutUs = lazy(() => import("./modules/user/AboutUs"));
 const FAQ = lazy(() => import("./modules/user/FAQ"));
-const Wishlist = lazy(() => import("./modules/user/Wishlist"));
 const Addresses = lazy(() => import("./modules/user/Addresses"));
 const AddressBook = lazy(() => import("./modules/user/AddressBook"));
 const SpiritualStore = lazy(() => import("./modules/user/SpiritualStore"));
@@ -78,7 +82,6 @@ const DeliverySignUp = lazy(() => import("./modules/delivery/pages/DeliverySignU
 const SellerLayout = lazy(() => import("./modules/seller/components/SellerLayout"));
 const SellerDashboard = lazy(() => import("./modules/seller/pages/SellerDashboard"));
 const SellerOrders = lazy(() => import("./modules/seller/pages/SellerOrders"));
-const SellerNextDayOrders = lazy(() => import("./modules/seller/pages/SellerNextDayOrders"));
 const SellerOrderDetail = lazy(() => import("./modules/seller/pages/SellerOrderDetail"));
 const SellerCategory = lazy(() => import("./modules/seller/pages/SellerCategory"));
 const SellerSubCategory = lazy(() => import("./modules/seller/pages/SellerSubCategory"));
@@ -108,6 +111,7 @@ const AdminSellerTransaction = lazy(() => import("./modules/admin/pages/AdminSel
 const AdminStockManagement = lazy(() => import("./modules/admin/pages/AdminStockManagement"));
 const AdminSubcategoryOrder = lazy(() => import("./modules/admin/pages/AdminSubcategoryOrder"));
 const AdminManageSellerList = lazy(() => import("./modules/admin/pages/AdminManageSellerList"));
+const AdminSellerTransactionDetail = lazy(() => import("./modules/admin/pages/AdminSellerTransaction"));
 const AdminCoupon = lazy(() => import("./modules/admin/pages/AdminCoupon"));
 const AdminNotification = lazy(() => import("./modules/admin/pages/AdminNotification"));
 const AdminSellerLocation = lazy(() => import("./modules/admin/pages/AdminSellerLocation"));
@@ -122,7 +126,6 @@ const AdminSystemUser = lazy(() => import("./modules/admin/pages/AdminSystemUser
 const AdminUsers = lazy(() => import("./modules/admin/pages/AdminUsers"));
 const AdminFAQ = lazy(() => import("./modules/admin/pages/AdminFAQ"));
 const AdminHomeSection = lazy(() => import("./modules/admin/pages/AdminHomeSection"));
-const AdminNextDaySections = lazy(() => import("./modules/admin/pages/AdminNextDaySections"));
 const AdminBestsellerCards = lazy(() => import("./modules/admin/pages/AdminBestsellerCards"));
 const AdminPromoStrip = lazy(() => import("./modules/admin/pages/AdminPromoStrip"));
 const AdminLowestPrices = lazy(() => import("./modules/admin/pages/AdminLowestPrices"));
@@ -167,12 +170,12 @@ function App() {
     <ErrorBoundary>
       <LoadingProvider>
         <AxiosLoadingInterceptor>
-          <IconLoader />
+          <SubscriptionProvider>
           <AuthProvider>
             <ThemeProvider>
               <LocationProvider>
+                <WishlistProvider>
                 <ToastProvider>
-
                   <CartProvider>
                     <OrdersProvider>
                       <BrowserRouter
@@ -180,6 +183,8 @@ function App() {
                           v7_startTransition: true,
                           v7_relativeSplatPath: true,
                         }}>
+                        <DailyServiceBasketBar />
+                        <IconLoader />
                         <RouteLoaderTrigger />
                         <Routes>
                           {/* Public Routes */}
@@ -187,7 +192,7 @@ function App() {
                             path="/login"
                             element={
                               <PublicRoute>
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <Login />
                                 </Suspense>
                               </PublicRoute>
@@ -198,7 +203,7 @@ function App() {
                             path="/seller/login"
                             element={
                               <PublicRoute userType="Seller">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <SellerLogin />
                                 </Suspense>
                               </PublicRoute>
@@ -208,7 +213,7 @@ function App() {
                             path="/seller/signup"
                             element={
                               <PublicRoute userType="Seller">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <SellerSignUp />
                                 </Suspense>
                               </PublicRoute>
@@ -218,7 +223,7 @@ function App() {
                             path="/delivery/login"
                             element={
                               <PublicRoute userType="Delivery">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <DeliveryLogin />
                                 </Suspense>
                               </PublicRoute>
@@ -228,7 +233,7 @@ function App() {
                             path="/delivery/signup"
                             element={
                               <PublicRoute userType="Delivery">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <DeliverySignUp />
                                 </Suspense>
                               </PublicRoute>
@@ -238,7 +243,7 @@ function App() {
                             path="/admin/login"
                             element={
                               <PublicRoute userType="Admin">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <AdminLogin />
                                 </Suspense>
                               </PublicRoute>
@@ -250,7 +255,7 @@ function App() {
                             path="/delivery/*"
                             element={
                               <ProtectedRoute requiredUserType="Delivery" redirectTo="/delivery/login">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <DeliveryLayout>
                                     <Routes>
                                       <Route path="" element={<DeliveryDashboard />} />
@@ -280,13 +285,12 @@ function App() {
                             path="/seller/*"
                             element={
                               <ProtectedRoute requiredUserType="Seller" redirectTo="/seller/login">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <SellerLayout>
                                     <Routes>
                                       <Route path="" element={<SellerDashboard />} />
                                       <Route path="orders" element={<SellerOrders />} />
                                       <Route path="orders/:id" element={<SellerOrderDetail />} />
-                                      <Route path="next-day-orders" element={<SellerNextDayOrders />} />
                                       <Route path="category" element={<SellerCategory />} />
                                       <Route path="subcategory" element={<SellerSubCategory />} />
                                       <Route path="product/add" element={<SellerAddProduct />} />
@@ -311,7 +315,7 @@ function App() {
                             path="/admin/*"
                             element={
                               <ProtectedRoute requiredUserType="Admin" redirectTo="/admin/login">
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <AdminLayout>
                                     <Suspense fallback={<ContentLoader />}>
                                       <Routes>
@@ -319,7 +323,6 @@ function App() {
                                         <Route path="profile" element={<AdminProfile />} />
                                         <Route path="catalog-manager" element={<AdminCatalogManager />} />
                                         <Route path="catalog/sections" element={<AdminHomeSection />} />
-                                        <Route path="next-day-sections" element={<AdminNextDaySections />} />
                                         <Route path="category" element={<AdminCategory />} />
                                         <Route path="category/header" element={<AdminHeaderCategory />} />
                                         <Route path="subcategory" element={<AdminSubCategory />} />
@@ -332,6 +335,7 @@ function App() {
                                         <Route path="product/edit/:id" element={<SellerAddProduct />} />
                                         <Route path="manage-seller/list" element={<AdminManageSellerList />} />
                                         <Route path="manage-seller/transaction" element={<AdminSellerTransaction />} />
+                                        <Route path="manage-seller/transaction/:id" element={<AdminSellerTransactionDetail />} />
                                         <Route path="delivery-boy/manage" element={<AdminManageDeliveryBoy />} />
                                         <Route path="delivery-boy/fund-transfer" element={<AdminFundTransfer />} />
                                         <Route path="delivery-boy/cash-collection" element={<AdminCashCollection />} />
@@ -384,7 +388,7 @@ function App() {
                             path="/*"
                             element={
                               <AppLayout>
-                                <Suspense fallback={<IconLoader forceShow />}>
+                                <Suspense fallback={null}>
                                   <Routes>
                                     <Route path="/" element={<Home />} />
                                     <Route path="/user/home" element={<Home />} />
@@ -395,7 +399,8 @@ function App() {
                                     <Route path="/account" element={<Account />} />
                                     <Route path="/about-us" element={<AboutUs />} />
                                     <Route path="/faq" element={<FAQ />} />
-                                    <Route path="/wishlist" element={<Wishlist />} />
+                                    <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+                            <Route path="/daily-service/checkout" element={<ProtectedRoute><DailyServiceCheckout /></ProtectedRoute>} />
                                     <Route path="/categories" element={<Categories />} />
                                     <Route path="/category/:id" element={<Category />} />
                                     <Route path="/address-book" element={<AddressBook />} />
@@ -403,7 +408,6 @@ function App() {
                                     <Route path="/checkout/address" element={<CheckoutAddress />} />
                                     <Route path="/product/:id" element={<ProductDetail />} />
                                     <Route path="/invoice/:id" element={<Invoice />} />
-                                    <Route path="/cart" element={<Cart />} />
                                     <Route path="/addresses" element={<Addresses />} />
                                     <Route path="/store/:slug" element={<StorePage />} />
                                     <Route path="/store/spiritual" element={<SpiritualStore />} />
@@ -414,7 +418,6 @@ function App() {
                                     <Route path="/store/fashion-basics" element={<FashionStore />} />
                                     <Route path="/store/toy" element={<ToyStore />} />
                                     <Route path="/store/hobby" element={<HobbyStore />} />
-                                    <Route path="/tomorrow-veg-booking" element={<TomorrowVegBooking />} />
                                     <Route path="/rewards" element={<UserRewards />} />
                                   </Routes>
                                 </Suspense>
@@ -426,10 +429,12 @@ function App() {
                     </OrdersProvider>
                   </CartProvider>
                 </ToastProvider>
+                </WishlistProvider>
               </LocationProvider>
 
             </ThemeProvider>
-          </AuthProvider>
+            </AuthProvider>
+          </SubscriptionProvider>
         </AxiosLoadingInterceptor>
       </LoadingProvider>
     </ErrorBoundary>

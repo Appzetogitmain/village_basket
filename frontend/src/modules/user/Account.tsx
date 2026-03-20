@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import { getProfile, CustomerProfile } from '../../services/api/customerService';
 import { sendTestNotification } from '../../services/pushNotificationService';
 import { useToast } from '../../context/ToastContext';
+import { useLocation } from 'react-router-dom';
+import DailyServiceList from './components/DailyServiceList';
 
 export default function Account() {
   const navigate = useNavigate();
@@ -15,6 +17,14 @@ export default function Account() {
   const [gstNumber, setGstNumber] = useState('');
   const { showToast } = useToast();
   const [testNotifLoading, setTestNotifLoading] = useState(false);
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<'profile' | 'subscriptions'>('profile');
+
+  useEffect(() => {
+    if (location.state && (location.state as any).activeTab) {
+      setActiveTab((location.state as any).activeTab);
+    }
+  }, [location]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -80,34 +90,36 @@ export default function Account() {
   // Show login/signup prompt for unregistered users
   if (!user) {
     return (
-      <div className="pb-24 md:pb-8 bg-white min-h-screen">
-        <div className="bg-gradient-to-b from-green-200 via-green-100 to-white pb-6 md:pb-8 pt-12 md:pt-16">
-          <div className="px-4 md:px-6 lg:px-8">
-            <button onClick={() => navigate(-1)} className="mb-4 text-neutral-900" aria-label="Back">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
+        <div className="bg-gradient-to-b from-[#8B3D28]/10 via-[#8B3D28]/5 to-transparent pb-6 md:pb-8 pt-12 md:pt-16 relative">
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="px-4 md:px-6 lg:px-8 relative z-10">
+            <button onClick={() => navigate(-1)} className="mb-4 text-[#8B3D28] hover:bg-[#8B3D28]/10 p-2 rounded-full transition-colors" aria-label="Back">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </button>
             <div className="flex flex-col items-center mb-4 md:mb-6">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-neutral-200 flex items-center justify-center mb-3 md:mb-4 border-2 border-white shadow-sm">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-neutral-500 md:w-12 md:h-12">
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-neutral-100 flex items-center justify-center mb-3 md:mb-4 border-2 border-[#8B3D28]/20 shadow-sm relative overflow-hidden">
+                <div className="absolute inset-0 bg-[#8B3D28]/5"></div>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-[#8B3D28]/60 md:w-12 md:h-12 relative z-10">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <h1 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2">Welcome!</h1>
-              <p className="text-sm md:text-base text-neutral-600 text-center px-4">
+              <h1 className="text-2xl md:text-3xl font-black text-[#8B3D28] mb-2 font-poppins tracking-tight">Welcome!</h1>
+              <p className="text-sm md:text-base text-[#8B3D28]/70 text-center px-8 font-medium max-w-xs">
                 Login to access your profile, orders, and more
               </p>
             </div>
           </div>
         </div>
 
-        <div className="px-4 md:px-6 lg:px-8 mt-6">
-          <div className="max-w-md mx-auto space-y-3">
+        <div className="px-6 md:px-8 mt-6">
+          <div className="max-w-md mx-auto">
             <button
               onClick={() => navigate('/login')}
-              className="w-full py-3.5 rounded-lg font-semibold text-base bg-teal-600 text-white hover:bg-teal-700 transition-colors shadow-lg shadow-teal-500/20"
+              className="w-full py-4 rounded-xl font-bold text-base bg-[#8B3D28] text-white hover:bg-[#8B3D28]/95 transition-all shadow-xl shadow-[#8B3D28]/20 active:scale-[0.98] uppercase tracking-wider"
             >
-              Login
+              Login / Signup
             </button>
           </div>
         </div>
@@ -117,7 +129,7 @@ export default function Account() {
 
   if (loading) {
     return (
-      <div className="pb-24 md:pb-8 bg-white min-h-screen flex items-center justify-center">
+      <div className="pb-24 md:pb-8 bg-transparent min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
           <p className="text-neutral-600">Loading profile...</p>
@@ -128,7 +140,7 @@ export default function Account() {
 
   if (error && !profile) {
     return (
-      <div className="pb-24 md:pb-8 bg-white min-h-screen flex items-center justify-center">
+      <div className="pb-24 md:pb-8 bg-transparent min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button onClick={() => navigate(-1)} className="px-4 py-2 bg-teal-600 text-white rounded">
@@ -144,136 +156,180 @@ export default function Account() {
   const displayDateOfBirth = profile?.dateOfBirth;
 
   return (
-    <div className="pb-24 md:pb-8 bg-white min-h-screen">
-      <div className="bg-gradient-to-b from-green-200 via-green-100 to-white pb-6 md:pb-8 pt-12 md:pt-16">
-        <div className="px-4 md:px-6 lg:px-8">
-          <button onClick={() => navigate(-1)} className="mb-4 text-neutral-900" aria-label="Back">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
-          <div className="flex flex-col items-center mb-4 md:mb-6">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-neutral-200 flex items-center justify-center mb-3 md:mb-4 border-2 border-white shadow-sm">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-neutral-500 md:w-12 md:h-12">
+    <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
+      <div className="bg-gradient-to-b from-[#8B3D28] to-[#8B3D28]/80 pb-6 md:pb-8 pt-12 md:pt-16 shadow-lg border-b border-white/10">
+        <div className="px-4 md:px-6 lg:px-8 text-white text-center">
+          <div className="flex justify-start mb-2">
+            <button onClick={() => navigate(-1)} className="text-white hover:bg-white/10 p-2 rounded-full transition-colors" aria-label="Back">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </button>
+          </div>
+          <div className="flex flex-col items-center mb-4">
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-neutral-200 flex items-center justify-center mb-3 border-2 border-white shadow-sm overflow-hidden">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="text-neutral-500">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2">{displayName}</h1>
-            <div className="flex flex-col items-center gap-1.5 md:gap-2 text-xs md:text-sm text-neutral-600">
-              {displayPhone && (
-                <div className="flex items-center gap-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  <span>{displayPhone}</span>
-                </div>
-              )}
-              {displayDateOfBirth && (
-                <div className="flex items-center gap-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" /><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                  <span>{formatDate(displayDateOfBirth)}</span>
-                </div>
-              )}
-            </div>
+            <h1 className="text-xl md:text-2xl font-black text-white mb-1 uppercase tracking-tight">{displayName}</h1>
+            <p className="text-xs text-white/70 font-bold uppercase tracking-widest">{displayPhone}</p>
           </div>
         </div>
       </div>
 
-      <div className="px-4 md:px-6 lg:px-8 -mt-4 md:-mt-6 mb-4 md:mb-6">
-        <div className="grid grid-cols-2 md:grid-cols-2 gap-2.5 md:gap-6 max-w-2xl md:mx-auto">
-          <button onClick={() => navigate('/orders')} className="bg-white rounded-lg border border-neutral-200 p-3 md:p-4 hover:shadow-md transition-shadow text-center outline-none">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="mx-auto mb-1.5 md:mb-2 text-neutral-700 md:w-6 md:h-6"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /><path d="M16 10a4 4 0 0 1-8 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            <div className="text-[10px] md:text-xs font-semibold text-neutral-900">Your orders</div>
+      {/* Tabs */}
+      <div className="px-4 -mt-6 mb-6">
+        <div className="flex bg-white rounded-2xl p-1.5 border border-stone-100 shadow-xl max-w-md mx-auto">
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'profile' ? 'bg-village-umber text-white shadow-md' : 'text-stone-400'
+              }`}
+          >
+            My Profile
           </button>
           <button
-            onClick={() => navigate('/faq')}
-            className="bg-white rounded-lg border border-neutral-200 p-3 md:p-4 hover:shadow-md transition-shadow text-center outline-none"
+            onClick={() => setActiveTab('subscriptions')}
+            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'subscriptions' ? 'bg-village-green text-white shadow-md' : 'text-stone-400'
+              }`}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="mx-auto mb-1.5 md:mb-2 text-neutral-700 md:w-6 md:h-6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            <div className="text-[10px] md:text-xs font-semibold text-neutral-900">Need help?</div>
+            Daily Service
           </button>
         </div>
       </div>
 
-      <div className="px-4 py-2.5">
-        <h2 className="text-xs font-bold text-neutral-900 mb-2 uppercase tracking-wide">Your information</h2>
-        <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden divide-y divide-neutral-100">
-          <button onClick={() => navigate('/address-book')} className="w-full flex items-center justify-between px-3 py-3 hover:bg-neutral-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-neutral-500"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              <span className="text-[13px] font-medium text-neutral-900">Address Book</span>
+      <div className="px-4 max-w-2xl mx-auto">
+        {activeTab === 'profile' ? (
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => navigate('/orders')} className="bg-white rounded-2xl border border-stone-100 p-4 hover:shadow-md transition-all text-center group">
+                <div className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center mx-auto mb-2 group-hover:bg-village-umber/5 transition-colors">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-stone-600 group-hover:text-village-umber transition-colors"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /><path d="M16 10a4 4 0 0 1-8 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </div>
+                <div className="text-[10px] font-black text-village-umber uppercase tracking-widest">Orders</div>
+              </button>
+              <button
+                onClick={() => navigate('/faq')}
+                className="bg-white rounded-2xl border border-stone-100 p-4 hover:shadow-md transition-all text-center group"
+              >
+                <div className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center mx-auto mb-2 group-hover:bg-village-umber/5 transition-colors">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-stone-600 group-hover:text-village-umber transition-colors"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </div>
+                <div className="text-[10px] font-black text-village-umber uppercase tracking-widest">Help</div>
+              </button>
             </div>
-            <span className="text-neutral-400">›</span>
-          </button>
-          <button onClick={() => navigate('/wishlist')} className="w-full flex items-center justify-between px-3 py-3 hover:bg-neutral-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-neutral-500"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              <span className="text-[13px] font-medium text-neutral-900">Your Wishlist</span>
-            </div>
-            <span className="text-neutral-400">›</span>
-          </button>
-          <button onClick={() => navigate('/rewards')} className="w-full flex items-center justify-between px-3 py-3 hover:bg-neutral-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <span className="text-lg leading-none">🪙</span>
-              <span className="text-[13px] font-medium text-neutral-900">My Rewards</span>
-            </div>
-            <span className="text-neutral-400">›</span>
-          </button>
-          <button onClick={() => setShowGstModal(true)} className="w-full flex items-center justify-between px-3 py-3 hover:bg-neutral-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-neutral-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              <span className="text-[13px] font-medium text-neutral-900">GST Details</span>
-            </div>
-            <span className="text-neutral-400">›</span>
-          </button>
-          <button onClick={() => window.location.href = 'https://about.villagebasket.com'} className="w-full flex items-center justify-between px-3 py-3 hover:bg-neutral-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-neutral-500"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" /><line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" strokeWidth="2" /><line x1="12" y1="8" x2="12.01" y2="8" stroke="currentColor" strokeWidth="2" /></svg>
-              <span className="text-[13px] font-medium text-neutral-900">About Us</span>
-            </div>
-            <span className="text-neutral-400">›</span>
-          </button>
-          <button
-            onClick={handleTestNotification}
-            disabled={testNotifLoading}
-            className="w-full flex items-center justify-between px-3 py-3 hover:bg-neutral-50 transition-colors disabled:opacity-50"
-          >
-            <div className="flex items-center gap-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-blue-500">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="text-[13px] font-medium text-neutral-900">
-                {testNotifLoading ? 'Sending...' : 'Test Push Notification'}
-              </span>
-            </div>
-            <span className="text-neutral-400">›</span>
-          </button>
 
-          <button onClick={handleLogout} className="w-full flex items-center justify-between px-3 py-3 hover:bg-neutral-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-500"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-              <span className="text-[13px] font-medium text-red-500">Log Out</span>
+            {/* Information Grid */}
+            <div>
+              <h2 className="text-[10px] font-black text-stone-400 mb-3 uppercase tracking-[0.2em] px-1">Your Information</h2>
+              <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden divide-y divide-stone-50 shadow-sm">
+                <button onClick={() => navigate('/address-book')} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-stone-400"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">Address Book</span>
+                  </div>
+                  <span className="text-stone-300">›</span>
+                </button>
+                <button onClick={() => navigate('/wishlist')} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-stone-400"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">Wishlist</span>
+                  </div>
+                  <span className="text-stone-300">›</span>
+                </button>
+                <button onClick={() => navigate('/rewards')} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <span className="text-lg leading-none">🪙</span>
+                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">Village Rewards</span>
+                  </div>
+                  <span className="text-stone-300">›</span>
+                </button>
+                <button onClick={() => setShowGstModal(true)} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-stone-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">GST Details</span>
+                  </div>
+                  <span className="text-stone-300">›</span>
+                </button>
+              </div>
             </div>
-            <span className="text-neutral-400">›</span>
-          </button>
-        </div>
+
+            {/* App Settings */}
+            <div>
+              <h2 className="text-[10px] font-black text-stone-400 mb-3 uppercase tracking-[0.2em] px-1">App & Support</h2>
+              <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden divide-y divide-stone-50 shadow-sm">
+                <button onClick={() => window.location.href = 'https://about.villagebasket.com'} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-stone-400"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" /><line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" strokeWidth="2" /><line x1="12" y1="8" x2="12.01" y2="8" stroke="currentColor" strokeWidth="2" /></svg>
+                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">About Village</span>
+                  </div>
+                  <span className="text-stone-300">›</span>
+                </button>
+                <button
+                  onClick={handleTestNotification}
+                  disabled={testNotifLoading}
+                  className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-4">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-village-green">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">
+                      {testNotifLoading ? 'Testing...' : 'Test Notifications'}
+                    </span>
+                  </div>
+                  <span className="text-stone-300">›</span>
+                </button>
+                <button onClick={handleLogout} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors text-red-500">
+                  <div className="flex items-center gap-4">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-500"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                    <span className="text-xs font-black uppercase tracking-widest">Log Out</span>
+                  </div>
+                  <span className="text-stone-300 opacity-50">›</span>
+                </button>
+              </div>
+            </div>
+            <p className="text-center text-[10px] text-stone-300 font-bold uppercase tracking-widest pb-10">Version 2.4.0 • Village Basket</p>
+          </div>
+        ) : (
+          <DailyServiceList />
+        )}
       </div>
 
       {showGstModal && (
         <>
-          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setShowGstModal(false)} />
-          <div className="fixed inset-x-0 bottom-0 z-50 animate-in slide-in-from-bottom duration-500 ease-out">
-            <div className="bg-white rounded-t-[32px] shadow-2xl max-w-lg mx-auto p-6 pt-10 relative">
-              <button onClick={() => setShowGstModal(false)} className="absolute -top-12 right-4 w-10 h-10 rounded-full bg-neutral-900 flex items-center justify-center text-white"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
+          <div className="fixed inset-0 z-[60] bg-stone-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setShowGstModal(false)} />
+          <div className="fixed inset-x-0 bottom-0 z-[70] animate-in slide-in-from-bottom duration-500 ease-out p-4">
+            <div className="bg-white rounded-[32px] shadow-2xl max-w-lg mx-auto p-8 relative">
+              <button
+                onClick={() => setShowGstModal(false)}
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 hover:bg-stone-200 transition-colors"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </button>
               <div className="text-center">
-                <div className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-neutral-50 border border-neutral-100 flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" className="w-10 h-10 text-neutral-400" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="5" y="3" width="14" height="18" rx="2" ry="2" /><line x1="9" y1="7" x2="15" y2="7" /><line x1="9" y1="11" x2="15" y2="11" /><line x1="9" y1="15" x2="13" y2="15" /></svg>
+                <div className="mx-auto mb-6 w-20 h-20 rounded-3xl bg-village-umber/5 flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="w-10 h-10 text-village-umber" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="5" y="3" width="14" height="18" rx="2" ry="2" /><line x1="9" y1="7" x2="15" y2="7" /><line x1="9" y1="11" x2="15" y2="11" /><line x1="9" y1="15" x2="13" y2="15" /></svg>
                 </div>
-                <h3 className="text-xl font-bold text-neutral-900 mb-2">Add GST Details</h3>
-                <p className="text-[13px] text-neutral-500 mb-8 px-4">Identify your business to get a GST invoice on your business purchases.</p>
+                <h3 className="text-xl font-black text-village-umber mb-2 uppercase tracking-tight">Add GST Details</h3>
+                <p className="text-xs text-stone-400 mb-8 px-4 font-medium leading-relaxed">Save your business details to receive a GST-ready invoice on your village purchases.</p>
                 <form onSubmit={handleGstSubmit} className="space-y-4">
-                  <input type="text" value={gstNumber} onChange={(e) => setGstNumber(e.target.value)} placeholder="Enter GST Number" className="w-full rounded-xl border border-neutral-200 px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all" />
-                  <button type="submit" disabled={!gstNumber.trim()} className="w-full rounded-xl bg-teal-600 text-white font-bold py-4 hover:bg-teal-700 disabled:opacity-50 transition-colors shadow-lg shadow-teal-500/20 uppercase tracking-wider text-sm">Save Details</button>
+                  <input
+                    type="text"
+                    value={gstNumber}
+                    onChange={(e) => setGstNumber(e.target.value)}
+                    placeholder="Enter GST Number"
+                    className="w-full rounded-2xl border-2 border-stone-100 px-6 py-4 text-sm font-bold text-village-umber placeholder:text-stone-300 focus:outline-none focus:border-village-umber/20 transition-all bg-stone-50/30"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!gstNumber.trim()}
+                    className="w-full rounded-2xl bg-village-umber text-white font-black py-4 hover:shadow-xl disabled:opacity-30 disabled:shadow-none transition-all shadow-lg shadow-village-umber/20 uppercase tracking-widest text-xs"
+                  >
+                    Save Details
+                  </button>
                 </form>
-                <p className="mt-6 text-[11px] text-neutral-400">By continuing, you agree to our <span className="underline">Terms & Conditions</span></p>
               </div>
             </div>
           </div>

@@ -89,7 +89,7 @@ export default function CategoryTileSection({
 
   return (
     <div className="mb-6 md:mb-8 mt-0 overflow-visible">
-      <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight">
+      <h2 className="text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins">
         {title}
       </h2>
       <div className="px-4 md:px-6 lg:px-8 overflow-visible">
@@ -134,8 +134,8 @@ export default function CategoryTileSection({
                                 ? `/category/${tile.categoryId}`
                                 : "#"
                             : tile.categoryId
-                              ? `/category/${tile.categoryId}`
-                              : "#"
+                               ? `/category/${tile.categoryId}`
+                               : "#"
                   }
                   onClick={(e) => {
                     if (
@@ -148,25 +148,24 @@ export default function CategoryTileSection({
                       handleTileClick(tile);
                     }
                   }}
-                  className={`block bg-white rounded-xl shadow-sm border border-neutral-200 hover:shadow-md transition-shadow h-full ${showProductCount ? "px-2.5" : "px-1.5"
+                  className={`block transition-all h-full group ${showProductCount ? "px-2 py-2 bg-white/40 border border-village-umber/5 shadow-sm rounded-2xl" : "px-1"
                     }`}>
-                  {/* Image - Single image for non-bestsellers, 2x2 grid for bestsellers */}
+                  {/* Image Container - Enlarged, Rounded, and Standardized */}
                   <div
-                    className={`w-full rounded-lg overflow-hidden ${showProductCount ? "h-32 md:h-36 mb-2" : "aspect-square"
-                      } ${tile.bgColor || "bg-cyan-50"}`}>
+                    className={`w-full overflow-hidden flex items-center justify-center transition-transform group-hover:scale-105 ${showProductCount ? "h-32 md:h-40 mb-3 bg-white/40 border border-village-umber/5 shadow-sm rounded-3xl" : "aspect-square rounded-[2rem] border-2 border-village-umber/5 bg-transparent"
+                      }`}>
                     {hasImages ? (
                       showProductCount ? (
-                        // Bestsellers: 2x2 grid
-                        <div className="w-full h-full grid grid-cols-2 gap-0.5 p-0.5">
+                        // Bestsellers: Enhanced 2x2 grid
+                        <div className="w-full h-full grid grid-cols-2 gap-1 p-1">
                           {images.slice(0, 4).map((img, idx) =>
                             img ? (
                               <img
                                 key={idx}
                                 src={img}
                                 alt=""
-                                className="w-full h-full object-contain bg-white rounded-sm"
+                                className="w-full h-full object-cover rounded-xl"
                                 onError={(e) => {
-                                  // Hide broken image
                                   const target = e.target as HTMLImageElement;
                                   target.style.display = 'none';
                                 }}
@@ -174,48 +173,47 @@ export default function CategoryTileSection({
                             ) : (
                               <div
                                 key={idx}
-                                className="w-full h-full bg-neutral-200 rounded-sm flex items-center justify-center text-xs text-neutral-400">
+                                className="w-full h-full bg-neutral-100 rounded-xl flex items-center justify-center text-[10px] text-neutral-400">
                                 {idx + 1}
                               </div>
                             )
                           )}
                         </div>
                       ) : (
-                        // Other sections: Single image - use contain to show full image without cropping
+                        // Standard Category: Large filling rounded image
                         <img
                           src={images[0]}
                           alt={tile.name}
-                          className="w-full h-full object-contain rounded-lg"
+                          className="w-full h-full object-cover rounded-[1.9rem]"
                           onError={(e) => {
-                            // Hide broken image and show fallback
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
                             const parent = target.parentElement;
                             if (parent) {
-                              parent.innerHTML = `<div class="w-full h-full flex items-center justify-center text-3xl text-neutral-300">${tile.name.charAt(0)}</div>`;
+                              parent.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xl font-black text-village-umber/20 uppercase tracking-tighter">${tile.name.charAt(0)}</div>`;
                             }
                           }}
                         />
                       )
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-3xl text-neutral-300">
+                      <div className="w-full h-full flex items-center justify-center text-xl font-black text-village-umber/20 uppercase tracking-tighter">
                         {tile.name.charAt(0)}
                       </div>
                     )}
                   </div>
 
-                  {/* Product count - shown first (only for bestsellers) */}
+                  {/* Product count - (only for bestsellers) */}
                   {showProductCount && tile.productCount && (
                     <div className="mb-1.5 flex justify-center">
-                      <span className="inline-block bg-neutral-100 text-neutral-600 text-[10px] font-medium px-2 py-0.5 rounded-full leading-tight">
-                        +{tile.productCount} more
+                      <span className="inline-block bg-white text-village-umber text-[9px] font-black px-2 py-0.5 rounded-full ring-1 ring-village-umber/5 shadow-sm">
+                        +{tile.productCount} Items
                       </span>
                     </div>
                   )}
 
-                  {/* Tile name - inside card only for bestsellers */}
+                  {/* Tile name inside card for bestsellers */}
                   {showProductCount && (
-                    <div className="text-[11px] font-semibold text-neutral-900 line-clamp-2 leading-tight text-center w-full block">
+                    <div className="text-[11px] font-black text-village-umber uppercase tracking-tight line-clamp-1 text-center w-full block">
                       {tile.name}
                     </div>
                   )}
@@ -223,8 +221,8 @@ export default function CategoryTileSection({
 
                 {/* Category name - outside card for non-bestsellers */}
                 {!showProductCount && (
-                  <div className="mt-1.5 text-center">
-                    <span className="text-xs font-semibold text-neutral-900 line-clamp-2 leading-tight">
+                  <div className="mt-3 text-center overflow-hidden">
+                    <span className="text-[11px] font-black text-village-umber uppercase tracking-tight line-clamp-1 block leading-tight">
                       {tile.name}
                     </span>
                   </div>

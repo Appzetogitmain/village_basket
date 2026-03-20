@@ -79,18 +79,18 @@ export default function SellerWallet() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#4A7C59]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="pb-20">
       {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10">
+      <div className="bg-white/90 backdrop-blur-md border-b border-village-umber/10 mb-4">
         <div className="px-4 py-3">
-          <h1 className="text-xl font-bold text-gray-900">Wallet</h1>
+          <h1 className="text-lg font-black text-village-umber uppercase tracking-tight">Wallet</h1>
         </div>
       </div>
 
@@ -98,13 +98,14 @@ export default function SellerWallet() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="m-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg"
+        className="mx-4 mb-4 bg-gradient-to-br from-[#4A7C59] to-[#3D664A] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden"
       >
-        <p className="text-sm opacity-90 mb-1">Wallet Balance</p>
-        <h1 className="text-4xl font-bold mb-4">₹{balance.toFixed(2)}</h1>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8"></div>
+        <p className="text-xs opacity-80 mb-1 uppercase font-bold tracking-widest">Wallet Balance</p>
+        <h1 className="text-3xl font-black mb-4">₹{balance.toFixed(2)}</h1>
         <button
           onClick={() => setShowWithdrawModal(true)}
-          className="bg-white text-blue-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition-all shadow-md"
+          className="bg-white/95 text-[#4A7C59] px-5 py-2 rounded-lg text-sm font-black uppercase tracking-wide hover:bg-white transition-all shadow-md"
         >
           Request Withdrawal
         </button>
@@ -112,31 +113,31 @@ export default function SellerWallet() {
 
 
       {/* Tabs */}
-      <div className="bg-white mx-4 rounded-xl shadow-sm overflow-hidden">
-        <div className="flex border-b">
+      <div className="bg-white/90 backdrop-blur-md mx-4 rounded-xl shadow-sm border border-neutral-100 overflow-hidden">
+        <div className="flex border-b border-neutral-100">
           <button
             onClick={() => setActiveTab('transactions')}
-            className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'transactions'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600'
+            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider transition-colors ${activeTab === 'transactions'
+              ? 'text-[#4A7C59] border-b-2 border-[#4A7C59]'
+              : 'text-neutral-500 hover:text-neutral-800'
               }`}
           >
             Transactions
           </button>
           <button
             onClick={() => setActiveTab('withdrawals')}
-            className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'withdrawals'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600'
+            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider transition-colors ${activeTab === 'withdrawals'
+              ? 'text-[#4A7C59] border-b-2 border-[#4A7C59]'
+              : 'text-neutral-500 hover:text-neutral-800'
               }`}
           >
             Withdrawals
           </button>
           <button
             onClick={() => setActiveTab('commissions')}
-            className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'commissions'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600'
+            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider transition-colors ${activeTab === 'commissions'
+              ? 'text-[#4A7C59] border-b-2 border-[#4A7C59]'
+              : 'text-neutral-500 hover:text-neutral-800'
               }`}
           >
             Commissions
@@ -165,14 +166,14 @@ export default function SellerWallet() {
                 ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
                 if (allItems.length === 0) {
-                  return <p className="text-center text-gray-500 py-8">No transactions yet</p>;
+                  return <p className="text-center text-neutral-400 py-8 text-sm">No transactions yet</p>;
                 }
 
                 return allItems.map((item: any) => (
-                  <div key={item._id} className="flex justify-between items-start p-3 bg-gray-50 rounded-lg">
+                  <div key={item._id} className="flex justify-between items-start p-3 bg-village-cream/60 rounded-lg border border-neutral-100">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-gray-900">{item.description}</p>
+                        <p className="font-medium text-neutral-800 text-sm">{item.description}</p>
                         {item.status === 'Pending' && (
                           <span className="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-medium">
                             Pending
@@ -184,7 +185,7 @@ export default function SellerWallet() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-neutral-400 mt-1">
                         {new Date(item.createdAt).toLocaleDateString('en-IN', {
                           day: 'numeric',
                           month: 'short',
@@ -194,7 +195,7 @@ export default function SellerWallet() {
                         })}
                       </p>
                     </div>
-                    <p className={`font-bold text-lg ${item.type === 'Credit' ? 'text-green-600' : 'text-red-600'} ${item.status === 'Pending' ? 'opacity-60' : ''}`}>
+                    <p className={`font-bold text-lg ${item.type === 'Credit' ? 'text-[#4A7C59]' : 'text-red-600'} ${item.status === 'Pending' ? 'opacity-60' : ''}`}>
                       {item.type === 'Credit' ? '+' : '-'}₹{item.amount.toFixed(2)}
                     </p>
                   </div>
@@ -207,14 +208,14 @@ export default function SellerWallet() {
           {activeTab === 'withdrawals' && (
             <div className="space-y-3">
               {withdrawals.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No withdrawal requests yet</p>
+                <p className="text-center text-neutral-400 py-8 text-sm">No withdrawal requests yet</p>
               ) : (
                 withdrawals.map((withdrawal: any) => (
-                  <div key={withdrawal._id} className="p-3 bg-gray-50 rounded-lg">
+                  <div key={withdrawal._id} className="p-3 bg-village-cream/60 rounded-lg border border-neutral-100">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <p className="font-bold text-gray-900">₹{withdrawal.amount.toFixed(2)}</p>
-                        <p className="text-xs text-gray-600">{withdrawal.paymentMethod}</p>
+                        <p className="font-bold text-neutral-800">₹{withdrawal.amount.toFixed(2)}</p>
+                        <p className="text-xs text-neutral-500">{withdrawal.paymentMethod}</p>
                       </div>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${withdrawal.status === 'Completed'
@@ -229,7 +230,7 @@ export default function SellerWallet() {
                         {withdrawal.status}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-neutral-400">
                       {new Date(withdrawal.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'short',
@@ -237,7 +238,7 @@ export default function SellerWallet() {
                       })}
                     </p>
                     {withdrawal.remarks && (
-                      <p className="text-xs text-gray-600 mt-2 italic">{withdrawal.remarks}</p>
+                      <p className="text-xs text-neutral-500 mt-2 italic">{withdrawal.remarks}</p>
                     )}
                   </div>
                 ))
@@ -249,18 +250,18 @@ export default function SellerWallet() {
           {activeTab === 'commissions' && (
             <div className="space-y-3">
               {commissions.commissions?.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No commissions yet</p>
+                <p className="text-center text-neutral-400 py-8 text-sm">No commissions yet</p>
               ) : (
                 commissions.commissions?.map((comm: any) => (
-                  <div key={comm.id} className="p-3 bg-gray-50 rounded-lg">
+                  <div key={comm.id} className="p-3 bg-village-cream/60 rounded-lg border border-neutral-100">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <p className="font-medium text-gray-900">Order Commission</p>
-                        <p className="text-xs text-gray-600">Rate: {comm.rate}%</p>
+                        <p className="font-medium text-neutral-800 text-sm">Order Commission</p>
+                        <p className="text-xs text-neutral-500">Rate: {comm.rate}%</p>
                       </div>
-                      <p className="font-bold text-green-600">₹{comm.amount.toFixed(2)}</p>
+                      <p className="font-bold text-[#4A7C59]">₹{comm.amount.toFixed(2)}</p>
                     </div>
-                    <div className="flex justify-between text-xs text-gray-500">
+                    <div className="flex justify-between text-xs text-neutral-400">
                       <span>Order Amount: ₹{comm.orderAmount.toFixed(2)}</span>
                       <span>{new Date(comm.createdAt).toLocaleDateString('en-IN')}</span>
                     </div>
@@ -275,35 +276,35 @@ export default function SellerWallet() {
       {/* Withdrawal Modal */}
       {
         showWithdrawModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl p-6 max-w-md w-full"
+              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-neutral-100"
             >
-              <h2 className="text-2xl font-bold mb-4">Request Withdrawal</h2>
+              <h2 className="text-lg font-black text-village-umber uppercase tracking-tight mb-4">Request Withdrawal</h2>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">Amount</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
                   <input
                     type="number"
                     value={withdrawAmount}
                     onChange={(e) => setWithdrawAmount(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg pl-8 pr-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-neutral-200 rounded-lg pl-8 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent"
                     placeholder="Enter amount"
                     min="0"
                     step="0.01"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Available: ₹{balance.toFixed(2)}</p>
+                <p className="text-xs text-neutral-400 mt-1">Available: ₹{balance.toFixed(2)}</p>
               </div>
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">Payment Method</label>
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value as any)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent"
                 >
                   <option value="Bank Transfer">Bank Transfer</option>
                   <option value="UPI">UPI</option>
@@ -315,14 +316,14 @@ export default function SellerWallet() {
                     setShowWithdrawModal(false);
                     setWithdrawAmount('');
                   }}
-                  className="flex-1 border border-gray-300 rounded-lg py-2.5 font-semibold hover:bg-gray-50 transition"
+                  className="flex-1 border border-neutral-200 rounded-lg py-2.5 text-sm font-bold text-neutral-700 hover:bg-neutral-50 transition"
                   disabled={isSubmitting}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleWithdrawRequest}
-                  className="flex-1 bg-blue-600 text-white rounded-lg py-2.5 font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                  className="flex-1 bg-[#4A7C59] text-white rounded-lg py-2.5 text-sm font-black uppercase tracking-wide hover:bg-[#3a6346] transition disabled:opacity-50"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Request'}
@@ -335,3 +336,5 @@ export default function SellerWallet() {
     </div >
   );
 }
+
+

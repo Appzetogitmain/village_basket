@@ -6,6 +6,7 @@ import DashboardCard from "../components/DashboardCard";
 import DeliveryBottomNav from "../components/DeliveryBottomNav";
 import { getDashboardStats } from "../../../services/api/delivery/deliveryService";
 import { useDeliveryStatus } from "../context/DeliveryStatusContext";
+import VillageLoader from "../../../components/VillageLoader";
 
 export default function DeliveryDashboard() {
   const navigate = useNavigate();
@@ -254,12 +255,7 @@ export default function DeliveryDashboard() {
   );
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-neutral-100 flex items-center justify-center pb-20">
-        <p className="text-neutral-500">Loading dashboard...</p>
-        <DeliveryBottomNav />
-      </div>
-    );
+    return <VillageLoader message="Preparing Your Dashboard" />;
   }
 
   if (error) {
@@ -272,11 +268,11 @@ export default function DeliveryDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-100 pb-20">
+    <div className="min-h-screen bg-transparent pb-32">
       {/* Header */}
       <DeliveryHeader />
 
-      <div className="px-4 py-4 space-y-4">
+      <div className="px-4 py-5 space-y-5 relative z-10">
         {/* Daily Collection & Cash Balance Bar */}
         <SummaryBar
           leftIcon={dailyCollectionIcon}
@@ -285,103 +281,76 @@ export default function DeliveryDashboard() {
           rightIcon={cashBalanceIcon}
           rightLabel="Cash Balance"
           rightValue={`₹ ${stats?.cashBalance?.toFixed(2) || "0.00"}`}
-          accentColor="#FFC94A"
+          accentColor="#8B3D28"
         />
 
-        {/* Wallet Balance Card */}
+        {/* Wallet Balance Card - Village Themed Gradient */}
         <div
           onClick={() => navigate("/delivery/wallet")}
-          className="bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 text-white shadow-md cursor-pointer active:scale-[0.98] transition-transform">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-green-100 text-xs">Available Wallet Balance</p>
-            <div className="bg-green-400/30 p-1.5 rounded-lg">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
+          className="bg-gradient-to-br from-[#8B3D28] to-[#3D2B1F] organic-radius p-4 text-white shadow-lg shadow-[#8B3D28]/20 cursor-pointer active:scale-[0.98] transition-all relative overflow-hidden group">
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all"></div>
+          
+          <div className="flex items-center justify-between mb-2 relative z-10">
+            <p className="text-white/60 text-[8px] font-black uppercase tracking-[0.2em]">Partner Wallet Balance</p>
+            <div className="bg-white/10 p-1.5 rounded-xl backdrop-blur-sm ring-1 ring-white/10">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <rect x="2" y="5" width="20" height="14" rx="2" />
                 <line x1="2" y1="10" x2="22" y2="10" />
               </svg>
             </div>
           </div>
-          <div className="flex items-end justify-between">
-            <p className="text-2xl font-bold">
+          <div className="flex items-end justify-between relative z-10">
+            <p className="text-2xl font-black tracking-tight">
               ₹ {stats?.walletBalance?.toFixed(2) || "0.00"}
             </p>
-            <p className="text-green-100 text-[10px] flex items-center gap-1">
-              View Details
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round">
+            <div className="px-2 py-1 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-all group-hover:bg-white/20">
+              View History
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                 <path d="M9 18l6-6-6-6" />
               </svg>
-            </p>
+            </div>
           </div>
         </div>
 
         {/* Real-time Seller Radius Indicator */}
         <div
           onClick={() => isOnline && navigate("/delivery/sellers-in-range")}
-          className={`p-4 rounded-xl border cursor-pointer transition-all active:scale-95 ${isOnline ? "bg-teal-50 border-teal-100 hover:bg-teal-100" : "bg-neutral-50 border-neutral-200"}`}>
+          className={`village-card paper-texture organic-radius p-4 border-none cursor-pointer transition-all active:scale-[0.98] ${isOnline ? 'ring-2 ring-[#4A7C59]/10' : 'opacity-60'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div
-                className={`p-2 rounded-full ${isOnline ? "bg-teal-100 text-teal-600" : "bg-neutral-200 text-neutral-400"}`}>
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2">
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isOnline ? "bg-[#4A7C59]/10 text-[#4A7C59]" : "bg-stone-200 text-stone-400"}`}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                   <circle cx="12" cy="10" r="3" />
                 </svg>
               </div>
-              <div>
-                <h3
-                  className={`text-sm font-semibold ${isOnline ? "text-teal-900" : "text-neutral-500"}`}>
-                  {isOnline ? "Active Service Areas" : "Offline"}
+              <div className="flex flex-col">
+                <h3 className={`text-[10px] font-black uppercase tracking-widest leading-none mb-1.5 ${isOnline ? "text-[#4A7C59]" : "text-stone-500"}`}>
+                  {isOnline ? "Active Radius" : "Device Offline"}
                 </h3>
-                <p className="text-xs text-neutral-500">
+                <p className="text-stone-400 text-[9px] font-bold leading-none">
                   {isOnline
-                    ? `You are currently in ${sellersInRangeCount} seller radius`
-                    : "Go online to track service areas"}
+                    ? `Tracking ${sellersInRangeCount} Seller Hubs`
+                    : "Connect to receive real-time pings"}
                 </p>
               </div>
             </div>
             {isOnline && (
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-teal-500"></span>
+              <div className="flex items-center gap-2 bg-stone-50 px-2 py-1.5 rounded-xl border border-stone-100">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4A7C59] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4A7C59]"></span>
                 </span>
-                <span className="text-xl font-bold text-teal-600">
+                <span className="text-sm font-black text-village-umber">
                   {sellersInRangeCount}
                 </span>
               </div>
             )}
           </div>
           {locationError && isOnline && (
-            <div className="mt-3 p-2 bg-red-50 border border-red-100 rounded text-xs text-red-600 flex items-center gap-2">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2">
+            <div className="mt-3 p-2 bg-red-50 organic-radius border border-red-100 text-[8px] font-black text-red-600 flex items-center gap-2 uppercase tracking-tight">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -392,102 +361,120 @@ export default function DeliveryDashboard() {
         </div>
 
         {/* Dashboard Cards Grid */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3.5">
           <DashboardCard
             icon={pendingOrderIcon}
-            title="Today's Pending Order"
+            title="Today's Pending"
             value={stats?.pendingOrders || 0}
-            accentColor="#16a34a"
+            accentColor="#8B3D28"
             onClick={() => navigate("/delivery/orders/pending")}
           />
           <DashboardCard
             icon={allOrderIcon}
-            title="Today's All Order"
+            title="Total Orders"
             value={stats?.allOrders || 0}
-            accentColor="#ef4444"
+            accentColor="#3D2B1F"
             onClick={() => navigate("/delivery/orders/all")}
           />
           <DashboardCard
             icon={returnOrderIcon}
-            title="Today's Return Order"
+            title="Returns Today"
             value={stats?.returnOrders || 0}
             accentColor="#f97316"
             onClick={() => navigate("/delivery/orders/return")}
           />
           <DashboardCard
             icon={returnItemIcon}
-            title="Total return item have"
+            title="In Possession"
             value={stats?.returnItems || 0}
-            accentColor="#3b82f6"
+            accentColor="#4A7C59"
           />
         </div>
 
-        {/* Today's Earning & Total Earning Bar */}
+        {/* Today's Earning Summary Bar */}
         <SummaryBar
           leftIcon={earningIcon}
           leftLabel="Today's Earning"
           leftValue={`₹ ${stats?.todayEarning || 0}`}
           rightIcon={cashBalanceIcon}
-          rightLabel="Total Earning"
+          rightLabel="Total Earnings"
           rightValue={`₹ ${stats?.totalEarning?.toFixed(2) || "0.00"}`}
-          accentColor="#16a34a"
+          accentColor="#4A7C59"
         />
 
         {/* Today's Pending Order Section */}
-        <div className="mt-6">
-          <h2 className="text-neutral-900 text-lg font-semibold mb-4">
-            Todays Pending Order
-          </h2>
+        <div className="pt-2">
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="text-village-umber text-xs font-black uppercase tracking-[0.2em] opacity-80">
+              Live Pending tasks
+            </h2>
+            <div className="h-[2px] w-12 bg-village-umber/5 rounded-full"></div>
+          </div>
+          
           {stats?.pendingOrdersList && stats.pendingOrdersList.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               {stats.pendingOrdersList.map((order: any) => (
                 <div
                   key={order.id}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-neutral-200 cursor-pointer"
+                  className="village-card paper-texture organic-radius p-4 border-none shadow-sm cursor-pointer transition-all active:scale-[0.98]"
                   onClick={() => navigate(`/delivery/orders/${order.id}`)}>
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="text-neutral-900 font-semibold text-sm">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex flex-col">
+                      <p className="text-village-umber font-black text-[11px] uppercase tracking-wide">
                         {order.orderId}
                       </p>
-                      <p className="text-neutral-600 text-xs mt-1">
-                        {order.customerName}
-                      </p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <div className="w-1 h-1 rounded-full bg-stone-300"></div>
+                        <p className="text-stone-500 text-[9px] font-bold uppercase tracking-tight">
+                          {order.customerName}
+                        </p>
+                      </div>
                     </div>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${
                         order.status === "Ready for pickup"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-blue-100 text-blue-700"
+                          ? "bg-amber-100 text-amber-700 ring-1 ring-amber-200"
+                          : "bg-[#4A7C59]/10 text-[#4A7C59] ring-1 ring-[#4A7C59]/20"
                       }`}>
                       {order.status}
                     </span>
                   </div>
-                  <p className="text-neutral-600 text-xs mb-2">
-                    {order.address}
-                  </p>
+                  
+                  <div className="bg-stone-50/50 p-2.5 rounded-xl border border-stone-100/50 mb-3">
+                    <p className="text-stone-500 text-[9px] font-bold leading-relaxed line-clamp-1">
+                      <span className="text-[#8B3D28]/40 mr-1 opacity-50 font-black">📍</span>
+                      {order.address}
+                    </p>
+                  </div>
+
                   <div className="flex items-center justify-between">
-                    <p className="text-neutral-900 font-bold">
+                    <p className="text-village-umber font-black text-sm tracking-tight pt-1">
                       ₹ {order.totalAmount}
                     </p>
                     {order.estimatedDeliveryTime && (
-                      <p className="text-neutral-500 text-xs">
-                        ETA: {order.estimatedDeliveryTime}
-                      </p>
+                      <div className="flex items-center gap-1.5 bg-stone-50 px-2 py-1 rounded-lg">
+                        <span className="text-[8px] font-black text-stone-400 uppercase tracking-tighter">ETA</span>
+                        <p className="text-village-umber text-[9px] font-black tracking-tight">
+                          {order.estimatedDeliveryTime}
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl p-8 min-h-[200px] flex items-center justify-center shadow-sm border border-neutral-200">
-              <p className="text-neutral-500 text-sm">No pending orders</p>
+            <div className="village-card paper-texture organic-radius p-10 min-h-[160px] flex flex-col items-center justify-center opacity-60">
+              <div className="w-12 h-12 bg-stone-100 rounded-2xl flex items-center justify-center mb-3 text-stone-300">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                </svg>
+              </div>
+              <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest">Awaiting New Orders</p>
             </div>
           )}
         </div>
       </div>
-
-      {/* Bottom Navigation */}
       <DeliveryBottomNav />
     </div>
   );

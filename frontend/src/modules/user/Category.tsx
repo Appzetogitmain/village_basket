@@ -173,7 +173,7 @@ export default function CategoryPage() {
 
   if (!category && !categoryLoading) {
     return (
-      <div className="px-4 md:px-6 lg:px-8 py-6 md:py-8">
+      <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
         <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-4">
           Category not found
         </h1>
@@ -292,10 +292,10 @@ export default function CategoryPage() {
 
 
   return (
-    <div className="flex bg-white h-screen overflow-hidden">
+    <div className="flex bg-transparent h-screen overflow-hidden">
       {/* Left Sidebar - Only show if has real subcategories */}
       {hasRealSubcategories && (
-        <div className="w-24 bg-white border-r border-neutral-100 overflow-y-auto scrollbar-hide flex-shrink-0 py-2">
+        <div className="w-[72px] bg-white border-r border-neutral-100 overflow-y-auto scrollbar-hide flex-shrink-0 py-1 shadow-sm">
           <div className="space-y-1">
             {subcategories.map((subcat) => {
               const isSelected =
@@ -308,21 +308,21 @@ export default function CategoryPage() {
                     console.log("Clicked subcategory:", subcat.id || subcat._id);
                     setSelectedSubcategory(subcat.id || subcat._id);
                   }}
-                  className={`w-full flex flex-col items-center justify-center py-2 relative transition-all duration-200 group ${isSelected ? "bg-green-50" : "hover:bg-neutral-50"
+                  className={`w-full flex flex-col items-center justify-center py-1 relative transition-all duration-200 group ${isSelected ? "bg-[#4A7C59]/10" : "hover:bg-neutral-50"
                     }`}
                   style={{
-                    minHeight: "80px",
+                    minHeight: "64px",
                   }}>
                   {/* Active Indicator - curved blob on left */}
                   {isSelected && (
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-green-600 rounded-r-full"></div>
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-10 bg-[#4A7C59] rounded-r-full"></div>
                   )}
 
                   {/* Image Container */}
                   <div
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl mb-1.5 flex-shrink-0 overflow-hidden transition-all duration-200 shadow-sm ${isSelected
-                      ? "ring-2 ring-green-600 ring-offset-2 bg-white"
-                      : "bg-neutral-50 border border-neutral-100 group-hover:shadow-md"
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-lg mb-1 flex-shrink-0 overflow-hidden transition-all duration-200 ${isSelected
+                      ? "ring-2 ring-[#4A7C59] bg-white shadow-md"
+                      : "bg-[#F5F5F3] border border-neutral-100/50 group-hover:shadow-sm"
                       }`}>
                     {subcat.image ? (
                       <img
@@ -346,9 +346,9 @@ export default function CategoryPage() {
 
                   {/* Text Label */}
                   <span
-                    className={`text-[10px] text-center leading-tight px-1 transition-colors ${isSelected
-                      ? "font-bold text-green-700"
-                      : "text-neutral-500 group-hover:text-neutral-900"
+                    className={`text-[8px] text-center leading-tight px-0.5 transition-colors ${isSelected
+                      ? "font-black text-[#4A7C59]"
+                      : "font-bold text-neutral-500 group-hover:text-black"
                       }`}
                     style={{
                       wordBreak: "break-word",
@@ -368,10 +368,10 @@ export default function CategoryPage() {
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-white">
+      <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
         {/* Header */}
-        <div className="sticky top-0 z-40 bg-white border-b border-neutral-200 flex-shrink-0">
-          <div className="px-4 md:px-6 lg:px-8 py-3 md:py-4">
+        <header className="sticky top-0 z-50 bg-[#8B3D28] shadow-lg md:top-[60px] border-b border-white/10 flex-shrink-0">
+          <div className="px-3 py-2 md:py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button
@@ -386,28 +386,28 @@ export default function CategoryPage() {
                     xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M15 18L9 12L15 6"
-                      stroke="currentColor"
-                      strokeWidth="2"
+                      stroke="white"
+                      strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </svg>
                 </button>
-                <h1 className="text-base md:text-xl font-bold text-neutral-900">
+                <h1 className="text-base md:text-xl font-bold text-white font-poppins capitalize">
                   {category?.name}
                 </h1>
               </div>
             </div>
           </div>
-        </div>
+        </header>
 
         {/* Filter/Sort Bar - Updated layout */}
-        <div className="px-4 md:px-6 lg:px-8 py-1.5 md:py-2 bg-white border-b border-neutral-200 flex-shrink-0">
-          <div className="flex items-center gap-1.5 md:gap-2 overflow-x-auto scrollbar-hide -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 scroll-smooth">
+        <div className="px-3 py-1.5 bg-[#8B3D28]/95 backdrop-blur-md border-b border-white/10 flex-shrink-0">
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide -mx-3 px-3 scroll-smooth">
             {/* Filters Button */}
             <button
               onClick={() => setIsFiltersOpen(true)}
-              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50 transition-colors flex-shrink-0 whitespace-nowrap">
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition-all flex-shrink-0 whitespace-nowrap active:scale-95 shadow-sm">
               <svg
                 width="12"
                 height="12"
@@ -482,7 +482,7 @@ export default function CategoryPage() {
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide bg-white">
+        <div className="flex-1 overflow-y-auto scrollbar-hide bg-transparent">
           {/* Products Grid */}
           {categoryProducts.length > 0 ? (
             <div className="px-3 md:px-6 lg:px-8 py-4 md:py-6">
@@ -510,7 +510,7 @@ export default function CategoryPage() {
         </div>
       </div>
 
-      {/* Filters Modal */}
+
       <AnimatePresence>
         {isFiltersOpen && (
           <>

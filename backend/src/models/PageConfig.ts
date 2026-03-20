@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IPageConfig extends Document {
-  page: string; // e.g., "NEXT_DAY"
+  page: string; // e.g., "HOME"
   sections: mongoose.Types.ObjectId[]; // Ordered list of HomeSection IDs
 }
 

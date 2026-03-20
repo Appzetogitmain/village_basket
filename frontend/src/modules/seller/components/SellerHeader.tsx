@@ -56,70 +56,48 @@ export default function SellerHeader({ onMenuClick, isSidebarOpen }: SellerHeade
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-30">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-3 sm:px-4 md:px-6 py-3 sm:py-4 gap-3 sm:gap-0">
+    <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-village-umber/10 sticky top-0 z-30">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-3 sm:px-4 md:px-6 py-2 sm:py-3 gap-3 sm:gap-0">
         {/* Logo and Hamburger Menu */}
         <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
           {/* Hamburger Menu Button */}
           <button
             onClick={onMenuClick}
-            className="p-2 text-neutral-600 hover:text-neutral-900 transition-colors flex-shrink-0"
+            className="p-1.5 rounded-lg text-neutral-600 hover:bg-white/50 hover:text-village-umber transition-colors flex-shrink-0"
             aria-label="Toggle menu"
           >
             {isSidebarOpen ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M18 6L6 18M6 6L18 18"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M4 6H20M4 12H20M4 18H20"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             )}
           </button>
-          {/* Village Basket Logo */}
+
+          {/* Village Basket Logo - Compact */}
           <button
             onClick={handleLogoClick}
-            className="hover:opacity-80 transition-opacity relative flex items-center h-10 sm:h-12"
+            className="hover:opacity-80 transition-opacity flex items-center h-8 sm:h-10 ml-2"
           >
-            <div className="absolute left-0 h-28 sm:h-36 flex items-center pointer-events-none">
-              <img
-                src={villageBasketLogo}
-                alt="Village Basket"
-                className="h-full w-auto object-contain cursor-pointer"
-                style={{ maxWidth: '300px' }}
-              />
-            </div>
-            {/* Invisible spacer to maintain some width in the flexbox */}
-            <div className="w-32 sm:w-40 h-full"></div>
+            <img
+              src={villageBasketLogo}
+              alt="Village Basket"
+              className="h-full w-auto object-contain cursor-pointer drop-shadow-sm"
+            />
           </button>
 
           {/* Mobile Logout Button - Only visible on mobile */}
           <div className="ml-auto sm:hidden">
             <button
               onClick={handleLogout}
-              className="p-2 text-neutral-600 hover:text-neutral-900 transition-colors"
+              className="p-1.5 rounded-lg text-neutral-600 hover:bg-red-50 hover:text-red-600 transition-colors"
               aria-label="Logout"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>
@@ -177,13 +155,13 @@ export default function SellerHeader({ onMenuClick, isSidebarOpen }: SellerHeade
               </svg>
             </button>
             {showSettingsDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-lg border border-neutral-200 py-2 z-50">
                 <button
                   onClick={() => {
                     setShowSettingsDropdown(false);
                     navigate('/seller/account-settings');
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
+                  className="w-full text-left px-4 py-2 text-sm text-neutral-700 hover:bg-white/40 transition-colors"
                 >
                   Account Settings
                 </button>
@@ -217,7 +195,7 @@ export default function SellerHeader({ onMenuClick, isSidebarOpen }: SellerHeade
               </svg>
             </button>
             {showLocationDropdown && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-neutral-200 py-2 z-50">
+              <div className="absolute right-0 mt-2 w-56 bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-lg border border-neutral-200 py-2 z-50">
                 <div className="px-4 py-2 border-b border-neutral-200">
                   <p className="text-xs text-neutral-500 mb-1">Store Location</p>
                   <p className="text-sm font-medium text-neutral-900">
@@ -250,4 +228,5 @@ export default function SellerHeader({ onMenuClick, isSidebarOpen }: SellerHeade
     </header>
   );
 }
+
 

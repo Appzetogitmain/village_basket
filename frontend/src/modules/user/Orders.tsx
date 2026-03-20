@@ -1,18 +1,18 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useOrders } from '../../hooks/useOrders';
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'Delivered':
-      return 'bg-green-100 text-green-700';
+      return 'bg-green-100 text-[#4A7C59]';
     case 'On the way':
       return 'bg-blue-100 text-blue-700';
     case 'Accepted':
-      return 'bg-yellow-100 text-yellow-700';
+      return 'bg-amber-100 text-amber-700';
     case 'Received':
-      return 'bg-neutral-100 text-neutral-700';
+      return 'bg-neutral-100 text-neutral-500';
     default:
-      return 'bg-neutral-100 text-neutral-700';
+      return 'bg-neutral-100 text-neutral-500';
   }
 };
 
@@ -29,67 +29,83 @@ const formatDate = (dateString: string) => {
 
 export default function Orders() {
   const { orders } = useOrders();
-
-  console.log('📋 Orders component - orders:', orders);
-  console.log('📋 Orders count:', orders.length);
-
-  if (orders.length === 0) {
-    return (
-      <div className="px-4 md:px-6 lg:px-8 py-12 md:py-16 text-center">
-        <div className="text-6xl md:text-8xl mb-4">📦</div>
-        <h2 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2">No orders yet</h2>
-        <p className="text-neutral-600 mb-6 md:mb-8 md:text-lg">Start shopping to see your orders here!</p>
-        <Link
-          to="/"
-          className="inline-block bg-green-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors md:text-lg"
-        >
-          Start Shopping
-        </Link>
-      </div>
-    );
-  }
+  const navigate = useNavigate();
 
   return (
-    <div className="pb-4 md:pb-8">
-      <div className="px-4 md:px-6 lg:px-8 py-4 md:py-6 bg-white border-b border-neutral-200 mb-4 md:mb-6 sticky top-0 z-10">
-        <h1 className="text-xl md:text-2xl font-bold text-neutral-900">My Orders</h1>
+    <div className="pb-24 min-h-screen">
+      {/* Village Themed Header - Compact */}
+      <div className="px-4 py-3 bg-[#8B3D28] border-b border-white/10 mb-4 sticky top-0 z-20 flex items-center gap-2 shadow-lg">
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <button 
+          onClick={() => navigate(-1)} 
+          className="p-1.5 text-white hover:bg-white/10 rounded-full transition-all active:scale-95 z-10"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <h1 className="text-[12px] font-black text-white uppercase tracking-[0.2em] font-poppins z-10">My Orders</h1>
+        <div className="ml-auto bg-white/20 px-2 py-0.5 rounded-full text-[8px] font-black text-white uppercase tracking-tighter z-10">
+          {orders.length} Orders
+        </div>
       </div>
 
-      <div className="px-4 md:px-6 lg:px-8 space-y-4 md:space-y-6">
-        {orders.map((order) => {
-          const shortId = order.id.split('-').slice(-1)[0];
-          return (
-            <Link
-              key={order.id}
-              to={`/orders/${order.id}`}
-              className="block bg-white rounded-xl border border-neutral-200 p-4 hover:shadow-md transition-shadow"
+      <div className="px-4 space-y-3">
+        {orders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center pt-20 text-center px-8">
+            <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center text-4xl mb-4 opacity-50">
+              📦
+            </div>
+            <h2 className="text-[14px] font-black text-village-umber mb-2 uppercase tracking-widest">No orders yet</h2>
+            <p className="text-[10px] text-neutral-400 mb-8 font-bold leading-relaxed max-w-[200px] mx-auto italic">
+              Start shopping to see your village treasures here!
+            </p>
+            <button 
+              onClick={() => navigate('/')} 
+              className="bg-[#4A7C59] text-white rounded-xl h-9 px-6 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-[#4A7C59]/20"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <div className="text-sm font-semibold text-neutral-900 mb-1">
-                    Order #{shortId}
+              Start Shopping
+            </button>
+          </div>
+        ) : (
+          orders.map((order) => (
+            <div
+              key={order.id}
+              onClick={() => navigate(`/orders/${order.id}`)}
+              className="village-card paper-texture organic-radius p-3 active:scale-[0.98] transition-all cursor-pointer bg-white relative shadow-sm border border-neutral-100/50"
+            >
+              <div className="flex justify-between items-start mb-1">
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[8px] font-black text-village-umber/40 uppercase tracking-tighter">Order</span>
+                  <h4 className="text-[10px] font-black text-village-umber uppercase truncate max-w-[160px]">#{order.id}</h4>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
+                    <span className="text-xs font-black text-village-umber">₹{order.totalAmount.toFixed(0)}</span>
                   </div>
-                  <div className="text-xs text-neutral-500">{formatDate(order.createdAt)}</div>
-                </div>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                    order.status
-                  )}`}
-                >
-                  {order.status}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-neutral-600">
-                  {order.totalItems} {order.totalItems === 1 ? 'item' : 'items'}
-                </div>
-                <div className="text-lg font-bold text-neutral-900">
-                  ₹{order.totalAmount.toFixed(0)}
+                  <span className="text-[9px] font-bold text-neutral-400 italic">
+                    {order.totalItems} {order.totalItems === 1 ? 'item' : 'items'}
+                  </span>
                 </div>
               </div>
-            </Link>
-          );
-        })}
+
+              <div className="flex justify-between items-center mt-1 border-t border-village-umber/5 pt-2">
+                <div className="text-[9px] font-bold text-neutral-500">{formatDate(order.createdAt)}</div>
+                <div className="flex items-center gap-1">
+                  <div className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center text-[7px] font-black text-neutral-400 border border-neutral-200 uppercase">
+                    {order.status.charAt(0)}
+                  </div>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="text-village-umber/20">
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

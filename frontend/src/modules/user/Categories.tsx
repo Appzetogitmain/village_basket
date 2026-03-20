@@ -53,7 +53,7 @@ export default function Categories() {
         <p className="text-gray-600 mb-6 max-w-xs">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-6 py-2 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-colors"
+          className="px-6 py-2 bg-[#8B3D28] text-white rounded-full font-black font-poppins hover:bg-[#722F1E] transition-colors uppercase tracking-widest"
         >
           Try Refreshing
         </button>
@@ -64,13 +64,13 @@ export default function Categories() {
 
 
   return (
-    <div className="pb-4 md:pb-8 bg-white min-h-screen">
+    <div className="pb-4 md:pb-8 bg-transparent min-h-screen">
       {/* Page Header */}
-      <div className="px-4 py-4 md:px-6 md:py-6 bg-white border-b border-neutral-200 sticky top-0 z-10 shadow-sm">
-        <h1 className="text-xl md:text-2xl font-bold text-neutral-900">All Categories</h1>
+      <div className="px-4 py-4 md:px-6 md:py-6 bg-[#8B3D28] border-b border-white/10 sticky top-0 z-10 shadow-lg">
+        <h1 className="text-xl md:text-2xl font-bold text-white font-poppins capitalize">All Categories</h1>
       </div>
 
-      <div className="bg-neutral-50 pt-1 md:pt-4">
+      <div className="bg-transparent pt-1 md:pt-4">
         {categories && categories.length > 0 ? (
           <div className="px-4 md:px-6 lg:px-8">
             <CategoryTileSection

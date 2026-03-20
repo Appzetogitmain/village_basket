@@ -1,6 +1,28 @@
 import { useEffect, useState } from 'react';
-import DeliveryHeader from '../components/DeliveryHeader';
 import { getNotifications, markNotificationRead } from '../../../services/api/delivery/deliveryService';
+import VillageLoader from '../../../components/VillageLoader';
+
+// Icons
+const Icons = {
+    Package: ({ size = 18, className = "" }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <path d="M21 7.5L12 3L3 7.5v9l9 4.5l9-4.5v-9z" />
+            <path d="M3 7.5l9 4.5l9-4.5" />
+            <path d="M12 12v9" />
+        </svg>
+    ),
+    Bell: ({ size = 18, className = "" }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+    ),
+    ChevronLeft: ({ size = 20 }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+        </svg>
+    )
+};
 
 export default function DeliveryNotifications() {
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -24,44 +46,9 @@ export default function DeliveryNotifications() {
   const handleMarkAsRead = async (id: string) => {
     try {
       await markNotificationRead(id);
-      // Update local state to show as read
       setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
     } catch (error) {
       console.error("Failed to mark as read", error);
-    }
-  };
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'Order':
-      case 'order':
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M5 8V6C5 4.34315 6.34315 3 8 3H16C17.6569 3 19 4.34315 19 6V8H21C21.5523 8 22 8.44772 22 9V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V9C2 8.44772 2.44772 8 3 8H5Z"
-              stroke="#16a34a"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
-            <path
-              d="M7 8V6C7 5.44772 7.44772 5 8 5H16C16.5523 5 17 5.44772 17 6V8"
-              stroke="#16a34a"
-              strokeWidth="2"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <circle cx="9" cy="13" r="1" fill="#16a34a" />
-            <circle cx="15" cy="13" r="1" fill="#16a34a" />
-          </svg>
-        );
-      default:
-        return (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2 12 2C11.17 2 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" fill="#F97316" />
-          </svg>
-        );
     }
   };
 
@@ -70,44 +57,68 @@ export default function DeliveryNotifications() {
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
 
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+    if (diffInMinutes < 1) return 'JUST NOW';
+    if (diffInMinutes < 60) return `${diffInMinutes}M AGO`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}H AGO`;
+    return `${Math.floor(diffInMinutes / 1440)}D AGO`;
   };
 
   return (
-    <div className="min-h-screen bg-neutral-100 pb-20">
-      <DeliveryHeader />
-      <div className="px-4 py-4">
-        <h2 className="text-neutral-900 text-xl font-semibold mb-4">Notifications</h2>
+    <div className="min-h-screen bg-transparent pb-20 font-poppins relative">
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+
+      {/* Local Header */}
+      <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="ml-2 flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">Intelligence</span>
+              <span className="font-black text-[12px] text-white tracking-wide mt-1">Operational Briefings</span>
+          </div>
+      </div>
+
+      <div className="px-6 py-6 relative z-10">
         {loading ? (
-          <p className="text-center text-neutral-500">Loading...</p>
+          <VillageLoader message="Updating Notices" />
         ) : notifications.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {notifications.map((notification) => (
               <div key={notification._id}
                 onClick={() => !notification.isRead && handleMarkAsRead(notification._id)}
-                className={`bg-white rounded-xl p-4 shadow-sm border ${notification.isRead ? 'border-neutral-200' : 'border-orange-200 bg-orange-50'}`}>
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    {getNotificationIcon(notification.type)}
+                className={`village-card paper-texture organic-radius p-5 border-none shadow-sm transition-all active:scale-[0.98] group relative overflow-hidden ${
+                    notification.isRead ? 'bg-white opacity-80' : 'bg-stone-50 ring-2 ring-[#8B3D28]/10'
+                }`}
+              >
+                  <div className="flex gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${
+                        notification.type?.toLowerCase() === 'order' 
+                        ? 'bg-[#4A7C59]/10 text-[#4A7C59]' 
+                        : 'bg-stone-100 text-[#8B3D28]/30'
+                    }`}>
+                        {notification.type?.toLowerCase() === 'order' ? <Icons.Package /> : <Icons.Bell />}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                            <h3 className="text-village-umber text-sm font-black tracking-tight leading-none truncate">{notification.title}</h3>
+                            <span className="text-stone-300 text-[8px] font-black uppercase tracking-widest shrink-0">{formatTime(notification.createdAt)}</span>
+                        </div>
+                        <p className="text-stone-500 text-[10px] font-black leading-relaxed opacity-70 line-clamp-2">{notification.message}</p>
+                    </div>
+
+                    {!notification.isRead && (
+                        <div className="absolute top-4 right-4 w-1.5 h-1.5 rounded-full bg-[#8B3D28] animate-pulse shadow-[0_0_8px_rgba(139,61,40,0.5)]"></div>
+                    )}
                   </div>
-                  <div className="flex-1">
-                    <h3 className={`text-sm font-semibold ${notification.isRead ? 'text-neutral-900' : 'text-neutral-900'}`}>{notification.title}</h3>
-                    <p className="text-neutral-600 text-xs mt-1 line-clamp-2">{notification.message}</p>
-                    <p className="text-neutral-400 text-[10px] mt-2">{formatTime(notification.createdAt)}</p>
-                  </div>
-                  {!notification.isRead && (
-                    <div className="w-2 h-2 rounded-full bg-orange-500 mt-2"></div>
-                  )}
-                </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-xl p-8 min-h-[400px] flex items-center justify-center shadow-sm border border-neutral-200">
-            <p className="text-neutral-500 text-sm">No notifications</p>
+          <div className="village-card paper-texture organic-radius p-10 min-h-[300px] border-none shadow-sm flex flex-col items-center justify-center text-center">
+            <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mb-6 text-stone-100">
+                <Icons.Bell size={32} />
+            </div>
+            <p className="text-stone-300 text-[10px] font-black uppercase tracking-[0.2em]">Zero Intercepts</p>
+            <p className="text-stone-200 text-[8px] font-bold uppercase tracking-widest mt-2">No active briefings at this moment</p>
           </div>
         )}
       </div>

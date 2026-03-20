@@ -1,4 +1,4 @@
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "../../components/ui/button";
@@ -231,7 +231,7 @@ const AnimatedCheckmark = ({ delay = 0 }) => (
       cy="40"
       r="36"
       fill="none"
-      stroke="#22c55e"
+      stroke="#8B3D28"
       strokeWidth="4"
       initial={{ pathLength: 0, opacity: 0 }}
       animate={{ pathLength: 1, opacity: 1 }}
@@ -240,7 +240,7 @@ const AnimatedCheckmark = ({ delay = 0 }) => (
     <motion.path
       d="M24 40 L35 51 L56 30"
       fill="none"
-      stroke="#22c55e"
+      stroke="#8B3D28"
       strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -290,50 +290,48 @@ const PromoCarousel = () => {
 
   return (
     <motion.div
-      className="bg-white rounded-xl p-4 shadow-sm"
-      initial={{ opacity: 0, y: 20 }}
+      className="p-3 bg-white"
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}>
       <div className="overflow-hidden relative">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
+            exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className={`flex items-center gap-4 p-3 rounded-lg bg-gradient-to-r ${promos[currentSlide].color}`}>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold bg-blue-900 text-white px-2 py-0.5 rounded">
+            className={`flex items-center gap-3 p-2.5 rounded-lg bg-gradient-to-r ${promos[currentSlide].color} border border-village-umber/5`}>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-[8px] font-black bg-village-umber/10 text-village-umber px-1.5 py-0.5 rounded uppercase tracking-tighter">
                   {promos[currentSlide].bank}
                 </span>
               </div>
-              <p className="font-semibold text-gray-900">
+              <p className="text-[10px] font-black text-village-umber uppercase leading-tight">
                 {promos[currentSlide].offer}
               </p>
-              <p className="text-xs text-gray-600 mt-1">
+              <p className="text-[8px] text-neutral-400 font-bold mt-0.5 truncate italic">
                 {promos[currentSlide].subtext}
               </p>
-              <button className="text-green-700 font-medium text-sm mt-2 flex items-center gap-1">
-                Apply now <ChevronRightIcon className="w-4 h-4" />
+              <button className="text-[#8B3D28] font-black text-[9px] mt-2 flex items-center gap-0.5 uppercase tracking-widest active:scale-95 transition-all">
+                Review Offer <ChevronRightIcon className="w-3 h-3" />
               </button>
             </div>
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">💳</span>
+            <div className="w-10 h-10 bg-white/50 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/50 shadow-sm flex-shrink-0">
+              <span className="text-xl">💳</span>
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Dots indicator */}
-      <div className="flex justify-center gap-2 mt-3">
+      <div className="flex justify-center gap-1.5 mt-2.5">
         {promos.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-green-600 w-4" : "bg-gray-300"
-              }`}
+            className={`h-1 rounded-full transition-all duration-300 ${index === currentSlide ? "bg-[#8B3D28] w-4" : "bg-neutral-200 w-1"}`}
           />
         ))}
       </div>
@@ -349,15 +347,14 @@ const TipSection = () => {
 
   return (
     <motion.div
-      className="bg-white rounded-xl p-4 shadow-sm"
-      initial={{ opacity: 0, y: 20 }}
+      className="p-3 bg-white"
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}>
-      <p className="text-gray-700 text-sm mb-3">
-        Make their day by leaving a tip. 100% of the amount will go to them
-        after delivery
+      <p className="text-[10px] font-bold text-neutral-400 mb-3 leading-tight italic">
+        Show your gratitude! 100% of the tip goes directly to the delivery partner.
       </p>
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         {tips.map((tip) => (
           <motion.button
             key={tip}
@@ -365,9 +362,9 @@ const TipSection = () => {
               setSelectedTip(tip);
               setCustomTip("");
             }}
-            className={`flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all ${selectedTip === tip
-              ? "border-green-600 bg-green-50 text-green-700"
-              : "border-gray-200 text-gray-700 hover:border-gray-300"
+            className={`flex-1 py-1.5 px-2 rounded-lg border-2 text-[10px] font-black transition-all ${selectedTip === tip
+              ? "border-[#8B3D28] bg-[#8B3D28]/5 text-[#8B3D28]"
+              : "border-neutral-100 text-neutral-500 hover:border-neutral-200"
               }`}
             whileTap={{ scale: 0.95 }}>
             ₹{tip}
@@ -377,9 +374,9 @@ const TipSection = () => {
           onClick={() => {
             setSelectedTip("other");
           }}
-          className={`flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all ${selectedTip === "other"
-            ? "border-green-600 bg-green-50 text-green-700"
-            : "border-gray-200 text-gray-700 hover:border-gray-300"
+          className={`flex-1 py-1.5 px-2 rounded-lg border-2 text-[10px] font-black transition-all ${selectedTip === "other"
+            ? "border-[#8B3D28] bg-[#8B3D28]/5 text-[#8B3D28]"
+            : "border-neutral-100 text-neutral-500 hover:border-neutral-200"
             }`}
           whileTap={{ scale: 0.95 }}>
           Other
@@ -393,13 +390,16 @@ const TipSection = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden">
-            <input
-              type="number"
-              placeholder="Enter custom amount"
-              value={customTip}
-              onChange={(e) => setCustomTip(e.target.value)}
-              className="mt-3 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+            <div className="relative mt-3">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-black text-village-umber/40">₹</span>
+              <input
+                type="number"
+                placeholder="Custom amount"
+                value={customTip}
+                onChange={(e) => setCustomTip(e.target.value)}
+                className="w-full pl-6 pr-3 py-2 bg-neutral-50 border-none rounded-lg text-[10px] font-black focus:ring-1 focus:ring-village-umber/20 focus:bg-white transition-all outline-none"
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -446,7 +446,7 @@ export default function OrderDetail() {
   const { getOrderById, fetchOrderById, loading: contextLoading } = useOrders();
   const [order, setOrder] = useState<any>(id ? getOrderById(id) : undefined);
   const [loading, setLoading] = useState(!order);
-
+  const navigate = useNavigate();
   const [showConfirmation, setShowConfirmation] = useState(confirmed);
   const [orderStatus, setOrderStatus] = useState<OrderStatus>(
     order?.status || "Received"
@@ -700,10 +700,10 @@ export default function OrderDetail() {
 
   if (loading && !order) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-          <p className="text-sm text-neutral-500">Loading order details...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B3D28]"></div>
+          <p className="text-sm font-bold text-neutral-500 font-poppins">Loading order details...</p>
         </div>
       </div>
     );
@@ -711,7 +711,7 @@ export default function OrderDetail() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
+      <div className="min-h-screen bg-transparent p-4">
         <div className="max-w-lg mx-auto text-center py-20">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-4">
             Order Not Found
@@ -731,22 +731,22 @@ export default function OrderDetail() {
     Received: {
       title: "Order received",
       subtitle: "Order will reach you shortly",
-      color: "bg-green-700",
+      color: "bg-[#8B3D28]",
     },
     Accepted: {
       title: "Preparing your order",
-      subtitle: `Arriving in ${estimatedTime} mins`,
-      color: "bg-green-700",
+      subtitle: "",
+      color: "bg-[#8B3D28]",
     },
     "On the way": {
       title: "Order picked up",
-      subtitle: `Arriving in ${estimatedTime} mins`,
-      color: "bg-green-700",
+      subtitle: "",
+      color: "bg-[#8B3D28]",
     },
     Delivered: {
       title: "Order delivered",
       subtitle: "Enjoy your meal!",
-      color: "bg-green-600",
+      color: "bg-[#8B3D28]",
     },
     // Backend status mappings
     Pending: {
@@ -757,7 +757,7 @@ export default function OrderDetail() {
     Processed: {
       title: "Order processed",
       subtitle: "Preparing for delivery",
-      color: "bg-green-700",
+      color: "bg-[#8B3D28]",
     },
     Shipped: {
       title: "Order shipped",
@@ -766,8 +766,8 @@ export default function OrderDetail() {
     },
     "Out for Delivery": {
       title: "Out for delivery",
-      subtitle: `Arriving in ${estimatedTime} mins`,
-      color: "bg-green-700",
+      subtitle: "",
+      color: "bg-[#8B3D28]",
     },
     Cancelled: {
       title: "Order cancelled",
@@ -784,103 +784,67 @@ export default function OrderDetail() {
   const currentStatus = statusConfig[orderStatus] || statusConfig["Received"];
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Order Confirmed Modal */}
-      <AnimatePresence>
-        {showConfirmation && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, type: "spring" }}
-              className="text-center px-8">
-              <AnimatedCheckmark delay={0.3} />
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9 }}
-                className="text-2xl font-bold text-gray-900 mt-6">
-                Order Confirmed!
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.1 }}
-                className="text-gray-600 mt-2">
-                Your order has been placed successfully
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.5 }}
-                className="mt-8">
-                <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm text-gray-500 mt-3">
-                  Loading order details...
-                </p>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Green Header */}
+    <div className="pb-24 min-h-screen bg-transparent">
+      {/* Status Header - Main Navigation & Tracking Info */}
       <motion.div
-        className={`${currentStatus.color} text-white sticky top-0 z-40`}
+        className={`${currentStatus.color} text-white sticky top-0 z-40 shadow-sm`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}>
-        {/* Navigation bar */}
-        <div className="flex items-center justify-between px-4 py-3">
-          <Link to="/orders">
+        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        
+        {/* Navigation bar - Compact & Consolidated */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 relative z-10">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-1.5 flex items-center justify-center hover:bg-white/10 rounded-full transition-all active:scale-95"
+          >
+            <ArrowLeftIcon className="w-5 h-5 text-white" />
+          </button>
+          
+          <div className="flex flex-col items-center min-w-0">
+             <h1 className="text-[11px] font-black uppercase tracking-[0.2em] font-poppins text-white/90 leading-none">Order Details</h1>
+             <span className="text-[8px] font-bold text-white/50 truncate mt-0.5">#{id}</span>
+          </div>
+
+          <div className="flex gap-1">
             <motion.button
-              className="w-10 h-10 flex items-center justify-center"
-              whileTap={{ scale: 0.9 }}>
-              <ArrowLeftIcon className="w-6 h-6" />
+              className="p-1.5 flex items-center justify-center hover:bg-white/10 rounded-full"
+              whileTap={{ scale: 0.9 }}
+              onClick={handleShare}>
+              <Share2Icon className="w-4 h-4 text-white" />
             </motion.button>
-          </Link>
-          <h2 className="font-semibold text-lg">Village Basket</h2>
-          <motion.button
-            className="w-10 h-10 flex items-center justify-center"
-            whileTap={{ scale: 0.9 }}
-            onClick={handleShare}>
-            <Share2Icon className="w-5 h-5" />
-          </motion.button>
+            <motion.button
+              className="p-1.5 flex items-center justify-center hover:bg-white/10 rounded-full"
+              whileTap={{ scale: 0.9 }}
+              onClick={handleRefresh}>
+              <RefreshCwIcon className={`w-4 h-4 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
+            </motion.button>
+          </div>
         </div>
 
-        {/* Status section */}
-        <div className="px-4 pb-4 text-center">
+        {/* Status section - Compact */}
+        <div className="px-4 py-4 text-center relative z-10">
           <motion.h1
-            className="text-2xl font-bold mb-3"
+            className="text-base font-black uppercase tracking-widest mb-1.5 leading-none"
             key={currentStatus.title}
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}>
             {currentStatus.title}
           </motion.h1>
 
-          {/* Status pill */}
+          {/* Status pill - Compact */}
           <motion.div
-            className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2"
-            initial={{ scale: 0.9, opacity: 0 }}
+            className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-md rounded-full px-3 py-1 border border-white/10"
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}>
-            <span className="text-sm">{currentStatus.subtitle}</span>
+            <span className="text-[10px] font-bold text-white/90">{currentStatus.subtitle}</span>
             {(orderStatus === "Accepted" || orderStatus === "On the way") && (
               <>
-                <span className="w-1 h-1 rounded-full bg-white" />
-                <span className="text-sm text-green-200">On time</span>
+                <span className="w-1 h-1 rounded-full bg-green-300 animate-pulse" />
+                <span className="text-[10px] font-bold text-green-200">On time</span>
               </>
             )}
-            <motion.button
-              onClick={handleRefresh}
-              className="ml-1"
-              animate={{ rotate: isRefreshing ? 360 : 0 }}
-              transition={{ duration: 0.5 }}>
-              <RefreshCwIcon className="w-4 h-4" />
-            </motion.button>
           </motion.div>
         </div>
       </motion.div>
@@ -959,25 +923,25 @@ export default function OrderDetail() {
         />
       )}
 
-      {/* Scrollable Content */}
-      <div className="px-4 py-4 space-y-4 pb-24">
-        {/* Payment Pending */}
+      {/* Scrollable Content - High Density */}
+      <div className="px-3 py-3 space-y-3 pb-24">
+        {/* Payment Card */}
         <motion.div
-          className="bg-white rounded-xl p-4 shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
+          className="village-card paper-texture organic-radius p-3 bg-white shadow-sm border-none"
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-gray-900">
-                Payment of ₹{order.totalAmount?.toFixed(0) || "0"} pending
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-black text-village-umber uppercase tracking-tight mb-0.5">
+                Payment Pending: ₹{order.totalAmount?.toFixed(0) || "0"}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
-                Pay now, or pay to the delivery partner using Cash/UPI
+              <p className="text-[9px] text-neutral-400 font-bold leading-tight italic">
+                Pay now or at delivery using Cash/UPI
               </p>
             </div>
-            <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-6">
-              Pay now <ChevronRightIcon className="w-4 h-4 ml-1" />
+            <Button className="bg-[#4A7C59] hover:bg-[#3D664A] text-white rounded-lg h-7 px-4 text-[9px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all flex-shrink-0">
+              Pay Now
             </Button>
           </div>
         </motion.div>
@@ -985,203 +949,165 @@ export default function OrderDetail() {
         {/* Promo Carousel */}
         <PromoCarousel />
 
-        {/* Delivery Partner Assignment - Only show if no partner assigned yet */}
+        {/* Assignment Status */}
         {!order?.deliveryPartner && (
           <motion.div
-            className="bg-white rounded-xl p-4 shadow-sm"
-            initial={{ opacity: 0, y: 20 }}
+            className="village-card paper-texture organic-radius p-3 bg-white shadow-sm border-none"
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                <span className="text-2xl">👨‍🍳</span>
+              <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center border border-amber-100">
+                <span className="text-xl">👨‍🍳</span>
               </div>
-              <p className="font-semibold text-gray-900">
+              <p className="text-[10px] font-black text-village-umber uppercase tracking-tight">
                 {order?.status === 'Received' || order?.status === 'Accepted'
-                  ? "Assigning delivery partner shortly"
-                  : "Preparing your order"}
+                  ? "Finding Delivery Professional..."
+                  : "Store is preparing your order"}
               </p>
             </div>
           </motion.div>
         )}
 
         {/* Tip Section */}
-        <TipSection />
+        <div className="village-card paper-texture organic-radius bg-white shadow-sm overflow-hidden">
+          <TipSection />
+        </div>
 
-        {/* Delivery Partner Safety */}
+        {/* Safety Banner */}
         <motion.button
-          className="w-full bg-white rounded-xl p-4 shadow-sm flex items-center gap-3"
-          initial={{ opacity: 0, y: 20 }}
+          className="village-card paper-texture organic-radius w-full bg-white p-3 shadow-sm flex items-center justify-between group"
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.5 }}
           whileTap={{ scale: 0.99 }}>
-          <ShieldIcon className="w-6 h-6 text-gray-600" />
-          <span className="flex-1 text-left font-medium text-gray-900">
-            Learn about delivery partner safety
-          </span>
-          <ChevronRightIcon className="w-5 h-5 text-gray-400" />
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+              <ShieldIcon className="w-3.5 h-3.5 text-blue-600" />
+            </div>
+            <span className="text-[10px] font-black text-village-umber uppercase tracking-tight">
+              Safety Protocols Verified
+            </span>
+          </div>
+          <ChevronRightIcon className="w-4 h-4 text-neutral-200 group-hover:translate-x-1 transition-transform" />
         </motion.button>
 
-        {/* Delivery Details Banner */}
+        {/* Address Card */}
         <motion.div
-          className="bg-yellow-50 rounded-xl p-4 text-center"
-          initial={{ opacity: 0, y: 20 }}
+          className="village-card paper-texture organic-radius bg-white shadow-sm overflow-hidden"
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.65 }}>
-          <p className="text-yellow-800 font-medium">
-            All your delivery details in one place 👇
-          </p>
-        </motion.div>
-
-        {/* Contact & Address Section */}
-        <motion.div
-          className="bg-white rounded-xl shadow-sm overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}>
+          transition={{ delay: 0.6 }}>
           <SectionItem
             icon={PhoneIcon}
-            title={`${order.address?.name || "Customer"}, ${order.address?.phone || "9XXXXXXXX"
-              }`}
-            subtitle="Delivery partner may call this number"
+            title={`${order.address?.name || "Customer"}`}
+            subtitle={order.address?.phone || "9XXXXXXXX"}
           />
           <SectionItem
             icon={HomeIcon}
-            title="Delivery at Home"
-            subtitle={
-              order.address
-                ? `${order.address.address}, ${order.address.city}`
-                : "Add delivery address"
-            }
+            title="Delivery Address"
+            subtitle={order.address ? `${order.address.address}, ${order.address.city}` : "Add delivery address"}
           />
           <SectionItem
             icon={MessageSquareIcon}
-            title="Add delivery instructions"
-            subtitle=""
+            title="Instructions"
+            subtitle="Add notes for partner"
             onClick={() => setShowInstructionsModal(true)}
           />
         </motion.div>
 
-        {/* Store Section */}
+        {/* Store Card */}
         <motion.div
-          className="bg-white rounded-xl shadow-sm overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
+          className="village-card paper-texture organic-radius bg-white shadow-sm overflow-hidden"
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.75 }}>
-          <div className="flex items-center gap-3 p-4 border-b border-dashed border-gray-200">
-            <div className="w-12 h-12 rounded-full bg-orange-100 overflow-hidden flex items-center justify-center">
-              <span className="text-2xl">🛒</span>
+          transition={{ delay: 0.7 }}>
+          <div className="flex items-center gap-3 p-3 border-b border-dashed border-village-umber/5">
+            <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center border border-amber-100">
+              <span className="text-xl">🛒</span>
             </div>
-            <div className="flex-1">
-              <p className="font-semibold text-gray-900">Village Basket Store</p>
-              <p className="text-sm text-gray-500">
-                {order.address?.city || "Local Area"}
-              </p>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-black text-village-umber uppercase tracking-tight">Village Basket Store</p>
+              <p className="text-[9px] text-neutral-400 font-bold italic">Official Outlet</p>
             </div>
-            <motion.button
-              className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center"
-              whileTap={{ scale: 0.9 }}
-              onClick={handleCallStore}>
-              <PhoneIcon className="w-5 h-5 text-green-700" />
-            </motion.button>
           </div>
+          <motion.button
+            className="w-full p-3 flex items-center justify-between group bg-village-umber/5"
+            onClick={handleCallStore}
+            whileTap={{ scale: 0.99 }}>
+            <div className="flex items-center gap-2">
+              <PhoneIcon className="w-3.5 h-3.5 text-village-umber/60" />
+              <span className="text-[10px] font-black text-village-umber uppercase tracking-tight">Call Store</span>
+            </div>
+            <ChevronRightIcon className="w-4 h-4 text-neutral-300 group-hover:translate-x-1 transition-transform" />
+          </motion.button>
+        </motion.div>
 
-          {/* Order Items */}
+        {/* Bill Summary Card */}
+        <motion.div
+          className="village-card paper-texture organic-radius bg-white shadow-sm overflow-hidden"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}>
           <div
-            className="p-4 border-b border-dashed border-gray-200"
+            className="p-3 border-b border-dashed border-village-umber/5 hover:bg-neutral-50 transition-colors"
             onClick={() => setShowItemsModal(true)}
             style={{ cursor: "pointer" }}>
             <div className="flex items-start gap-3">
-              <ReceiptIcon className="w-5 h-5 text-gray-500 mt-0.5" />
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">
-                  Order #{order.id.split("-").slice(-1)[0]}
-                </p>
-                <div className="mt-2 space-y-1">
-                  {order.items?.map((item: any, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-2 text-sm text-gray-600">
-                      <span className="w-4 h-4 rounded border border-green-600 flex items-center justify-center">
-                        <span className="w-2 h-2 rounded-full bg-green-600" />
-                      </span>
-                      <span>
-                        {item.quantity} x{" "}
-                        {item.product?.name || item.productName || "Product"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+              <div className="w-8 h-8 rounded bg-neutral-100 flex items-center justify-center">
+                <ReceiptIcon className="w-4 h-4 text-village-umber/60" />
               </div>
-              <ChevronRightIcon className="w-5 h-5 text-gray-400" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-black text-village-umber uppercase tracking-tight">
+                  Bill Summary
+                </p>
+                <p className="text-[9px] font-bold text-neutral-400 italic">#{order.id.split("-").slice(-1)[0]} • {order.items?.length} Items</p>
+              </div>
+              <ChevronRightIcon className="w-4 h-4 text-neutral-300" />
             </div>
           </div>
-
           <SectionItem
             icon={ChefHatIcon}
-            title="Add special requests"
-            subtitle=""
+            title="Special Requests"
+            subtitle={specialRequests || "Add cooking instructions"}
             onClick={() => setShowSpecialRequestsModal(true)}
           />
         </motion.div>
 
-        {/* Help Section */}
+        {/* Help & Cancel Card */}
         <motion.div
-          className="bg-white rounded-xl shadow-sm overflow-hidden"
-          initial={{ opacity: 0, y: 20 }}
+          className="village-card paper-texture organic-radius bg-white shadow-sm overflow-hidden"
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}>
-          <div
-            className="flex items-center gap-3 p-4 border-b border-dashed border-gray-200"
-            onClick={() => window.open('/help', '_blank')}
-            style={{ cursor: "pointer" }}>
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-              <HelpCircleIcon className="w-5 h-5 text-red-600" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold text-gray-900">
-                Need help with your order?
-              </p>
-              <p className="text-sm text-gray-500">Get help & support</p>
-            </div>
-            <ChevronRightIcon className="w-5 h-5 text-gray-400" />
-          </div>
+          transition={{ delay: 0.85 }}>
+          <SectionItem
+            icon={HelpCircleIcon}
+            title="Need Help?"
+            subtitle="Chat with support"
+            onClick={() => navigate("/support")}
+          />
           <SectionItem
             icon={CircleSlashIcon}
-            title="Cancel order"
-            subtitle=""
+            title="Cancel Order"
+            subtitle="Only available before store accepts"
             onClick={() => setShowCancelModal(true)}
           />
         </motion.div>
 
-        {/* Quick Actions */}
-        <motion.div
-          className="flex gap-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.85 }}>
-          {order?.invoiceEnabled ? (
-            <Link to={`/orders/${id}/invoice`} className="flex-1">
-              <Button className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white">
-                View Invoice
-              </Button>
-            </Link>
-          ) : (
-            <div className="flex-1">
-              <Button
-                className="w-full bg-gray-400 cursor-not-allowed text-white"
-                disabled
-                title="Invoice will be available after delivery is completed">
-                Invoice Unavailable
-              </Button>
-            </div>
-          )}
+        {/* Secondary Actions */}
+        <div className="flex gap-2.5 mt-2">
           <Link to="/orders" className="flex-1">
-            <Button variant="outline" className="w-full border-gray-300">
-              All Orders
-            </Button>
+            <button className="w-full h-8 bg-neutral-100 text-neutral-500 text-[10px] font-black uppercase tracking-widest rounded-lg active:scale-95 transition-all">
+              View All Orders
+            </button>
           </Link>
-        </motion.div>
+          <button
+            onClick={handleShare}
+            className="w-12 h-8 bg-neutral-100 text-neutral-500 flex items-center justify-center rounded-lg active:scale-95 transition-all"
+          >
+            <Share2Icon className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Cancel Order Modal */}

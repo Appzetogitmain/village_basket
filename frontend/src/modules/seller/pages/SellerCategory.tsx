@@ -51,7 +51,7 @@ export default function SellerCategory() {
             </div>
 
             {/* Content Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
+            <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
                 <div className="p-4 border-b border-neutral-100 font-medium text-neutral-700">
                     View Category
                 </div>
@@ -101,7 +101,7 @@ export default function SellerCategory() {
                             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">Search:</span>
                             <input
                                 type="text"
-                                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-teal-500 w-48"
+                                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#4A7C59] w-48"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -126,7 +126,7 @@ export default function SellerCategory() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse border border-neutral-200">
                             <thead>
-                                <tr className="bg-neutral-50 text-xs font-bold text-neutral-800">
+                                <tr className="bg-white/40 text-xs font-bold text-neutral-800">
                                     <th className="p-4 w-16 border border-neutral-200">
                                         <div className="flex items-center justify-between cursor-pointer">ID <span className="text-neutral-300 text-[10px]">⇅</span></div>
                                     </th>
@@ -143,11 +143,11 @@ export default function SellerCategory() {
                             </thead>
                             <tbody>
                                 {filteredCategories.map((category) => (
-                                    <tr key={category._id} className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700">
+                                    <tr key={category._id} className="hover:bg-white/40 transition-colors text-sm text-neutral-700">
                                         <td className="p-4 align-middle border border-neutral-200">{category._id}</td>
                                         <td className="p-4 align-middle border border-neutral-200">{category.name}</td>
                                         <td className="p-4 border border-neutral-200">
-                                            <div className="w-16 h-12 bg-white border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
+                                            <div className="w-16 h-12 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
                                                 <img
                                                     src={category.image || '/assets/category-placeholder.png'}
                                                     alt={category.name}
@@ -181,3 +181,4 @@ export default function SellerCategory() {
         </div>
     );
 }
+

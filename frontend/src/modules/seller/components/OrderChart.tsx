@@ -334,9 +334,11 @@ export default function OrderChart({ title, data, maxValue, height = 400 }: Orde
   const brushCoords = getBrushCoordinates();
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-2 sm:p-3 md:p-4 hover:shadow-xl transition-shadow duration-300">
+    <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white p-3 sm:p-4 hover:shadow-lg transition-all overflow-hidden relative">
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+      
       {/* Chart Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-4 gap-2 sm:gap-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-4 gap-2 sm:gap-0 relative z-10">
         <h3 className="text-base sm:text-lg md:text-xl font-bold text-neutral-900">{title}</h3>
         <div className="flex items-center gap-2">
           {/* Zoom Controls */}
@@ -597,7 +599,7 @@ export default function OrderChart({ title, data, maxValue, height = 400 }: Orde
         {/* Tooltip */}
         {hoveredIndex !== null && tooltipPosition && (
           <div
-            className="absolute bg-white text-neutral-900 text-sm rounded-lg px-5 py-4 shadow-2xl pointer-events-none z-10 whitespace-nowrap border-2 border-neutral-200"
+            className="absolute bg-white/90 backdrop-blur-md border-white/20 text-neutral-900 text-sm rounded-lg px-5 py-4 shadow-2xl pointer-events-none z-10 whitespace-nowrap border-2 border-neutral-200"
             style={{
               left: `${tooltipPosition.x}px`,
               top: `${tooltipPosition.y}px`,
@@ -607,15 +609,15 @@ export default function OrderChart({ title, data, maxValue, height = 400 }: Orde
           >
             <div className="font-bold mb-2 text-neutral-900 text-base">{data[hoveredIndex]?.date}</div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-teal-600"></div>
-              <span className="text-neutral-700 font-semibold">Orders: <span className="text-teal-600 font-bold">{data[hoveredIndex]?.value}</span></span>
+              <div className="w-3 h-3 rounded-full bg-[#4A7C59]"></div>
+              <span className="text-neutral-700 font-semibold">Orders: <span className="text-[#4A7C59] font-bold">{data[hoveredIndex]?.value}</span></span>
             </div>
           </div>
         )}
 
         {/* Zoom Indicator */}
         {zoom > 1 && (
-          <div className="absolute top-2 right-2 bg-teal-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+          <div className="absolute top-2 right-2 bg-[#4A7C59] text-white text-xs px-2 py-1 rounded-full font-medium">
             {Math.round(zoom * 100)}%
           </div>
         )}
@@ -623,3 +625,4 @@ export default function OrderChart({ title, data, maxValue, height = 400 }: Orde
     </div>
   );
 }
+

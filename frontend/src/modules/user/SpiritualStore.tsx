@@ -43,7 +43,7 @@ export default function SpiritualStore() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       {/* Spiritual Store Banner */}
       <div className="relative w-full">
         <img
@@ -188,11 +188,6 @@ export default function SpiritualStore() {
                       <span className="text-[8px] text-neutral-500">({(product.reviews || 0).toLocaleString()})</span>
                     </div>
 
-                    {/* Delivery Time */}
-                    <div className="text-[9px] text-neutral-600 mb-0.5">
-                      15 MINS
-                    </div>
-
                     {/* Discount */}
                     {hasDiscount && (
                       <div className="text-[9px] text-blue-600 font-semibold mb-0.5">
@@ -259,7 +254,7 @@ export default function SpiritualStore() {
                               −
                             </Button>
                           </motion.div>
-                          <motion.span
+                           <motion.span
                             key={inCartQty}
                             initial={{ scale: 1.2, y: -4 }}
                             animate={{ scale: 1, y: 0 }}

@@ -4,6 +4,7 @@ import { sendOTP, verifyOTP } from '../../../services/api/auth/adminAuthService'
 import OTPInput from '../../../components/OTPInput';
 import { useAuth } from '../../../context/AuthContext';
 import villageBasketLogo from '@assets/village_basket-removebg-preview.png';
+import VillageLoader from '../../../components/VillageLoader';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -64,6 +65,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-green-50 flex flex-col items-center justify-center px-4 py-8">
+      {loading && <VillageLoader />}
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}

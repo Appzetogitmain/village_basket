@@ -8,15 +8,29 @@
   font-display: swap;
 }
 
+:root {
+  --village-red: #E53935; /* Vibrant Red for badges */
+  --village-terracotta: #8B3D28; /* Authentic Brand Color Updated */
+  --village-orange: #FF9800; /* Richer Orange for buttons */
+  --village-gold: #FFD700;
+  --village-green: #2E7D32;
+  --village-cream: #FAF7F2; /* Warmer, more organic cream */
+  --village-card-bg: #F5EFE6; /* Slightly darker kraft paper tone for cards */
+  --village-umber: #3E2723;
+  --village-mustard: #E1AD01;
+}
+
 @layer base {
   body {
-    @apply bg-white md:bg-white text-neutral-900;
+    background-color: var(--village-cream);
+    color: var(--village-umber);
     margin: 0;
     padding: 0;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
     width: 100%;
     overflow-x: hidden;
+    font-family: 'Poppins', sans-serif;
   }
 
   html {
@@ -25,6 +39,9 @@
     width: 100%;
     overflow-x: hidden;
     background: white;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   #root {
@@ -32,7 +49,13 @@
     padding: 0;
     width: 100%;
     min-height: 100vh;
-    background: white;
+    background-color: var(--village-cream);
+    background-image: 
+      linear-gradient(rgba(250, 247, 242, 0.88), rgba(250, 247, 242, 0.88)),
+      url('/assets/warli_pattern.png');
+    background-repeat: repeat;
+    background-size: 320px;
+    background-attachment: fixed;
     overflow-x: hidden;
   }
 }
@@ -44,6 +67,62 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+  
+  .organic-radius {
+    border-radius: 20px;
+  }
+  
+  .village-card {
+    background-color: var(--village-card-bg);
+    border: 1px solid rgba(62, 39, 35, 0.08);
+    box-shadow: 0 4px 12px rgba(62, 39, 35, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .paper-texture {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .paper-texture::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    pointer-events: none;
+    background-image: url("https://www.transparenttextures.com/patterns/recycled-paper.png");
+    z-index: 0;
+  }
+
+  .premium-pill {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  }
+  
+  .organic-image-container {
+    background: white;
+    border-radius: 18px;
+    margin: 8px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+  }
+
+  .organic-radius-top {
+    border-radius: 24px 24px 0 0;
+  }
+
+  /* Decorative Village Divider */
+  /* Performance: Only render what's near the viewport */
+  .smooth-render {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 1000px;
+  }
+
+  /* Smooth feedback for any interactive element */
+  .press-smooth:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease-out;
   }
 }
 

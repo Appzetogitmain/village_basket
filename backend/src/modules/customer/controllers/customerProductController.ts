@@ -151,8 +151,12 @@ export const getProducts = async (req: Request, res: Response) => {
     }
 
     if (search) {
-      // Use text search for broad matching
-      query.$text = { $search: search as string };
+      // Use case-insensitive fuzzy regex for smoother grocery matching (e.g., 'egg' matches 'eggs')
+      query.$or = [
+        { productName: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { brand: { $regex: search, $options: "i" } }
+      ];
     }
 
     // Calculate skip for pagination

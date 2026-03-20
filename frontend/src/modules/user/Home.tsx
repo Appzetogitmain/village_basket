@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import HomeHero from "./components/HomeHero";
 
 import PromoStrip from "./components/PromoStrip";
-import NextDayBookingCard from "./components/NextDayBookingCard";
 import LowestPricesEver from "./components/LowestPricesEver";
 import CategoryTileSection from "./components/CategoryTileSection";
 import FeaturedThisWeek from "./components/FeaturedThisWeek";
-import BestsellerCards from "./components/BestsellerCards";
+// Bestseller section removed for cleaner layout
 import ProductCard from "./components/ProductCard";
 import { getHomeContent } from "../../services/api/customerHomeService";
 import { getHeaderCategoriesPublic } from "../../services/api/headerCategoryService";
@@ -251,27 +250,31 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-white min-h-screen pb-20 md:pb-0" ref={contentRef}>
+    <div className="bg-transparent min-h-screen pb-32 md:pb-8 font-poppins relative" ref={contentRef}>
+      {/* Page Texture Overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+
       {/* Hero Header with Gradient and Tabs */}
       <HomeHero activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Promo Strip */}
-      <PromoStrip activeTab={activeTab} />
-
-      {/* Next Day Vegetable Booking Card */}
-      <NextDayBookingCard />
+      <div className="relative z-10">
+        <PromoStrip activeTab={activeTab} />
+      </div>
 
       {/* LOWEST PRICES EVER Section */}
-      <LowestPricesEver activeTab={activeTab} products={homeData.lowestPrices} />
+      <div className="bg-gradient-to-b from-white to-transparent pt-2 relative z-10">
+        <LowestPricesEver activeTab={activeTab} products={homeData.lowestPrices} />
+      </div>
 
-      {/* BESTSELLER CARDS (2x2 Grid) */}
-      <BestsellerCards cards={homeData.bestsellerCards} />
+      {/* Dynamic spacing between hero sections */}
+      <div className="h-4 relative z-10"></div>
 
       {/* Main content */}
       <div
-        className="-mt-2 pt-1 space-y-5 md:space-y-8 md:pt-4"
-        style={{ backgroundColor: `${theme.secondary[0]}44` }} // 0x44 is ~27% opacity
+        className="pt-1 space-y-6 md:space-y-10 md:pt-4 relative z-10"
       >
+
 
         {/* Featured This Week Section */}
         {/* <FeaturedThisWeek /> */}
@@ -297,7 +300,7 @@ export default function Home() {
                 return (
                   <div key={section.id} className="mt-6 mb-6 md:mt-8 md:mb-8">
                     {section.title && (
-                      <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight capitalize">
+                      <h2 className="text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins capitalize">
                         {section.title}
                       </h2>
                     )}
@@ -336,18 +339,18 @@ export default function Home() {
         {/* Bestsellers Section (Dynamic) */}
         {homeData.bestsellers && homeData.bestsellers.length > 0 && (
           <div className="mt-6 mb-6 md:mt-8 md:mb-8">
-            <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight">
+            <h2 className="text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins">
               Bestsellers
             </h2>
             <div className="px-4 md:px-6 lg:px-8">
               <div
-                className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2"
+                className="flex items-stretch gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2"
                 style={{ scrollSnapType: 'x mandatory' }}
               >
                 {homeData.bestsellers.map((product: any) => (
                   <div
                     key={product.id || product._id}
-                    className="flex-shrink-0 w-[140px] md:w-[180px]"
+                    className="flex-shrink-0 w-[130px] md:w-[180px]"
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <ProductCard
@@ -386,17 +389,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* Shop by Store Section */}
-        {homeData.shops && homeData.shops.length > 0 && (
-          <div className="mt-6 mb-10 md:mb-16">
-            <CategoryTileSection
-              title="Shop by Store"
-              tiles={homeData.shops}
-              columns={4}
-              showProductCount={false}
-            />
-          </div>
-        )}
+        {/* Shop by Store Section removed for cleaner UI */}
       </div>
     </div>
   );

@@ -25,21 +25,14 @@ router.post('/create-order', authenticate, requireUserType('Customer'), async (r
         let totalToPay = 0;
         let customerId;
 
-        if (order) {
-            totalToPay = order.total;
-            customerId = order.customer.toString();
-        } else {
-            const NextDayOrder = (await import("../models/NextDayOrder")).default;
-            const ndOrder = await NextDayOrder.findById(orderId);
-            if (!ndOrder) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Order not found',
-                });
-            }
-            totalToPay = ndOrder.total;
-            customerId = ndOrder.customer.toString();
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found',
+            });
         }
+        totalToPay = order.total;
+        customerId = order.customer.toString();
 
         // Verify order belongs to customer
         if (customerId !== req.user!.userId) {
@@ -81,21 +74,14 @@ router.post('/verify', authenticate, requireUserType('Customer'), async (req: Re
 
         const order = await Order.findById(orderId);
 
-        let customerId;
-
-        if (order) {
-            customerId = order.customer.toString();
-        } else {
-            const NextDayOrder = (await import("../models/NextDayOrder")).default;
-            const ndOrder = await NextDayOrder.findById(orderId);
-            if (!ndOrder) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Order not found',
-                });
-            }
-            customerId = ndOrder.customer.toString();
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found',
+            });
         }
+        
+        const customerId = order.customer.toString();
 
         // Verify order belongs to customer
         if (customerId !== req.user!.userId) {
@@ -109,8 +95,7 @@ router.post('/verify', authenticate, requireUserType('Customer'), async (req: Re
             orderId,
             razorpayOrderId,
             razorpayPaymentId,
-            razorpaySignature,
-            !order // Pass boolean flag indicating if it's a next day order (if original order lookup failed)
+            razorpaySignature
         );
 
         if (!result.success) {

@@ -59,7 +59,7 @@ export default function SellerTaxes() {
             </div>
 
             {/* Content Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
+            <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
                 {/* Controls */}
                 <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-neutral-100">
                     <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export default function SellerTaxes() {
                         <select
                             value={rowsPerPage}
                             onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                            className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                            className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
                         >
                             <option value={10}>10</option>
                             <option value={20}>20</option>
@@ -98,7 +98,7 @@ export default function SellerTaxes() {
                                 link.click();
                                 document.body.removeChild(link);
                             }}
-                            className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
+                            className="bg-[#4A7C59] hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
                         >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -114,7 +114,7 @@ export default function SellerTaxes() {
                             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">Search:</span>
                             <input
                                 type="text"
-                                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-teal-500 w-48"
+                                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#4A7C59] w-48"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder=""
@@ -127,7 +127,7 @@ export default function SellerTaxes() {
                 <div className="overflow-x-auto flex-1">
                     <table className="w-full text-left border-collapse border border-neutral-200">
                         <thead>
-                            <tr className="bg-neutral-50 text-xs font-bold text-neutral-800">
+                            <tr className="bg-white/40 text-xs font-bold text-neutral-800">
                                 <th
                                     className="p-4 w-16 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
                                     onClick={() => handleSort('id')}
@@ -173,7 +173,7 @@ export default function SellerTaxes() {
                                     </td>
                                 </tr>
                             ) : displayedTaxes.map((tax, index) => (
-                                <tr key={tax._id} className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700">
+                                <tr key={tax._id} className="hover:bg-white/40 transition-colors text-sm text-neutral-700">
                                     <td className="p-4 align-middle border border-neutral-200">{startIndex + index + 1}</td>
                                     <td className="p-4 align-middle border border-neutral-200 font-medium">{tax.name}</td>
                                     <td className="p-4 align-middle border border-neutral-200">{tax.percentage}%</td>
@@ -208,8 +208,8 @@ export default function SellerTaxes() {
                             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                             disabled={currentPage === 1}
                             className={`p-2 border border-teal-600 rounded ${currentPage === 1
-                                ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                : 'text-teal-600 hover:bg-teal-50'
+                                ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                                : 'text-[#4A7C59] hover:bg-teal-50'
                                 }`}
                             aria-label="Previous page"
                         >
@@ -230,7 +230,7 @@ export default function SellerTaxes() {
                             </svg>
                         </button>
                         <button
-                            className="px-3 py-1.5 border border-teal-600 bg-teal-600 text-white rounded font-medium text-sm"
+                            className="px-3 py-1.5 border border-teal-600 bg-[#4A7C59] text-white rounded font-medium text-sm"
                         >
                             {currentPage}
                         </button>
@@ -238,8 +238,8 @@ export default function SellerTaxes() {
                             onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                             disabled={currentPage === totalPages}
                             className={`p-2 border border-teal-600 rounded ${currentPage === totalPages
-                                ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                : 'text-teal-600 hover:bg-teal-50'
+                                ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                                : 'text-[#4A7C59] hover:bg-teal-50'
                                 }`}
                             aria-label="Next page"
                         >
@@ -265,4 +265,5 @@ export default function SellerTaxes() {
         </div>
     );
 }
+
 

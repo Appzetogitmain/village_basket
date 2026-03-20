@@ -58,7 +58,6 @@ export default function SellerAddProduct() {
     galleryImageUrls: [] as string[],
     isShopByStoreOnly: "No",
     shopId: "",
-    nextDayEnabled: "No",
   });
 
   const [variations, setVariations] = useState<ProductVariation[]>([]);
@@ -184,7 +183,6 @@ export default function SellerAddProduct() {
               galleryImageUrls: product.galleryImageUrls || [],
               isShopByStoreOnly: (product as any).isShopByStoreOnly ? "Yes" : "No",
               shopId: (product as any).shopId?._id || (product as any).shopId || "",
-              nextDayEnabled: product.nextDay?.enabled ? "Yes" : "No",
             });
             setVariations(product.variations);
             if (product.mainImageUrl || product.mainImage) {
@@ -466,9 +464,6 @@ export default function SellerAddProduct() {
         variationType: formData.variationType || undefined,
         isShopByStoreOnly: formData.isShopByStoreOnly === "Yes",
         shopId: formData.isShopByStoreOnly === "Yes" && formData.shopId ? formData.shopId : undefined,
-        nextDay: {
-          enabled: formData.nextDayEnabled === "Yes"
-        }
       };
 
       // Create or Update product via API
@@ -513,7 +508,6 @@ export default function SellerAddProduct() {
               galleryImageUrls: [],
               isShopByStoreOnly: "No",
               shopId: "",
-              nextDayEnabled: "No",
             });
             setVariations([]);
             setMainImageFile(null);
@@ -549,8 +543,8 @@ export default function SellerAddProduct() {
       <div className="flex-1">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Product Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-            <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
+          <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+            <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3">
               <h2 className="text-lg font-semibold">Product</h2>
             </div>
             <div className="p-4 sm:p-6 space-y-4">
@@ -565,7 +559,7 @@ export default function SellerAddProduct() {
                     value={formData.productName}
                     onChange={handleChange}
                     placeholder="Enter Product Name"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                   />
                 </div>
                 <div>
@@ -577,7 +571,7 @@ export default function SellerAddProduct() {
                     name="headerCategory"
                     value={formData.headerCategory}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                     <option value="">Select Header Category</option>
                     {headerCategories.map((headerCat) => (
                       <option key={headerCat._id} value={headerCat._id}>
@@ -600,9 +594,9 @@ export default function SellerAddProduct() {
                     value={formData.category}
                     onChange={handleChange}
                     disabled={!formData.headerCategory}
-                    className={`w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 ${!formData.headerCategory
+                    className={`w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 ${!formData.headerCategory
                       ? "bg-neutral-100 cursor-not-allowed text-neutral-500"
-                      : "bg-white"
+                      : "bg-white/90 backdrop-blur-md border-white/20"
                       }`}>
                     <option value="">
                       {formData.headerCategory
@@ -644,9 +638,9 @@ export default function SellerAddProduct() {
                     value={formData.subcategory}
                     onChange={handleChange}
                     disabled={!formData.category}
-                    className={`w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 ${!formData.category
+                    className={`w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 ${!formData.category
                       ? "bg-neutral-100 cursor-not-allowed text-neutral-500"
-                      : "bg-white"
+                      : "bg-white/90 backdrop-blur-md border-white/20"
                       }`}>
                     <option value="">
                       {formData.category
@@ -668,7 +662,7 @@ export default function SellerAddProduct() {
                     name="publish"
                     value={formData.publish}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -681,7 +675,7 @@ export default function SellerAddProduct() {
                     name="popular"
                     value={formData.popular}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -694,7 +688,7 @@ export default function SellerAddProduct() {
                     name="dealOfDay"
                     value={formData.dealOfDay}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -707,7 +701,7 @@ export default function SellerAddProduct() {
                     name="brand"
                     value={formData.brand}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                     <option value="">Select Brand</option>
                     {brands.map((brand) => (
                       <option key={brand._id} value={brand._id}>
@@ -726,25 +720,13 @@ export default function SellerAddProduct() {
                     value={formData.tags}
                     onChange={handleChange}
                     placeholder="Select or create tags"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                   />
                   <p className="text-xs text-red-500 mt-1">
                     This will help for search
                   </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Available for Next Day Delivery?
-                  </label>
-                  <select
-                    name="nextDayEnabled"
-                    value={formData.nextDayEnabled}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                  </select>
-                </div>
+
               </div>
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -756,15 +738,15 @@ export default function SellerAddProduct() {
                   onChange={handleChange}
                   placeholder="Enter Product Small Description"
                   rows={4}
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
+                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 resize-none"
                 />
               </div>
             </div>
           </div>
 
           {/* SEO Content Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-            <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
+          <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+            <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3">
               <h2 className="text-lg font-semibold">SEO Content</h2>
             </div>
             <div className="p-4 sm:p-6 space-y-4">
@@ -778,7 +760,7 @@ export default function SellerAddProduct() {
                   value={formData.seoTitle}
                   onChange={handleChange}
                   placeholder="Enter SEO Title"
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                 />
               </div>
               <div>
@@ -791,7 +773,7 @@ export default function SellerAddProduct() {
                   value={formData.seoKeywords}
                   onChange={handleChange}
                   placeholder="Enter SEO Keywords"
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                 />
               </div>
               <div>
@@ -804,7 +786,7 @@ export default function SellerAddProduct() {
                   value={formData.seoImageAlt}
                   onChange={handleChange}
                   placeholder="Enter SEO Image Alt Text"
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                 />
               </div>
               <div>
@@ -817,15 +799,15 @@ export default function SellerAddProduct() {
                   onChange={handleChange}
                   placeholder="Enter SEO Description"
                   rows={4}
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
+                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 resize-none"
                 />
               </div>
             </div>
           </div>
 
           {/* Add Variation Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-            <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
+          <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+            <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3">
               <h2 className="text-lg font-semibold">Add Variation</h2>
             </div>
             <div className="p-4 sm:p-6 space-y-4">
@@ -837,7 +819,7 @@ export default function SellerAddProduct() {
                   name="variationType"
                   value={formData.variationType}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                   <option value="">Select Product Type</option>
                   <option value="Size">Size</option>
                   <option value="Weight">Weight</option>
@@ -847,7 +829,7 @@ export default function SellerAddProduct() {
               </div>
 
               {/* Variation Form */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 bg-neutral-50 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 bg-white/40 rounded-lg">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Title (e.g., 100g)
@@ -862,7 +844,7 @@ export default function SellerAddProduct() {
                       })
                     }
                     placeholder="100g"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59]"
                   />
                 </div>
                 <div>
@@ -879,7 +861,7 @@ export default function SellerAddProduct() {
                       })
                     }
                     placeholder="100"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59]"
                   />
                 </div>
                 <div>
@@ -896,7 +878,7 @@ export default function SellerAddProduct() {
                       })
                     }
                     placeholder="80"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59]"
                   />
                 </div>
                 <div>
@@ -913,14 +895,14 @@ export default function SellerAddProduct() {
                       })
                     }
                     placeholder="0"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59]"
                   />
                 </div>
                 <div className="flex items-end">
                   <button
                     type="button"
                     onClick={addVariation}
-                    className="w-full px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium">
+                    className="w-full px-4 py-2 bg-[#4A7C59] hover:bg-teal-700 text-white rounded-lg font-medium">
                     Add Variation
                   </button>
                 </div>
@@ -936,12 +918,12 @@ export default function SellerAddProduct() {
                     {variations.map((variation, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-3 bg-white border border-neutral-200 rounded-lg">
+                        className="flex items-center justify-between p-3 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-200 rounded-lg">
                         <div className="flex-1">
                           <span className="font-medium">{variation.title}</span>{" "}
                           - ₹{variation.price}
                           {variation.discPrice > 0 && (
-                            <span className="text-green-600 ml-2">
+                            <span className="text-[#4A7C59] ml-2">
                               (₹{variation.discPrice})
                             </span>
                           )}
@@ -968,8 +950,8 @@ export default function SellerAddProduct() {
           </div>
 
           {/* Add Other Details Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-            <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
+          <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+            <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3">
               <h2 className="text-lg font-semibold">Add Other Details</h2>
             </div>
             <div className="p-4 sm:p-6 space-y-4">
@@ -984,7 +966,7 @@ export default function SellerAddProduct() {
                     value={formData.manufacturer}
                     onChange={handleChange}
                     placeholder="Enter Manufacturer"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                   />
                 </div>
                 <div>
@@ -997,7 +979,7 @@ export default function SellerAddProduct() {
                     value={formData.madeIn}
                     onChange={handleChange}
                     placeholder="Enter Made In"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                   />
                 </div>
                 <div>
@@ -1008,7 +990,7 @@ export default function SellerAddProduct() {
                     name="tax"
                     value={formData.tax}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                     <option value="">Select Tax</option>
                     {taxes.map((tax) => (
                       <option key={tax._id} value={tax._id}>
@@ -1025,7 +1007,7 @@ export default function SellerAddProduct() {
                     name="isReturnable"
                     value={formData.isReturnable}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -1040,7 +1022,7 @@ export default function SellerAddProduct() {
                     value={formData.maxReturnDays}
                     onChange={handleChange}
                     placeholder="Enter Max Return Days"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                   />
                 </div>
                 <div>
@@ -1053,7 +1035,7 @@ export default function SellerAddProduct() {
                     value={formData.fssaiLicNo}
                     onChange={handleChange}
                     placeholder="Enter FSSAI Lic. No."
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                   />
                 </div>
                 <div>
@@ -1066,7 +1048,7 @@ export default function SellerAddProduct() {
                     value={formData.totalAllowedQuantity}
                     onChange={handleChange}
                     placeholder="Enter Total allowed quantit"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
                   />
                   <p className="text-xs text-neutral-500 mt-1">
                     Keep blank if no such limit
@@ -1077,8 +1059,8 @@ export default function SellerAddProduct() {
           </div>
 
           {/* Add Images Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-            <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
+          <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+            <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3">
               <h2 className="text-lg font-semibold">Add Images</h2>
             </div>
             <div className="p-4 sm:p-6 space-y-6">
@@ -1229,8 +1211,8 @@ export default function SellerAddProduct() {
           </div>
 
           {/* Shop by Store Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-            <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
+          <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+            <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3">
               <h2 className="text-lg font-semibold">Shop by Store</h2>
             </div>
             <div className="p-4 sm:p-6 space-y-4">
@@ -1248,7 +1230,7 @@ export default function SellerAddProduct() {
                     name="isShopByStoreOnly"
                     value={formData.isShopByStoreOnly}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -1263,7 +1245,7 @@ export default function SellerAddProduct() {
                       value={formData.shopId}
                       onChange={handleChange}
                       required={formData.isShopByStoreOnly === "Yes"}
-                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
+                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500 bg-white/90 backdrop-blur-md border-white/20">
                       <option value="">Select Store</option>
                       {shops.map((shop) => (
                         <option key={shop._id} value={shop._id}>
@@ -1289,7 +1271,7 @@ export default function SellerAddProduct() {
               disabled={uploading}
               className={`px-8 py-3 rounded-lg font-medium text-lg transition-colors shadow-sm ${uploading
                 ? "bg-neutral-400 cursor-not-allowed text-white"
-                : "bg-teal-600 hover:bg-teal-700 text-white"
+                : "bg-[#4A7C59] hover:bg-teal-700 text-white"
                 }`}>
               {uploading ? "Saving..." : (id ? "Update Product" : "Add Product")}
             </button>
@@ -1299,4 +1281,6 @@ export default function SellerAddProduct() {
     </div >
   );
 }
+
+
 

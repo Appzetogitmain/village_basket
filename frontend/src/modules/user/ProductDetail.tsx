@@ -12,10 +12,16 @@ import { useLocation } from '../../hooks/useLocation';
 import { useLoading } from '../../context/LoadingContext';
 import Button from '../../components/ui/button';
 import Badge from '../../components/ui/badge';
+import ProductCard from "./components/ProductCard";
 import { getProductById } from '../../services/api/customerProductService';
 import WishlistButton from '../../components/WishlistButton';
 import StarRating from "../../components/ui/StarRating";
 import { calculateProductPrice } from '../../utils/priceUtils';
+import { useSubscription } from '../../context/SubscriptionContext';
+import { SubscriptionPlanId } from '../../types/subscription';
+import DailyServiceSelector from './components/DailyServiceSelector';
+import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -29,7 +35,15 @@ export default function ProductDetail() {
     useState(false);
   const [isHighlightsExpanded, setIsHighlightsExpanded] = useState(false);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
-
+  const [isSubscriptionMode, setIsSubscriptionMode] = useState(false);
+  const { showToast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const {
+    dailyServiceCart,
+    addToDailyServiceCart,
+    updateDailyServiceCartQuantity,
+    calculateTotalPrice
+  } = useSubscription();
   const [product, setProduct] = useState<any>(null);
   const [similarProducts, setSimilarProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -210,6 +224,13 @@ export default function ProductDetail() {
     : null;
   const inCartQty = cartItem?.quantity || 0;
 
+  const currentProductId = product?.id || product?._id;
+  const dailyCartItem = product
+    ? dailyServiceCart.find(item => item.productId === currentProductId && item.variantId === selectedVariant?._id)
+    : null;
+  const isDailyInCart = !!dailyCartItem;
+  const dailyInCartQty = dailyCartItem?.quantity || 0;
+
   if (loading && !product) {
     return null; // Let the global IconLoader handle this
   }
@@ -226,7 +247,7 @@ export default function ProductDetail() {
         <p className="text-gray-600 mb-6 max-w-xs">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-6 py-2 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-colors"
+          className="px-6 py-2 bg-[#8B3D28] text-white rounded-full font-black font-poppins hover:bg-[#722F1E] transition-colors"
         >
           Try Refreshing
         </button>
@@ -236,7 +257,7 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white px-4 md:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-transparent px-4 md:px-6 lg:px-8">
         <div className="text-center">
           <p className="text-lg md:text-xl font-semibold text-neutral-900 mb-4">
             Product not found
@@ -277,7 +298,7 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-transparent pb-24">
       {/* Header with back button and action icons */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
         <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-3 md:py-4">
@@ -317,7 +338,7 @@ export default function ProductDetail() {
       </div>
 
       {/* Scrollable content */}
-      <div className="pt-16">
+      <div className="pt-14">
         {/* Location Availability Banner */}
         {!isAvailableAtLocation && (
           <div className="bg-amber-50 border-l-4 border-amber-500 px-4 py-3 mx-4 mt-4 rounded-r-lg">
@@ -350,11 +371,10 @@ export default function ProductDetail() {
           </div>
         )}
 
-        {/* Product Image Gallery */}
-        <div className="relative w-full bg-gradient-to-br from-neutral-100 to-neutral-200 overflow-hidden">
+        <div className="relative w-full bg-gradient-to-br from-neutral-50 to-neutral-100 overflow-hidden shadow-sm">
           {/* Main Product Image - Swipeable on mobile */}
           <div
-            className="w-full aspect-square relative overflow-hidden"
+            className="w-full aspect-[4/3] md:aspect-square relative overflow-hidden"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -512,7 +532,7 @@ export default function ProductDetail() {
                       setTimeout(() => setIsTransitioning(false), 300);
                     }}
                     className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${index === selectedImageIndex
-                      ? "border-green-600 ring-2 ring-green-200"
+                      ? "border-[#8B3D28] ring-2 ring-[#8B3D28]/20"
                       : "border-neutral-200 hover:border-neutral-300"
                       }`}>
                     <img
@@ -530,35 +550,8 @@ export default function ProductDetail() {
 
         {/* Product Details Card - White section */}
         <div className="bg-white rounded-t-3xl -mt-6 relative z-10 px-4 md:px-6 lg:px-8 pt-2.5 md:pt-4 pb-2 md:pb-4">
-          {/* Delivery time */}
-          <div className="flex items-center gap-0.5 mb-1">
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg">
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-              <path
-                d="M12 6v6l4 2"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-            <span className="text-sm text-neutral-700 font-medium">
-              17 MINS
-            </span>
-          </div>
-
           {/* Product name */}
-          <h2 className="text-lg md:text-2xl font-bold text-neutral-900 mb-0 leading-tight">
+          <h2 className="text-xl md:text-2xl font-black text-village-umber mb-0 leading-tight uppercase tracking-tight">
             {product.name}
           </h2>
 
@@ -581,14 +574,14 @@ export default function ProductDetail() {
                       key={index}
                       onClick={() => setSelectedVariantIndex(index)}
                       disabled={isOutOfStock}
-                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all border-2 flex flex-col items-center gap-0.5 min-w-[70px] ${isSelected
-                        ? "border-green-600 bg-green-50 text-green-700 shadow-sm ring-1 ring-green-600/20"
+                      className={`px-3 py-1.5 rounded-xl text-[10px] md:text-sm font-black transition-all border-2 flex flex-col items-center gap-0.5 min-w-[60px] font-poppins ${isSelected
+                        ? "border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28] shadow-sm transform scale-105"
                         : isOutOfStock
                           ? "border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed"
-                          : "border-neutral-200 bg-white text-neutral-600 hover:border-green-300 hover:bg-green-50/30"
+                          : "border-neutral-200 bg-white text-neutral-600 hover:border-[#8B3D28]/30 hover:bg-[#8B3D28]/5"
                         }`}>
                       <span className="whitespace-nowrap">{variantTitle}</span>
-                      <span className={`text-[10px] font-bold ${isSelected ? "text-green-600" : "text-neutral-500"}`}>
+                      <span className={`text-[10px] font-black ${isSelected ? "text-[#8B3D28]" : "text-neutral-500"}`}>
                         ₹{calculateProductPrice(product, index).displayPrice}
                       </span>
                       {isOutOfStock && (
@@ -602,13 +595,13 @@ export default function ProductDetail() {
           )}
 
           {/* Quantity/Pack */}
-          <p className="text-sm md:text-base text-neutral-600 mb-1">
+          <p className="text-xs md:text-sm font-bold text-neutral-400 uppercase italic tracking-widest">
             {variantTitle}
           </p>
 
           {/* Price section */}
           <div className="flex items-center gap-1.5 mb-1.5">
-            <span className="text-xl font-bold text-neutral-900">
+            <span className="text-xl font-black text-village-umber">
               ₹{variantPrice.toLocaleString('en-IN')}
             </span>
             {hasDiscount && (
@@ -617,7 +610,7 @@ export default function ProductDetail() {
                   ₹{variantMrp.toLocaleString('en-IN')}
                 </span>
                 {discount > 0 && (
-                  <Badge className="!bg-blue-500 !text-white !border-blue-500 text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                  <Badge className="!bg-[#4A7C59] !text-white !border-[#4A7C59] text-[10px] px-2 py-1 rounded-full font-black uppercase tracking-wider">
                     {discount}% OFF
                   </Badge>
                 )}
@@ -640,7 +633,7 @@ export default function ProductDetail() {
             onClick={() =>
               setIsProductDetailsExpanded(!isProductDetailsExpanded)
             }
-            className="flex items-center gap-0.5 text-sm text-green-600 font-medium">
+            className="flex items-center gap-0.5 text-sm text-[#8B3D28] font-black font-poppins">
             View product details
             <svg
               width="11"
@@ -659,6 +652,13 @@ export default function ProductDetail() {
               />
             </svg>
           </button>
+
+          {/* Daily Service Selection */}
+          <DailyServiceSelector
+            isSubscriptionMode={isSubscriptionMode}
+            onModeToggle={setIsSubscriptionMode}
+            dailyPrice={variantPrice}
+          />
         </div>
 
         {/* Expanded Product Details Section */}
@@ -1029,271 +1029,139 @@ export default function ProductDetail() {
 
         {/* Top products in this category */}
         {similarProducts.length > 0 && (
-          <div className="mt-6 mb-24">
-            <div className="bg-neutral-100/50 border-t border-b border-neutral-200/50 py-4 px-3">
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4 px-1">
-                Top products in this category
-              </h3>
-              <div className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2 px-1">
-                {similarProducts.map((similarProduct) => {
-                  const similarCartItem = cart.items.find(
-                    (item) =>
-                      item?.product &&
-                      (item.product.id === similarProduct.id ||
-                        item.product.id === similarProduct._id)
-                  );
-                  const similarInCartQty = similarCartItem?.quantity || 0;
-
-                  return (
-                    <div
-                      key={similarProduct.id}
-                      className="flex-shrink-0 w-40 bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden relative">
-                      {/* Heart icon - top right */}
-                      <WishlistButton
-                        productId={similarProduct.id || similarProduct._id}
-                        size="sm"
-                        className="absolute top-2 right-2 shadow-md"
-                      />
-
-                      {/* Image */}
-                      <div
-                        onClick={() =>
-                          navigate(
-                            `/product/${similarProduct.id || similarProduct._id
-                            }`,
-                            { state: { fromStore: true } }
-                          )
-                        }
-                        className="w-full h-32 bg-neutral-100 flex items-center justify-center overflow-hidden cursor-pointer">
-                        {similarProduct.imageUrl || similarProduct.mainImage ? (
-                          <img
-                            src={
-                              similarProduct.imageUrl ||
-                              similarProduct.mainImage
-                            }
-                            alt={
-                              similarProduct.name || similarProduct.productName
-                            }
-                            className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-2xl">
-                            {(
-                              similarProduct.name ||
-                              similarProduct.productName ||
-                              "P"
-                            )
-                              .charAt(0)
-                              .toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Info */}
-                      <div className="p-3">
-                        <h4 className="text-sm font-semibold text-neutral-900 mb-1 line-clamp-2 min-h-[2.5rem]">
-                          {similarProduct.name || similarProduct.productName}
-                        </h4>
-
-                        {/* Rating and Delivery time */}
-                        <div className="flex flex-col gap-1 mb-2">
-                          <StarRating
-                            rating={similarProduct.rating || 0}
-                            reviewCount={similarProduct.reviews || 0}
-                            size="sm"
-                            showCount={true}
-                          />
-                          <p className="text-[10px] text-neutral-600 flex items-center gap-1">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                              <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
-                            <span>{similarProduct.deliveryTime || 15} MINS</span>
-                          </p>
-                        </div>
-
-                        {/* Price display for similar products */}
-                        <div className="mb-2">
-                          {(() => {
-                            const { displayPrice, mrp, discount: sDiscount, hasDiscount: sHasDiscount } = calculateProductPrice(similarProduct);
-                            return (
-                              <div className="flex flex-col">
-                                {sHasDiscount && (
-                                  <Badge className="!bg-blue-500 !text-white !border-blue-500 text-[10px] px-1.5 py-0.5 rounded-full font-semibold mb-1 w-fit">
-                                    {sDiscount}% OFF
-                                  </Badge>
-                                )}
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-sm font-bold text-neutral-900">
-                                    ₹{displayPrice.toLocaleString('en-IN')}
-                                  </span>
-                                  {sHasDiscount && (
-                                    <span className="text-[10px] text-neutral-500 line-through">
-                                      ₹{mrp.toLocaleString('en-IN')}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })()}
-                        </div>
-
-                        {/* ADD button or Quantity stepper */}
-                        <AnimatePresence mode="wait">
-                          {similarInCartQty === 0 ? (
-                            <motion.div
-                              key="add-button"
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              transition={{ duration: 0.2 }}
-                              className="flex justify-center w-full">
-                              <Button
-                                variant="outline"
-                                size="default"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  addToCart(similarProduct);
-                                }}
-                                className="w-full border-2 border-green-600 text-green-600 bg-transparent hover:bg-green-50 rounded-full font-semibold text-sm h-9">
-                                ADD
-                              </Button>
-                            </motion.div>
-                          ) : (
-                            <motion.div
-                              key="stepper"
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              transition={{ duration: 0.2 }}
-                              className="flex items-center justify-center gap-2 bg-white border-2 border-green-600 rounded-full px-2 py-1.5 w-full">
-                              <motion.div whileTap={{ scale: 0.9 }}>
-                                <Button
-                                  variant="default"
-                                  size="icon"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    updateQuantity(
-                                      similarProduct.id,
-                                      similarInCartQty - 1
-                                    );
-                                  }}
-                                  className="w-7 h-7 p-0"
-                                  aria-label="Decrease quantity">
-                                  −
-                                </Button>
-                              </motion.div>
-                              <motion.span
-                                key={similarInCartQty}
-                                initial={{ scale: 1.2, y: -4 }}
-                                animate={{ scale: 1, y: 0 }}
-                                transition={{
-                                  type: "spring",
-                                  stiffness: 500,
-                                  damping: 15,
-                                }}
-                                className="text-sm font-bold text-green-600 min-w-[1.5rem] text-center">
-                                {similarInCartQty}
-                              </motion.span>
-                              <motion.div whileTap={{ scale: 0.9 }}>
-                                <Button
-                                  variant="default"
-                                  size="icon"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    updateQuantity(
-                                      similarProduct.id,
-                                      similarInCartQty + 1
-                                    );
-                                  }}
-                                  className="w-7 h-7 p-0"
-                                  aria-label="Increase quantity">
-                                  +
-                                </Button>
-                              </motion.div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+          <div className="mt-4 mb-24 px-4">
+            <h3 className="text-base md:text-lg font-black text-village-umber mb-4 uppercase tracking-tight">
+              Top products in this category
+            </h3>
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4 -mx-4 px-4">
+              {similarProducts.map((similarProduct) => (
+                <div key={similarProduct.id || similarProduct._id} className="w-40 flex-shrink-0">
+                  <ProductCard
+                    product={similarProduct}
+                    showHeartIcon={true}
+                    showStockInfo={false}
+                    showBadge={true}
+                    compact={true}
+                    categoryStyle={true}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         )}
       </div>
 
       {/* Sticky Footer */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 shadow-lg">
-        <div className="px-4 py-2.5 flex items-center justify-between">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-neutral-100 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+        <div className="px-4 py-2 flex items-center justify-between min-h-[58px]">
           {/* Left side - Product details */}
-          <div className="flex-1">
-            {/* First line - Pack size */}
-            <div>
-              <span className="text-sm text-neutral-900 font-medium">
-                {variantTitle}
-              </span>
-            </div>
-            {/* Second line - Price, MRP, and OFF */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-base font-bold text-neutral-900">
+          <div className="flex flex-col justify-center">
+            <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tight leading-none mb-1">
+              {variantTitle}
+            </span>
+            <div className="flex items-center gap-1.5 leading-none">
+              <span className="text-sm font-black text-village-umber">
                 ₹{variantPrice.toLocaleString('en-IN')}
               </span>
               {hasDiscount && (
-                <>
-                  <span className="text-xs text-neutral-500 line-through">
-                    MRP ₹{variantMrp.toLocaleString('en-IN')}
-                  </span>
-                  {discount > 0 && (
-                    <Badge className="!bg-blue-500 !text-white !border-blue-500 text-[10px] px-1.5 py-0.5 rounded-full font-semibold">
-                      {discount}% OFF
-                    </Badge>
-                  )}
-                </>
+                <span className="text-[9px] text-neutral-400 line-through">
+                  ₹{variantMrp.toLocaleString('en-IN')}
+                </span>
+              )}
+              {discount > 0 && (
+                <span className="text-[9px] font-black text-village-green uppercase">
+                  {discount}% OFF
+                </span>
               )}
             </div>
-            {/* Third line - Inclusive of all taxes */}
-            <p className="text-[11px] text-neutral-500 leading-none">
-              Inclusive of all taxes
-            </p>
           </div>
 
           {/* Right side - Add to cart button or Quantity Stepper */}
-          <div className="ml-3 flex items-center">
+          <div className="flex items-center">
             <AnimatePresence mode="wait">
-              {inCartQty === 0 ? (
+              {isSubscriptionMode ? (
+                !isDailyInCart ? (
+                  <motion.button
+                    key="add-daily"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        navigate('/login', { state: { from: routerLocation.pathname } });
+                        return;
+                      }
+
+                      addToDailyServiceCart({
+                        productId: product.id || product._id,
+                        productName: product.name,
+                        productImage: currentImage,
+                        variantId: selectedVariant?._id,
+                        variantName: variantTitle,
+                        quantity: 1,
+                        pricePerDay: variantPrice,
+                      });
+                      showToast(`Added to Daily Service Basket!`, 'success');
+                    }}
+                    className="px-5 h-9 bg-village-green text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-village-green/20 active:scale-95 transition-all"
+                  >
+                    Add to Daily Basket
+                  </motion.button>
+                ) : (
+                  <motion.div
+                    key="daily-stepper"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="flex items-center gap-2.5 bg-village-green/5 border border-village-green/10 rounded-xl px-1.5 py-1 h-9 shadow-inner"
+                  >
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => updateDailyServiceCartQuantity(currentProductId, dailyInCartQty - 1, selectedVariant?._id)}
+                      className="w-6 h-6 flex items-center justify-center text-village-green font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-village-green/10 p-0 leading-none text-sm bg-white"
+                    >
+                      <span>−</span>
+                    </motion.button>
+                    <motion.span
+                      key={dailyInCartQty}
+                      initial={{ scale: 1.2, y: -2 }}
+                      animate={{ scale: 1, y: 0 }}
+                      className="text-xs font-black text-village-green min-w-[1.25rem] text-center"
+                    >
+                      {dailyInCartQty}
+                    </motion.span>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => updateDailyServiceCartQuantity(currentProductId, dailyInCartQty + 1, selectedVariant?._id)}
+                      className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-green"
+                    >
+                      <span>+</span>
+                    </motion.button>
+                  </motion.div>
+                )
+              ) : inCartQty === 0 ? (
                 <motion.div
                   key="add-button"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center">
-                  <Button
+                  className="flex items-center"
+                >
+                  <button
                     ref={addButtonRef}
-                    variant="default"
-                    size="default"
                     onClick={handleAddToCart}
                     disabled={!isAvailableAtLocation || (!isVariantAvailable && variantStock !== 0)}
-                    className={`px-6 py-2 text-sm font-semibold h-[36px] ${!isAvailableAtLocation || (!isVariantAvailable && variantStock !== 0)
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
+                    className={`px-6 h-9 text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg transition-all active:scale-95 ${!isAvailableAtLocation || (!isVariantAvailable && variantStock !== 0)
+                      ? "bg-neutral-100 text-neutral-400 cursor-not-allowed opacity-50"
+                      : "bg-[#4A7C59] text-white hover:bg-[#3D664A] shadow-lg shadow-village-green/10"
                       }`}
-                    title={
-                      !isAvailableAtLocation
-                        ? "Not available at your location"
-                        : !isVariantAvailable && variantStock !== 0
-                          ? "This variant is out of stock"
-                          : ""
-                    }>
+                  >
                     {!isAvailableAtLocation
                       ? "Unavailable"
                       : !isVariantAvailable && variantStock !== 0
                         ? "Out of Stock"
                         : "Add to cart"}
-                  </Button>
+                  </button>
                 </motion.div>
               ) : (
                 <motion.div
@@ -1301,8 +1169,7 @@ export default function ProductDetail() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center gap-2 bg-white border-2 border-green-600 rounded-full px-2 py-1 h-[36px]">
+                  className="flex items-center gap-2.5 bg-stone-50 border border-stone-200/50 rounded-xl px-1.5 py-1 h-9 shadow-inner">
                   <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={() => {
@@ -1310,16 +1177,16 @@ export default function ProductDetail() {
                       const variantId = selectedVariant?._id;
                       updateQuantity(productId, inCartQty - 1, variantId, variantTitle);
                     }}
-                    className="w-6 h-6 flex items-center justify-center text-green-600 font-bold hover:bg-green-50 rounded-full transition-colors border border-green-600 p-0 leading-none text-base"
-                    style={{ lineHeight: 1 }}>
-                    <span className="relative top-[-1px]">−</span>
+                    className="w-6 h-6 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-stone-200/50 p-0 leading-none text-sm bg-white"
+                  >
+                    <span>−</span>
                   </motion.button>
                   <motion.span
                     key={inCartQty}
                     initial={{ scale: 1.2, y: -2 }}
                     animate={{ scale: 1, y: 0 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                    className="text-sm font-bold text-green-600 min-w-[1.5rem] text-center">
+                    className="text-xs font-black text-village-umber min-w-[1.25rem] text-center"
+                  >
                     {inCartQty}
                   </motion.span>
                   <motion.button
@@ -1329,9 +1196,9 @@ export default function ProductDetail() {
                       const variantId = selectedVariant?._id;
                       updateQuantity(productId, inCartQty + 1, variantId, variantTitle);
                     }}
-                    className="w-6 h-6 flex items-center justify-center text-green-600 font-bold hover:bg-green-50 rounded-full transition-colors border border-green-600 p-0 leading-none text-base"
-                    style={{ lineHeight: 1 }}>
-                    <span className="relative top-[-1px]">+</span>
+                    className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-umber"
+                  >
+                    <span>+</span>
                   </motion.button>
                 </motion.div>
               )}

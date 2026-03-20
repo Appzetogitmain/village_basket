@@ -87,14 +87,14 @@ export default function SellerSubCategory() {
         <div className="flex flex-col h-full">
             {/* Page Header */}
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold text-neutral-800">View SubCategory</h1>
-                <div className="text-sm text-blue-500">
-                    <span className="cursor-pointer hover:underline">Home</span> <span className="text-neutral-400">/</span> <span className="text-neutral-600">Dashboard</span>
+                <h1 className="text-xl font-black text-village-umber uppercase tracking-tight">SubCategory</h1>
+                <div className="flex items-center gap-1 text-sm">
+                    <span className="text-[#4A7C59] font-medium cursor-pointer hover:underline">Home</span> <span className="text-neutral-400">/</span> <span className="text-neutral-600">SubCategory</span>
                 </div>
             </div>
 
             {/* Content Card */}
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
+            <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 flex-1 flex flex-col">
                 <div className="p-4 border-b border-neutral-100 font-medium text-neutral-700">
                     View SubCategory
                 </div>
@@ -109,7 +109,7 @@ export default function SellerSubCategory() {
                                 setRowsPerPage(Number(e.target.value));
                                 setCurrentPage(1);
                             }}
-                            className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                            className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
                         >
                             <option value={10}>10 entries</option>
                             <option value={20}>20 entries</option>
@@ -131,8 +131,8 @@ export default function SellerSubCategory() {
                                 disabled={currentPage === 1}
                                 className={`p-2 border border-teal-600 rounded ${
                                     currentPage === 1
-                                        ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                        : 'text-teal-600 hover:bg-teal-50'
+                                        ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                                        : 'text-[#4A7C59] hover:bg-teal-50'
                                 }`}
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -145,8 +145,8 @@ export default function SellerSubCategory() {
                                     onClick={() => setCurrentPage(page)}
                                     className={`px-3 py-1.5 border border-teal-600 rounded font-medium text-sm ${
                                         currentPage === page
-                                            ? 'bg-teal-600 text-white'
-                                            : 'text-teal-600 hover:bg-teal-50'
+                                            ? 'bg-[#4A7C59] text-white'
+                                            : 'text-[#4A7C59] hover:bg-teal-50'
                                     }`}
                                 >
                                     {page}
@@ -157,8 +157,8 @@ export default function SellerSubCategory() {
                                 disabled={currentPage === displayTotalPages}
                                 className={`p-2 border border-teal-600 rounded ${
                                     currentPage === displayTotalPages
-                                        ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                        : 'text-teal-600 hover:bg-teal-50'
+                                        ? 'text-neutral-400 cursor-not-allowed bg-white/40'
+                                        : 'text-[#4A7C59] hover:bg-teal-50'
                                 }`}
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -186,7 +186,7 @@ export default function SellerSubCategory() {
                 <div className="overflow-x-auto flex-1">
                     <table className="w-full text-left border-collapse border border-neutral-200">
                         <thead>
-                            <tr className="bg-neutral-50 text-xs font-bold text-neutral-800">
+                            <tr className="bg-white/40 text-xs font-bold text-neutral-800">
                                 <th 
                                     className="p-4 w-16 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
                                     onClick={() => handleSort('id')}
@@ -231,12 +231,12 @@ export default function SellerSubCategory() {
                         </thead>
                         <tbody>
                             {displayedSubcategories.map((subcategory) => (
-                                <tr key={subcategory._id || subcategory.id} className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700">
+                                <tr key={subcategory._id || subcategory.id} className="hover:bg-white/40 transition-colors text-sm text-neutral-700">
                                     <td className="p-4 align-middle border border-neutral-200">{subcategory._id || subcategory.id}</td>
                                     <td className="p-4 align-middle border border-neutral-200">{subcategory.categoryName}</td>
                                     <td className="p-4 align-middle border border-neutral-200">{subcategory.subcategoryName}</td>
                                     <td className="p-4 border border-neutral-200">
-                                        <div className="w-16 h-12 bg-white border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
+                                        <div className="w-16 h-12 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
                                             <img
                                                 src={subcategory.subcategoryImage || '/assets/category-placeholder.png'}
                                                 alt={subcategory.subcategoryName}
@@ -265,4 +265,5 @@ export default function SellerSubCategory() {
         </div>
     );
 }
+
 

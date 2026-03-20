@@ -18,10 +18,12 @@ import { appConfig } from '../../services/configService';
 import { getAddresses, updateAddress } from '../../services/api/customerAddressService';
 import GoogleMapsLocationPicker from '../../components/GoogleMapsLocationPicker';
 import { getProducts } from '../../services/api/customerProductService';
-import { addToWishlist } from '../../services/api/customerWishlistService';
+import { useWishlist } from '../../context/WishlistContext';
 import { updateProfile } from '../../services/api/customerService';
 import { calculateProductPrice } from '../../utils/priceUtils';
+import QuantityInput from '../../components/ui/QuantityInput';
 import RazorpayCheckout from '../../components/RazorpayCheckout';
+import ProductCard from '../user/components/ProductCard';
 
 // const STORAGE_KEY = 'saved_address'; // Removed
 
@@ -34,6 +36,7 @@ export default function Checkout() {
   const { location: userLocation } = useLocationContext();
   const { showToast: showGlobalToast } = useToast();
   const { user, updateUser } = useAuth();
+  const { addToWishlist: contextAddToWishlist } = useWishlist();
   const navigate = useNavigate();
   const [tipAmount, setTipAmount] = useState<number | null>(null);
   const [customTipAmount, setCustomTipAmount] = useState<number>(0);
@@ -193,10 +196,10 @@ export default function Checkout() {
 
   if (cartLoading || ((cart?.items?.length || 0) === 0 && !showOrderSuccess)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
         <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-sm font-medium text-neutral-600">
+          <div className="w-12 h-12 border-4 border-[#8B3D28] border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-sm font-bold text-neutral-600 font-poppins">
             {cartLoading ? 'Loading checkout...' : 'Redirecting...'}
           </p>
         </div>
@@ -297,24 +300,18 @@ export default function Checkout() {
 
   const handleMoveToWishlist = async (product: any) => {
     if (!product?.id && !product?._id) return;
-
     const productId = product.id || product._id;
 
     try {
-      if (!userLocation?.latitude || !userLocation?.longitude) {
-        showGlobalToast('Location is required to move items to wishlist', 'error');
-        return;
-      }
-
-      // Add to wishlist
-      await addToWishlist(productId, userLocation.latitude, userLocation.longitude);
+      // Add to wishlist using context
+      await contextAddToWishlist(productId);
       // Remove from cart
       await removeFromCart(productId);
       // Show success message
       showGlobalToast('Item moved to wishlist');
     } catch (error: any) {
       console.error('Failed to move to wishlist:', error);
-      const msg = error.response?.data?.message || 'Failed to move item to wishlist';
+      const msg = error.message || 'Failed to move item to wishlist';
       showGlobalToast(msg, 'error');
     }
   };
@@ -502,7 +499,7 @@ export default function Checkout() {
 
   return (
     <div
-      className="bg-white min-h-screen flex flex-col opacity-100"
+      className="bg-transparent min-h-screen flex flex-col opacity-100"
       style={{ opacity: 1, height: '1250px' }}
     >
 
@@ -543,7 +540,7 @@ export default function Checkout() {
                     value={profileFormData.name}
                     onChange={(e) => setProfileFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Enter your full name"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-green-500 transition-colors"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] transition-colors"
                     disabled={isUpdatingProfile}
                   />
                 </div>
@@ -555,7 +552,7 @@ export default function Checkout() {
                     value={profileFormData.email}
                     onChange={(e) => setProfileFormData(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="Enter your email"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-green-500 transition-colors"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] transition-colors"
                     disabled={isUpdatingProfile}
                   />
                 </div>
@@ -577,7 +574,7 @@ export default function Checkout() {
                     disabled={isUpdatingProfile || !profileFormData.name.trim() || !profileFormData.email.trim()}
                     className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-colors ${isUpdatingProfile || !profileFormData.name.trim() || !profileFormData.email.trim()
                       ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
-                      : 'bg-green-600 text-white hover:bg-green-700'
+                      : 'bg-[#8B3D28] text-white hover:bg-[#722F1E]'
                       }`}
                   >
                     {isUpdatingProfile ? 'Saving...' : 'Save & Continue'}
@@ -675,14 +672,14 @@ export default function Checkout() {
             >
               {/* Outer ring animation */}
               <div
-                className="absolute inset-0 w-32 h-32 rounded-full border-4 border-green-500"
+                className="absolute inset-0 w-32 h-32 rounded-full border-4 border-[#8B3D28]"
                 style={{
                   animation: 'ringPulse 1.5s ease-out infinite',
                   opacity: 0.3
                 }}
               />
               {/* Main circle */}
-              <div className="w-32 h-32 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-2xl">
+              <div className="w-32 h-32 bg-gradient-to-br from-[#8B3D28] to-[#722F1E] rounded-full flex items-center justify-center shadow-2xl">
                 <svg
                   className="w-16 h-16 text-white"
                   viewBox="0 0 24 24"
@@ -736,14 +733,14 @@ export default function Checkout() {
               className="mt-12 text-center"
               style={{ animation: 'slideUp 0.5s ease-out 0.8s both' }}
             >
-              <h3 className="text-3xl font-bold text-green-600 mb-2">Order Placed!</h3>
+              <h3 className="text-3xl font-black font-poppins text-[#8B3D28] mb-2">Order Placed!</h3>
               <p className="text-gray-600">Your order is on the way</p>
             </div>
 
             {/* Action Button */}
             <button
               onClick={handleGoToOrders}
-              className="mt-10 bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-12 rounded-xl shadow-lg transition-all hover:shadow-xl hover:scale-105"
+              className="mt-10 bg-[#8B3D28] hover:bg-[#722F1E] text-white font-bold font-poppins py-4 px-12 rounded-xl shadow-lg transition-all hover:shadow-xl hover:scale-105"
               style={{ animation: 'slideUp 0.5s ease-out 1s both' }}
             >
               Track Your Order
@@ -766,7 +763,7 @@ export default function Checkout() {
           </button>
 
           {/* Title */}
-          <h1 className="text-base font-bold text-neutral-900">Checkout</h1>
+          <h1 className="text-base font-black text-neutral-900 font-poppins">Checkout</h1>
 
           {/* Spacer to maintain layout */}
           <div className="w-7 h-7"></div>
@@ -783,7 +780,7 @@ export default function Checkout() {
                 editAddress: savedAddress
               }
             })}
-            className="text-xs text-green-600 font-medium hover:text-green-700 transition-colors"
+            className="text-xs text-[#8B3D28] font-bold hover:text-[#722F1E] transition-colors font-poppins"
           >
             Add details
           </button>
@@ -799,7 +796,7 @@ export default function Checkout() {
           </div>
 
           <div
-            className={`border rounded-lg p-2.5 cursor-pointer transition-all ${selectedAddress && !isMapSelected ? 'border-green-600 bg-green-50' : 'border-neutral-300 bg-white'
+            className={`border rounded-lg p-2.5 cursor-pointer transition-all ${selectedAddress && !isMapSelected ? 'border-[#8B3D28] bg-[#8B3D28]/10' : 'border-neutral-300 bg-white'
               }`}
             onClick={() => {
               setSelectedAddress(savedAddress);
@@ -809,7 +806,7 @@ export default function Checkout() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedAddress && !isMapSelected ? 'border-green-600 bg-green-600' : 'border-neutral-400'
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedAddress && !isMapSelected ? 'border-[#8B3D28] bg-[#8B3D28]' : 'border-neutral-400'
                     }`}>
                     {selectedAddress && !isMapSelected && (
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -822,7 +819,7 @@ export default function Checkout() {
                 <p className="text-[10px] text-neutral-600 mb-0.5">{savedAddress.phone}</p>
                 <p className="text-[10px] text-neutral-600">
                   {savedAddress.flat ? `${savedAddress.flat}, ` : ''}{savedAddress.street}
-                  {savedAddress.landmark ? <>, <span className="font-medium text-green-700">Near {savedAddress.landmark}</span></> : ''}
+                  {savedAddress.landmark ? <>, <span className="font-bold text-[#8B3D28]">Near {savedAddress.landmark}</span></> : ''}
                   , {savedAddress.city} - {savedAddress.pincode}
                 </p>
               </div>
@@ -835,7 +832,7 @@ export default function Checkout() {
                     }
                   });
                 }}
-                className="text-xs text-green-600 font-medium ml-2"
+                className="text-xs text-[#8B3D28] font-bold ml-2 font-poppins"
               >
                 Edit
               </button>
@@ -853,9 +850,9 @@ export default function Checkout() {
                 setShowMapPicker(true);
               }}
 
-              className={`flex items-center gap-3 text-base font-bold px-5 py-4 rounded-xl w-full justify-center transition-colors ${isMapSelected
-                ? 'text-green-700 bg-green-100 border-2 border-green-500 ring-2 ring-green-600'
-                : 'text-green-600 hover:text-green-700 bg-green-50 border-2 border-green-300 hover:bg-green-100 hover:border-green-400'
+              className={`flex items-center gap-3 text-base font-black px-5 py-4 rounded-xl w-full justify-center transition-colors font-poppins ${isMapSelected
+                ? 'text-[#8B3D28] bg-[#8B3D28]/10 border-2 border-[#8B3D28] ring-2 ring-[#8B3D28]/30'
+                : 'text-[#8B3D28] hover:text-[#722F1E] bg-[#8B3D28]/5 border-2 border-[#8B3D28]/20 hover:border-[#8B3D28]/40'
                 }`}
             >
               {isMapSelected ? (
@@ -875,23 +872,12 @@ export default function Checkout() {
       {/* Main Product Card */}
       <div className="px-4 md:px-6 lg:px-8 py-2 md:py-3 bg-white border-b border-neutral-200">
         <div className="bg-white rounded-lg border border-neutral-200 p-2.5">
-          {/* Delivery info */}
-          <div className="flex items-center gap-1.5 mb-2">
-            <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2" />
-                <path d="M12 6v6l4 2" stroke="white" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </div>
-            <span className="text-xs font-semibold text-neutral-900">Delivery in {appConfig.estimatedDeliveryTime}</span>
-          </div>
-
           <p className="text-[10px] text-neutral-600 mb-2.5">Shipment of {displayCart.itemCount || 0} {(displayCart.itemCount || 0) === 1 ? 'item' : 'items'}</p>
 
           {/* Cart Items */}
           <div className="space-y-2.5">
-            {displayItems.filter(item => item.product).map((item) => (
-              <div key={item.product?.id || Math.random()} className="flex gap-2">
+            {displayItems.filter(item => item && item.product).map((item) => (
+              <div key={(item.product?.id || item.product?._id) || Math.random().toString()} className="flex gap-2">
                 {/* Product Image */}
                 <div className="w-12 h-12 bg-neutral-100 rounded-lg flex-shrink-0 overflow-hidden">
                   {item.product?.imageUrl ? (
@@ -915,31 +901,34 @@ export default function Checkout() {
                   <p className="text-[10px] text-neutral-600 mb-0.5">
                     {item.quantity} × {item.variant || (item.product as any).variantTitle || (item.product as any).pack || item.product?.pack}
                   </p>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMoveToWishlist(item.product);
-                    }}
-                    className="text-[10px] text-green-600 font-medium mb-1.5 hover:text-green-700 transition-colors"
-                  >
-                    Move to wishlist
-                  </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMoveToWishlist(item.product);
+                      }}
+                      className="text-[10px] text-[#8B3D28] font-bold mb-1.5 hover:text-[#722F1E] transition-colors font-poppins"
+                    >
+                      Move to wishlist
+                    </button>
 
                   {/* Quantity Selector */}
                   <div className="flex items-center justify-between mt-1.5">
-                    <div className="flex items-center gap-1.5 bg-white border-2 border-green-600 rounded-full px-1.5 py-0.5">
+                    <div className="flex items-center gap-1.5 bg-white border-2 border-[#8B3D28] rounded-full px-1.5 py-0.5">
                       <button
-                        onClick={() => updateQuantity(item.product?.id, item.quantity - 1, item.variant)}
-                        className="w-5 h-5 flex items-center justify-center text-green-600 font-bold hover:bg-green-50 rounded-full transition-colors text-xs"
+                        onClick={() => updateQuantity((item.product?.id || item.product?._id) as string, item.quantity - 1, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
+                        className="w-5 h-5 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-[#8B3D28]/10 rounded-full transition-colors text-xs"
                       >
                         −
                       </button>
-                      <span className="text-xs font-bold text-green-600 min-w-[1.25rem] text-center">
-                        {item.quantity}
-                      </span>
+                      <QuantityInput
+                        value={item.quantity}
+                        min={0}
+                        onChange={(val) => updateQuantity((item.product?.id || item.product?._id) as string, val, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
+                        className="text-xs font-bold text-[#8B3D28] w-8 text-center font-poppins bg-transparent border-none focus:outline-none"
+                      />
                       <button
-                        onClick={() => updateQuantity(item.product?.id, item.quantity + 1, item.variant)}
-                        className="w-5 h-5 flex items-center justify-center text-green-600 font-bold hover:bg-green-50 rounded-full transition-colors text-xs"
+                        onClick={() => updateQuantity((item.product?.id || item.product?._id) as string, item.quantity + 1, item.variant || (item.product as any).variantId, (item.product as any).variantTitle || (item.product as any).pack)}
+                        className="w-5 h-5 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-[#8B3D28]/10 rounded-full transition-colors text-xs"
                       >
                         +
                       </button>
@@ -973,225 +962,22 @@ export default function Checkout() {
       <div className="px-4 md:px-6 lg:px-8 py-2.5 md:py-3 border-b border-neutral-200">
         <h2 className="text-sm font-semibold text-neutral-900 mb-2">You might also like</h2>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-3" style={{ scrollSnapType: 'x mandatory' }}>
-          {similarProducts.map((product) => {
-            // Get price details
-            const { displayPrice, mrp, discount, hasDiscount } = calculateProductPrice(product);
-
-            // Get quantity in cart
-            const productId = product.id || product._id;
-            const inCartItem = (cart?.items || []).find(item => {
-              const itemProductId = item.product?.id || item.product?._id;
-              return itemProductId === productId;
-            });
-            const inCartQty = inCartItem?.quantity || 0;
-
-            return (
-              <div
-                key={product.id}
-                className="flex-shrink-0 w-[140px]"
-                style={{ scrollSnapAlign: 'start' }}
-              >
-                <div className="bg-white rounded-lg overflow-hidden flex flex-col relative h-full" style={{ boxShadow: '0 1px 1px rgba(0, 0, 0, 0.03)' }}>
-                  {/* Product Image Area */}
-                  <div
-                    onClick={() => navigate(`/product/${product.id || product._id}`)}
-                    className="relative block cursor-pointer"
-                  >
-                    <div className="w-full h-28 bg-neutral-100 flex items-center justify-center overflow-hidden relative">
-                      {product.imageUrl || product.mainImage ? (
-                        <img
-                          src={product.imageUrl || product.mainImage}
-                          alt={product.name || product.productName || 'Product'}
-                          className="w-full h-full object-contain"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent && !parent.querySelector('.fallback-icon')) {
-                              const fallback = document.createElement('div');
-                              fallback.className = 'w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-4xl fallback-icon';
-                              fallback.textContent = (product.name || product.productName || '?').charAt(0).toUpperCase();
-                              parent.appendChild(fallback);
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-4xl">
-                          {(product.name || product.productName || '?').charAt(0).toUpperCase()}
-                        </div>
-                      )}
-
-                      {/* Red Discount Badge - Top Left */}
-                      {discount > 0 && (
-                        <div className="absolute top-1 left-1 z-10 bg-red-600 text-white text-[9px] font-bold px-1 py-0.5 rounded">
-                          {discount}% OFF
-                        </div>
-                      )}
-
-                      {/* Heart Icon - Top Right */}
-                      <WishlistButton
-                        productId={product.id || product._id}
-                        size="sm"
-                        className="top-1 right-1 shadow-sm"
-                      />
-
-                      {/* ADD Button or Quantity Stepper - Overlaid on bottom right of image */}
-                      <div className="absolute bottom-1.5 right-1.5 z-10">
-                        <AnimatePresence mode="wait">
-                          {inCartQty === 0 ? (
-                            <motion.button
-                              key="add-button"
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              transition={{ duration: 0.2 }}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                addToCart(product, e.currentTarget);
-                              }}
-                              className="bg-white/95 backdrop-blur-sm text-green-600 border-2 border-green-600 text-[10px] font-semibold px-2 py-1 rounded shadow-md hover:bg-white transition-colors"
-                            >
-                              ADD
-                            </motion.button>
-                          ) : (
-                            <motion.div
-                              key="stepper"
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              transition={{ duration: 0.2 }}
-                              className="flex items-center gap-1 bg-green-600 rounded px-1.5 py-1 shadow-md"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  updateQuantity(productId, inCartQty - 1);
-                                }}
-                                className="w-4 h-4 flex items-center justify-center text-white font-bold hover:bg-green-700 rounded transition-colors p-0 leading-none"
-                                style={{ lineHeight: 1, fontSize: '14px' }}
-                              >
-                                <span className="relative top-[-1px]">−</span>
-                              </motion.button>
-                              <motion.span
-                                key={inCartQty}
-                                initial={{ scale: 1.2, y: -2 }}
-                                animate={{ scale: 1, y: 0 }}
-                                transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-                                className="text-white font-bold min-w-[0.75rem] text-center"
-                                style={{ fontSize: '12px' }}
-                              >
-                                {inCartQty}
-                              </motion.span>
-                              <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  updateQuantity(productId, inCartQty + 1);
-                                }}
-                                className="w-4 h-4 flex items-center justify-center text-white font-bold hover:bg-green-700 rounded transition-colors p-0 leading-none"
-                                style={{ lineHeight: 1, fontSize: '14px' }}
-                              >
-                                <span className="relative top-[-1px]">+</span>
-                              </motion.button>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Product Details */}
-                  <div className="p-1.5 flex-1 flex flex-col bg-white">
-                    {/* Light Grey Tags */}
-                    <div className="flex gap-0.5 mb-0.5">
-                      <div className="bg-neutral-200 text-neutral-700 text-[8px] font-medium px-1 py-0.5 rounded">
-                        {product.pack || '1 unit'}
-                      </div>
-                      {product.pack && (product.pack.includes('g') || product.pack.includes('kg')) && (
-                        <div className="bg-neutral-200 text-neutral-700 text-[8px] font-medium px-1 py-0.5 rounded">
-                          {product.pack.replace(/[gk]/gi, '').trim()} GSM
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Product Name */}
-                    <div
-                      onClick={() => navigate(`/product/${product.id || product._id}`)}
-                      className="mb-0.5 cursor-pointer"
-                    >
-                      <h3 className="text-[10px] font-bold text-neutral-900 line-clamp-2 leading-tight">
-                        {product.name || product.productName || 'Product'}
-                      </h3>
-                    </div>
-
-                    {/* Rating and Reviews */}
-                    <div className="flex items-center gap-0.5 mb-0.5">
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <svg
-                            key={i}
-                            width="8"
-                            height="8"
-                            viewBox="0 0 24 24"
-                            fill={i < 4 ? '#fbbf24' : '#e5e7eb'}
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                          </svg>
-                        ))}
-                      </div>
-                      <span className="text-[8px] text-neutral-500">(85)</span>
-                    </div>
-
-                    {/* Delivery Time */}
-                    <div className="text-[9px] text-neutral-600 mb-0.5">
-                      20 MINS
-                    </div>
-
-                    {/* Discount - Blue Text */}
-                    {discount > 0 && (
-                      <div className="text-[9px] text-blue-600 font-semibold mb-0.5">
-                        {discount}% OFF
-                      </div>
-                    )}
-
-                    {/* Price */}
-                    <div className="mb-1">
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-[13px] font-bold text-neutral-900">
-                          ₹{(displayPrice || 0).toLocaleString('en-IN')}
-                        </span>
-                        {hasDiscount && (
-                          <span className="text-[10px] text-neutral-400 line-through">
-                            ₹{(mrp || 0).toLocaleString('en-IN')}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Bottom Link */}
-                    <div
-                      onClick={() => navigate(`/category/${product.categoryId || product.category || 'all'}`)}
-                      className="w-full bg-green-100 text-green-700 text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 hover:bg-green-200 transition-colors mt-auto cursor-pointer"
-                    >
-                      <span>See more like this</span>
-                      <div className="flex items-center gap-0.5">
-                        <div className="w-px h-2 bg-green-300"></div>
-                        <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M0 0L8 4L0 8Z" fill="#16a34a" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {similarProducts.map((p) => (
+            <div
+              key={p.id || p._id}
+              className="flex-shrink-0 w-36"
+              style={{ scrollSnapAlign: 'start' }}
+            >
+              <ProductCard
+                product={p}
+                compact={true}
+                showBadge={true}
+                showHeartIcon={true}
+                categoryStyle={true}
+                className="!bg-white !shadow-none !border-neutral-100"
+              />
+            </div>
+          ))}
         </div>
       </div>
 
@@ -1226,21 +1012,21 @@ export default function Checkout() {
       {/* Coupon Section */}
       {selectedCoupon ? (
         <div className="px-4 py-1.5 border-b border-neutral-200">
-          <div className="flex items-center justify-between bg-green-50 rounded-lg p-2 border border-green-200">
+          <div className="flex items-center justify-between bg-[#8B3D28]/5 rounded-lg p-2 border border-[#8B3D28]/20">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+              <div className="w-6 h-6 rounded-full bg-[#8B3D28] flex items-center justify-center flex-shrink-0">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M20 6L9 17l-5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-green-700 truncate">{selectedCoupon.code}</p>
-                <p className="text-[10px] text-green-600 truncate">{selectedCoupon.title}</p>
+                <p className="text-xs font-black text-[#8B3D28] truncate font-poppins">{selectedCoupon.code}</p>
+                <p className="text-[10px] text-[#8B3D28]/80 truncate font-medium">{selectedCoupon.title}</p>
               </div>
             </div>
             <button
               onClick={handleRemoveCoupon}
-              className="text-xs text-green-600 font-medium ml-2 flex-shrink-0"
+              className="text-xs text-[#8B3D28] font-black ml-2 flex-shrink-0 font-poppins"
             >
               Remove
             </button>
@@ -1305,7 +1091,7 @@ export default function Checkout() {
               <span className="text-xs text-neutral-700">Delivery charge</span>
             </div>
             <div className="flex flex-col items-end">
-              <span className={`text-xs font-medium ${deliveryCharge === 0 ? 'text-green-600' : 'text-neutral-900'}`}>
+              <span className={`text-xs font-black font-poppins ${deliveryCharge === 0 ? 'text-[#8B3D28]' : 'text-neutral-900'}`}>
                 {deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}
               </span>
               {deliveryCharge > 0 && (
@@ -1322,11 +1108,11 @@ export default function Checkout() {
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <span className="text-xs text-neutral-700">Coupon discount</span>
-                <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">
+                <span className="text-[10px] bg-[#8B3D28]/10 text-[#8B3D28] px-1.5 py-0.5 rounded-full font-bold font-poppins">
                   {selectedCoupon.code}
                 </span>
               </div>
-              <span className="text-xs font-medium text-green-600">-₹{currentCouponDiscount.toLocaleString('en-IN')}</span>
+              <span className="text-xs font-black text-[#8B3D28] font-poppins">-₹{currentCouponDiscount.toLocaleString('en-IN')}</span>
             </div>
           )}
 
@@ -1399,8 +1185,8 @@ export default function Checkout() {
               setTipAmount(20);
               setShowCustomTipInput(false);
             }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs ${tipAmount === 20 && !showCustomTipInput
-              ? 'border-green-600 bg-green-50 text-green-700'
+            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-bold text-xs font-poppins ${tipAmount === 20 && !showCustomTipInput
+              ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
               : 'border-neutral-300 bg-white text-neutral-700'
               }`}
           >
@@ -1411,8 +1197,8 @@ export default function Checkout() {
               setTipAmount(30);
               setShowCustomTipInput(false);
             }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs ${tipAmount === 30 && !showCustomTipInput
-              ? 'border-green-600 bg-green-50 text-green-700'
+            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-bold text-xs font-poppins ${tipAmount === 30 && !showCustomTipInput
+              ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
               : 'border-neutral-300 bg-white text-neutral-700'
               }`}
           >
@@ -1423,8 +1209,8 @@ export default function Checkout() {
               setTipAmount(50);
               setShowCustomTipInput(false);
             }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs ${tipAmount === 50 && !showCustomTipInput
-              ? 'border-green-600 bg-green-50 text-green-700'
+            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-bold text-xs font-poppins ${tipAmount === 50 && !showCustomTipInput
+              ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
               : 'border-neutral-300 bg-white text-neutral-700'
               }`}
           >
@@ -1435,8 +1221,8 @@ export default function Checkout() {
               setShowCustomTipInput(true);
               setTipAmount(null);
             }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs ${showCustomTipInput
-              ? 'border-green-600 bg-green-50 text-green-700'
+            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-bold text-xs font-poppins ${showCustomTipInput
+              ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
               : 'border-neutral-300 bg-white text-neutral-700'
               }`}
           >
@@ -1463,7 +1249,7 @@ export default function Checkout() {
                 }
               }}
               placeholder="Enter custom tip amount"
-              className="flex-1 px-3 py-1.5 bg-white border-2 border-green-600 rounded-lg text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-green-500"
+              className="flex-1 px-3 py-1.5 bg-white border-2 border-[#8B3D28] rounded-lg text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
               min="0"
               step="1"
             />
@@ -1486,13 +1272,13 @@ export default function Checkout() {
         <button
           onClick={() => setGiftPackaging(!giftPackaging)}
           className={`w-full flex items-center justify-between rounded-lg p-2 transition-colors ${giftPackaging
-            ? 'bg-green-50 border-2 border-green-600'
+            ? 'bg-[#8B3D28]/5 border-2 border-[#8B3D28]'
             : 'bg-neutral-50 border-2 border-transparent hover:bg-neutral-100'
             }`}
         >
           <div className="flex items-center gap-2">
             <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${giftPackaging
-              ? 'border-green-600 bg-green-600'
+              ? 'border-[#8B3D28] bg-[#8B3D28]'
               : 'border-neutral-400 bg-white'
               }`}>
               {giftPackaging && (
@@ -1505,7 +1291,7 @@ export default function Checkout() {
               <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2z" stroke="currentColor" strokeWidth="2" fill="none" />
             </svg>
             <div className="text-left">
-              <p className={`text-xs font-semibold ${giftPackaging ? 'text-green-700' : 'text-neutral-900'}`}>
+              <p className={`text-xs font-black font-poppins ${giftPackaging ? 'text-[#8B3D28]' : 'text-neutral-900'}`}>
                 Gift Packaging
               </p>
               <p className="text-[10px] text-neutral-600">
@@ -1514,7 +1300,7 @@ export default function Checkout() {
             </div>
           </div>
           {giftPackaging && (
-            <span className="text-xs font-semibold text-green-600">₹30</span>
+            <span className="text-xs font-black text-[#8B3D28] font-poppins">₹30</span>
           )}
         </button>
       </div>
@@ -1542,7 +1328,7 @@ export default function Checkout() {
               ❤️
             </motion.span>
             <span className="text-[10px] font-medium">by</span>
-            <span className="text-[10px] font-semibold text-green-600">Village Basket</span>
+            <span className="text-[10px] font-black text-[#8B3D28] font-poppins underline decoration-[#8B3D28]/30 underline-offset-2">Village Basket</span>
           </div>
         </div>
       </div>
@@ -1576,7 +1362,7 @@ export default function Checkout() {
                   }
                 }}
                 placeholder="Enter 15-character GSTIN"
-                className="w-full px-4 py-3 bg-white border-2 border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full px-4 py-3 bg-white border-2 border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                 maxLength={15}
               />
               <p className="text-xs text-neutral-500 mt-1">
@@ -1591,7 +1377,7 @@ export default function Checkout() {
                   alert('Please enter a valid 15-character GSTIN');
                 }
               }}
-              className="w-full bg-green-600 text-white py-3 px-4 font-bold text-sm uppercase tracking-wide hover:bg-green-700 transition-colors rounded-lg"
+              className="w-full bg-[#8B3D28] text-white py-3 px-4 font-black text-sm uppercase tracking-widest hover:bg-[#722F1E] transition-colors rounded-lg font-poppins"
             >
               Save GSTIN
             </button>
@@ -1690,7 +1476,7 @@ export default function Checkout() {
                     <div
                       key={coupon._id}
                       className={`border-2 rounded-lg p-2.5 transition-all ${isSelected
-                        ? 'border-green-600 bg-green-50'
+                        ? 'border-[#8B3D28] bg-[#8B3D28]/10'
                         : meetsMinOrder
                           ? 'border-neutral-200 bg-white'
                           : 'border-neutral-200 bg-neutral-50 opacity-60'
@@ -1699,8 +1485,8 @@ export default function Checkout() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-bold text-green-600">{coupon.code}</span>
-                            <span className="text-xs font-semibold text-neutral-900">{coupon.title}</span>
+                            <span className="text-xs font-black text-[#8B3D28] font-poppins">{coupon.code}</span>
+                            <span className="text-xs font-bold text-neutral-900 font-poppins">{coupon.title}</span>
                           </div>
                           <p className="text-[10px] text-neutral-600 mb-1">{coupon.description}</p>
                           {coupon.minOrderValue && (
@@ -1710,18 +1496,18 @@ export default function Checkout() {
                           )}
                         </div>
                         {isSelected ? (
-                          <div className="flex items-center gap-1 text-green-600">
+                          <div className="flex items-center gap-1 text-[#8B3D28]">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
-                            <span className="text-xs font-medium">Applied</span>
+                            <span className="text-xs font-bold font-poppins">Applied</span>
                           </div>
                         ) : (
                           <button
                             onClick={() => meetsMinOrder && handleApplyCoupon(coupon)}
                             disabled={!meetsMinOrder || isValidatingCoupon}
-                            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${meetsMinOrder
-                              ? 'bg-green-600 text-white hover:bg-green-700'
+                            className={`px-3 py-1 rounded text-xs font-black uppercase transition-colors font-poppins shadow-sm ${meetsMinOrder
+                              ? 'bg-[#8B3D28] text-white hover:bg-[#722F1E]'
                               : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
                               }`}
                           >
@@ -1744,8 +1530,8 @@ export default function Checkout() {
           <button
             onClick={handlePlaceOrder}
             disabled={cart.items.length === 0}
-            className={`w-full py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors ${cart.items.length > 0
-              ? 'bg-green-600 text-white hover:bg-green-700'
+            className={`w-full py-4 px-4 font-black font-poppins text-base uppercase tracking-widest transition-all ${cart.items.length > 0
+              ? 'bg-[#8B3D28] text-white hover:bg-[#722F1E] active:scale-95'
               : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
               }`}
           >
@@ -1758,9 +1544,9 @@ export default function Checkout() {
                 editAddress: savedAddress
               }
             })}
-            className="w-full bg-green-600 text-white py-3 px-4 font-bold text-sm uppercase tracking-wide hover:bg-green-700 transition-colors"
+            className="w-full bg-[#8B3D28] text-white py-4 px-4 font-black font-poppins text-base uppercase tracking-widest hover:bg-[#722F1E] transition-all active:scale-95"
           >
-            Choose address at next step
+            Choose address
           </button>
         )}
       </div>

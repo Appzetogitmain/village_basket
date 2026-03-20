@@ -2,15 +2,19 @@ import { useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useRef, useState, useEffect, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { getTheme } from '../../../utils/themes';
-import { useLocation } from '../../../hooks/useLocation';
+import { useLoading } from '../../../context/LoadingContext';
+import { useLocation as useUserLocation } from '../../../hooks/useLocation';
 import { useThemeContext } from '../../../context/ThemeContext';
 import { appConfig } from '../../../services/configService';
 import { getCategories } from '../../../services/api/customerProductService';
 import { Category } from '../../../types/domain';
 import { getHeaderCategoriesPublic } from '../../../services/api/headerCategoryService';
+import { getHomeContent } from '../../../services/api/customerHomeService';
 import { getIconByName } from '../../../utils/iconLibrary';
 import homeIcon from '@assets/category/home_v2.png';
+import { useCart } from '../../../context/CartContext';
+import { useAuth } from '../../../context/AuthContext';
+import brandLogo from '@assets/village_basket-removebg-preview.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -69,7 +73,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
     fetchHeaderCategories();
   }, []);
   const navigate = useNavigate();
-  const { location: userLocation } = useLocation();
+  const { location: userLocation } = useUserLocation();
   const heroRef = useRef<HTMLDivElement>(null);
   const topSectionRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
@@ -273,14 +277,23 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
     };
   }, [activeTab]);
 
+  const { startRouteLoading } = useLoading();
+
+  const handleSearchClick = () => {
+    // Navigate directly - the global useRouteLoader hook handles the transition animation
+    navigate('/search');
+  };
+
   const handleTabClick = (tabId: string) => {
     onTabChange?.(tabId);
     // Don't scroll - keep page at current position
   };
 
   const { currentTheme } = useThemeContext();
+  const { cart } = useCart();
+  const { isAuthenticated } = useAuth();
   const theme = currentTheme;
-  const heroGradient = `linear-gradient(to bottom right, ${theme.primary[0]}, ${theme.primary[1]}, ${theme.primary[2]})`;
+  // Use theme constant instead of hardcoded yellow gradient background
 
   // Helper to convert RGB to RGBA
   const rgbToRgba = (rgb: string, alpha: number) => {
@@ -290,14 +303,106 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
   return (
     <div
       ref={heroRef}
+      className="bg-transparent paper-texture"
       style={{
-        background: heroGradient,
         paddingBottom: 0,
         marginBottom: 0,
       }}
     >
-      {/* Top section with delivery info and buttons - NOT sticky */}
-      <div>
+      <div
+        className="md:hidden pt-3 pb-3 px-4 relative z-10 overflow-hidden"
+        style={{
+          backgroundColor: '#8B3D28',
+          borderBottomLeftRadius: '24px',
+          borderBottomRightRadius: '24px',
+          boxShadow: '0 8px 25px rgba(139, 61, 40, 0.25)'
+        }}
+      >
+        {/* Decorative Warli Pattern Overlay */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+
+        {/* Top Row: Logo & Cart */}
+        <div className="flex items-center justify-between mb-2.5 relative z-20">
+          <div className="flex items-center gap-2">
+            <div className="bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/20">
+              <img
+                src={brandLogo}
+                alt="Village Basket"
+                className="h-7 w-auto object-contain brightness-125"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={() => navigate('/checkout')}
+            className="w-8 h-8 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white relative active:scale-90 transition-transform"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
+              <path d="M3 6h18" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            {(cart?.itemCount || 0) > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#4A7C59] text-white text-[8px] font-black rounded-md min-w-[14px] h-[14px] px-1 flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
+                {cart?.itemCount || 0}
+              </span>
+            )}
+          </button>
+        </div>
+
+        <div className="mb-2.5 relative z-20">
+          <div
+            onClick={handleSearchClick}
+            className="w-full bg-white rounded-xl px-3.5 py-2 flex items-center gap-2.5 shadow-[0_4px_12px_rgba(0,0,0,0.08)] cursor-pointer group active:scale-[0.98] transition-all"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B3D28" strokeWidth="3" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <div className="flex-1 relative h-4 overflow-hidden">
+              {searchSuggestions.map((suggestion, index) => {
+                const isActive = index === currentSearchIndex;
+                return (
+                  <div
+                    key={suggestion}
+                    className={`absolute inset-0 flex items-center transition-all duration-500 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                  >
+                    <span className="text-neutral-400 text-[12px] font-bold">Search &quot;{suggestion}&quot;</span>
+                  </div>
+                );
+              })}
+            </div>
+            {/* Mic Icon for Voice Search Cue */}
+            <div className="text-neutral-400 pl-1 border-l border-neutral-100">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Delivery Address Pill */}
+        <div 
+          onClick={() => navigate('/location')}
+          className="flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2.5 py-1.5 border border-white/5 active:scale-[0.98] transition-all cursor-pointer relative z-20"
+        >
+          <div className="w-4 h-4 rounded-full bg-[#4A7C59] flex items-center justify-center shadow-sm">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+            </svg>
+          </div>
+          <span className="text-[9px] text-white/80 font-black truncate flex-1 uppercase tracking-tight">
+            {locationDisplayText || 'Set delivery location'}
+          </span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-30">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Legacy/Desktop Header - Hidden on Mobile */}
+      <div className="hidden md:block">
         <div ref={topSectionRef} className="px-4 md:px-6 lg:px-8 pt-2 md:pt-3 pb-0">
           <div className="flex items-start justify-between mb-2 md:mb-2">
             {/* Left: Text content */}
@@ -307,7 +412,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
                 <img src="/assets/village_basket-removebg-preview.png" alt="Village Basket" className="h-[38px] md:h-[46px] object-contain" />
               </div>
               {/* Delivery time - large, bold, dark grey/black */}
-              <div className="text-neutral-900 font-extrabold text-2xl md:text-xl mb-0 md:mb-0.5 leading-tight">{appConfig.estimatedDeliveryTime}</div>
+              
               {/* Location with dropdown indicator - only show if location is provided */}
               {locationDisplayText && (
                 <div className="text-neutral-700 text-[10px] md:text-xs flex items-center gap-0.5 leading-tight">
@@ -327,84 +432,49 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
         ref={stickyRef}
         className="sticky top-0 z-50"
         style={{
-          ...(scrollProgress >= 0.1 && {
-            background: `linear-gradient(to bottom right,
-              ${rgbToRgba(theme.primary[0], 1 - scrollProgress)},
-              ${rgbToRgba(theme.primary[1], 1 - scrollProgress)},
-              ${rgbToRgba(theme.primary[2], 1 - scrollProgress)}),
-              rgba(255, 255, 255, ${scrollProgress})`,
-            boxShadow: `0 4px 6px -1px rgba(0, 0, 0, ${scrollProgress * 0.1})`,
-            transition: 'background 0.1s ease-out, box-shadow 0.1s ease-out',
-          }),
+          background: scrollProgress >= 0.1 
+            ? `rgba(139, 61, 40, ${Math.min(1, scrollProgress * 1.2)})` 
+            : 'transparent',
+          backdropFilter: scrollProgress >= 0.1 ? `blur(${scrollProgress * 8}px)` : 'none',
+          boxShadow: scrollProgress >= 0.1 ? `0 4px 15px rgba(0, 0, 0, 0.15)` : 'none',
+          transition: 'background 0.3s ease-out, backdrop-filter 0.3s ease-out, box-shadow 0.3s ease-out',
         }}
       >
-        <div className="px-4 md:px-6 lg:px-8 pt-2 md:pt-2 pb-2 md:pb-2">
-          {/* Search Bar */}
+        <div className="px-4 md:px-6 lg:px-8 pt-2 md:pt-2 pb-2 md:pb-2 hidden md:block">
+          {/* Desktop Search Bar Only - Animated Search moved into Top Row for Mobile */}
           <div
-            onClick={() => navigate('/search')}
-            className="w-full md:w-auto md:max-w-xl md:mx-auto rounded-xl shadow-lg px-3 py-2 md:px-3 md:py-1.5 flex items-center gap-2 cursor-pointer hover:shadow-xl transition-all duration-300 mb-2 md:mb-1.5 bg-white"
-            style={{
-              backgroundColor: scrollProgress > 0.1 ? `rgba(249, 250, 251, ${scrollProgress})` : 'white',
-              border: scrollProgress > 0.1 ? `1px solid rgba(229, 231, 235, ${scrollProgress})` : 'none',
-            }}
+            onClick={handleSearchClick}
+            className={`w-full md:w-auto md:max-w-xl md:mx-auto rounded-2xl shadow-lg px-3 py-2 md:px-3 md:py-1.5 flex items-center gap-2 cursor-pointer hover:shadow-xl transition-all duration-300 mb-2 md:mb-1.5 ${scrollProgress > 0.5 ? 'bg-white shadow-inner' : 'bg-white'}`}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 md:w-4 md:h-4">
-              <circle cx="11" cy="11" r="8" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" />
-              <path d="m21 21-4.35-4.35" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" className="text-neutral-400">
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <div className="flex-1 relative h-4 md:h-4 overflow-hidden">
-              {searchSuggestions.map((suggestion, index) => {
-                const isActive = index === currentSearchIndex;
-                const prevIndex = (currentSearchIndex - 1 + searchSuggestions.length) % searchSuggestions.length;
-                const isPrev = index === prevIndex;
-
-                return (
-                  <div
-                    key={suggestion}
-                    className={`absolute inset-0 flex items-center transition-all duration-500 ${isActive
-                      ? 'translate-y-0 opacity-100'
-                      : isPrev
-                        ? '-translate-y-full opacity-0'
-                        : 'translate-y-full opacity-0'
-                      }`}
-                  >
-                    <span className={`text-xs md:text-xs`} style={{ color: scrollProgress > 0.5 ? '#9ca3af' : '#6b7280' }}>
-                      Search &apos;{suggestion}&apos;
-                    </span>
-                  </div>
-                );
-              })}
+            <span className="flex-1 text-neutral-400 font-medium text-sm">Search for products...</span>
+            <div className="text-neutral-300 ml-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+              </svg>
             </div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 md:w-4 md:h-4">
-              <path d="M12 1C13.1 1 14 1.9 14 3C14 4.1 13.1 5 12 5C10.9 5 10 4.1 10 3C10 1.9 10.9 1 12 1Z" fill={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} />
-              <path d="M19 10V17C19 18.1 18.1 19 17 19H7C5.9 19 5 18.1 5 17V10" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12 11V17" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" />
-              <path d="M8 11V17" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" />
-              <path d="M16 11V17" stroke={scrollProgress > 0.5 ? "#9ca3af" : "#6b7280"} strokeWidth="2" strokeLinecap="round" />
-            </svg>
           </div>
         </div>
 
         {/* Category Tabs Section */}
         <div className="w-full relative" style={{ paddingTop: '12px', paddingBottom: '24px' }}>
           <div className="px-4 md:px-6 lg:px-8 mb-4">
-            <h2 className="text-lg md:text-xl font-bold text-neutral-900 tracking-tight">
+            <h2 className={`text-lg md:text-xl font-bold tracking-tight font-poppins transition-colors ${scrollProgress > 0.5 ? 'text-white' : 'text-village-umber'}`}>
               Popular Categories
             </h2>
           </div>
           <div
             ref={tabsContainerRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide px-4 md:px-6 lg:px-8 md:justify-center scroll-smooth"
+            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide px-4 md:px-6 lg:px-8 md:justify-center scroll-smooth py-4"
           >
 
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
-              const tabColor = isActive
-                ? 'text-neutral-900'
-                : scrollProgress > 0.5
-                  ? 'text-neutral-600'
-                  : 'text-neutral-800';
-
+              
               return (
                 <button
                   key={tab.id}
@@ -420,17 +490,17 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
                   type="button"
                 >
                   <div
-                    className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 ${isActive
-                      ? 'bg-white shadow-[0_0_0_3px_#111827,0_4px_12px_rgba(0,0,0,0.15)] scale-110 z-20'
+                    className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center overflow-hidden transition-all duration-300 ${isActive
+                      ? 'bg-white shadow-[0_0_0_3px_#8B3D28,0_4px_12px_rgba(139,61,40,0.25)] scale-110 z-20'
                       : 'bg-white shadow-md border border-neutral-100 hover:shadow-lg group-hover:scale-105'
                       }`}
                   >
-                    <div className="w-full h-full transition-all duration-300">
+                    <div className="w-full h-full transition-all duration-300 p-1">
                       {tab.icon}
                     </div>
                   </div>
                   <span
-                    className={`text-[10px] md:text-sm text-center font-bold leading-tight max-w-[80px] transition-all duration-300 ${isActive ? 'text-neutral-900 scale-105' : 'text-neutral-500'
+                    className={`text-[10px] md:text-sm text-center font-bold font-poppins leading-tight max-w-[80px] transition-all duration-300 ${isActive ? 'text-[#8B3D28] scale-105' : 'text-village-umber/70'
                       }`}
                   >
                     {tab.label}

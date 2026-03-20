@@ -58,11 +58,11 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
         loop
       />
 
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-300">
+      <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-300">
         {/* Header */}
-        <div className={`px-6 py-4 flex items-center justify-between ${notification.type === 'NEW_ORDER' ? 'bg-teal-600' : 'bg-blue-600'} text-white`}>
+        <div className={`px-6 py-4 flex items-center justify-between ${notification.type === 'NEW_ORDER' ? 'bg-[#4A7C59]' : 'bg-blue-600'} text-white`}>
           <div className="flex items-center gap-3">
-            <div className="bg-white bg-opacity-20 p-2 rounded-full">
+            <div className="bg-white/90 backdrop-blur-md border-white/20 bg-opacity-20 p-2 rounded-full">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -77,7 +77,7 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:bg-white hover:bg-opacity-10 p-1 rounded-full transition-colors"
+            className="text-white hover:bg-white/90 backdrop-blur-md border-white/20 hover:bg-opacity-10 p-1 rounded-full transition-colors"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -89,7 +89,7 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
         {/* Content */}
         <div className="p-6 max-h-[70vh] overflow-y-auto">
           {/* Volume Control */}
-          <div className="mb-6 bg-neutral-50 p-3 rounded-lg flex items-center gap-4">
+          <div className="mb-6 bg-white/40 p-3 rounded-lg flex items-center gap-4">
             <span className="text-neutral-500">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -110,7 +110,7 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
           {/* Customer Info */}
           <section className="mb-6">
             <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-3">Customer Information</h3>
-            <div className="bg-neutral-50 rounded-lg p-4">
+            <div className="bg-white/40 rounded-lg p-4">
               <p className="font-bold text-neutral-800 text-lg">{notification.customer.name}</p>
               <p className="text-neutral-600 flex items-center gap-2 mt-1">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -150,21 +150,21 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
 
               <div className="flex justify-between items-center pt-4 mt-2 border-t-2 border-neutral-100">
                 <span className="text-lg font-bold text-neutral-800">Total (Your Items)</span>
-                <span className="text-2xl font-black text-teal-600">₹{notification.totalAmount.toFixed(2)}</span>
+                <span className="text-2xl font-black text-[#4A7C59]">₹{notification.totalAmount.toFixed(2)}</span>
               </div>
             </div>
           </section>
         </div>
 
         {/* Footer */}
-        <div className="p-6 bg-neutral-50 border-t border-neutral-200">
+        <div className="p-6 bg-white/40 border-t border-neutral-200">
 
           {notification.type === 'NEW_ORDER' ? (
              <div className="flex gap-4">
                <button
                  onClick={() => handleStatusUpdate('Accepted')}
                  disabled={loading}
-                 className="flex-1 py-4 rounded-xl font-bold text-white shadow-lg bg-teal-600 hover:bg-teal-700 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                 className="flex-1 py-4 rounded-xl font-bold text-white shadow-lg bg-[#4A7C59] hover:bg-teal-700 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                >
                  {loading ? 'Please wait...' : 'Accept Order'}
                </button>
@@ -195,3 +195,4 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
 };
 
 export default SellerNotificationAlert;
+

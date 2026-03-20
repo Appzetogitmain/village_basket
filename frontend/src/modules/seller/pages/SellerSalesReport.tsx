@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getSalesReport, SalesReport } from '../../../services/api/reportService';
 
@@ -80,7 +80,7 @@ export default function SellerSalesReport() {
 
     const SortIcon = ({ column }: { column: string }) => (
         <span className="text-neutral-300 text-[10px]">
-            {sortColumn === column ? (sortDirection === 'asc' ? 'â†‘' : 'â†“') : 'â‡…'}
+            {sortColumn === column ? (sortDirection === 'asc' ? '↑' : '↓') : '⇅'}
         </span>
     );
 
@@ -90,13 +90,13 @@ export default function SellerSalesReport() {
     };
 
     return (
-        <div className="flex flex-col h-full min-h-screen bg-neutral-50">
+        <div className="flex flex-col h-full min-h-screen bg-white/40">
             {/* Top Navigation/Header */}
-            <div className="bg-white border-b border-neutral-200 px-4 sm:px-6 py-4">
+            <div className="bg-white/90 backdrop-blur-md border-white/20 border-b border-neutral-200 px-4 sm:px-6 py-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <h1 className="text-2xl font-semibold text-neutral-900">Sales Report</h1>
+                    <h1 className="text-xl font-black text-village-umber uppercase tracking-tight">Sales Report</h1>
                     <div className="flex items-center gap-2 text-sm">
-                        <Link to="/seller" className="text-blue-600 hover:text-blue-700">
+                        <Link to="/seller" className="text-[#4A7C59] hover:text-[#3a6346] font-medium">
                             Home
                         </Link>
                         <span className="text-neutral-400">/</span>
@@ -107,9 +107,9 @@ export default function SellerSalesReport() {
 
             {/* Content Card */}
             <div className="flex-1 p-4 sm:p-6">
-                <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col">
+                <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 flex flex-col">
                     {/* Section Header */}
-                    <div className="bg-teal-600 text-white px-4 sm:px-6 py-3 rounded-t-lg">
+                    <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3 rounded-t-lg">
                         <h2 className="text-lg sm:text-xl font-semibold">View Sales Report</h2>
                     </div>
 
@@ -123,7 +123,7 @@ export default function SellerSalesReport() {
                                     type="text"
                                     value={fromDate && toDate ? `${fromDate} - ${toDate}` : ''}
                                     placeholder="Select date range"
-                                    className="pl-10 pr-3 py-2 bg-white border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none w-full sm:w-64"
+                                    className="pl-10 pr-3 py-2 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none w-full sm:w-64"
                                     readOnly
                                 />
                                 <svg
@@ -162,7 +162,7 @@ export default function SellerSalesReport() {
                                         setRowsPerPage(Number(e.target.value));
                                         setCurrentPage(1);
                                     }}
-                                    className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                                    className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
                                 >
                                     <option value={10}>10</option>
                                     <option value={20}>20</option>
@@ -196,7 +196,7 @@ export default function SellerSalesReport() {
                                     link.click();
                                     document.body.removeChild(link);
                                 }}
-                                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
+                                className="bg-[#4A7C59] hover:bg-[#3a6346] text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -214,7 +214,7 @@ export default function SellerSalesReport() {
                                 <span className="absolute left-2 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">Search:</span>
                                 <input
                                     type="text"
-                                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-teal-500 w-full sm:w-48"
+                                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#4A7C59] w-full sm:w-48"
                                     value={searchTerm}
                                     onChange={(e) => {
                                         setSearchTerm(e.target.value);
@@ -237,7 +237,7 @@ export default function SellerSalesReport() {
                         ) : (
                             <table className="w-full text-left border-collapse border border-neutral-200">
                                 <thead>
-                                    <tr className="bg-neutral-50 text-xs font-bold text-neutral-800">
+                                    <tr className="bg-white/40 text-xs font-bold text-neutral-800">
                                         <th
                                             className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
                                             onClick={() => handleSort('orderId')}
@@ -303,9 +303,9 @@ export default function SellerSalesReport() {
                                         </tr>
                                     ) : (
                                         reports.map((report, index) => (
-                                            <tr key={index} className="hover:bg-neutral-50">
+                                            <tr key={index} className="hover:bg-white/40">
                                                 <td className="p-4 border border-neutral-200 text-sm">
-                                                    <span className="text-blue-600 hover:text-blue-700 font-medium">
+                                                    <span className="text-[#4A7C59] font-medium">
                                                         {report.orderId}
                                                     </span>
                                                 </td>
@@ -345,7 +345,7 @@ export default function SellerSalesReport() {
                                         key={pageNum}
                                         onClick={() => setCurrentPage(pageNum)}
                                         className={`w-8 h-8 flex items-center justify-center border rounded transition-colors ${currentPage === pageNum
-                                            ? 'border-teal-600 bg-teal-600 text-white'
+                                            ? 'border-teal-600 bg-[#4A7C59] text-white'
                                             : 'border-teal-300 hover:bg-teal-50 text-neutral-900'
                                             }`}
                                     >
@@ -368,14 +368,16 @@ export default function SellerSalesReport() {
             </div>
 
             {/* Footer */}
-            <footer className="px-4 sm:px-6 py-4 text-center bg-white border-t border-neutral-200">
+            <footer className="px-4 sm:px-6 py-4 text-center bg-white/90 backdrop-blur-md border-white/20 border-t border-neutral-200">
                 <p className="text-xs sm:text-sm text-neutral-600">
-                    Copyright Â© 2025. Developed By{' '}
-                    <span className="font-semibold text-teal-600">Village Basket</span>
+                    Copyright © 2025. Developed By{' '}
+                    <span className="font-semibold text-[#4A7C59]">Village Basket</span>
                 </p>
             </footer>
         </div>
     );
 }
+
+
 
 

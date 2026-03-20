@@ -40,17 +40,17 @@ export default function Addresses() {
     };
 
     return (
-        <div className="pb-24 md:pb-8 bg-white min-h-screen">
+        <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
             <div className="px-4 py-4 bg-white border-b border-neutral-200 mb-4 sticky top-0 z-10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <button onClick={() => navigate(-1)} className="p-1">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </button>
-                    <h1 className="text-xl font-bold text-neutral-900">Saved Addresses</h1>
+                    <h1 className="text-xl font-black text-neutral-900 font-poppins uppercase tracking-tight">Saved Addresses</h1>
                 </div>
                 <Button
                     onClick={() => navigate('/checkout/address')}
-                    className="bg-green-600 text-white rounded-lg text-xs py-1.5 h-auto"
+                    className="bg-[#8B3D28] text-white rounded-lg text-xs py-1.5 h-auto font-black font-poppins uppercase tracking-widest hover:bg-[#722F1E]"
                 >
                     ADD NEW
                 </Button>
@@ -59,7 +59,7 @@ export default function Addresses() {
             <div className="px-4 space-y-4">
                 {loading ? (
                     <div className="flex justify-center pt-20">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B3D28]"></div>
                     </div>
                 ) : addresses.length > 0 ? (
                     <div className="space-y-4">
@@ -68,7 +68,7 @@ export default function Addresses() {
                                 key={addr._id}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="p-4 rounded-xl border border-neutral-200 bg-white relative hover:border-green-200 transition-colors"
+                                className="p-4 rounded-xl border border-neutral-200 bg-white relative hover:border-[#8B3D28]/30 transition-colors"
                             >
                                 <div className="flex items-start gap-4">
                                     <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0">
@@ -81,7 +81,7 @@ export default function Addresses() {
                                                 {addr.type}
                                             </span>
                                             {addr.isDefault && (
-                                                <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded uppercase">
+                                                <span className="text-[10px] font-black bg-[#8B3D28]/10 text-[#8B3D28] px-2 py-0.5 rounded uppercase font-poppins">
                                                     Default
                                                 </span>
                                             )}
@@ -99,7 +99,7 @@ export default function Addresses() {
                                     >
                                         Delete
                                     </button>
-                                    <button className="text-xs font-bold text-green-600 hover:text-green-700 uppercase tracking-wider">
+                                    <button className="text-xs font-black text-[#8B3D28] hover:text-[#722F1E] uppercase tracking-widest font-poppins">
                                         Edit
                                     </button>
                                 </div>
@@ -109,9 +109,9 @@ export default function Addresses() {
                 ) : (
                     <div className="text-center py-20 text-neutral-500">
                         <div className="text-6xl mb-4">📍</div>
-                        <h2 className="text-lg font-bold text-neutral-900 mb-2">No saved addresses</h2>
-                        <p className="text-sm mb-6">Add an address to start ordering</p>
-                        <Button onClick={() => navigate('/checkout/address')} className="bg-green-600 text-white rounded-full px-8">
+                        <h2 className="text-lg font-black text-neutral-900 mb-2 font-poppins">No saved addresses</h2>
+                        <p className="text-sm mb-6 text-neutral-600 font-medium">Add an address to start ordering</p>
+                        <Button onClick={() => navigate('/checkout/address')} className="bg-[#8B3D28] text-white rounded-full px-8 font-black font-poppins uppercase tracking-widest hover:bg-[#722F1E]">
                             Add New Address
                         </Button>
                     </div>
