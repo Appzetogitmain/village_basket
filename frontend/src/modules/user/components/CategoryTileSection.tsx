@@ -213,7 +213,7 @@ export default function CategoryTileSection({
 
                   {/* Tile name inside card for bestsellers */}
                   {showProductCount && (
-                    <div className="text-[11px] font-black text-village-umber uppercase tracking-tight line-clamp-1 text-center w-full block">
+                    <div className="text-[10px] md:text-[11px] font-black text-village-umber uppercase tracking-tight line-clamp-2 text-center w-full block leading-tight min-h-[2.2em]">
                       {tile.name}
                     </div>
                   )}
@@ -221,8 +221,8 @@ export default function CategoryTileSection({
 
                 {/* Category name - outside card for non-bestsellers */}
                 {!showProductCount && (
-                  <div className="mt-3 text-center overflow-hidden">
-                    <span className="text-[11px] font-black text-village-umber uppercase tracking-tight line-clamp-1 block leading-tight">
+                  <div className="mt-2 text-center overflow-visible min-h-[2.4em] flex items-start justify-center">
+                    <span className="text-[10px] md:text-[11px] font-black text-village-umber uppercase tracking-tight line-clamp-2 block leading-tight break-words px-0.5">
                       {tile.name}
                     </span>
                   </div>

@@ -324,26 +324,26 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
         {/* Top Row: Logo & Cart */}
         <div className="flex items-center justify-between mb-2.5 relative z-20">
           <div className="flex items-center gap-2">
-            <div className="bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/20">
+            <div className="bg-white p-2 rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.15)] border-2 border-white/20 transform hover:scale-105 transition-transform duration-300">
               <img
                 src={brandLogo}
                 alt="Village Basket"
-                className="h-7 w-auto object-contain brightness-125"
+                className="h-7 w-auto object-contain"
               />
             </div>
           </div>
 
           <button
             onClick={() => navigate('/checkout')}
-            className="w-8 h-8 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white relative active:scale-90 transition-transform"
+            className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 shadow-lg flex items-center justify-center text-white relative active:scale-95 transition-all"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
               <path d="M3 6h18" />
               <path d="M16 10a4 4 0 01-8 0" />
             </svg>
             {(cart?.itemCount || 0) > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#4A7C59] text-white text-[8px] font-black rounded-md min-w-[14px] h-[14px] px-1 flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
+              <span className="absolute -top-1.5 -right-1.5 bg-[#4A7C59] text-white text-[9px] font-black rounded-lg min-w-[18px] h-[18px] px-1 flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
                 {cart?.itemCount || 0}
               </span>
             )}
@@ -409,7 +409,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
             <div className="flex-1 pr-2">
               {/* Service name & Logo */}
               <div className="mb-0.5 flex flex-col items-start gap-1">
-                <img src="/assets/village_basket-removebg-preview.png" alt="Village Basket" className="h-[38px] md:h-[46px] object-contain" />
+                <img src={brandLogo} alt="Village Basket" className="h-[38px] md:h-[46px] object-contain" />
               </div>
               {/* Delivery time - large, bold, dark grey/black */}
               
