@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   getAllOrders,
@@ -234,7 +234,7 @@ export default function AdminAllOrders() {
       case "Payment Pending":
         return "bg-yellow-100 text-yellow-800";
       case "Received":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-[#8B3D28]";
       case "Processed":
         return "bg-purple-100 text-purple-800";
       case "Shipped":
@@ -269,13 +269,13 @@ export default function AdminAllOrders() {
       <div className="bg-white border-b border-neutral-200 px-3 sm:px-4 md:px-6 py-3 sm:py-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
           {/* Page Title */}
-          <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">
+          <h1 className="text-lg sm:text-xl font-black text-neutral-900 font-outfit uppercase tracking-tight">
             Orders List
           </h1>
 
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs sm:text-sm">
-            <Link to="/admin" className="text-blue-600 hover:text-blue-700">
+            <Link to="/admin" className="text-[#8B3D28] hover:text-[#8B3D28]">
               Dashboard
             </Link>
             <span className="text-neutral-500">/</span>
@@ -289,21 +289,21 @@ export default function AdminAllOrders() {
         {/* White Card Container */}
         <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
           {/* Green Banner */}
-          <div className="bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3">
-            <h2 className="text-base sm:text-lg font-semibold">
+          <div className="bg-[#8B3D28] text-white px-4 sm:px-6 py-2 sm:py-2.5">
+            <h2 className="text-sm sm:text-[#8B3D28]ase font-black uppercase tracking-widest font-outfit">
               View Order List
             </h2>
           </div>
 
           {/* Filter and Action Bar */}
           <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-neutral-200 bg-neutral-50">
-            <div className="flex flex-col lg:flex-row flex-wrap items-start lg:items-center gap-3 sm:gap-4">
+            <div className="flex flex-col lg:flex-row flex-wrap items-start lg:items-center gap-3 sm:gapx-3 py-2">
               {/* Date Range Filter */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full lg:w-auto">
-                <label className="text-xs sm:text-sm font-medium text-neutral-700 whitespace-nowrap">
+                <label className="text-[11px] font-black text-neutral-500 whitespace-nowrap uppercase tracking-wider">
                   From - To Order Date
                 </label>
-                <div className="flex items-center gap-2 bg-white border border-neutral-300 rounded px-2 sm:px-3 py-1.5 sm:py-2 w-full sm:w-auto">
+                <div className="flex items-center gap-2 bg-white border border-neutral-300 rounded px-2 sm:px-3 py-1 sm:py-1.5 w-full sm:w-auto">
                   <svg
                     width="16"
                     height="16"
@@ -326,7 +326,7 @@ export default function AdminAllOrders() {
                       setDateRange(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="flex-1 sm:w-48 text-xs sm:text-sm text-neutral-600 bg-transparent focus:outline-none placeholder:text-neutral-400"
+                    className="flex-1 sm:w-48 text-xs sm:text-[12px] font-bold text-neutral-500 bg-transparent focus:outline-none placeholder:text-neutral-400"
                     placeholder="MM/DD/YYYY - MM/DD/YYYY"
                   />
                   {dateRange && (
@@ -341,7 +341,7 @@ export default function AdminAllOrders() {
 
               {/* Sellers Filter */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full lg:w-auto">
-                <label className="text-xs sm:text-sm font-medium text-neutral-700 whitespace-nowrap">
+                <label className="text-xs sm:text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider whitespace-nowrap">
                   Sellers
                 </label>
                 <select
@@ -350,7 +350,7 @@ export default function AdminAllOrders() {
                     setSeller(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500">
+                  className="w-full sm:w-auto px-3 py-1.5 border border-neutral-300 rounded text-[12px] text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]">
                   <option>All Sellers</option>
                   <option>Seller 1</option>
                   <option>Seller 2</option>
@@ -360,7 +360,7 @@ export default function AdminAllOrders() {
 
               {/* Status Filter */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full lg:w-auto">
-                <label className="text-xs sm:text-sm font-medium text-neutral-700 whitespace-nowrap">
+                <label className="text-xs sm:text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider whitespace-nowrap">
                   Status
                 </label>
                 <select
@@ -369,7 +369,7 @@ export default function AdminAllOrders() {
                     setStatus(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500">
+                  className="w-full sm:w-auto px-3 py-1.5 border border-neutral-300 rounded text-[12px] text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]">
                   <option>All Status</option>
                   <option>Pending</option>
                   <option>Received</option>
@@ -391,7 +391,7 @@ export default function AdminAllOrders() {
                     setEntriesPerPage(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500">
+                  className="w-full sm:w-auto px-3 py-1.5 border border-neutral-300 rounded text-[12px] text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]">
                   <option>10</option>
                   <option>25</option>
                   <option>50</option>
@@ -404,10 +404,10 @@ export default function AdminAllOrders() {
                 <div className="relative">
                   <button
                     onClick={handleExport}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded text-xs sm:text-sm font-medium transition-colors w-full sm:w-auto">
+                    className="flex items-center justify-center gap-2 bg-[#A54B31] hover:opacity-90 text-white px-3 sm:px-4 py-1.5 rounded text-[11px] font-black uppercase tracking-wider transition-all w-full sm:w-auto shadow-sm">
                     <svg
-                      width="16"
-                      height="16"
+                      width="14"
+                      height="14"
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -422,15 +422,15 @@ export default function AdminAllOrders() {
                     </svg>
                     Export
                     <svg
-                      width="12"
-                      height="12"
+                      width="10"
+                      height="10"
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M6 9L12 15L18 9"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="3"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
@@ -441,7 +441,7 @@ export default function AdminAllOrders() {
 
               {/* Search Bar */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full lg:w-auto lg:flex-1">
-                <label className="text-xs sm:text-sm font-medium text-neutral-700 whitespace-nowrap">
+                <label className="text-xs sm:text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider whitespace-nowrap">
                   Search:
                 </label>
                 <input
@@ -451,8 +451,8 @@ export default function AdminAllOrders() {
                     setSearchQuery(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="flex-1 w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
-                  placeholder="Search by Order ID, Customer, or Amount"
+                  className="flex-1 w-full sm:w-auto px-3 py-1.5 border border-neutral-300 rounded text-[12px] text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                  placeholder="Search orders..."
                 />
               </div>
             </div>
@@ -460,12 +460,12 @@ export default function AdminAllOrders() {
 
           {/* Table Section */}
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-neutral-200">
-              <thead className="bg-neutral-50">
+            <table className="min-w-full divide-y divide-neutral-100">
+              <thead className="bg-[#FAF7F2] font-outfit border-b border-neutral-200">
                 <tr>
                   <th
                     onClick={() => handleSort("orderId")}
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-neutral-100">
+                    className="px-3 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2] transition-colors">
                     <div className="flex items-center gap-1">
                       O. Id
                       {sortField === "orderId" && (
@@ -498,7 +498,7 @@ export default function AdminAllOrders() {
                   </th>
                   <th
                     onClick={() => handleSort("customerDetails")}
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-neutral-100">
+                    className="px-3 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2] transition-colors">
                     <div className="flex items-center gap-1">
                       Customer Details
                       {sortField === "customerDetails" && (
@@ -531,7 +531,7 @@ export default function AdminAllOrders() {
                   </th>
                   <th
                     onClick={() => handleSort("address")}
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-neutral-100">
+                    className="px-3 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2] transition-colors">
                     <div className="flex items-center gap-1">
                       Address
                       {sortField === "address" && (
@@ -564,7 +564,7 @@ export default function AdminAllOrders() {
                   </th>
                   <th
                     onClick={() => handleSort("deliveryDate")}
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-neutral-100">
+                    className="px-3 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2] transition-colors">
                     <div className="flex items-center gap-1">
                       D. Date
                       {sortField === "deliveryDate" && (
@@ -597,7 +597,7 @@ export default function AdminAllOrders() {
                   </th>
                   <th
                     onClick={() => handleSort("orderDate")}
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-neutral-100">
+                    className="px-3 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2] transition-colors">
                     <div className="flex items-center gap-1">
                       O. Date
                       {sortField === "orderDate" && (
@@ -630,7 +630,7 @@ export default function AdminAllOrders() {
                   </th>
                   <th
                     onClick={() => handleSort("status")}
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-neutral-100">
+                    className="px-3 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2] transition-colors">
                     <div className="flex items-center gap-1">
                       Status
                       {sortField === "status" && (
@@ -663,7 +663,7 @@ export default function AdminAllOrders() {
                   </th>
                   <th
                     onClick={() => handleSort("deliveryBoyStatus")}
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-neutral-100">
+                    className="px-3 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2] transition-colors">
                     <div className="flex items-center gap-1">
                       Delivery Boy Assign Status
                       {sortField === "deliveryBoyStatus" && (
@@ -696,7 +696,7 @@ export default function AdminAllOrders() {
                   </th>
                   <th
                     onClick={() => handleSort("amount")}
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-neutral-100">
+                    className="px-3 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2] transition-colors">
                     <div className="flex items-center gap-1">
                       Amount
                       {sortField === "amount" && (
@@ -727,7 +727,7 @@ export default function AdminAllOrders() {
                       )}
                     </div>
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <th className="px-3 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">
                     Action
                   </th>
                 </tr>
@@ -737,7 +737,7 @@ export default function AdminAllOrders() {
                   <tr>
                     <td
                       colSpan={9}
-                      className="px-4 sm:px-6 py-8 text-center text-sm text-neutral-500">
+                      className="px-4 sm:px-4 py-2.5 text-center text-sm text-neutral-500">
                       Loading orders...
                     </td>
                   </tr>
@@ -745,7 +745,7 @@ export default function AdminAllOrders() {
                   <tr>
                     <td
                       colSpan={9}
-                      className="px-4 sm:px-6 py-8 text-center text-sm text-red-600">
+                      className="px-4 sm:px-4 py-2.5 text-center text-sm text-red-600">
                       {error}
                     </td>
                   </tr>
@@ -753,38 +753,38 @@ export default function AdminAllOrders() {
                   <tr>
                     <td
                       colSpan={9}
-                      className="px-4 sm:px-6 py-8 text-center text-sm text-neutral-500">
+                      className="px-4 sm:px-4 py-2.5 text-center text-sm text-neutral-500">
                       No data available in table
                     </td>
                   </tr>
                 ) : (
                   paginatedOrders.map((order) => (
-                    <tr key={order._id} className="hover:bg-neutral-50">
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
+                    <tr key={order._id} className="hover:bg-neutral-50/50 transition-colors">
+                      <td className="px-3 py-2 text-[12px] font-black text-neutral-900">
                         {order.orderNumber}
                       </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                      <td className="px-3 py-2 text-[12px] text-neutral-600">
                         {order.customerName ||
                           (typeof order.customer === "object"
                             ? order.customer.name
                             : "")}
                       </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                      <td className="px-3 py-2 text-[12px] text-neutral-600">
                         {order.deliveryAddress?.address || "-"}
                       </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                      <td className="px-3 py-2 text-[12px] text-neutral-600">
                         {order.estimatedDeliveryDate
                           ? new Date(
                             order.estimatedDeliveryDate
                           ).toLocaleDateString()
                           : "-"}
                       </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                      <td className="px-3 py-2 text-[12px] text-neutral-600">
                         {order.orderDate
                           ? new Date(order.orderDate).toLocaleDateString()
                           : "-"}
                       </td>
-                      <td className="px-4 sm:px-6 py-3">
+                      <td className="px-3 py-2">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
                             order.status
@@ -792,7 +792,7 @@ export default function AdminAllOrders() {
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-4 sm:px-6 py-3">
+                      <td className="px-3 py-2">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getDeliveryBoyStatusColor(
                             order.deliveryBoyStatus || "Not Assigned"
@@ -800,13 +800,13 @@ export default function AdminAllOrders() {
                           {order.deliveryBoyStatus || "Not Assigned"}
                         </span>
                       </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900 font-medium">
+                      <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">
                         ₹{order.total?.toFixed(2) || "0.00"}
                       </td>
-                      <td className="px-4 sm:px-6 py-3">
+                      <td className="px-3 py-2">
                         <Link to={`/admin/orders/${order._id}`}>
                           <button
-                            className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded transition-colors"
+                            className="bg-[#A54B31] hover:opacity-90 text-white p-2 rounded transition-colors"
                             aria-label="View order">
                             <svg
                               width="16"
@@ -842,7 +842,7 @@ export default function AdminAllOrders() {
           </div>
 
           {/* Pagination Footer */}
-          <div className="px-4 sm:px-6 py-3 bg-neutral-50 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="px-3 py-2 bg-neutral-50 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div className="text-xs sm:text-sm text-neutral-700">
               Showing{" "}
               {filteredAndSortedOrders.length === 0 ? 0 : startIndex + 1} to{" "}
@@ -896,13 +896,20 @@ export default function AdminAllOrders() {
       </div>
 
       {/* Footer */}
-      <div className="text-center py-4 text-xs sm:text-sm text-neutral-600">
+      <div className="text-center py-4 text-xs sm:text-[12px] font-bold text-neutral-500">
         Copyright Â© 2025. Developed By{" "}
-        <Link to="/" className="text-blue-600 hover:text-blue-700">
+        <Link to="/" className="text-[#8B3D28] hover:text-[#8B3D28]">
           Village Basket
         </Link>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 

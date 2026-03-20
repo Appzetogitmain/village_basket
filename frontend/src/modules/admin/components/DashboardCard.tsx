@@ -9,15 +9,29 @@ interface DashboardCardProps {
 
 export default function DashboardCard({ icon, title, value, accentColor }: DashboardCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-3 sm:p-4 md:p-5">
-      <div className="flex items-start justify-between mb-2 sm:mb-3">
-        <div className="p-2 sm:p-3 rounded-lg" style={{ backgroundColor: `${accentColor}20` }}>
-          <div style={{ color: accentColor }} className="w-6 h-6 sm:w-8 sm:h-8">{icon}</div>
+    <div className="glass-card organic-clay-radius p-3 sm:p-4 transition-all card-hover font-poppins relative overflow-hidden group border border-[#8B3D28]/5">
+      {/* Village Brand Accent - Organic Shape Overlay */}
+      <div 
+        className="absolute -top-4 -right-4 w-16 h-16 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none rounded-full"
+        style={{ backgroundColor: accentColor || '#8B3D28' }}
+      ></div>
+      
+      <div className="flex items-center gap-4 relative z-10">
+        <div 
+            className="p-2.5 rounded-2xl shadow-inner transition-transform group-hover:scale-110" 
+            style={{ backgroundColor: `${accentColor}10` }}
+        >
+          <div style={{ color: accentColor }} className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full opacity-80">{icon}</div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-neutral-500 text-[10px] sm:text-xs font-black uppercase tracking-[0.1em] mb-1 truncate font-outfit opacity-60 group-hover:opacity-100 transition-opacity">{title}</h3>
+          <p className="text-sm sm:text-base md:text-lg font-black text-neutral-800 tracking-tight group-hover:text-[#8B3D28] transition-colors">{value}</p>
         </div>
       </div>
-      <h3 className="text-neutral-600 text-xs sm:text-sm font-medium mb-1">{title}</h3>
-      <p className="text-xl sm:text-2xl font-bold text-neutral-900">{value}</p>
     </div>
   );
 }
+
+
+
 

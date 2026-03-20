@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     getDeliveryBoys,
     updateDeliveryBoyStatus,
@@ -282,7 +282,7 @@ export default function AdminManageDeliveryBoy() {
 
         return (
             <span className="text-neutral-400 text-xs ml-1">
-                {sortColumn === backendColumn ? (sortDirection === 'asc' ? 'â†‘' : 'â†“') : 'â‡…'}
+                {sortColumn === backendColumn ? (sortDirection === 'asc' ? '↑' : '↓') : '⇅'}
             </span>
         );
     };
@@ -294,46 +294,46 @@ export default function AdminManageDeliveryBoy() {
     return (
         <div className="flex flex-col h-full bg-gray-50">
             {/* Page Content */}
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-3">
                 {/* Main Panel */}
                 <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
                     {/* Header */}
-                    <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg">
+                    <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg">
                         <h2 className="text-lg font-semibold">View Delivery Boy List</h2>
                     </div>
 
                     {/* Error Message */}
                     {error && (
-                        <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center justify-between">
+                        <div className="px-3 py-2 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center justify-between">
                             <p className="text-sm">{error}</p>
                             <button
                                 onClick={() => setError('')}
                                 className="text-red-700 hover:text-red-900 ml-4 text-lg font-bold"
                                 type="button"
                             >
-                                Ã—
+                                ×
                             </button>
                         </div>
                     )}
 
                     {/* Success Message */}
                     {successMessage && (
-                        <div className="p-4 bg-green-50 border-l-4 border-green-500 text-green-700 flex items-center justify-between">
+                        <div className="px-3 py-2 bg-green-50 border-l-4 border-green-500 text-[#A54B31] flex items-center justify-between">
                             <p className="text-sm">{successMessage}</p>
                             <button
                                 onClick={() => setSuccessMessage('')}
-                                className="text-green-700 hover:text-green-900 ml-4 text-lg font-bold"
+                                className="text-[#A54B31] hover:text-green-900 ml-4 text-lg font-bold"
                                 type="button"
                             >
-                                Ã—
+                                ×
                             </button>
                         </div>
                     )}
 
                     {/* Controls */}
-                    <div className="p-4 border-b border-neutral-200 flex flex-col gap-4">
+                    <div className="px-3 py-2 border-b border-neutral-200 flex flex-col gapx-3 py-2">
                         {/* Filters Row */}
-                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                        <div className="flex flex-col sm:flex-row gapx-3 py-2 items-start sm:items-center">
                             {/* Status Filter */}
                             <div className="flex items-center gap-2">
                                 <label className="text-sm text-neutral-700 whitespace-nowrap">Status:</label>
@@ -343,7 +343,7 @@ export default function AdminManageDeliveryBoy() {
                                         setStatusFilter(e.target.value);
                                         setCurrentPage(1);
                                     }}
-                                    className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                    className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:ring-1 focus:ring-[#8B3D28] focus:outline-none"
                                 >
                                     <option value="All">All Status</option>
                                     <option value="Active">Active</option>
@@ -360,7 +360,7 @@ export default function AdminManageDeliveryBoy() {
                                         setAvailabilityFilter(e.target.value);
                                         setCurrentPage(1);
                                     }}
-                                    className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                    className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:ring-1 focus:ring-[#8B3D28] focus:outline-none"
                                 >
                                     <option value="All">All Availability</option>
                                     <option value="Available">Available</option>
@@ -373,7 +373,7 @@ export default function AdminManageDeliveryBoy() {
                                 <label className="text-sm text-neutral-700 whitespace-nowrap">Search:</label>
                                 <input
                                     type="text"
-                                    className="px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none min-w-[200px]"
+                                    className="px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none min-w-[200px]"
                                     value={searchTerm}
                                     onChange={(e) => {
                                         setSearchTerm(e.target.value);
@@ -385,28 +385,28 @@ export default function AdminManageDeliveryBoy() {
                         </div>
 
                         {/* Controls Row */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gapx-3 py-2">
                             <div className="flex items-center gap-2">
-                                <span className="text-sm text-neutral-600">Show</span>
+                                <span className="text-[12px] font-bold text-neutral-500">Show</span>
                                 <select
                                     value={rowsPerPage}
                                     onChange={(e) => {
                                         setRowsPerPage(Number(e.target.value));
                                         setCurrentPage(1);
                                     }}
-                                    className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                                    className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer"
                                 >
                                     <option value={10}>10</option>
                                     <option value={20}>20</option>
                                     <option value={50}>50</option>
                                     <option value={100}>100</option>
                                 </select>
-                                <span className="text-sm text-neutral-600">entries</span>
+                                <span className="text-[12px] font-bold text-neutral-500">entries</span>
                             </div>
 
                             <button
                                 onClick={handleExport}
-                                className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
+                                className="bg-[#A54B31] hover:opacity-90 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
                             >
                                 Export
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -422,7 +422,7 @@ export default function AdminManageDeliveryBoy() {
                             <thead>
                                 <tr className="bg-neutral-50 text-xs font-bold text-neutral-800 border-b border-neutral-200">
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('id')}
                                     >
                                         <div className="flex items-center">
@@ -430,7 +430,7 @@ export default function AdminManageDeliveryBoy() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('name')}
                                     >
                                         <div className="flex items-center">
@@ -438,29 +438,29 @@ export default function AdminManageDeliveryBoy() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('mobile')}
                                     >
                                         <div className="flex items-center">
                                             Mobile <SortIcon column="mobile" />
                                         </div>
                                     </th>
-                                    <th className="p-4">
+                                    <th className="px-3 py-2">
                                         Address
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('city')}
                                     >
                                         <div className="flex items-center">
                                             City <SortIcon column="city" />
                                         </div>
                                     </th>
-                                    <th className="p-4">
+                                    <th className="px-3 py-2">
                                         Commission
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('balance')}
                                     >
                                         <div className="flex items-center">
@@ -468,7 +468,7 @@ export default function AdminManageDeliveryBoy() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('cashCollected')}
                                     >
                                         <div className="flex items-center">
@@ -476,7 +476,7 @@ export default function AdminManageDeliveryBoy() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('status')}
                                     >
                                         <div className="flex items-center">
@@ -484,14 +484,14 @@ export default function AdminManageDeliveryBoy() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('available')}
                                     >
                                         <div className="flex items-center">
                                             Available <SortIcon column="available" />
                                         </div>
                                     </th>
-                                    <th className="p-4">
+                                    <th className="px-3 py-2">
                                         Action
                                     </th>
                                 </tr>
@@ -501,7 +501,7 @@ export default function AdminManageDeliveryBoy() {
                                     <tr>
                                         <td colSpan={11} className="p-8 text-center">
                                             <div className="flex items-center justify-center">
-                                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600 mr-2"></div>
+                                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#A54B31] mr-2"></div>
                                                 Loading delivery boys...
                                             </div>
                                         </td>
@@ -521,12 +521,12 @@ export default function AdminManageDeliveryBoy() {
                                 ) : (
                                     displayedDeliveryBoys.map((deliveryBoy) => (
                                         <tr key={deliveryBoy._id} className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700 border-b border-neutral-200">
-                                            <td className="p-4 align-middle">{deliveryBoy._id.slice(-6)}</td>
-                                            <td className="p-4 align-middle">{deliveryBoy.name}</td>
-                                            <td className="p-4 align-middle">{deliveryBoy.mobile}</td>
-                                            <td className="p-4 align-middle">{deliveryBoy.address}</td>
-                                            <td className="p-4 align-middle">{deliveryBoy.city}</td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">{deliveryBoy._id.slice(-6)}</td>
+                                            <td className="px-3 py-2 align-middle">{deliveryBoy.name}</td>
+                                            <td className="px-3 py-2 align-middle">{deliveryBoy.mobile}</td>
+                                            <td className="px-3 py-2 align-middle">{deliveryBoy.address}</td>
+                                            <td className="px-3 py-2 align-middle">{deliveryBoy.city}</td>
+                                            <td className="px-3 py-2 align-middle">
                                                 {deliveryBoy.commissionType === 'Percentage' ? (
                                                     <div className="text-xs">
                                                         <div className="font-medium">Commission {deliveryBoy.commission}%</div>
@@ -541,9 +541,9 @@ export default function AdminManageDeliveryBoy() {
                                                     <span className="text-xs">Fixed</span>
                                                 )}
                                             </td>
-                                            <td className="p-4 align-middle">₹{deliveryBoy.balance.toFixed(2)}</td>
-                                            <td className="p-4 align-middle">₹{deliveryBoy.cashCollected.toFixed(2)}</td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">{(deliveryBoy.balance || 0).toFixed(2)}</td>
+                                            <td className="px-3 py-2 align-middle">{(deliveryBoy.cashCollected || 0).toFixed(2)}</td>
+                                            <td className="px-3 py-2 align-middle">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${deliveryBoy.status === 'Active'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-red-100 text-red-800'
@@ -551,7 +551,7 @@ export default function AdminManageDeliveryBoy() {
                                                     {deliveryBoy.status}
                                                 </span>
                                             </td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${deliveryBoy.available === 'Available'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-red-100 text-red-800'
@@ -559,14 +559,14 @@ export default function AdminManageDeliveryBoy() {
                                                     {deliveryBoy.available}
                                                 </span>
                                             </td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">
                                                 <div className="flex items-center gap-2">
                                                     <button
                                                         onClick={() => handleStatusChange(deliveryBoy._id, deliveryBoy.status === 'Active' ? 'Inactive' : 'Active')}
                                                         disabled={processing === deliveryBoy._id}
                                                         className={`p-1.5 rounded transition-colors ${deliveryBoy.status === 'Active'
                                                             ? 'text-red-600 hover:bg-red-50'
-                                                            : 'text-green-600 hover:bg-green-50'
+                                                            : 'text-[#8B3D28] hover:bg-[#FAF7F2]'
                                                             }`}
                                                         title={deliveryBoy.status === 'Active' ? 'Deactivate' : 'Activate'}
                                                     >
@@ -586,7 +586,7 @@ export default function AdminManageDeliveryBoy() {
                                                         disabled={processing === deliveryBoy._id}
                                                         className={`p-1.5 rounded transition-colors ${deliveryBoy.available === 'Available'
                                                             ? 'text-yellow-600 hover:bg-yellow-50'
-                                                            : 'text-green-600 hover:bg-green-50'
+                                                            : 'text-[#8B3D28] hover:bg-[#FAF7F2]'
                                                             }`}
                                                         title={deliveryBoy.available === 'Available' ? 'Mark as Not Available' : 'Mark as Available'}
                                                     >
@@ -616,7 +616,7 @@ export default function AdminManageDeliveryBoy() {
                     </div>
 
                     {/* Pagination Footer */}
-                    <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                    <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
                         <div className="text-xs sm:text-sm text-neutral-700">
                             Showing {displayedDeliveryBoys.length > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + displayedDeliveryBoys.length, totalDeliveryBoys)} of {totalDeliveryBoys} entries
                         </div>
@@ -624,9 +624,9 @@ export default function AdminManageDeliveryBoy() {
                             <button
                                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                                 disabled={currentPage === 1}
-                                className={`p-2 border border-teal-600 rounded ${currentPage === 1
+                                className={`p-2 border border-[#A54B31] rounded ${currentPage === 1
                                     ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                    : 'text-teal-600 hover:bg-teal-50'
+                                    : 'text-[#A54B31] hover:bg-[#FAF7F2]'
                                     }`}
                                 aria-label="Previous page"
                             >
@@ -661,9 +661,9 @@ export default function AdminManageDeliveryBoy() {
                                     <button
                                         key={pageNum}
                                         onClick={() => setCurrentPage(pageNum)}
-                                        className={`px-3 py-1.5 border border-teal-600 rounded font-medium text-sm ${currentPage === pageNum
-                                            ? 'bg-teal-600 text-white'
-                                            : 'text-teal-600 hover:bg-teal-50'
+                                        className={`px-3 py-1.5 border border-[#A54B31] rounded font-medium text-sm ${currentPage === pageNum
+                                            ? 'bg-[#A54B31] text-white'
+                                            : 'text-[#A54B31] hover:bg-[#FAF7F2]'
                                             }`}
                                     >
                                         {pageNum}
@@ -676,9 +676,9 @@ export default function AdminManageDeliveryBoy() {
                             <button
                                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                                 disabled={currentPage === totalPages}
-                                className={`p-2 border border-teal-600 rounded ${currentPage === totalPages
+                                className={`p-2 border border-[#A54B31] rounded ${currentPage === totalPages
                                     ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                    : 'text-teal-600 hover:bg-teal-50'
+                                    : 'text-[#A54B31] hover:bg-[#FAF7F2]'
                                     }`}
                                 aria-label="Next page"
                             >
@@ -704,12 +704,19 @@ export default function AdminManageDeliveryBoy() {
             </div>
 
             {/* Footer */}
-            <footer className="text-center py-4 text-sm text-neutral-600 border-t border-neutral-200 bg-white">
-                Copyright Â© 2025. Developed By{' '}
-                <a href="#" className="text-blue-600 hover:underline">Village Basket</a>
+            <footer className="text-center py-4 text-[12px] font-bold text-neutral-500 border-t border-neutral-200 bg-white">
+                Copyright © 2025. Developed By{' '}
+                <a href="#" className="text-[#8B3D28] hover:underline">Village Basket</a>
             </footer>
         </div>
     );
 }
+
+
+
+
+
+
+
 
 

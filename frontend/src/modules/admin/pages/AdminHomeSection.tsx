@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     getHomeSections,
     createHomeSection,
@@ -368,13 +368,13 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
     return (
         <div className="flex flex-col h-full bg-gray-50">
             {/* Page Header */}
-            <div className="p-6 pb-0">
+            <div className="p-3 pb-0">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-semibold text-neutral-800">
                         {readOnly ? "View Home Sections" : "Home Sections"}
                     </h1>
-                    <div className="text-sm text-blue-500">
-                        <span className="text-blue-500 hover:underline cursor-pointer">
+                    <div className="text-sm text-[#8B3D28]">
+                        <span className="text-[#8B3D28] hover:underline cursor-pointer">
                             Home
                         </span>{" "}
                         <span className="text-neutral-400">/</span> {readOnly ? "View Home Sections" : "Home Sections"}
@@ -386,7 +386,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
             {!readOnly && (success || error) && (
                 <div className="px-6">
                     {success && (
-                        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+                        <div className="bg-green-50 border border-green-200 text-[#A54B31] px-4 py-3 rounded mb-4">
                             {success}
                         </div>
                     )}
@@ -400,10 +400,10 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
 
             {/* Page Content */}
             <div className="flex-1 px-6 pb-6">
-                <div className={`grid grid-cols-1 ${readOnly ? '' : 'lg:grid-cols-3'} gap-6 h-full`}>
+                <div className={`grid grid-cols-1 ${readOnly ? '' : 'lg:grid-cols-3'} gap-3 h-full`}>
                     {/* Left Sidebar: Add/Edit Form */}
                     {!readOnly && (
-                        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 flex flex-col">
+                        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-3 flex flex-col">
                             <h2 className="text-lg font-semibold text-neutral-800 mb-4">
                                 {editingId ? "Edit Section" : "Add Section"}
                             </h2>
@@ -411,7 +411,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                             <div className="space-y-4 flex-1 overflow-y-auto">
                                 {/* Title */}
                                 <div>
-                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                         Section Title <span className="text-red-500">*</span>
                                     </label>
                                     <input
@@ -419,13 +419,13 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
                                         placeholder="e.g., Grocery & Kitchen"
-                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                     />
                                 </div>
 
                                 {/* Slug */}
                                 <div>
-                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                         Slug <span className="text-red-500">*</span>
                                     </label>
                                     <input
@@ -433,7 +433,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                         value={slug}
                                         onChange={(e) => setSlug(e.target.value)}
                                         placeholder="grocery-kitchen"
-                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                     />
                                     <p className="text-xs text-neutral-500 mt-1">
                                         URL-friendly identifier (lowercase, hyphens only)
@@ -442,13 +442,13 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
 
                                 {/* Show on Page Tab (formerly Parent Header Category) */}
                                 <div>
-                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                         Show on Page Tab
                                     </label>
                                     <select
                                         value={sectionHeaderCategory}
                                         onChange={(e) => setSectionHeaderCategory(e.target.value)}
-                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                     >
                                         <option value="">None (Global - Home Page)</option>
                                         {headerCategories
@@ -466,7 +466,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
 
                                 {/* Display Type */}
                                 <div>
-                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                         Display Type <span className="text-red-500">*</span>
                                     </label>
                                     <select
@@ -481,7 +481,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                                 setSelectedHeaderCategory("");
                                             }
                                         }}
-                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                     >
                                         {DISPLAY_TYPE_OPTIONS.map((option) => (
                                             <option key={option.value} value={option.value}>
@@ -494,7 +494,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                 {/* Source Category Group - Filter for selecting categories */}
                                 {displayType === "categories" && (
                                     <div>
-                                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                        <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                             Source Category Group <span className="text-red-500">*</span>
                                         </label>
                                         <select
@@ -509,7 +509,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                                     setSelectedCategories([]);
                                                 }
                                             }}
-                                            className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                            className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                         >
                                             <option value="">Select a header category</option>
                                             {headerCategories
@@ -528,7 +528,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
 
                                 {/* Categories - Checkbox List */}
                                 <div>
-                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                         Categories
                                         {displayType === "categories" && (
                                             <span className="text-red-500 ml-1">*</span>
@@ -562,7 +562,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                                                 );
                                                             }
                                                         }}
-                                                        className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-[#A54B31] focus:ring-[#8B3D28] border-gray-300 rounded"
                                                     />
                                                     <span className="ml-2 text-sm text-neutral-700">{cat.name}</span>
                                                 </label>
@@ -577,7 +577,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                 {/* SubCategories - Checkbox List - Only show when displayType is NOT "categories" */}
                                 {displayType !== "categories" && (
                                     <div>
-                                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                        <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                             SubCategories
                                         </label>
                                         <div className={`border border-neutral-300 rounded max-h-40 overflow-y-auto p-2 ${selectedCategories.length === 0 ? 'bg-gray-100' : 'bg-white'
@@ -605,7 +605,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                                                     );
                                                                 }
                                                             }}
-                                                            className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                                                            className="h-4 w-4 text-[#A54B31] focus:ring-[#8B3D28] border-gray-300 rounded"
                                                         />
                                                         <span className="ml-2 text-sm text-neutral-700">{sub.subcategoryName}</span>
                                                     </label>
@@ -620,13 +620,13 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
 
                                 {/* Columns */}
                                 <div>
-                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                         Number of Columns <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         value={columns}
                                         onChange={(e) => setColumns(Number(e.target.value))}
-                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                     >
                                         {COLUMNS_OPTIONS.map((col) => (
                                             <option key={col} value={col}>
@@ -638,7 +638,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
 
                                 {/* Limit */}
                                 <div>
-                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                         Item Limit <span className="text-red-500">*</span>
                                     </label>
                                     <input
@@ -647,7 +647,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                         onChange={(e) => setLimit(Number(e.target.value))}
                                         min="1"
                                         max="50"
-                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                        className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                     />
                                 </div>
 
@@ -658,9 +658,9 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                             type="checkbox"
                                             checked={isActive}
                                             onChange={(e) => setIsActive(e.target.checked)}
-                                            className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                                            className="h-4 w-4 text-[#A54B31] focus:ring-[#8B3D28] border-gray-300 rounded"
                                         />
-                                        <span className="ml-2 text-sm font-medium text-neutral-700">
+                                        <span className="ml-2 text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider">
                                             Active (Show on home page)
                                         </span>
                                     </label>
@@ -672,9 +672,9 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                             type="checkbox"
                                             checked={isGlobal}
                                             onChange={(e) => setIsGlobal(e.target.checked)}
-                                            className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                                            className="h-4 w-4 text-[#A54B31] focus:ring-[#8B3D28] border-gray-300 rounded"
                                         />
-                                        <span className="ml-2 text-sm font-medium text-neutral-700">
+                                        <span className="ml-2 text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider">
                                             Global Section (Always show on Home Page)
                                         </span>
                                     </label>
@@ -688,7 +688,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                     disabled={loading}
                                     className={`w-full px-4 py-2 rounded font-medium transition-colors ${loading
                                         ? "bg-gray-400 cursor-not-allowed text-white"
-                                        : "bg-teal-600 hover:bg-teal-700 text-white"
+                                        : "bg-[#A54B31] hover:opacity-90 text-white"
                                         }`}
                                 >
                                     {loading
@@ -711,14 +711,14 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
 
                     {/* Right Section: View Sections Table */}
                     <div className={`${readOnly ? 'lg:col-span-3' : 'lg:col-span-2'} bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col`}>
-                        <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg">
+                        <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg">
                             <h2 className="text-lg font-semibold">View Sections</h2>
                         </div>
 
                         {/* Controls */}
-                        <div className="p-4 border-b border-neutral-100">
+                        <div className="px-3 py-2 border-b border-neutral-100">
                             <div className="flex items-center gap-2">
-                                <span className="text-sm text-neutral-600">Show</span>
+                                <span className="text-[12px] font-bold text-neutral-500">Show</span>
                                 <input
                                     type="number"
                                     value={rowsPerPage}
@@ -726,9 +726,9 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                         setRowsPerPage(Number(e.target.value));
                                         setCurrentPage(1);
                                     }}
-                                    className="w-16 px-2 py-1.5 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                    className="w-16 px-2 py-1.5 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none"
                                 />
-                                <span className="text-sm text-neutral-600">entries</span>
+                                <span className="text-[12px] font-bold text-neutral-500">entries</span>
                             </div>
                         </div>
 
@@ -739,14 +739,14 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-neutral-50 text-xs font-bold text-neutral-800 border-b border-neutral-200">
-                                        <th className="p-4">Order</th>
-                                        <th className="p-4">Title</th>
-                                        <th className="p-4">Header</th>
-                                        <th className="p-4">Type</th>
-                                        <th className="p-4">Categories</th>
-                                        <th className="p-4">Columns</th>
-                                        <th className="p-4">Status</th>
-                                        {!readOnly && <th className="p-4">Action</th>}
+                                        <th className="px-3 py-2">Order</th>
+                                        <th className="px-3 py-2">Title</th>
+                                        <th className="px-3 py-2">Header</th>
+                                        <th className="px-3 py-2">Type</th>
+                                        <th className="px-3 py-2">Categories</th>
+                                        <th className="px-3 py-2">Columns</th>
+                                        <th className="px-3 py-2">Status</th>
+                                        {!readOnly && <th className="px-3 py-2">Action</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -765,26 +765,26 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                                 key={section._id}
                                                 className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700 border-b border-neutral-200"
                                             >
-                                                <td className="p-4">{section.order}</td>
-                                                <td className="p-4 font-medium">{section.title}</td>
-                                                <td className="p-4 text-xs text-neutral-500">
+                                                <td className="px-3 py-2">{section.order}</td>
+                                                <td className="px-3 py-2 font-medium">{section.title}</td>
+                                                <td className="px-3 py-2 text-xs text-neutral-500">
                                                     {section.headerCategory && typeof section.headerCategory === 'object' && 'name' in section.headerCategory
                                                         ? (section.headerCategory as any).name
                                                         : "Global"}
                                                     {section.isGlobal && section.headerCategory && (
-                                                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-[#8B3D28]">
                                                             + Global
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="p-4 capitalize">{section.displayType}</td>
-                                                <td className="p-4">
+                                                <td className="px-3 py-2 capitalize">{section.displayType}</td>
+                                                <td className="px-3 py-2">
                                                     {section.categories && section.categories.length > 0
                                                         ? section.categories.map((c: any) => c.name).join(", ")
                                                         : "None"}
                                                 </td>
-                                                <td className="p-4">{section.columns}</td>
-                                                <td className="p-4">
+                                                <td className="px-3 py-2">{section.columns}</td>
+                                                <td className="px-3 py-2">
                                                     <span
                                                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${section.isActive
                                                             ? "bg-green-100 text-green-800"
@@ -795,7 +795,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                                     </span>
                                                 </td>
                                                 {!readOnly && (
-                                                    <td className="p-4">
+                                                    <td className="px-3 py-2">
                                                         <div className="flex items-center gap-2">
                                                             <button
                                                                 onClick={() => handleEdit(section)}
@@ -846,7 +846,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                         </div>
 
                         {/* Pagination Footer */}
-                        <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                        <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
                             <div className="text-xs sm:text-sm text-neutral-700">
                                 Showing {startIndex + 1} to{" "}
                                 {Math.min(endIndex, sections.length)} of {sections.length}{" "}
@@ -856,9 +856,9 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                 <button
                                     onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className={`p-2 border border-teal-600 rounded ${currentPage === 1
+                                    className={`p-2 border border-[#A54B31] rounded ${currentPage === 1
                                         ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                                        : "text-teal-600 hover:bg-teal-50"
+                                        : "text-[#A54B31] hover:bg-[#FAF7F2]"
                                         }`}
                                     aria-label="Previous page"
                                 >
@@ -878,7 +878,7 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                         />
                                     </svg>
                                 </button>
-                                <button className="px-3 py-1.5 border border-teal-600 bg-teal-600 text-white rounded font-medium text-sm">
+                                <button className="px-3 py-1.5 border border-[#A54B31] bg-[#A54B31] text-white rounded font-medium text-sm">
                                     {currentPage}
                                 </button>
                                 <button
@@ -886,9 +886,9 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
                                         setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                                     }
                                     disabled={currentPage === totalPages}
-                                    className={`p-2 border border-teal-600 rounded ${currentPage === totalPages
+                                    className={`p-2 border border-[#A54B31] rounded ${currentPage === totalPages
                                         ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                                        : "text-teal-600 hover:bg-teal-50"
+                                        : "text-[#A54B31] hover:bg-[#FAF7F2]"
                                         }`}
                                     aria-label="Next page"
                                 >
@@ -915,13 +915,20 @@ export default function AdminHomeSection({ readOnly = false }: AdminHomeSectionP
             </div>
 
             {/* Footer */}
-            <footer className="text-center py-4 text-sm text-neutral-600 border-t border-neutral-200 bg-white">
-                Copyright © 2025. Developed By{" "}
-                <a href="#" className="text-blue-600 hover:underline">
+            <footer className="text-center py-4 text-[12px] font-bold text-neutral-500 border-t border-neutral-200 bg-white">
+                Copyright � 2025. Developed By{" "}
+                <a href="#" className="text-[#8B3D28] hover:underline">
                     Village Basket
                 </a>
             </footer>
         </div>
     );
 }
+
+
+
+
+
+
+
 

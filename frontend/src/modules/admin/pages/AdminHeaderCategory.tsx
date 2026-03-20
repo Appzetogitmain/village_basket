@@ -182,20 +182,20 @@ export default function AdminHeaderCategory() {
           <p className="text-sm text-neutral-500 mt-1">Configure main navigation categories seen on the app home header.</p>
         </div>
         <div className="text-sm">
-          <span className="text-blue-500 hover:underline cursor-pointer">Admin</span>{' '}
+          <span className="text-[#8B3D28] hover:underline cursor-pointer">Admin</span>{' '}
           <span className="text-neutral-400">/</span> Header Navigation
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gapx-3 py-2 sm:gap-3">
         {/* Left Panel - Add/Edit Form */}
         <div className="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden h-fit">
-          <div className="bg-teal-600 text-white px-6 py-4">
+          <div className="bg-[#A54B31] text-white px-4 py-2.5">
             <h2 className="text-lg font-semibold">
               {editingId ? 'Update Header Tab' : 'Create New Header Tab'}
             </h2>
           </div>
-          <div className="p-6 space-y-5">
+          <div className="p-3 space-y-5">
             {/* Header Category Name */}
             <div>
               <label className="block text-sm font-semibold text-neutral-700 mb-2">
@@ -206,7 +206,7 @@ export default function AdminHeaderCategory() {
                 value={headerCategoryName}
                 onChange={(e) => setHeaderCategoryName(e.target.value)}
                 placeholder="e.g. Grocery, Fruits, Dairy"
-                className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] transition-all"
               />
             </div>
 
@@ -218,8 +218,8 @@ export default function AdminHeaderCategory() {
               <div
                 onClick={() => fileInputRef.current?.click()}
                 className={`
-                  relative border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all
-                  ${imagePreview ? 'border-teal-400 bg-teal-50' : 'border-neutral-200 bg-neutral-50 hover:bg-neutral-100'}
+                  relative border-2 border-dashed rounded-xl px-3 py-2 flex flex-col items-center justify-center cursor-pointer transition-all
+                  ${imagePreview ? 'border-teal-400 bg-teal-50' : 'border-neutral-200 bg-neutral-50 hover:bg-[#FAF7F2]'}
                 `}
               >
                 <input
@@ -255,7 +255,7 @@ export default function AdminHeaderCategory() {
                   <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-xl">
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-xs font-bold text-teal-600">Uploading...</span>
+                      <span className="text-xs font-bold text-[#A54B31]">Uploading...</span>
                     </div>
                   </div>
                 )}
@@ -270,7 +270,7 @@ export default function AdminHeaderCategory() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
               >
                 <option value="">Select Category (Optional)</option>
                 {productCategories.map(cat => (
@@ -320,7 +320,7 @@ export default function AdminHeaderCategory() {
                 min="1"
                 value={headerCategoryOrder}
                 onChange={(e) => setHeaderCategoryOrder(parseInt(e.target.value) || 1)}
-                className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+                className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] transition-all"
               />
               <p className="mt-1 text-[10px] text-neutral-500 italic">Determines the order in which tabs are shown (1 is first).</p>
             </div>
@@ -333,12 +333,12 @@ export default function AdminHeaderCategory() {
                   onClick={() => setSelectedStatus(selectedStatus === 'Published' ? 'Unpublished' : 'Published')}
                   className={`
                     flex items-center w-12 h-6 rounded-full cursor-pointer transition-all p-1
-                    ${selectedStatus === 'Published' ? 'bg-green-500' : 'bg-neutral-300'}
+                    ${selectedStatus === 'Published' ? 'bg-[#8B3D28]' : 'bg-neutral-300'}
                   `}
                 >
                   <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-all ${selectedStatus === 'Published' ? 'translate-x-6' : 'translate-x-0'}`} />
                 </div>
-                <span className={`text-[10px] font-bold uppercase ${selectedStatus === 'Published' ? 'text-green-600' : 'text-neutral-500'}`}>
+                <span className={`text-[10px] font-bold uppercase ${selectedStatus === 'Published' ? 'text-[#8B3D28]' : 'text-neutral-500'}`}>
                   {selectedStatus}
                 </span>
               </div>
@@ -354,7 +354,7 @@ export default function AdminHeaderCategory() {
                 )}
                 <button
                   onClick={handleAddOrUpdate}
-                  className="bg-teal-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-teal-700 transition shadow-md shadow-teal-900/10 active:scale-95"
+                  className="bg-[#A54B31] text-white px-6 py-2 rounded-lg text-sm font-bold hover:opacity-90 transition shadow-md shadow-teal-900/10 active:scale-95"
                 >
                   {editingId ? 'Update' : 'Create'}
                 </button>
@@ -365,7 +365,7 @@ export default function AdminHeaderCategory() {
 
         {/* Right Panel - Tab List */}
         <div className="bg-white rounded-xl shadow-sm border border-neutral-200 flex flex-col h-full overflow-hidden">
-          <div className="p-4 border-b border-neutral-200 flex justify-between items-center bg-neutral-50">
+          <div className="px-3 py-2 border-b border-neutral-200 flex justify-between items-center bg-neutral-50">
             <h3 className="font-bold text-neutral-700 flex items-center gap-2">
               Navigation Tabs
               <span className="text-[10px] bg-neutral-200 px-2 py-0.5 rounded-full text-neutral-600">
@@ -379,7 +379,7 @@ export default function AdminHeaderCategory() {
                 placeholder="Find tab..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8 pr-4 py-1.5 text-xs border border-neutral-300 rounded-full w-40 focus:outline-none focus:ring-1 focus:ring-teal-500 bg-white"
+                className="pl-8 pr-4 py-1.5 text-xs border border-neutral-300 rounded-full w-40 focus:outline-none focus:ring-1 focus:ring-[#8B3D28] bg-white"
               />
               <svg className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -403,7 +403,7 @@ export default function AdminHeaderCategory() {
                   const isHome = category.slug === 'all' || category.name.toUpperCase() === 'HOME';
 
                   return (
-                    <tr key={category._id} className="hover:bg-teal-50/30 transition-colors group">
+                    <tr key={category._id} className="hover:bg-[#FAF7F2]/30 transition-colors group">
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-neutral-50 rounded-lg flex items-center justify-center p-1 border border-neutral-100">
@@ -412,9 +412,9 @@ export default function AdminHeaderCategory() {
                           <div>
                             <p className="text-sm font-bold text-neutral-800">
                               {category.name}
-                              {isHome && <span className="text-[9px] font-bold text-teal-600 bg-teal-100 px-1 py-0.5 rounded ml-1">DEFAULT</span>}
+                              {isHome && <span className="text-[9px] font-bold text-[#A54B31] bg-teal-100 px-1 py-0.5 rounded ml-1">DEFAULT</span>}
                             </p>
-                            <p className="text-[10px] text-teal-600 font-medium">L: {category.relatedCategory || 'All Categories'}</p>
+                            <p className="text-[10px] text-[#A54B31] font-medium">L: {category.relatedCategory || 'All Categories'}</p>
                           </div>
                         </div>
                       </td>
@@ -427,7 +427,7 @@ export default function AdminHeaderCategory() {
                         <div className="w-4 h-4 rounded-full mx-auto shadow-sm border border-black/10" style={{ background: themes[category.theme || category.slug]?.primary[0] || '#ccc' }} />
                       </td>
                       <td className="px-5 py-4 text-center">
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${category.status === 'Published' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-neutral-100 text-neutral-500'}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${category.status === 'Published' ? 'bg-green-100 text-[#A54B31] border border-green-200' : 'bg-neutral-100 text-neutral-500'}`}>
                           {category.status}
                         </span>
                       </td>
@@ -435,7 +435,7 @@ export default function AdminHeaderCategory() {
                         <div className="flex justify-end gap-1">
                           <button
                             onClick={() => handleEdit(category)}
-                            className="p-1.5 text-neutral-400 hover:text-teal-600 hover:bg-white rounded-lg transition-all"
+                            className="p-1.5 text-neutral-400 hover:text-[#A54B31] hover:bg-white rounded-lg transition-all"
                             title="Edit"
                           >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -457,7 +457,7 @@ export default function AdminHeaderCategory() {
             </table>
           </div>
 
-          <div className="p-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-between">
+          <div className="px-3 py-2 border-t border-neutral-200 bg-neutral-50 flex items-center justify-between">
             <span className="text-[10px] text-neutral-500 font-medium">Page {currentPage} of {totalPages}</span>
             <div className="flex gap-2">
               <button
@@ -477,3 +477,10 @@ export default function AdminHeaderCategory() {
     </div>
   );
 }
+
+
+
+
+
+
+

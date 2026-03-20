@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   getNotifications,
   createNotification,
@@ -160,7 +160,7 @@ export default function AdminNotification() {
 
   const SortIcon = ({ column }: { column: string }) => (
     <span className="text-neutral-400 text-xs ml-1">
-      {sortColumn === column ? (sortDirection === 'asc' ? 'â†‘' : 'â†“') : 'â‡…'}
+      {sortColumn === column ? (sortDirection === 'asc' ? '↑' : '↓') : '⇅'}
     </span>
   );
 
@@ -235,56 +235,56 @@ export default function AdminNotification() {
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Page Content */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-3">
         {/* Header with Title and Breadcrumb */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gapx-3 py-2 mb-6">
           <h1 className="text-2xl font-semibold text-neutral-800">Notification</h1>
           <div className="text-sm">
-            <span className="text-blue-600 hover:underline cursor-pointer">Home</span>
+            <span className="text-[#8B3D28] hover:underline cursor-pointer">Home</span>
             <span className="text-neutral-400 mx-1">/</span>
             <span className="text-neutral-600">Notification</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 h-full">
           {/* Left Panel: Send Notification */}
           <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col">
-            <div className="bg-green-600 text-white px-6 py-4 rounded-t-lg">
+            <div className="bg-[#8B3D28] text-white px-4 py-2.5 rounded-t-lg">
               <h2 className="text-lg font-semibold">Send Notification</h2>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center justify-between">
+              <div className="px-3 py-2 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center justify-between">
                 <p className="text-sm">{error}</p>
                 <button
                   onClick={() => setError('')}
                   className="text-red-700 hover:text-red-900 ml-4 text-lg font-bold"
                   type="button"
                 >
-                  Ã—
+                  ×
                 </button>
               </div>
             )}
 
             {/* Success Message */}
             {successMessage && (
-              <div className="p-4 bg-green-50 border-l-4 border-green-500 text-green-700 flex items-center justify-between">
+              <div className="px-3 py-2 bg-green-50 border-l-4 border-green-500 text-[#A54B31] flex items-center justify-between">
                 <p className="text-sm">{successMessage}</p>
                 <button
                   onClick={() => setSuccessMessage('')}
-                  className="text-green-700 hover:text-green-900 ml-4 text-lg font-bold"
+                  className="text-[#A54B31] hover:text-green-900 ml-4 text-lg font-bold"
                   type="button"
                 >
-                  Ã—
+                  ×
                 </button>
               </div>
             )}
 
-            <div className="p-6 flex-1 flex flex-col">
+            <div className="p-3 flex-1 flex flex-col">
               <form onSubmit={handleSendNotification} className="space-y-4 flex-1 flex flex-col">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                     Select User Type
                   </label>
                   <select
@@ -292,7 +292,7 @@ export default function AdminNotification() {
                     value={formData.recipientType}
                     onChange={handleInputChange}
                     disabled={loading}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none bg-white"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none bg-white"
                   >
                     <option value="All">All Users</option>
                     <option value="Admin">Admin</option>
@@ -303,7 +303,7 @@ export default function AdminNotification() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                     Title <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -314,12 +314,12 @@ export default function AdminNotification() {
                     required
                     disabled={loading}
                     placeholder="Enter Title"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                   />
                 </div>
 
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                     Message <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -330,7 +330,7 @@ export default function AdminNotification() {
                     disabled={loading}
                     placeholder="Enter Message"
                     rows={6}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none resize-none"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none resize-none"
                   />
                 </div>
 
@@ -338,7 +338,7 @@ export default function AdminNotification() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded font-medium transition-colors"
+                    className="w-full bg-[#8B3D28] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded font-medium transition-colors"
                   >
                     {loading ? 'Sending...' : 'Send Notification'}
                   </button>
@@ -349,14 +349,14 @@ export default function AdminNotification() {
 
           {/* Right Panel: View Notification */}
           <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col">
-            <div className="px-6 py-4 border-b border-neutral-200">
+            <div className="px-4 py-2.5 border-b border-neutral-200">
               <h2 className="text-lg font-semibold text-neutral-800">View Notification</h2>
             </div>
 
             {/* Controls */}
-            <div className="p-4 border-b border-neutral-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="px-3 py-2 border-b border-neutral-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gapx-3 py-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-neutral-600">Filter by Type:</span>
+                <span className="text-[12px] font-bold text-neutral-500">Filter by Type:</span>
                 <select
                   value={filterRecipientType}
                   onChange={(e) => {
@@ -364,7 +364,7 @@ export default function AdminNotification() {
                     setCurrentPage(1);
                   }}
                   disabled={loading}
-                  className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none cursor-pointer"
+                  className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer"
                 >
                   <option value="All">All</option>
                   <option value="Admin">Admin</option>
@@ -379,7 +379,7 @@ export default function AdminNotification() {
                     setCurrentPage(1);
                   }}
                   disabled={loading}
-                  className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-green-500 focus:outline-none cursor-pointer"
+                  className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer"
                 >
                   <option value={10}>10</option>
                   <option value={20}>20</option>
@@ -392,7 +392,7 @@ export default function AdminNotification() {
                   <span className="absolute left-2 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">Search:</span>
                   <input
                     type="text"
-                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-green-500 w-48"
+                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#8B3D28] w-48"
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -409,8 +409,8 @@ export default function AdminNotification() {
             {loading && (
               <div className="flex-1 flex items-center justify-center p-8">
                 <div className="text-center">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                  <p className="mt-2 text-sm text-neutral-600">Loading...</p>
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B3D28]"></div>
+                  <p className="mt-2 text-[12px] font-bold text-neutral-500">Loading...</p>
                 </div>
               </div>
             )}
@@ -421,9 +421,9 @@ export default function AdminNotification() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-neutral-50 text-xs font-bold text-neutral-800 border-b border-neutral-200">
-                      <th className="p-4">Sr No</th>
+                      <th className="px-3 py-2">Sr No</th>
                       <th
-                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                         onClick={() => handleSort('recipientType')}
                       >
                         <div className="flex items-center">
@@ -431,7 +431,7 @@ export default function AdminNotification() {
                         </div>
                       </th>
                       <th
-                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                         onClick={() => handleSort('title')}
                       >
                         <div className="flex items-center">
@@ -439,7 +439,7 @@ export default function AdminNotification() {
                         </div>
                       </th>
                       <th
-                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                         onClick={() => handleSort('message')}
                       >
                         <div className="flex items-center">
@@ -447,14 +447,14 @@ export default function AdminNotification() {
                         </div>
                       </th>
                       <th
-                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                         onClick={() => handleSort('createdAt')}
                       >
                         <div className="flex items-center">
                           Date <SortIcon column="createdAt" />
                         </div>
                       </th>
-                      <th className="p-4">Action</th>
+                      <th className="px-3 py-2">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -470,12 +470,12 @@ export default function AdminNotification() {
                           key={notification._id}
                           className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700 border-b border-neutral-200"
                         >
-                          <td className="p-4 align-middle">{startIndex + index + 1}</td>
-                          <td className="p-4 align-middle">{getRecipientDisplayName(notification.recipientType)}</td>
-                          <td className="p-4 align-middle">{notification.title}</td>
-                          <td className="p-4 align-middle max-w-md">{notification.message}</td>
-                          <td className="p-4 align-middle">{formatDate(notification.createdAt)}</td>
-                          <td className="p-4 align-middle">
+                          <td className="px-3 py-2 align-middle">{startIndex + index + 1}</td>
+                          <td className="px-3 py-2 align-middle">{getRecipientDisplayName(notification.recipientType)}</td>
+                          <td className="px-3 py-2 align-middle">{notification.title}</td>
+                          <td className="px-3 py-2 align-middle max-w-md">{notification.message}</td>
+                          <td className="px-3 py-2 align-middle">{formatDate(notification.createdAt)}</td>
+                          <td className="px-3 py-2 align-middle">
                             <button
                               onClick={() => handleDelete(notification._id)}
                               disabled={loading}
@@ -507,7 +507,7 @@ export default function AdminNotification() {
 
             {/* Pagination Footer */}
             {!loading && totalPages > 1 && (
-              <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+              <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
                 <div className="text-xs sm:text-sm text-neutral-700">
                   Showing {displayedNotifications.length > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + displayedNotifications.length, totalNotifications)} of {totalNotifications} entries
                 </div>
@@ -515,9 +515,9 @@ export default function AdminNotification() {
                   <button
                     onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                     disabled={currentPage === 1 || loading}
-                    className={`p-2 border border-green-600 rounded ${currentPage === 1
+                    className={`p-2 border border-[#8B3D28] rounded ${currentPage === 1
                         ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                        : 'text-green-600 hover:bg-green-50'
+                        : 'text-[#8B3D28] hover:bg-[#FAF7F2]'
                       }`}
                     aria-label="Previous page"
                   >
@@ -553,9 +553,9 @@ export default function AdminNotification() {
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
                         disabled={loading}
-                        className={`px-3 py-1.5 border border-green-600 rounded font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed ${currentPage === pageNum
-                            ? 'bg-green-600 text-white'
-                            : 'text-green-600 hover:bg-green-50'
+                        className={`px-3 py-1.5 border border-[#8B3D28] rounded font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed ${currentPage === pageNum
+                            ? 'bg-[#8B3D28] text-white'
+                            : 'text-[#8B3D28] hover:bg-[#FAF7F2]'
                           }`}
                       >
                         {pageNum}
@@ -568,9 +568,9 @@ export default function AdminNotification() {
                   <button
                     onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages || loading}
-                    className={`p-2 border border-green-600 rounded ${currentPage === totalPages
+                    className={`p-2 border border-[#8B3D28] rounded ${currentPage === totalPages
                         ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                        : 'text-green-600 hover:bg-green-50'
+                        : 'text-[#8B3D28] hover:bg-[#FAF7F2]'
                       }`}
                     aria-label="Next page"
                   >
@@ -598,13 +598,20 @@ export default function AdminNotification() {
       </div>
 
       {/* Footer */}
-      <footer className="text-center py-4 text-sm text-neutral-600 border-t border-neutral-200 bg-white">
-        Copyright Â© 2025. Developed By{' '}
-        <a href="#" className="text-blue-600 hover:underline">
+      <footer className="text-center py-4 text-[12px] font-bold text-neutral-500 border-t border-neutral-200 bg-white">
+        Copyright © 2025. Developed By{' '}
+        <a href="#" className="text-[#8B3D28] hover:underline">
           Village Basket
         </a>
       </footer>
     </div>
   );
 }
+
+
+
+
+
+
+
 

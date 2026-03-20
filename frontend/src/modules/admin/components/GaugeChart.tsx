@@ -57,10 +57,13 @@ export default function GaugeChart({ value, maxValue, label }: GaugeChartProps) 
       </svg>
       
       <div className="mt-2 text-center">
-        <div className="text-2xl font-bold text-neutral-900">₹{value.toFixed(2)}</div>
+        <div className="text-2xl font-bold text-neutral-900">₹{(value || 0).toFixed(2)}</div>
         <div className="text-sm text-neutral-600 mt-1">{label}</div>
       </div>
     </div>
   );
 }
+
+
+
 

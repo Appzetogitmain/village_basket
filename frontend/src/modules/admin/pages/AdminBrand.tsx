@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { uploadImage } from "../../../services/api/uploadService";
 import { validateImageFile, createImagePreview } from "../../../utils/imageUpload";
 import {
@@ -232,21 +232,21 @@ export default function AdminBrand() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <h1 className="text-2xl font-semibold text-neutral-800">Brand</h1>
-        <div className="text-sm text-blue-500">
-          <span className="text-blue-500 hover:underline cursor-pointer">
+        <div className="text-sm text-[#8B3D28]">
+          <span className="text-[#8B3D28] hover:underline cursor-pointer">
             Home
           </span>{" "}
           <span className="text-neutral-400">/</span> Dashboard
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gapx-3 py-2 sm:gap-3">
         {/* Left Panel - Add Brand */}
         <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-          <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
-            <h2 className="text-base sm:text-lg font-semibold">Add Brand</h2>
+          <div className="bg-[#A54B31] text-white px-3 py-2">
+            <h2 className="text-[#8B3D28]ase sm:text-lg font-semibold">Add Brand</h2>
           </div>
-          <div className="p-4 sm:p-6 space-y-4">
+          <div className="px-3 py-2 sm:p-3 space-y-4">
             {uploadError && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                 {uploadError}
@@ -254,7 +254,7 @@ export default function AdminBrand() {
             )}
             {/* Brand Name */}
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                 Brand Name:
               </label>
               <input
@@ -262,17 +262,17 @@ export default function AdminBrand() {
                 value={brandName}
                 onChange={(e) => setBrandName(e.target.value)}
                 placeholder="Enter Brand Name"
-                className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                 disabled={uploading}
               />
             </div>
 
             {/* Brand Image */}
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                 Brand Image:
               </label>
-              <label className="block border-2 border-dashed border-neutral-300 rounded-lg p-4 text-center cursor-pointer hover:border-teal-500 transition-colors">
+              <label className="block border-2 border-dashed border-neutral-300 rounded-lg px-3 py-2 text-center cursor-pointer hover:border-teal-500 transition-colors">
                 {brandImagePreview ? (
                   <div className="space-y-2">
                     <img
@@ -337,7 +337,7 @@ export default function AdminBrand() {
               disabled={uploading}
               className={`w-full py-2.5 rounded text-sm font-medium transition-colors ${uploading
                 ? "bg-neutral-400 cursor-not-allowed text-white"
-                : "bg-teal-600 hover:bg-teal-700 text-white"
+                : "bg-[#A54B31] hover:opacity-90 text-white"
                 }`}>
               {uploading
                 ? "Saving..."
@@ -363,12 +363,12 @@ export default function AdminBrand() {
 
         {/* Right Panel - View Brand */}
         <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-          <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
-            <h2 className="text-base sm:text-lg font-semibold">View Brand</h2>
+          <div className="bg-[#A54B31] text-white px-3 py-2">
+            <h2 className="text-[#8B3D28]ase sm:text-lg font-semibold">View Brand</h2>
           </div>
 
           {/* Controls */}
-          <div className="p-4 sm:p-6 border-b border-neutral-200">
+          <div className="px-3 py-2 sm:p-3 border-b border-neutral-200">
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
               {/* Entries Per Page */}
               <div className="flex items-center gap-2">
@@ -379,7 +379,7 @@ export default function AdminBrand() {
                     setEntriesPerPage(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="px-2 py-1 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500">
+                  className="px-2 py-1 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]">
                   <option value={10}>10</option>
                   <option value={25}>25</option>
                   <option value={50}>50</option>
@@ -391,7 +391,7 @@ export default function AdminBrand() {
               {/* Export Button */}
               <button
                 onClick={handleExport}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2 transition-colors">
+                className="bg-[#A54B31] hover:opacity-90 text-white px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors">
                 <svg
                   width="16"
                   height="16"
@@ -430,7 +430,7 @@ export default function AdminBrand() {
                     setCurrentPage(1);
                   }}
                   placeholder="Search..."
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[150px]"
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[150px]"
                 />
               </div>
             </div>
@@ -442,7 +442,7 @@ export default function AdminBrand() {
               <thead className="bg-neutral-50 border-b border-neutral-200">
                 <tr>
                   <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                    className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                     onClick={() => handleSort("id")}>
                     <div className="flex items-center gap-2">
                       ID
@@ -463,7 +463,7 @@ export default function AdminBrand() {
                     </div>
                   </th>
                   <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                    className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                     onClick={() => handleSort("name")}>
                     <div className="flex items-center gap-2">
                       Brand Name
@@ -483,11 +483,11 @@ export default function AdminBrand() {
                       </svg>
                     </div>
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
                     Brand Image
                   </th>
                   <th
-                    className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                    className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                     onClick={() => handleSort("action")}>
                     <div className="flex items-center gap-2">
                       Action
@@ -514,7 +514,7 @@ export default function AdminBrand() {
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-4 sm:px-6 py-8 text-center text-sm text-neutral-500">
+                      className="px-4 sm:px-4 py-2.5 text-center text-sm text-neutral-500">
                       Loading brands...
                     </td>
                   </tr>
@@ -522,7 +522,7 @@ export default function AdminBrand() {
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-4 sm:px-6 py-8 text-center text-sm text-red-600">
+                      className="px-4 sm:px-4 py-2.5 text-center text-sm text-red-600">
                       {error}
                     </td>
                   </tr>
@@ -530,20 +530,20 @@ export default function AdminBrand() {
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-4 sm:px-6 py-8 text-center text-sm text-neutral-500">
+                      className="px-4 sm:px-4 py-2.5 text-center text-sm text-neutral-500">
                       No brands found
                     </td>
                   </tr>
                 ) : (
                   displayedBrands.map((brand) => (
                     <tr key={brand._id} className="hover:bg-neutral-50">
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
+                      <td className="px-3 py-2 text-[12px] font-black text-neutral-900">
                         {brand._id.slice(-6)}
                       </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900 font-medium">
+                      <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">
                         {brand.name}
                       </td>
-                      <td className="px-4 sm:px-6 py-3">
+                      <td className="px-3 py-2">
                         <div className="w-20 h-16 bg-neutral-100 rounded overflow-hidden flex items-center justify-center">
                           {brand.image ? (
                             <img
@@ -552,7 +552,7 @@ export default function AdminBrand() {
                               className="w-full h-full object-contain p-1"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src =
-                                  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect width="100" height="100" fill="%23e5e7eb"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="12"%3ENo Image%3C/text%3E%3C/svg%3E';
+                                  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect width="100" height="100" fill="%23e5e7eb"/%3E%3Ctext x="50%25" y="50%25" text-[#8B3D28]nchor="middle" dy=".3em" fill="%239ca3af" font-size="12"%3ENo Image%3C/text%3E%3C/svg%3E';
                               }}
                             />
                           ) : (
@@ -562,11 +562,11 @@ export default function AdminBrand() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 sm:px-6 py-3">
+                      <td className="px-3 py-2">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleEdit(brand._id)}
-                            className="p-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
+                            className="p-1.5 bg-blue-100 hover:bg-blue-200 text-[#8B3D28] rounded transition-colors"
                             title="Edit">
                             <svg
                               width="16"
@@ -608,7 +608,7 @@ export default function AdminBrand() {
           </div>
 
           {/* Pagination Footer */}
-          <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+          <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
             <div className="text-xs sm:text-sm text-neutral-700">
               Showing {startIndex + 1} to {Math.min(endIndex, brands.length)} of{" "}
               {brands.length} entries
@@ -643,7 +643,7 @@ export default function AdminBrand() {
                     key={page}
                     onClick={() => setCurrentPage(page)}
                     className={`px-3 py-1 border border-neutral-300 rounded text-sm ${currentPage === page
-                      ? "bg-teal-600 text-white border-teal-600"
+                      ? "bg-[#A54B31] text-white border-[#A54B31]"
                       : "text-neutral-700 hover:bg-neutral-50"
                       }`}>
                     {page}
@@ -682,12 +682,19 @@ export default function AdminBrand() {
 
       {/* Footer */}
       <div className="text-center text-sm text-neutral-500 py-4">
-        Copyright Â© 2025. Developed By{" "}
-        <a href="#" className="text-teal-600 hover:text-teal-700">
+        Copyright © 2025. Developed By{" "}
+        <a href="#" className="text-[#A54B31] hover:text-teal-700">
           Village Basket
         </a>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 

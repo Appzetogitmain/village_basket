@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { uploadImage } from "../../../services/api/uploadService";
 import {
@@ -133,9 +133,9 @@ function SubCategoryModal({ isOpen, onClose, onSubmit, initialData, categoryName
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-3 py-2 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-        <div className="px-6 py-4 border-b border-neutral-100 flex justify-between items-center bg-gray-50">
+        <div className="px-4 py-2.5 border-b border-neutral-100 flex justify-between items-center bg-gray-50">
           <h3 className="text-lg font-semibold text-neutral-900">
             {initialData ? "Edit Subcategory" : "Add New Subcategory"}
           </h3>
@@ -147,7 +147,7 @@ function SubCategoryModal({ isOpen, onClose, onSubmit, initialData, categoryName
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-3 space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg">
               {error}
@@ -155,7 +155,7 @@ function SubCategoryModal({ isOpen, onClose, onSubmit, initialData, categoryName
           )}
 
           <div>
-            <label className="block text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit mb-1">
               Parent Category
             </label>
             <div className="px-3 py-2 bg-neutral-100 rounded-lg text-neutral-700 text-sm font-medium">
@@ -164,24 +164,24 @@ function SubCategoryModal({ isOpen, onClose, onSubmit, initialData, categoryName
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+            <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-1.5">
               Subcategory Name
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-transparent transition-all"
               placeholder="e.g. Fresh Vegetables"
               autoFocus
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+            <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-1.5">
               Icon / Image
             </label>
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gapx-3 py-2">
               <div className="flex-shrink-0 w-24 h-24 bg-neutral-100 rounded-lg overflow-hidden border border-neutral-200 relative group">
                 {imagePreview ? (
                   <img
@@ -220,14 +220,14 @@ function SubCategoryModal({ isOpen, onClose, onSubmit, initialData, categoryName
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
+              className="px-4 py-2 text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-70 flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-white bg-[#A54B31] rounded-lg hover:opacity-90 transition-colors disabled:opacity-70 flex items-center gap-2"
               disabled={loading}
             >
               {loading && <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
@@ -411,7 +411,7 @@ export default function AdminSubCategory() {
     <div className="flex h-[calc(100vh-6rem)] -m-6 bg-gray-50 overflow-hidden">
       {/* Sidebar - Categories List */}
       <div className="w-80 bg-white border-r border-neutral-200 flex flex-col h-full flex-shrink-0 z-10 shadow-sm transition-all">
-        <div className="p-4 border-b border-neutral-100 bg-white">
+        <div className="px-3 py-2 border-b border-neutral-100 bg-white">
           <h2 className="text-lg font-bold text-neutral-800 mb-4 px-1">Categories</h2>
           <div className="relative">
             <input
@@ -419,7 +419,7 @@ export default function AdminSubCategory() {
               placeholder="Search categories..."
               value={categorySearch}
               onChange={(e) => setCategorySearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:bg-white transition-all"
             />
             <div className="absolute left-3 top-2.5 text-neutral-400">
               <SearchIcon />
@@ -429,9 +429,9 @@ export default function AdminSubCategory() {
 
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {loadingCategories ? (
-            <div className="p-4 text-center text-neutral-400 text-sm">Loading categories...</div>
+            <div className="px-3 py-2 text-center text-neutral-400 text-sm">Loading categories...</div>
           ) : filteredCategories.length === 0 ? (
-            <div className="p-4 text-center text-neutral-400 text-sm">No categories found</div>
+            <div className="px-3 py-2 text-center text-neutral-400 text-sm">No categories found</div>
           ) : (
             filteredCategories.map(item => (
               <div
@@ -464,7 +464,7 @@ export default function AdminSubCategory() {
                   </p>
                 </div>
                 {selectedCategoryId === item._id && (
-                  <div className="text-teal-600">
+                  <div className="text-[#A54B31]">
                     <ChevronRightIcon />
                   </div>
                 )}
@@ -487,7 +487,7 @@ export default function AdminSubCategory() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-neutral-600 mb-2">Select a Category</h3>
-            <p className="text-base text-neutral-400 max-w-sm text-center">
+            <p className="text-[#8B3D28]ase text-neutral-400 max-w-sm text-center">
               Choose a category from the sidebar to view, manage, and add new subcategories.
             </p>
           </div>
@@ -509,7 +509,7 @@ export default function AdminSubCategory() {
 
               <button
                 onClick={openCreateModal}
-                className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95 border border-teal-500"
+                className="inline-flex items-center gap-2 bg-[#A54B31] hover:opacity-90 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95 border border-teal-500"
               >
                 <PlusIcon />
                 <span>Add Subcategory</span>
@@ -519,11 +519,11 @@ export default function AdminSubCategory() {
             {/* Content Grid */}
             <div className="flex-1 overflow-y-auto p-8">
               {loadingSubCategories ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                   {[1, 2, 3, 4, 5, 6].map(i => (
                     <div key={i} className="bg-white rounded-xl shadow-sm border border-neutral-100 h-64 animate-pulse flex flex-col">
                       <div className="h-40 bg-neutral-100 rounded-t-xl" />
-                      <div className="p-4 space-y-3 flex-1">
+                      <div className="px-3 py-2 space-y-3 flex-1">
                         <div className="h-4 w-3/4 bg-neutral-100 rounded" />
                         <div className="h-3 w-1/2 bg-neutral-100 rounded" />
                       </div>
@@ -545,7 +545,7 @@ export default function AdminSubCategory() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 pb-12">
                   {subCategories.map((sub) => (
                     <div
                       key={sub._id}
@@ -561,7 +561,7 @@ export default function AdminSubCategory() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-neutral-300 bg-neutral-50">
-                            <span className="text-4xl font-bold opacity-30 select-none">{sub.name.charAt(0)}</span>
+                            <span className="text-3xl font-bold opacity-30 select-none">{sub.name.charAt(0)}</span>
                           </div>
                         )}
 
@@ -569,7 +569,7 @@ export default function AdminSubCategory() {
                         <div className="absolute inset-x-0 bottom-4 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
                           <button
                             onClick={(e) => openEditModal(sub, e)}
-                            className="flex items-center gap-2 px-4 py-2 bg-white/95 backdrop-blur-sm text-neutral-700 rounded-full hover:bg-teal-50 hover:text-teal-700 shadow-lg border border-transparent hover:border-teal-100 transition-all text-xs font-bold uppercase tracking-wider"
+                            className="flex items-center gap-2 px-4 py-2 bg-white/95 backdrop-blur-sm text-neutral-700 rounded-full hover:bg-[#FAF7F2] hover:text-teal-700 shadow-lg border border-transparent hover:border-teal-100 transition-all text-xs font-bold uppercase tracking-wider"
                             title="Edit"
                           >
                             <span className="w-4 h-4"><EditIcon /></span>
@@ -586,7 +586,7 @@ export default function AdminSubCategory() {
                       </div>
 
                       {/* Info Area */}
-                      <div className="p-4 flex-1 flex flex-col justify-center text-center">
+                      <div className="px-3 py-2 flex-1 flex flex-col justify-center text-center">
                         <h3 className="font-semibold text-neutral-800 group-hover:text-teal-700 transition-colors truncate px-2" title={sub.name}>
                           {sub.name}
                         </h3>
@@ -614,3 +614,10 @@ export default function AdminSubCategory() {
     </div>
   );
 }
+
+
+
+
+
+
+

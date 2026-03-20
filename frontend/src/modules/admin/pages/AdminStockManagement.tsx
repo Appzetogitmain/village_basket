@@ -278,7 +278,7 @@ export default function AdminStockManagement() {
     <div className="flex h-[calc(100vh-6rem)] -m-6 bg-gray-50 overflow-hidden">
       {/* Sidebar - Categories List */}
       <div className="w-80 bg-white border-r border-neutral-200 flex flex-col h-full flex-shrink-0 z-10 shadow-sm transition-all hidden md:flex">
-        <div className="p-4 border-b border-neutral-100 bg-white">
+        <div className="px-3 py-2 border-b border-neutral-100 bg-white">
           <h2 className="text-lg font-bold text-neutral-800 mb-4 px-1">Categories</h2>
           <div className="relative">
             <input
@@ -286,7 +286,7 @@ export default function AdminStockManagement() {
               placeholder="Search categories..."
               value={categorySearch}
               onChange={(e) => setCategorySearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:bg-white transition-all"
             />
             <div className="absolute left-3 top-2.5 text-neutral-400">
               <SearchIcon />
@@ -296,9 +296,9 @@ export default function AdminStockManagement() {
 
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {loadingCategories ? (
-            <div className="p-4 text-center text-neutral-400 text-sm">Loading categories...</div>
+            <div className="px-3 py-2 text-center text-neutral-400 text-sm">Loading categories...</div>
           ) : filteredCategories.length === 0 ? (
-            <div className="p-4 text-center text-neutral-400 text-sm">No categories found</div>
+            <div className="px-3 py-2 text-center text-neutral-400 text-sm">No categories found</div>
           ) : (
             filteredCategories.map(item => (
               <div
@@ -331,7 +331,7 @@ export default function AdminStockManagement() {
                   </p>
                 </div>
                 {selectedCategoryId === item._id && (
-                  <div className="text-teal-600">
+                  <div className="text-[#A54B31]">
                     <ChevronRightIcon />
                   </div>
                 )}
@@ -361,7 +361,7 @@ export default function AdminStockManagement() {
             {/* Header Area */}
             <div className="bg-white border-b border-neutral-200 z-10 sticky top-0 shadow-sm">
               {/* 1. Title & Global Actions */}
-              <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gapx-3 py-2">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 uppercase tracking-widest border border-teal-100">Managing Stock</span>
@@ -401,7 +401,7 @@ export default function AdminStockManagement() {
                         className={`
                                   px-4 py-1.5 rounded-full text-xs font-bold tracking-wider whitespace-nowrap transition-all border flex items-center gap-2
                                   ${selectedSubCategoryId === sub._id
-                            ? "bg-teal-600 text-white border-teal-600 shadow-sm"
+                            ? "bg-[#A54B31] text-white border-[#A54B31] shadow-sm"
                             : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"}
                                `}
                       >
@@ -426,7 +426,7 @@ export default function AdminStockManagement() {
                   <select
                     value={filterSeller}
                     onChange={(e) => setFilterSeller(e.target.value)}
-                    className="bg-white border border-neutral-300 text-neutral-700 text-sm rounded-md focus:ring-teal-500 focus:border-teal-500 block p-2 outline-none h-10"
+                    className="bg-white border border-neutral-300 text-neutral-700 text-sm rounded-md focus:ring-[#8B3D28] focus:border-[#8B3D28] block p-2 outline-none h-10"
                   >
                     {uniqueSellers.map(seller => (
                       <option key={seller} value={seller}>{seller}</option>
@@ -436,7 +436,7 @@ export default function AdminStockManagement() {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="bg-white border border-neutral-300 text-neutral-700 text-sm rounded-md focus:ring-teal-500 focus:border-teal-500 block p-2 outline-none h-10"
+                    className="bg-white border border-neutral-300 text-neutral-700 text-sm rounded-md focus:ring-[#8B3D28] focus:border-[#8B3D28] block p-2 outline-none h-10"
                   >
                     {STATUS_OPTIONS.map(status => (
                       <option key={status} value={status}>{status}</option>
@@ -446,7 +446,7 @@ export default function AdminStockManagement() {
                   <select
                     value={filterStock}
                     onChange={(e) => setFilterStock(e.target.value)}
-                    className="bg-white border border-neutral-300 text-neutral-700 text-sm rounded-md focus:ring-teal-500 focus:border-teal-500 block p-2 outline-none h-10"
+                    className="bg-white border border-neutral-300 text-neutral-700 text-sm rounded-md focus:ring-[#8B3D28] focus:border-[#8B3D28] block p-2 outline-none h-10"
                   >
                     {STOCK_OPTIONS.map(stock => (
                       <option key={stock} value={stock}>{stock}</option>
@@ -460,7 +460,7 @@ export default function AdminStockManagement() {
                     placeholder="Search products..."
                     value={productSearch}
                     onChange={(e) => setProductSearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-white border border-neutral-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 transition-all h-10"
+                    className="w-full pl-9 pr-4 py-2 bg-white border border-neutral-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] transition-all h-10"
                   />
                   <div className="absolute left-3 top-2.5 text-neutral-400">
                     <SearchIcon />
@@ -470,13 +470,13 @@ export default function AdminStockManagement() {
             </div>
 
             {/* Content Grid */}
-            <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+            <div className="flex-1 overflow-y-auto p-3 bg-gray-50/50">
               {loadingProducts ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                     <div key={i} className="bg-white rounded-xl shadow-sm border border-neutral-100 h-72 animate-pulse flex flex-col">
                       <div className="h-40 bg-neutral-100 rounded-t-xl" />
-                      <div className="p-4 space-y-3 flex-1">
+                      <div className="px-3 py-2 space-y-3 flex-1">
                         <div className="h-4 w-3/4 bg-neutral-100 rounded" />
                         <div className="h-3 w-1/2 bg-neutral-100 rounded" />
                         <div className="h-6 w-full bg-neutral-100 rounded mt-auto" />
@@ -501,7 +501,7 @@ export default function AdminStockManagement() {
                         setSelectedSubCategoryId(null);
                         setProductSearch("");
                       }}
-                      className="mt-4 text-teal-600 font-medium hover:underline text-sm"
+                      className="mt-4 text-[#A54B31] font-medium hover:underline text-sm"
                     >
                       Clear all filters
                     </button>
@@ -516,7 +516,7 @@ export default function AdminStockManagement() {
                       onClick={() => navigate(`/admin/product/edit/${product._id}`)}
                     >
                       {/* Image Area */}
-                      <div className="relative aspect-square bg-neutral-50 overflow-hidden border-b border-neutral-100 p-4">
+                      <div className="relative aspect-square bg-neutral-50 overflow-hidden border-b border-neutral-100 px-3 py-2">
                         {product.mainImage ? (
                           <img
                             src={product.mainImage}
@@ -547,7 +547,7 @@ export default function AdminStockManagement() {
                         <div className="absolute inset-x-0 bottom-2 flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                           <button
                             onClick={(e) => { e.stopPropagation(); navigate(`/admin/product/edit/${product._id}`); }}
-                            className="p-2 bg-white text-neutral-700 rounded-full hover:bg-teal-500 hover:text-white shadow-md border border-neutral-100 transition-colors"
+                            className="p-2 bg-white text-neutral-700 rounded-full hover:bg-[#A54B31] hover:text-white shadow-md border border-neutral-100 transition-colors"
                             title="Edit"
                           >
                             <EditIcon />
@@ -571,9 +571,9 @@ export default function AdminStockManagement() {
                         <div className="mt-auto flex items-end justify-between">
                           <div className="flex flex-col">
                             {/* <span className="text-[10px] text-neutral-400 capitalize">{product.brand ? (typeof product.brand === 'string' ? 'Brand' : product.brand.name) : 'No Brand'}</span> */}
-                            <span className="text-base font-bold text-neutral-900">₹{product.price}</span>
+                            <span className="text-[#8B3D28]ase font-bold text-neutral-900">₹{product.price}</span>
                           </div>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${product.publish ? "bg-green-50 text-green-700 border-green-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${product.publish ? "bg-green-50 text-[#A54B31] border-green-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
                             {product.publish ? "LIVE" : "DRAFT"}
                           </span>
                         </div>
@@ -589,3 +589,10 @@ export default function AdminStockManagement() {
     </div>
   );
 }
+
+
+
+
+
+
+

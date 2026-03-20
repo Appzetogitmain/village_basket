@@ -144,9 +144,9 @@ export default function AdminWithdrawals() {
                             key={withdrawal._id || withdrawal.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+                            className="bg-white rounded-xl shadow-sm border border-gray-100 p-3"
                         >
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gapx-3 py-2 mb-4">
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
                                         <h3 className="font-semibold text-lg">
@@ -168,9 +168,9 @@ export default function AdminWithdrawals() {
                                     <p className="text-2xl font-bold text-gray-900">₹{withdrawal.amount?.toFixed(2)}</p>
                                     <span
                                         className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mt-2 ${withdrawal.status === 'Completed'
-                                            ? 'bg-green-100 text-green-700'
+                                            ? 'bg-green-100 text-[#A54B31]'
                                             : withdrawal.status === 'Approved'
-                                                ? 'bg-blue-100 text-blue-700'
+                                                ? 'bg-blue-100 text-[#8B3D28]'
                                                 : withdrawal.status === 'Rejected'
                                                     ? 'bg-red-100 text-red-700'
                                                     : 'bg-yellow-100 text-yellow-700'
@@ -181,7 +181,7 @@ export default function AdminWithdrawals() {
                                 </div>
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-4 mb-4 bg-gray-50 p-4 rounded-lg">
+                            <div className="grid md:grid-cols-2 gapx-3 py-2 mb-4 bg-gray-50 px-3 py-2 rounded-lg">
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Payment Method</p>
                                     <p className="font-medium text-sm">{withdrawal.paymentMethod}</p>
@@ -213,7 +213,7 @@ export default function AdminWithdrawals() {
                                     <button
                                         onClick={() => handleApprove(withdrawal._id || withdrawal.id)}
                                         disabled={isProcessing}
-                                        className="flex-1 bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition disabled:opacity-50"
+                                        className="flex-1 bg-[#8B3D28] text-white py-2 rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50"
                                     >
                                         Approve
                                     </button>
@@ -248,11 +248,11 @@ export default function AdminWithdrawals() {
 
             {/* Complete Modal */}
             {showCompleteModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-3 py-2">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+                        className="bg-white rounded-2xl p-3 max-w-md w-full shadow-xl"
                     >
                         <h2 className="text-xl font-bold mb-4">Complete Withdrawal</h2>
                         <div className="mb-4">
@@ -294,3 +294,10 @@ export default function AdminWithdrawals() {
         </div>
     );
 }
+
+
+
+
+
+
+

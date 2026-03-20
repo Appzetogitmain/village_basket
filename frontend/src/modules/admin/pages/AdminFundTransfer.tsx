@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 interface FundTransfer {
   id: number;
@@ -72,9 +72,9 @@ export default function AdminFundTransfer() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="bg-teal-600 px-4 sm:px-6 py-4 rounded-t-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+      <div className="bg-[#A54B31] px-3 py-2.5 rounded-t-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <h1 className="text-white text-xl sm:text-2xl font-semibold">View Fund Transfer</h1>
-        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2 transition-colors">
+        <button className="bg-[#8B3D28] hover:bg-[#8B3D28] text-white px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -86,8 +86,8 @@ export default function AdminFundTransfer() {
       {/* Main Content Card */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
         {/* Filters */}
-        <div className="p-4 sm:p-6 border-b border-neutral-200">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <div className="px-3 py-2 sm:p-3 border-b border-neutral-200">
+          <div className="flex flex-col lg:flex-row gapx-3 py-2 items-start lg:items-center justify-between">
             {/* Left Side Filters */}
             <div className="flex flex-col sm:flex-row gap-3 flex-1 flex-wrap">
               {/* From - To Date */}
@@ -106,7 +106,7 @@ export default function AdminFundTransfer() {
                       value={fromDate}
                       onChange={(e) => setFromDate(e.target.value)}
                       placeholder="MM/DD/YYYY"
-                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[140px]"
+                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>
                   <span className="text-neutral-500">-</span>
@@ -122,7 +122,7 @@ export default function AdminFundTransfer() {
                       value={toDate}
                       onChange={(e) => setToDate(e.target.value)}
                       placeholder="MM/DD/YYYY"
-                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[140px]"
+                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>
                   <button
@@ -143,7 +143,7 @@ export default function AdminFundTransfer() {
                     setSelectedDeliveryBoy(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[150px]"
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[150px]"
                 >
                   {deliveryBoys.map((boy) => (
                     <option key={boy} value={boy === 'All Delivery Boy' ? 'all' : boy}>
@@ -162,7 +162,7 @@ export default function AdminFundTransfer() {
                     setSelectedMethod(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[100px]"
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[100px]"
                 >
                   {methods.map((method) => (
                     <option key={method} value={method === 'All' ? 'all' : method}>
@@ -184,7 +184,7 @@ export default function AdminFundTransfer() {
                     setEntriesPerPage(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="px-2 py-1 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                  className="px-2 py-1 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                 >
                   <option value={10}>10</option>
                   <option value={25}>25</option>
@@ -196,7 +196,7 @@ export default function AdminFundTransfer() {
               {/* Export Button */}
               <button
                 onClick={handleExport}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2 transition-colors"
+                className="bg-[#8B3D28] hover:bg-[#8B3D28] text-white px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -220,7 +220,7 @@ export default function AdminFundTransfer() {
                     setCurrentPage(1);
                   }}
                   placeholder="Search:"
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[150px]"
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[150px]"
                 />
               </div>
             </div>
@@ -233,7 +233,7 @@ export default function AdminFundTransfer() {
             <thead className="bg-neutral-50 border-b border-neutral-200">
               <tr>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort('id')}
                 >
                   <div className="flex items-center gap-2">
@@ -244,7 +244,7 @@ export default function AdminFundTransfer() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort('name')}
                 >
                   <div className="flex items-center gap-2">
@@ -255,7 +255,7 @@ export default function AdminFundTransfer() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort('mobile')}
                 >
                   <div className="flex items-center gap-2">
@@ -266,40 +266,40 @@ export default function AdminFundTransfer() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort('openingBalance')}
                 >
                   <div className="flex items-center gap-2">
-                    Opening Balance (₹)
+                    Opening Balance (?)
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-neutral-400">
                       <path d="M7 10L12 5L17 10M7 14L12 19L17 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort('closingBalance')}
                 >
                   <div className="flex items-center gap-2">
-                    Closing Balance (₹)
+                    Closing Balance (?)
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-neutral-400">
                       <path d="M7 10L12 5L17 10M7 14L12 19L17 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort('amount')}
                 >
                   <div className="flex items-center gap-2">
-                    amount (₹)
+                    amount (?)
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-neutral-400">
                       <path d="M7 10L12 5L17 10M7 14L12 19L17 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort('type')}
                 >
                   <div className="flex items-center gap-2">
@@ -310,7 +310,7 @@ export default function AdminFundTransfer() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort('message')}
                 >
                   <div className="flex items-center gap-2">
@@ -321,7 +321,7 @@ export default function AdminFundTransfer() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort('date')}
                 >
                   <div className="flex items-center gap-2">
@@ -336,20 +336,20 @@ export default function AdminFundTransfer() {
             <tbody className="bg-white divide-y divide-neutral-200">
               {displayedTransfers.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 sm:px-6 py-8 text-center text-sm text-neutral-500">
+                  <td colSpan={9} className="px-4 sm:px-4 py-2.5 text-center text-sm text-neutral-500">
                     No data available in table
                   </td>
                 </tr>
               ) : (
                 displayedTransfers.map((transfer) => (
                   <tr key={transfer.id} className="hover:bg-neutral-50">
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">{transfer.id}</td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900 font-medium">{transfer.name}</td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">{transfer.mobile}</td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">₹{transfer.openingBalance.toFixed(2)}</td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">₹{transfer.closingBalance.toFixed(2)}</td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900 font-medium">₹{transfer.amount.toFixed(2)}</td>
-                    <td className="px-4 sm:px-6 py-3">
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900">{transfer.id}</td>
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">{transfer.name}</td>
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">{transfer.mobile}</td>
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900">{(transfer.openingBalance || 0).toFixed(2)}</td>
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900">{(transfer.closingBalance || 0).toFixed(2)}</td>
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">{(transfer.amount || 0).toFixed(2)}</td>
+                    <td className="px-3 py-2">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${transfer.type === 'Credit'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
@@ -357,8 +357,8 @@ export default function AdminFundTransfer() {
                         {transfer.type}
                       </span>
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">{transfer.message}</td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">{transfer.date}</td>
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">{transfer.message}</td>
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">{transfer.date}</td>
                   </tr>
                 ))
               )}
@@ -367,7 +367,7 @@ export default function AdminFundTransfer() {
         </div>
 
         {/* Pagination Footer */}
-        <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+        <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
           <div className="text-xs sm:text-sm text-neutral-700">
             Showing {startIndex + 1} to {Math.min(endIndex, filteredTransfers.length)} of {filteredTransfers.length} entries
           </div>
@@ -404,13 +404,20 @@ export default function AdminFundTransfer() {
 
       {/* Footer */}
       <div className="text-center text-sm text-neutral-500 py-4">
-        Copyright Â© 2025. Developed By{' '}
-        <a href="#" className="text-teal-600 hover:text-teal-700">
+        Copyright © 2025. Developed By{' '}
+        <a href="#" className="text-[#A54B31] hover:text-teal-700">
           Village Basket
         </a>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 
 

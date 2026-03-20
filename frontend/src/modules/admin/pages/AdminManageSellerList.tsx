@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getAllSellers, updateSellerStatus, deleteSeller, Seller as SellerType, updateSeller } from '../../../services/api/sellerService';
 import SellerServiceMap from '../components/SellerServiceMap';
 
@@ -151,7 +151,7 @@ export default function AdminManageSellerList() {
 
     const SortIcon = ({ column }: { column: string }) => (
         <span className="text-neutral-400 text-xs ml-1">
-            {sortColumn === column ? (sortDirection === 'asc' ? 'â†‘' : 'â†“') : 'â‡…'}
+            {sortColumn === column ? (sortDirection === 'asc' ? '↑' : '↓') : '⇅'}
         </span>
     );
 
@@ -363,37 +363,37 @@ export default function AdminManageSellerList() {
     return (
         <div className="flex flex-col h-full bg-gray-50">
             {/* Page Content */}
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-3">
                 {/* Main Panel */}
                 <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
                     {/* Header */}
-                    <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg">
+                    <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg">
                         <h2 className="text-lg font-semibold">View Seller List</h2>
                     </div>
 
                     {/* Error Message */}
                     {error && (
-                        <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center justify-between">
+                        <div className="px-3 py-2 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center justify-between">
                             <p className="text-sm">{error}</p>
                             <button
                                 onClick={() => setError('')}
                                 className="text-red-700 hover:text-red-900 ml-4 text-lg font-bold"
                                 type="button"
                             >
-                                Ã—
+                                ×
                             </button>
                         </div>
                     )}
                     {/* Success Message */}
                     {successMessage && (
-                        <div className="p-4 bg-green-50 border-l-4 border-green-500 text-green-700 flex items-center justify-between">
+                        <div className="px-3 py-2 bg-green-50 border-l-4 border-green-500 text-[#A54B31] flex items-center justify-between">
                             <p className="text-sm">{successMessage}</p>
                             <button
                                 onClick={() => setSuccessMessage('')}
-                                className="text-green-700 hover:text-green-900 ml-4 text-lg font-bold"
+                                className="text-[#A54B31] hover:text-green-900 ml-4 text-lg font-bold"
                                 type="button"
                             >
-                                Ã—
+                                ×
                             </button>
                         </div>
                     )}
@@ -406,16 +406,16 @@ export default function AdminManageSellerList() {
                     )}
 
                     {/* Controls */}
-                    <div className="p-4 border-b border-neutral-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div className="px-3 py-2 border-b border-neutral-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gapx-3 py-2">
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-neutral-600">Show</span>
+                            <span className="text-[12px] font-bold text-neutral-500">Show</span>
                             <select
                                 value={rowsPerPage}
                                 onChange={(e) => {
                                     setRowsPerPage(Number(e.target.value));
                                     setCurrentPage(1);
                                 }}
-                                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                                className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer"
                             >
                                 <option value={10}>10</option>
                                 <option value={20}>20</option>
@@ -426,7 +426,7 @@ export default function AdminManageSellerList() {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={handleExport}
-                                className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
+                                className="bg-[#A54B31] hover:opacity-90 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors"
                             >
                                 Export
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -437,7 +437,7 @@ export default function AdminManageSellerList() {
                                 <span className="absolute left-2 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">Search:</span>
                                 <input
                                     type="text"
-                                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-teal-500 w-48"
+                                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#8B3D28] w-48"
                                     value={searchTerm}
                                     onChange={(e) => {
                                         setSearchTerm(e.target.value);
@@ -456,7 +456,7 @@ export default function AdminManageSellerList() {
                                 <thead>
                                     <tr className="bg-neutral-50 text-xs font-bold text-neutral-800 border-b border-neutral-200">
                                         <th
-                                            className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                            className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                             onClick={() => handleSort('id')}
                                         >
                                             <div className="flex items-center">
@@ -464,7 +464,7 @@ export default function AdminManageSellerList() {
                                             </div>
                                         </th>
                                         <th
-                                            className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                            className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                             onClick={() => handleSort('name')}
                                         >
                                             <div className="flex items-center">
@@ -472,21 +472,21 @@ export default function AdminManageSellerList() {
                                             </div>
                                         </th>
                                         <th
-                                            className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                            className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                             onClick={() => handleSort('storeName')}
                                         >
                                             <div className="flex items-center">
                                                 Store Name <SortIcon column="storeName" />
                                             </div>
                                         </th>
-                                        <th className="p-4">
+                                        <th className="px-3 py-2">
                                             Contact
                                         </th>
-                                        <th className="p-4">
+                                        <th className="px-3 py-2">
                                             Logo
                                         </th>
                                         <th
-                                            className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                            className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                             onClick={() => handleSort('balance')}
                                         >
                                             <div className="flex items-center">
@@ -494,28 +494,28 @@ export default function AdminManageSellerList() {
                                             </div>
                                         </th>
                                         <th
-                                            className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                            className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                             onClick={() => handleSort('commission')}
                                         >
                                             <div className="flex items-center">
                                                 Commission <SortIcon column="commission" />
                                             </div>
                                         </th>
-                                        <th className="p-4">
+                                        <th className="px-3 py-2">
                                             Category
                                         </th>
                                         <th
-                                            className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                            className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                             onClick={() => handleSort('status')}
                                         >
                                             <div className="flex items-center">
                                                 Status <SortIcon column="status" />
                                             </div>
                                         </th>
-                                        <th className="p-4">
+                                        <th className="px-3 py-2">
                                             Need Approval?
                                         </th>
-                                        <th className="p-4">
+                                        <th className="px-3 py-2">
                                             Action
                                         </th>
                                     </tr>
@@ -523,16 +523,16 @@ export default function AdminManageSellerList() {
                                 <tbody>
                                     {displayedSellers.map((seller) => (
                                         <tr key={seller._id} className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700 border-b border-neutral-200">
-                                            <td className="p-4 align-middle">{seller.id || seller._id.slice(-6)}</td>
-                                            <td className="p-4 align-middle">{seller.name}</td>
-                                            <td className="p-4 align-middle">{seller.storeName}</td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">{seller.id || seller._id.slice(-6)}</td>
+                                            <td className="px-3 py-2 align-middle">{seller.name}</td>
+                                            <td className="px-3 py-2 align-middle">{seller.storeName}</td>
+                                            <td className="px-3 py-2 align-middle">
                                                 <div className="text-xs">
                                                     <div>{seller.phone}</div>
                                                     <div className="text-neutral-500">{seller.email}</div>
                                                 </div>
                                             </td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">
                                                 <img
                                                     src={(seller.logo && seller.logo.trim() !== '') ? seller.logo : FALLBACK_LOGO}
                                                     alt={seller.storeName}
@@ -546,12 +546,12 @@ export default function AdminManageSellerList() {
                                                     }}
                                                 />
                                             </td>
-                                            <td className="p-4 align-middle">{seller.balance.toFixed(2)}</td>
-                                            <td className="p-4 align-middle">{seller.commission.toFixed(2)}%</td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">{(seller.balance || 0).toFixed(2)}</td>
+                                            <td className="px-3 py-2 align-middle">{(seller.commission || 0).toFixed(2)}%</td>
+                                            <td className="px-3 py-2 align-middle">
                                                 <button
                                                     onClick={() => handleViewCategories(seller)}
-                                                    className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-medium rounded transition-colors flex items-center gap-1"
+                                                    className="px-3 py-1.5 bg-[#A54B31] hover:opacity-90 text-white text-xs font-medium rounded transition-colors flex items-center gap-1"
                                                 >
                                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -560,7 +560,7 @@ export default function AdminManageSellerList() {
                                                     View ({seller.categories.length})
                                                 </button>
                                             </td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${seller.status === 'Approved'
                                                     ? 'bg-green-100 text-green-800'
                                                     : seller.status === 'Pending'
@@ -570,7 +570,7 @@ export default function AdminManageSellerList() {
                                                     {seller.status}
                                                 </span>
                                             </td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${seller.needApproval
                                                     ? 'bg-pink-100 text-pink-800'
                                                     : 'bg-pink-100 text-pink-800'
@@ -578,11 +578,11 @@ export default function AdminManageSellerList() {
                                                     {seller.needApproval ? 'Yes' : 'No'}
                                                 </span>
                                             </td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">
                                                 <div className="flex items-center gap-2">
                                                     <button
                                                         onClick={() => handleEdit(seller._id)}
-                                                        className="p-1.5 text-teal-600 hover:bg-teal-50 rounded transition-colors"
+                                                        className="p-1.5 text-[#A54B31] hover:bg-[#FAF7F2] rounded transition-colors"
                                                         title="Edit"
                                                     >
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -618,7 +618,7 @@ export default function AdminManageSellerList() {
 
                     {/* Pagination Footer */}
                     {!loading && (
-                        <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                        <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
                             <div className="text-xs sm:text-sm text-neutral-700">
                                 Showing {startIndex + 1} to {Math.min(endIndex, filteredSellers.length)} of {filteredSellers.length} entries
                             </div>
@@ -626,9 +626,9 @@ export default function AdminManageSellerList() {
                                 <button
                                     onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className={`p-2 border border-teal-600 rounded ${currentPage === 1
+                                    className={`p-2 border border-[#A54B31] rounded ${currentPage === 1
                                         ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                        : 'text-teal-600 hover:bg-teal-50'
+                                        : 'text-[#A54B31] hover:bg-[#FAF7F2]'
                                         }`}
                                     aria-label="Previous page"
                                 >
@@ -649,16 +649,16 @@ export default function AdminManageSellerList() {
                                     </svg>
                                 </button>
                                 <button
-                                    className="px-3 py-1.5 border border-teal-600 bg-teal-600 text-white rounded font-medium text-sm"
+                                    className="px-3 py-1.5 border border-[#A54B31] bg-[#A54B31] text-white rounded font-medium text-sm"
                                 >
                                     {currentPage}
                                 </button>
                                 <button
                                     onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage === totalPages}
-                                    className={`p-2 border border-teal-600 rounded ${currentPage === totalPages
+                                    className={`p-2 border border-[#A54B31] rounded ${currentPage === totalPages
                                         ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                        : 'text-teal-600 hover:bg-teal-50'
+                                        : 'text-[#A54B31] hover:bg-[#FAF7F2]'
                                         }`}
                                     aria-label="Next page"
                                 >
@@ -685,9 +685,9 @@ export default function AdminManageSellerList() {
             </div>
 
             {/* Footer */}
-            <footer className="text-center py-4 text-sm text-neutral-600 border-t border-neutral-200 bg-white">
-                Copyright Â© 2025. Developed By{' '}
-                <a href="#" className="text-blue-600 hover:underline">Village Basket</a>
+            <footer className="text-center py-4 text-[12px] font-bold text-neutral-500 border-t border-neutral-200 bg-white">
+                Copyright © 2025. Developed By{' '}
+                <a href="#" className="text-[#8B3D28] hover:underline">Village Basket</a>
             </footer>
 
             {/* Categories Modal */}
@@ -695,7 +695,7 @@ export default function AdminManageSellerList() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onClick={handleCloseModal}>
                     <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
                         {/* Modal Header */}
-                        <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg flex items-center justify-between">
+                        <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg flex items-center justify-between">
                             <div>
                                 <h3 className="text-lg font-semibold">Categories</h3>
                                 <p className="text-sm text-teal-100 mt-1">{selectedSeller.storeName} - {selectedSeller.name}</p>
@@ -713,7 +713,7 @@ export default function AdminManageSellerList() {
                         </div>
 
                         {/* Modal Body */}
-                        <div className="p-6 overflow-y-auto flex-1">
+                        <div className="p-3 overflow-y-auto flex-1">
                             {selectedSeller.categories.length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {selectedSeller.categories.map((category, index) => (
@@ -721,7 +721,7 @@ export default function AdminManageSellerList() {
                                             key={index}
                                             className="flex items-center gap-2 px-4 py-3 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-colors"
                                         >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal-600 flex-shrink-0">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#A54B31] flex-shrink-0">
                                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                             </svg>
@@ -730,17 +730,17 @@ export default function AdminManageSellerList() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-8 text-neutral-400">
+                                <div className="text-center py-4 text-neutral-400">
                                     <p>No categories assigned to this seller.</p>
                                 </div>
                             )}
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="px-6 py-4 border-t border-neutral-200 flex justify-end">
+                        <div className="px-4 py-2.5 border-t border-neutral-200 flex justify-end">
                             <button
                                 onClick={handleCloseModal}
-                                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded text-sm font-medium transition-colors"
+                                className="px-4 py-2 bg-[#A54B31] hover:opacity-90 text-white rounded text-sm font-medium transition-colors"
                             >
                                 Close
                             </button>
@@ -754,7 +754,7 @@ export default function AdminManageSellerList() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onClick={handleCloseEditModal}>
                     <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
                         {/* Modal Header */}
-                        <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg flex items-center justify-between">
+                        <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg flex items-center justify-between">
                             <div>
                                 <h3 className="text-lg font-semibold">Edit Seller - {editingSeller.name}</h3>
                                 <p className="text-sm text-teal-100 mt-1">View and manage seller details</p>
@@ -772,7 +772,7 @@ export default function AdminManageSellerList() {
                         </div>
 
                         {/* Modal Body */}
-                        <div className="p-6 overflow-y-auto flex-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                        <div className="p-3 overflow-y-auto flex-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                             <style>{`
                                 .edit-seller-modal::-webkit-scrollbar {
                                     display: none;
@@ -796,7 +796,7 @@ export default function AdminManageSellerList() {
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => handleApprove(editingSeller._id)}
-                                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-medium transition-colors flex items-center gap-2"
+                                                className="px-4 py-2 bg-[#8B3D28] hover:opacity-90 text-white rounded text-sm font-medium transition-colors flex items-center gap-2"
                                             >
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <polyline points="20 6 9 17 4 12"></polyline>
@@ -818,9 +818,9 @@ export default function AdminManageSellerList() {
                                 </div>
 
                                 {/* Basic Information */}
-                                <div className="bg-neutral-50 rounded-lg p-4">
+                                <div className="bg-neutral-50 rounded-lg px-3 py-2">
                                     <h4 className="text-sm font-semibold text-neutral-700 mb-3">Basic Information</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
                                         <div>
                                             <label className="text-xs text-neutral-500">Seller Name</label>
                                             <p className="text-sm font-medium text-neutral-900">{editingSeller.name}</p>
@@ -843,15 +843,15 @@ export default function AdminManageSellerList() {
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Commission</label>
-                                            <p className="text-sm font-medium text-neutral-900">{editingSeller.commission.toFixed(2)}%</p>
+                                            <p className="text-sm font-medium text-neutral-900">{(editingSeller.commission || 0).toFixed(2)}%</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Address Information */}
-                                <div className="bg-neutral-50 rounded-lg p-4">
+                                <div className="bg-neutral-50 rounded-lg px-3 py-2">
                                     <h4 className="text-sm font-semibold text-neutral-700 mb-3">Address Information</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
                                         <div className="md:col-span-2">
                                             <label className="text-xs text-neutral-500">Address</label>
                                             <p className="text-sm font-medium text-neutral-900">{editingSeller.address || 'N/A'}</p>
@@ -871,7 +871,7 @@ export default function AdminManageSellerList() {
                                             </div>
                                         )}
                                         {(editingSeller.latitude || editingSeller.longitude) && (
-                                            <div className="md:col-span-2 grid grid-cols-2 gap-4">
+                                            <div className="md:col-span-2 grid grid-cols-2 gapx-3 py-2">
                                                 <div>
                                                     <label className="text-xs text-neutral-500">Latitude</label>
                                                     <p className="text-sm font-medium text-neutral-900">{editingSeller.latitude || 'N/A'}</p>
@@ -886,11 +886,11 @@ export default function AdminManageSellerList() {
                                 </div>
 
                                 {/* Service Area Map */}
-                                <div className="bg-neutral-50 rounded-lg p-4">
+                                <div className="bg-neutral-50 rounded-lg px-3 py-2">
                                     <h4 className="text-sm font-semibold text-neutral-700 mb-3">Service Area Visualization</h4>
                                     {editingSeller.latitude && editingSeller.longitude ? (
                                         <div className="space-y-4">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2 items-end">
                                                 <div>
                                                     <label className="text-xs text-neutral-500 mb-1 block">Service Radius (km)</label>
                                                     <div className="flex gap-2">
@@ -901,12 +901,12 @@ export default function AdminManageSellerList() {
                                                             step="0.1"
                                                             value={newRadius}
                                                             onChange={(e) => setNewRadius(parseFloat(e.target.value))}
-                                                            className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-teal-500 focus:border-teal-500"
+                                                            className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                                                         />
                                                         <button
                                                             onClick={handleUpdateRadius}
                                                             disabled={isUpdatingRadius || newRadius === editingSeller.serviceRadiusKm}
-                                                            className="px-4 py-2 bg-teal-600 text-white rounded text-sm font-medium hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                                                            className="px-4 py-2 bg-[#A54B31] text-white rounded text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                                                         >
                                                             {isUpdatingRadius ? 'Updating...' : 'Update Radius'}
                                                         </button>
@@ -935,9 +935,9 @@ export default function AdminManageSellerList() {
 
                                 {/* Tax Information */}
                                 {(editingSeller.panCard || editingSeller.taxName || editingSeller.taxNumber) && (
-                                    <div className="bg-neutral-50 rounded-lg p-4">
+                                    <div className="bg-neutral-50 rounded-lg px-3 py-2">
                                         <h4 className="text-sm font-semibold text-neutral-700 mb-3">Tax Information</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
                                             {editingSeller.panCard && (
                                                 <div>
                                                     <label className="text-xs text-neutral-500">PAN Card</label>
@@ -962,9 +962,9 @@ export default function AdminManageSellerList() {
 
                                 {/* Bank Information */}
                                 {(editingSeller.accountName || editingSeller.bankName || editingSeller.accountNumber) && (
-                                    <div className="bg-neutral-50 rounded-lg p-4">
+                                    <div className="bg-neutral-50 rounded-lg px-3 py-2">
                                         <h4 className="text-sm font-semibold text-neutral-700 mb-3">Bank Information</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
                                             {editingSeller.accountName && (
                                                 <div>
                                                     <label className="text-xs text-neutral-500">Account Name</label>
@@ -1000,9 +1000,9 @@ export default function AdminManageSellerList() {
                                 )}
 
                                 {/* Settings */}
-                                <div className="bg-neutral-50 rounded-lg p-4">
+                                <div className="bg-neutral-50 rounded-lg px-3 py-2">
                                     <h4 className="text-sm font-semibold text-neutral-700 mb-3">Settings</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
                                         <div>
                                             <label className="text-xs text-neutral-500">Require Product Approval</label>
                                             <p className="text-sm font-medium text-neutral-900">
@@ -1017,7 +1017,7 @@ export default function AdminManageSellerList() {
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Balance</label>
-                                            <p className="text-sm font-medium text-neutral-900">₹{editingSeller.balance.toFixed(2)}</p>
+                                            <p className="text-sm font-medium text-neutral-900">{(editingSeller.balance || 0).toFixed(2)}</p>
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Categories Count</label>
@@ -1028,7 +1028,7 @@ export default function AdminManageSellerList() {
 
                                 {/* Categories */}
                                 {editingSeller.categories.length > 0 && (
-                                    <div className="bg-neutral-50 rounded-lg p-4">
+                                    <div className="bg-neutral-50 rounded-lg px-3 py-2">
                                         <h4 className="text-sm font-semibold text-neutral-700 mb-3">Categories</h4>
                                         <div className="flex flex-wrap gap-2">
                                             {editingSeller.categories.map((category, index) => (
@@ -1046,7 +1046,7 @@ export default function AdminManageSellerList() {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="px-6 py-4 border-t border-neutral-200 flex justify-end gap-2">
+                        <div className="px-4 py-2.5 border-t border-neutral-200 flex justify-end gap-2">
                             <button
                                 onClick={handleCloseEditModal}
                                 className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 text-neutral-700 rounded text-sm font-medium transition-colors"
@@ -1060,5 +1060,12 @@ export default function AdminManageSellerList() {
         </div>
     );
 }
+
+
+
+
+
+
+
 
 

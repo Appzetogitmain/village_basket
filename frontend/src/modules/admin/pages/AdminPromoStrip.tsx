@@ -53,14 +53,14 @@ const CompactPromoPreview = ({ strip }: { strip: PromoStrip }) => {
   return (
     <div className="mt-4 mb-6 rounded-xl overflow-hidden border border-neutral-100 bg-neutral-50 shadow-inner">
       <div
-        className="p-4 relative min-h-[160px]"
+        className="px-3 py-2 relative min-h-[160px]"
         style={{
           background: `linear-gradient(to bottom, #dcfce7, #f0fdf4, #ffffff)`
         }}
       >
-        <div className="flex gap-4">
+        <div className="flex gapx-3 py-2">
           {/* Left: Deals Preview */}
-          <div className="w-28 bg-green-600/10 rounded-lg p-2 flex flex-col items-center justify-between border border-green-200">
+          <div className="w-28 bg-[#8B3D28]/10 rounded-lg p-2 flex flex-col items-center justify-between border border-green-200">
             <div className="text-center">
               <p className="text-green-800 font-black text-[10px] leading-tight uppercase">
                 {(strip.crazyDealsTitle || "CRAZY DEALS").split(' ').map((w, i) => <div key={i}>{w}</div>)}
@@ -68,7 +68,7 @@ const CompactPromoPreview = ({ strip }: { strip: PromoStrip }) => {
             </div>
             <div className="my-1.5 text-center">
               <div className="bg-neutral-800 text-white text-[7px] px-1 rounded line-through">₹999</div>
-              <div className="bg-green-500 text-white text-[10px] font-bold px-1.5 rounded -mt-0.5 shadow-sm">₹499</div>
+              <div className="bg-[#8B3D28] text-white text-[10px] font-bold px-1.5 rounded -mt-0.5 shadow-sm">₹499</div>
             </div>
             <div className="w-full aspect-square bg-white/60 rounded-md flex items-center justify-center text-[24px] shadow-sm">
               📦
@@ -562,7 +562,7 @@ export default function AdminPromoStrip() {
   return (
     <div className="flex flex-col min-h-screen bg-neutral-50 uppercase-none">
       {/* Header Section */}
-      <div className="p-6">
+      <div className="p-3">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-neutral-800">Promo Strips</h1>
@@ -575,9 +575,9 @@ export default function AdminPromoStrip() {
 
         {/* Alerts */}
         {(success || error) && (
-          <div className={`mb-6 p-4 rounded-xl border text-sm font-bold flex items-center gap-3 ${success ? "bg-teal-50 border-teal-200 text-teal-700" : "bg-rose-50 border-rose-200 text-rose-700"
+          <div className={`mb-6 px-3 py-2 rounded-xl border text-sm font-bold flex items-center gap-3 ${success ? "bg-teal-50 border-teal-200 text-teal-700" : "bg-rose-50 border-rose-200 text-rose-700"
             }`}>
-            <div className={`w-2 h-2 rounded-full ${success ? "bg-teal-500" : "bg-rose-500"}`}></div>
+            <div className={`w-2 h-2 rounded-full ${success ? "bg-[#A54B31]" : "bg-rose-500"}`}></div>
             {success || error}
           </div>
         )}
@@ -586,9 +586,9 @@ export default function AdminPromoStrip() {
 
           {/* LEFT: Management Form */}
           <div className="lg:col-span-5">
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 sticky top-6">
+            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-3 sticky top-3">
               <h2 className="text-xl font-bold text-neutral-800 mb-6 flex items-center gap-3">
-                <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600">
+                <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center text-[#A54B31]">
                   <PlusIcon />
                 </div>
                 {editingId ? "Edit Campaign" : "New Campaign"}
@@ -596,13 +596,13 @@ export default function AdminPromoStrip() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gapx-3 py-2">
                   <div className="space-y-2">
                     <label className="text-[10px] font-semibold text-slate-500 uppercase">1. Header Placement</label>
                     <select
                       value={headerCategorySlug}
                       onChange={(e) => setHeaderCategorySlug(e.target.value)}
-                      className="w-full px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg font-semibold text-sm focus:ring-2 focus:ring-teal-500/10 outline-none transition-all"
+                      className="w-full px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg font-semibold text-sm focus:ring-2 focus:ring-[#8B3D28]/10 outline-none transition-all"
                       required
                     >
                       <option value="">Choose placement...</option>
@@ -624,7 +624,7 @@ export default function AdminPromoStrip() {
                 </div>
 
                 {/* 2. Heading & Basis */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gapx-3 py-2">
                   <div className="space-y-2">
                     <label className="text-[10px] font-semibold text-slate-500 uppercase">2. Campaign Heading</label>
                     <input
@@ -651,7 +651,7 @@ export default function AdminPromoStrip() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gapx-3 py-2">
                   <div className="space-y-2">
                     <label className="text-[10px] font-semibold text-slate-500 uppercase">Starts On</label>
                     <input
@@ -678,11 +678,11 @@ export default function AdminPromoStrip() {
                 <div className="space-y-4 pt-4 border-t border-slate-50">
                   <div className="flex justify-between items-center px-1">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">4. Shortcut Boxes (Up to 4)</label>
-                    <span className="text-[9px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded">MULTI-SELECT ACTIVE</span>
+                    <span className="text-[9px] font-bold text-[#A54B31] bg-teal-50 px-2 py-0.5 rounded">MULTI-SELECT ACTIVE</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gapx-3 py-2">
                     {categoryCards.map((card, idx) => (
-                      <div key={idx} className="p-4 bg-neutral-50 rounded-2xl border border-neutral-200 relative group transition-all hover:border-teal-200 hover:shadow-md">
+                      <div key={idx} className="px-3 py-2 bg-neutral-50 rounded-2xl border border-neutral-200 relative group transition-all hover:border-teal-200 hover:shadow-md">
                         <span className="absolute -top-2 -left-2 w-7 h-7 bg-slate-900 text-white rounded-xl flex items-center justify-center text-[10px] font-black shadow-lg z-10">{idx + 1}</span>
 
                         <div className="space-y-3">
@@ -694,7 +694,7 @@ export default function AdminPromoStrip() {
                                  <select
                                    value={typeof card.subCategoryId === 'string' ? card.subCategoryId : (card.subCategoryId as any)?._id || ""}
                                    onChange={(e) => updateCardField(idx, "subCategoryId", e.target.value)}
-                                   className="w-full bg-white border border-neutral-200 py-2 px-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-teal-500/10"
+                                   className="w-full bg-white border border-neutral-200 py-2 px-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-[#8B3D28]/10"
                                  >
                                    <option value="">Subcategory Link...</option>
                                    {subcategories.map(s => <option key={s._id} value={s._id}>{s.name || s.subcategoryName}</option>)}
@@ -704,7 +704,7 @@ export default function AdminPromoStrip() {
                                <select
                                  value={typeof card.productId === 'string' ? card.productId : (card.productId as any)?._id || ""}
                                  onChange={(e) => updateCardField(idx, "productId", e.target.value)}
-                                 className="w-full bg-white border border-neutral-200 py-2 px-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-teal-500/10"
+                                 className="w-full bg-white border border-neutral-200 py-2 px-3 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-[#8B3D28]/10"
                                >
                                  <option value="">Specific Product Link...</option>
                                  {categoryProducts.map(p => (
@@ -718,7 +718,7 @@ export default function AdminPromoStrip() {
                           {categoryProducts.length > 0 && (
                             <div className="space-y-2 pt-2 border-t border-slate-100">
                                <div className="flex items-center justify-between">
-                                  <p className="text-[8px] font-black text-teal-600 uppercase tracking-widest pl-1">Choose 4 Images</p>
+                                  <p className="text-[8px] font-black text-[#A54B31] uppercase tracking-widest pl-1">Choose 4 Images</p>
                                   <input 
                                     placeholder="Filter products..."
                                     value={cardProductFilters[idx]}
@@ -752,7 +752,7 @@ export default function AdminPromoStrip() {
                                             <div className="w-full h-full bg-slate-200 flex items-center justify-center text-[8px]">📦</div>
                                           )}
                                           {isSelected && (
-                                             <div className="absolute inset-x-0 bottom-0 bg-teal-500 h-1.5" />
+                                             <div className="absolute inset-x-0 bottom-0 bg-[#A54B31] h-1.5" />
                                           )}
                                         </button>
                                       );
@@ -815,7 +815,7 @@ export default function AdminPromoStrip() {
                                 ))}
                               </div>
                               <div className="flex items-center justify-between px-1">
-                                <span className="text-[8px] font-bold text-teal-600 uppercase tracking-wider">{card.images.length}/4 IMAGES SET</span>
+                                <span className="text-[8px] font-bold text-[#A54B31] uppercase tracking-wider">{card.images.length}/4 IMAGES SET</span>
                                 <button
                                   type="button"
                                   onClick={() => updateCardField(idx, "images", [])}
@@ -895,8 +895,8 @@ export default function AdminPromoStrip() {
                               }}
                               className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${
                                 isAdded 
-                                  ? "bg-teal-600 text-white border-teal-600 shadow-sm" 
-                                  : "bg-white text-neutral-600 border-neutral-200 hover:border-teal-500 hover:text-teal-600"
+                                  ? "bg-[#A54B31] text-white border-[#A54B31] shadow-sm" 
+                                  : "bg-white text-neutral-600 border-neutral-200 hover:border-teal-500 hover:text-[#A54B31]"
                               }`}
                             >
                               {isAdded ? "✓ " : "+ "}{p.productName}
@@ -935,7 +935,7 @@ export default function AdminPromoStrip() {
                                   <span className={`text-xs font-bold ${isAdded ? "text-teal-700" : "text-slate-800"}`}>{p.productName}</span>
                                 </div>
                                 {isAdded ? (
-                                  <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center text-white text-[10px] shadow-sm">✓</div>
+                                  <div className="w-5 h-5 bg-[#A54B31] rounded-full flex items-center justify-center text-white text-[10px] shadow-sm">✓</div>
                                 ) : (
                                   <PlusIcon />
                                 )}
@@ -966,11 +966,11 @@ export default function AdminPromoStrip() {
                   </div>
                 </div>
 
-                <div className="flex gap-4 pt-6">
+                <div className="flex gapx-3 py-2 pt-6">
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 bg-teal-600 text-white py-3 rounded-lg font-semibold text-sm hover:bg-teal-700 transition-all shadow-md disabled:opacity-50"
+                    className="flex-1 bg-[#A54B31] text-white py-3 rounded-lg font-semibold text-sm hover:opacity-90 transition-all shadow-md disabled:opacity-50"
                   >
                     {loading ? "SAVING..." : (editingId ? "UPDATE CAMPAIGN" : "LAUNCH CAMPAIGN")}
                   </button>
@@ -994,10 +994,10 @@ export default function AdminPromoStrip() {
 
 
             {/* List Header */}
-            <div className="bg-white p-6 rounded-lg border border-neutral-200 shadow-sm flex items-center justify-between">
+            <div className="bg-white p-3 rounded-lg border border-neutral-200 shadow-sm flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-neutral-800">Live Campaigns</h3>
-                <p className="text-[10px] font-bold text-teal-600 uppercase">{promoStrips.length} TOTAL</p>
+                <p className="text-[10px] font-bold text-[#A54B31] uppercase">{promoStrips.length} TOTAL</p>
               </div>
               <div className="flex bg-neutral-50 p-1 rounded-lg gap-1">
                 {[10, 20, 50].map(v => (
@@ -1023,11 +1023,11 @@ export default function AdminPromoStrip() {
                 <p className="text-neutral-400 font-bold">No active campaigns found</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gapx-3 py-2">
                 {displayedStrips.map(strip => (
-                  <div key={strip._id} className="bg-white p-6 rounded-lg border border-neutral-200 shadow-sm hover:border-teal-200 transition-all group overflow-hidden relative">
+                  <div key={strip._id} className="bg-white p-3 rounded-lg border border-neutral-200 shadow-sm hover:border-teal-200 transition-all group overflow-hidden relative">
                     {/* Status */}
-                    <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-lg text-[10px] font-bold uppercase ${strip.isActive ? "bg-teal-500 text-white" : "bg-neutral-100 text-neutral-400"
+                    <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-lg text-[10px] font-bold uppercase ${strip.isActive ? "bg-[#A54B31] text-white" : "bg-neutral-100 text-neutral-400"
                       }`}>
                       {strip.isActive ? "ACTIVE" : "INACTIVE"}
                     </div>
@@ -1045,7 +1045,7 @@ export default function AdminPromoStrip() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={() => handleEdit(strip)} className="w-9 h-9 flex items-center justify-center bg-neutral-50 text-neutral-400 hover:bg-teal-50 hover:text-teal-600 rounded-lg transition-all">
+                        <button onClick={() => handleEdit(strip)} className="w-9 h-9 flex items-center justify-center bg-neutral-50 text-neutral-400 hover:bg-[#FAF7F2] hover:text-[#A54B31] rounded-lg transition-all">
                           <EditIcon />
                         </button>
                         <button
@@ -1066,16 +1066,16 @@ export default function AdminPromoStrip() {
 
                     <CompactPromoPreview strip={strip} />
 
-                    <div className="grid grid-cols-3 gap-4 pb-8 border-b border-neutral-50 mb-6">
-                      <div className="bg-neutral-50/50 p-4 rounded-xl border border-neutral-50">
+                    <div className="grid grid-cols-3 gapx-3 py-2 pb-8 border-b border-neutral-50 mb-6">
+                      <div className="bg-neutral-50/50 px-3 py-2 rounded-xl border border-neutral-50">
                         <p className="text-[9px] font-bold text-neutral-400 uppercase mb-1">Shortcut Boxes</p>
                         <p className="text-sm font-bold text-neutral-700">{strip.categoryCards.length} SUB-CATS</p>
                       </div>
-                      <div className="bg-neutral-50/50 p-4 rounded-xl border border-neutral-50">
+                      <div className="bg-neutral-50/50 px-3 py-2 rounded-xl border border-neutral-50">
                         <p className="text-[9px] font-bold text-neutral-400 uppercase mb-1">Featured Deals</p>
                         <p className="text-sm font-bold text-neutral-700">{strip.featuredProducts.length} PRODUCTS</p>
                       </div>
-                      <div className="bg-neutral-50/50 p-4 rounded-xl border border-neutral-50">
+                      <div className="bg-neutral-50/50 px-3 py-2 rounded-xl border border-neutral-50">
                         <p className="text-[9px] font-bold text-neutral-400 uppercase mb-1">Duration</p>
                         <p className="text-sm font-bold text-neutral-700">{new Date(strip.endDate).toLocaleDateString()}</p>
                       </div>
@@ -1083,8 +1083,8 @@ export default function AdminPromoStrip() {
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 group-hover:gap-3 cursor-pointer transition-all" onClick={() => handleEdit(strip)}>
-                        <span className="text-[10px] font-bold text-teal-600 uppercase">Edit Campaign Details</span>
-                        <div className="w-6 h-6 rounded-full bg-teal-50 flex items-center justify-center text-teal-600">
+                        <span className="text-[10px] font-bold text-[#A54B31] uppercase">Edit Campaign Details</span>
+                        <div className="w-6 h-6 rounded-full bg-teal-50 flex items-center justify-center text-[#A54B31]">
                           <EditIcon />
                         </div>
                       </div>
@@ -1101,7 +1101,7 @@ export default function AdminPromoStrip() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between bg-white px-6 py-4 rounded-lg border border-neutral-200 shadow-sm mt-8">
+              <div className="flex items-center justify-between bg-white px-4 py-2.5 rounded-lg border border-neutral-200 shadow-sm mt-8">
                 <p className="text-[10px] font-bold text-neutral-400 uppercase">
                   Showing {startIndex + 1} - {Math.min(startIndex + rowsPerPage, promoStrips.length)} of {promoStrips.length}
                 </p>
@@ -1133,3 +1133,10 @@ export default function AdminPromoStrip() {
     </div>
   );
 }
+
+
+
+
+
+
+

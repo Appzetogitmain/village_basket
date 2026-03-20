@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   getReturnRequests,
   updateReturnRequest,
@@ -186,8 +186,8 @@ export default function AdminReturnRequest() {
         <h1 className="text-2xl font-semibold text-neutral-800">
           Return Request
         </h1>
-        <div className="text-sm text-neutral-600">
-          <span className="text-teal-600 hover:text-teal-700 cursor-pointer">
+        <div className="text-[12px] font-bold text-neutral-500">
+          <span className="text-[#A54B31] hover:text-teal-700 cursor-pointer">
             Home
           </span>
           <span className="mx-2">/</span>
@@ -198,15 +198,15 @@ export default function AdminReturnRequest() {
       {/* Main Content Card */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
         {/* Green Header Bar */}
-        <div className="bg-green-500 px-4 sm:px-6 py-3">
+        <div className="bg-[#8B3D28] px-3 py-2">
           <h2 className="text-white text-lg font-semibold">
             View Return Request
           </h2>
         </div>
 
         {/* Filters */}
-        <div className="p-4 sm:p-6 border-b border-neutral-200">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <div className="px-3 py-2 sm:p-3 border-b border-neutral-200">
+          <div className="flex flex-col lg:flex-row gapx-3 py-2 items-start lg:items-center justify-between">
             {/* Left Side Filters */}
             <div className="flex flex-col sm:flex-row gap-3 flex-1 flex-wrap">
               {/* From - To Date */}
@@ -242,7 +242,7 @@ export default function AdminReturnRequest() {
                       value={fromDate}
                       onChange={(e) => setFromDate(e.target.value)}
                       placeholder="MM/DD/YYYY"
-                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 min-w-[140px]"
+                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>
                   <span className="text-neutral-500">-</span>
@@ -273,7 +273,7 @@ export default function AdminReturnRequest() {
                       value={toDate}
                       onChange={(e) => setToDate(e.target.value)}
                       placeholder="MM/DD/YYYY"
-                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 min-w-[140px]"
+                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>
                   <button
@@ -295,7 +295,7 @@ export default function AdminReturnRequest() {
                     setSelectedSeller(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 min-w-[130px]">
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[130px]">
                   {sellers.map((seller) => (
                     <option
                       key={seller}
@@ -317,7 +317,7 @@ export default function AdminReturnRequest() {
                     setSelectedStatus(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 min-w-[130px]">
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[130px]">
                   {statuses.map((status) => (
                     <option
                       key={status}
@@ -340,7 +340,7 @@ export default function AdminReturnRequest() {
                     setEntriesPerPage(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="px-2 py-1 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500">
+                  className="px-2 py-1 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]">
                   <option value={10}>10</option>
                   <option value={25}>25</option>
                   <option value={50}>50</option>
@@ -351,7 +351,7 @@ export default function AdminReturnRequest() {
               {/* Export Button */}
               <button
                 onClick={handleExport}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2 transition-colors">
+                className="bg-[#8B3D28] hover:bg-[#8B3D28] text-white px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors">
                 <svg
                   width="16"
                   height="16"
@@ -390,7 +390,7 @@ export default function AdminReturnRequest() {
                     setCurrentPage(1);
                   }}
                   placeholder="Search:"
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 min-w-[150px]"
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[150px]"
                 />
               </div>
             </div>
@@ -403,7 +403,7 @@ export default function AdminReturnRequest() {
             <thead className="bg-neutral-50 border-b border-neutral-200">
               <tr>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("orderItemId")}>
                   <div className="flex items-center gap-2">
                     Order Item Id
@@ -424,7 +424,7 @@ export default function AdminReturnRequest() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("user")}>
                   <div className="flex items-center gap-2">
                     User
@@ -445,7 +445,7 @@ export default function AdminReturnRequest() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("product")}>
                   <div className="flex items-center gap-2">
                     Product
@@ -466,7 +466,7 @@ export default function AdminReturnRequest() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("variant")}>
                   <div className="flex items-center gap-2">
                     Variant
@@ -487,7 +487,7 @@ export default function AdminReturnRequest() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("price")}>
                   <div className="flex items-center gap-2">
                     Price
@@ -508,7 +508,7 @@ export default function AdminReturnRequest() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("discPrice")}>
                   <div className="flex items-center gap-2">
                     Disc Price
@@ -529,7 +529,7 @@ export default function AdminReturnRequest() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("quantity")}>
                   <div className="flex items-center gap-2">
                     Quantity
@@ -550,7 +550,7 @@ export default function AdminReturnRequest() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("total")}>
                   <div className="flex items-center gap-2">
                     Total
@@ -571,7 +571,7 @@ export default function AdminReturnRequest() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("status")}>
                   <div className="flex items-center gap-2">
                     Status
@@ -592,7 +592,7 @@ export default function AdminReturnRequest() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("date")}>
                   <div className="flex items-center gap-2">
                     Date
@@ -612,7 +612,7 @@ export default function AdminReturnRequest() {
                     </svg>
                   </div>
                 </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
@@ -620,9 +620,9 @@ export default function AdminReturnRequest() {
             <tbody className="bg-white divide-y divide-neutral-200">
               {loading ? (
                 <tr>
-                  <td colSpan={11} className="px-4 sm:px-6 py-8 text-center">
+                  <td colSpan={11} className="px-4 sm:px-4 py-2.5 text-center">
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600 mr-2"></div>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#A54B31] mr-2"></div>
                       Loading return requests...
                     </div>
                   </td>
@@ -631,7 +631,7 @@ export default function AdminReturnRequest() {
                 <tr>
                   <td
                     colSpan={11}
-                    className="px-4 sm:px-6 py-8 text-center text-red-600">
+                    className="px-4 sm:px-4 py-2.5 text-center text-red-600">
                     {error}
                   </td>
                 </tr>
@@ -639,38 +639,38 @@ export default function AdminReturnRequest() {
                 <tr>
                   <td
                     colSpan={11}
-                    className="px-4 sm:px-6 py-8 text-center text-sm text-neutral-500">
+                    className="px-4 sm:px-4 py-2.5 text-center text-sm text-neutral-500">
                     No return requests found
                   </td>
                 </tr>
               ) : (
                 displayedRequests.map((request) => (
                   <tr key={request._id} className="hover:bg-neutral-50">
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900">
                       {request.orderItemId}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900 font-medium">
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">
                       {request.userName}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {request.productName}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {request.variant || "-"}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
-                      ₹{request.price.toFixed(2)}
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900">
+                      {(request.price || 0).toFixed(2)}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
-                      ₹{(request.discountedPrice || request.price).toFixed(2)}
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900">
+                      {(request.discountedPrice || request.price).toFixed(2)}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {request.quantity}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900 font-medium">
-                      ₹{request.total.toFixed(2)}
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">
+                      {(request.total || 0).toFixed(2)}
                     </td>
-                    <td className="px-4 sm:px-6 py-3">
+                    <td className="px-3 py-2">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${request.status === "Approved"
                           ? "bg-green-100 text-green-800"
@@ -678,22 +678,22 @@ export default function AdminReturnRequest() {
                             ? "bg-yellow-100 text-yellow-800"
                             : request.status === "Rejected"
                               ? "bg-red-100 text-red-800"
-                              : "bg-blue-100 text-blue-800"
+                              : "bg-blue-100 text-[#8B3D28]"
                           }`}>
                         {request.status}
                       </span>
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {new Date(request.requestedAt).toLocaleDateString()}
                     </td>
-                    <td className="px-4 sm:px-6 py-3">
+                    <td className="px-3 py-2">
                       <div className="flex items-center gap-2">
                         {request.status === "Pending" ? (
                           <>
                             <button
                               onClick={() => handleApproveReturn(request._id)}
                               disabled={updating === request._id}
-                              className="p-1.5 bg-green-100 hover:bg-green-200 disabled:bg-neutral-100 disabled:text-neutral-400 text-green-700 rounded transition-colors"
+                              className="p-1.5 bg-green-100 hover:bg-green-200 disabled:bg-neutral-100 disabled:text-neutral-400 text-[#A54B31] rounded transition-colors"
                               title="Approve">
                               <svg
                                 width="16"
@@ -743,7 +743,7 @@ export default function AdminReturnRequest() {
         </div>
 
         {/* Pagination Footer */}
-        <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+        <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
           <div className="text-xs sm:text-sm text-neutral-700">
             Showing {startIndex + 1} to{" "}
             {Math.min(endIndex, displayedRequests.length)} of{" "}
@@ -755,7 +755,7 @@ export default function AdminReturnRequest() {
               disabled={currentPage === 1 || totalPages === 0}
               className={`p-2 border border-green-300 rounded bg-white ${currentPage === 1 || totalPages === 0
                 ? "text-neutral-400 cursor-not-allowed"
-                : "text-neutral-700 hover:bg-green-50"
+                : "text-neutral-700 hover:bg-[#FAF7F2]"
                 }`}
               aria-label="Previous page">
               <svg
@@ -780,7 +780,7 @@ export default function AdminReturnRequest() {
               disabled={currentPage === totalPages || totalPages === 0}
               className={`p-2 border border-green-300 rounded bg-white ${currentPage === totalPages || totalPages === 0
                 ? "text-neutral-400 cursor-not-allowed"
-                : "text-neutral-700 hover:bg-green-50"
+                : "text-neutral-700 hover:bg-[#FAF7F2]"
                 }`}
               aria-label="Next page">
               <svg
@@ -804,12 +804,19 @@ export default function AdminReturnRequest() {
 
       {/* Footer */}
       <div className="text-center text-sm text-neutral-500 py-4">
-        Copyright Â© 2025. Developed By{" "}
-        <a href="#" className="text-teal-600 hover:text-teal-700">
+        Copyright © 2025. Developed By{" "}
+        <a href="#" className="text-[#A54B31] hover:text-teal-700">
           Village Basket
         </a>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 

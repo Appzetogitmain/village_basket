@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getUsers, updateUserStatus, type User as UserType } from '../../../services/api/admin/adminMiscService';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -118,9 +118,9 @@ export default function AdminUsers() {
                 `"${user.phone || ''}"`,
                 `"${new Date(user.registrationDate).toLocaleString()}"`,
                 user.status,
-                user.walletAmount.toFixed(2),
+                (user.walletAmount || 0).toFixed(2),
                 user.totalOrders,
-                user.totalSpent.toFixed(2),
+                (user.totalSpent || 0).toFixed(2),
             ].join(','))
         ].join('\n');
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -178,7 +178,7 @@ export default function AdminUsers() {
 
         return (
             <span className="text-neutral-400 text-xs ml-1">
-                {sortColumn === backendColumn ? (sortDirection === 'asc' ? 'â†‘' : 'â†“') : 'â‡…'}
+                {sortColumn === backendColumn ? (sortDirection === 'asc' ? '↑' : '↓') : '⇅'}
             </span>
         );
     };
@@ -186,11 +186,11 @@ export default function AdminUsers() {
     return (
         <div className="flex flex-col h-full bg-gray-50">
             {/* Page Header */}
-            <div className="p-6 pb-0">
+            <div className="p-3 pb-0">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-semibold text-teal-800">User List</h1>
-                    <div className="text-sm text-blue-500">
-                        <span className="text-blue-500 hover:underline cursor-pointer">Home</span>{' '}
+                    <h1 className="text-2xl font-semibold text-[#8B3D28] font-outfit uppercase">User List</h1>
+                    <div className="text-sm text-[#8B3D28]">
+                        <span className="text-[#8B3D28] hover:underline cursor-pointer">Home</span>{' '}
                         <span className="text-neutral-400">/</span> User List
                     </div>
                 </div>
@@ -201,7 +201,7 @@ export default function AdminUsers() {
                 {/* Main Panel */}
                 <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
                     {/* Header */}
-                    <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
+                    <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg flex justify-between items-center">
                         <h2 className="text-lg font-semibold">View Users</h2>
                         <div className="flex items-center gap-2">
                             <span className="text-sm">Show</span>
@@ -211,7 +211,7 @@ export default function AdminUsers() {
                                     setEntriesPerPage(Number(e.target.value));
                                     setCurrentPage(1);
                                 }}
-                                className="bg-white text-teal-600 border border-teal-300 rounded py-1 px-2 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer"
+                                className="bg-white text-[#A54B31] border border-teal-300 rounded py-1 px-2 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer"
                             >
                                 <option value={10}>10</option>
                                 <option value={20}>20</option>
@@ -227,22 +227,22 @@ export default function AdminUsers() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-neutral-50 text-xs font-bold text-neutral-800 border-b border-neutral-200">
-                                    <th className="p-4">
+                                    <th className="px-3 py-2">
                                         Sr No
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('name')}
                                     >
                                         <div className="flex items-center">
                                             Name <SortIcon column="name" />
                                         </div>
                                     </th>
-                                    <th className="p-4">
+                                    <th className="px-3 py-2">
                                         Contact
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('registrationDate')}
                                     >
                                         <div className="flex items-center">
@@ -250,7 +250,7 @@ export default function AdminUsers() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('status')}
                                     >
                                         <div className="flex items-center">
@@ -258,7 +258,7 @@ export default function AdminUsers() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('refCode')}
                                     >
                                         <div className="flex items-center">
@@ -266,7 +266,7 @@ export default function AdminUsers() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('walletAmount')}
                                     >
                                         <div className="flex items-center">
@@ -274,7 +274,7 @@ export default function AdminUsers() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('totalOrders')}
                                     >
                                         <div className="flex items-center">
@@ -282,14 +282,14 @@ export default function AdminUsers() {
                                         </div>
                                     </th>
                                     <th
-                                        className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
+                                        className="px-3 py-2 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                                         onClick={() => handleSort('totalSpent')}
                                     >
                                         <div className="flex items-center">
                                             Total Spent <SortIcon column="totalSpent" />
                                         </div>
                                     </th>
-                                    <th className="p-4">
+                                    <th className="px-3 py-2">
                                         Action
                                     </th>
                                 </tr>
@@ -299,7 +299,7 @@ export default function AdminUsers() {
                                     <tr>
                                         <td colSpan={11} className="p-8 text-center">
                                             <div className="flex items-center justify-center">
-                                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600 mr-2"></div>
+                                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#A54B31] mr-2"></div>
                                                 Loading users...
                                             </div>
                                         </td>
@@ -319,9 +319,9 @@ export default function AdminUsers() {
                                 ) : (
                                     displayedUsers.map((user, index) => (
                                         <tr key={user._id} className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700 border-b border-neutral-200">
-                                            <td className="p-4 align-middle">{startIndex + index + 1}</td>
-                                            <td className="p-4 align-middle">{user.name}</td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">{startIndex + index + 1}</td>
+                                            <td className="px-3 py-2 align-middle">{user.name}</td>
+                                            <td className="px-3 py-2 align-middle">
                                                 <div className="text-xs">
                                                     <div>{user.email}</div>
                                                     {user.phone && (
@@ -329,8 +329,8 @@ export default function AdminUsers() {
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="p-4 align-middle">{new Date(user.registrationDate).toLocaleString()}</td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">{new Date(user.registrationDate).toLocaleString()}</td>
+                                            <td className="px-3 py-2 align-middle">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === 'Active'
                                                     ? 'bg-green-100 text-green-800'
                                                     : user.status === 'Suspended'
@@ -340,17 +340,17 @@ export default function AdminUsers() {
                                                     {user.status}
                                                 </span>
                                             </td>
-                                            <td className="p-4 align-middle">{user.refCode || '-'}</td>
-                                            <td className="p-4 align-middle">₹{user.walletAmount.toFixed(2)}</td>
-                                            <td className="p-4 align-middle">{user.totalOrders}</td>
-                                            <td className="p-4 align-middle">₹{user.totalSpent.toFixed(2)}</td>
-                                            <td className="p-4 align-middle">
+                                            <td className="px-3 py-2 align-middle">{user.refCode || '-'}</td>
+                                            <td className="px-3 py-2 align-middle">₹{(user.walletAmount || 0).toFixed(2)}</td>
+                                            <td className="px-3 py-2 align-middle">{user.totalOrders}</td>
+                                            <td className="px-3 py-2 align-middle">₹{(user.totalSpent || 0).toFixed(2)}</td>
+                                            <td className="px-3 py-2 align-middle">
                                                 <div className="flex items-center gap-2">
                                                     <button
                                                         onClick={() => handleStatusChange(user._id, user.status === 'Active' ? 'Suspended' : 'Active')}
                                                         className={`p-1.5 text-white rounded transition-colors ${user.status === 'Active'
                                                             ? 'bg-red-600 hover:bg-red-700'
-                                                            : 'bg-green-600 hover:bg-green-700'
+                                                            : 'bg-[#8B3D28] hover:opacity-90'
                                                             }`}
                                                         title={user.status === 'Active' ? 'Suspend User' : 'Activate User'}
                                                     >
@@ -375,7 +375,7 @@ export default function AdminUsers() {
                     </div>
 
                     {/* Pagination Footer */}
-                    <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                    <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
                         <div className="text-xs sm:text-sm text-neutral-700">
                             Showing {displayedUsers.length > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + displayedUsers.length, totalUsers)} of {totalUsers} entries
                         </div>
@@ -383,9 +383,9 @@ export default function AdminUsers() {
                             <button
                                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                                 disabled={currentPage === 1}
-                                className={`p-2 border border-teal-600 rounded ${currentPage === 1
+                                className={`p-2 border border-[#A54B31] rounded ${currentPage === 1
                                     ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                    : 'text-teal-600 hover:bg-teal-50'
+                                    : 'text-[#A54B31] hover:bg-[#FAF7F2]'
                                     }`}
                                 aria-label="Previous page"
                             >
@@ -420,9 +420,9 @@ export default function AdminUsers() {
                                     <button
                                         key={pageNum}
                                         onClick={() => setCurrentPage(pageNum)}
-                                        className={`px-3 py-1.5 border border-teal-600 rounded font-medium text-sm ${currentPage === pageNum
-                                            ? 'bg-teal-600 text-white'
-                                            : 'text-teal-600 hover:bg-teal-50'
+                                        className={`px-3 py-1.5 border border-[#A54B31] rounded font-medium text-sm ${currentPage === pageNum
+                                            ? 'bg-[#A54B31] text-white'
+                                            : 'text-[#A54B31] hover:bg-[#FAF7F2]'
                                             }`}
                                     >
                                         {pageNum}
@@ -435,9 +435,9 @@ export default function AdminUsers() {
                             <button
                                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                                 disabled={currentPage === totalPages}
-                                className={`p-2 border border-teal-600 rounded ${currentPage === totalPages
+                                className={`p-2 border border-[#A54B31] rounded ${currentPage === totalPages
                                     ? 'text-neutral-400 cursor-not-allowed bg-neutral-50'
-                                    : 'text-teal-600 hover:bg-teal-50'
+                                    : 'text-[#A54B31] hover:bg-[#FAF7F2]'
                                     }`}
                                 aria-label="Next page"
                             >
@@ -463,12 +463,19 @@ export default function AdminUsers() {
             </div>
 
             {/* Footer */}
-            <footer className="text-center py-4 text-sm text-neutral-600 border-t border-neutral-200 bg-white">
-                Copyright Â© 2025. Developed By{' '}
-                <a href="#" className="text-blue-600 hover:underline">Village Basket</a>
+            <footer className="text-center py-4 text-[12px] font-bold text-neutral-500 border-t border-neutral-200 bg-white">
+                Copyright © 2025. Developed By{' '}
+                <a href="#" className="text-[#8B3D28] hover:underline">Village Basket</a>
             </footer>
         </div>
     );
 }
+
+
+
+
+
+
+
 
 

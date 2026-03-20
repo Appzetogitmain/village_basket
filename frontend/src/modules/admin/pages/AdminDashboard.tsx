@@ -415,7 +415,7 @@ export default function AdminDashboard() {
           <p className="text-neutral-600 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors">
+            className="bg-[#A54B31] hover:opacity-90 text-white px-4 py-1.5 rounded-lg transition-all font-bold text-sm shadow-md">
             Retry
           </button>
         </div>
@@ -428,16 +428,16 @@ export default function AdminDashboard() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <p className="text-neutral-600">No dashboard data available</p>
+          <p className="text-neutral-600 font-medium">No dashboard data available</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* KPI Cards Grid - 2 columns on mobile, 4 on desktop */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+    <div className="space-y-4 sm:space-y-5 font-poppins">
+      {/* KPI Cards Grid - More Compact */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-3">
         <DashboardCard
           icon={userIcon}
           title="Total User"
@@ -501,58 +501,59 @@ export default function AdminDashboard() {
       </div>
 
       {/* Sales Section - Top Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gapx-3 py-2 sm:gap-5">
         {/* Total Sales Today */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-neutral-200 p-4 sm:p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-black/5 px-3 py-2 sm:p-5 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1 h-full bg-[#A54B31]"></div>
+          <h3 className="text-sm font-black text-neutral-800 mb-3 uppercase tracking-wider font-outfit">
             Total Sales Today
           </h3>
           <div className="mb-4">
-            <p className="text-3xl font-bold text-neutral-900">
-              ₹{salesToday.toFixed(2)}
+            <p className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+              ₹{(salesToday || 0).toFixed(2)}
             </p>
             {salesDifference >= 0 ? (
-              <p className="text-sm text-green-600 mt-1">
-                â–² ₹{Math.abs(salesDifference).toFixed(2)} (+{salesPercentChange}%)
-                vs same day last week
+              <p className="text-[11px] font-bold text-[#8B3D28] mt-1 flex items-center gap-1">
+                <span className="bg-green-100 px-1 rounded">▲ ₹{Math.abs(salesDifference).toFixed(2)} (+{salesPercentChange}%)</span>
+                <span className="text-neutral-400 font-medium">vs last week</span>
               </p>
             ) : (
-              <p className="text-sm text-red-600 mt-1">
-                â–¼ ₹{Math.abs(salesDifference).toFixed(2)} ({salesPercentChange}%)
-                vs same day last week
+              <p className="text-[11px] font-bold text-red-600 mt-1 flex items-center gap-1">
+                <span className="bg-red-100 px-1 rounded">▼ ₹{Math.abs(salesDifference).toFixed(2)} ({salesPercentChange}%)</span>
+                <span className="text-neutral-400 font-medium">vs last week</span>
               </p>
             )}
           </div>
           <SalesLineChart
             thisMonthData={salesThisMonth}
             lastMonthData={salesLastMonth}
-            height={200}
+            height={180}
           />
         </div>
 
         {/* Sales by Location & Gauge */}
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:space-y-5">
           {/* Sales by Location */}
-          <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-4 sm:p-6">
-            <h3 className="text-lg font-semibold text-neutral-900 mb-4">
+          <div className="bg-white rounded-xl shadow-sm border border-black/5 px-3 py-2 sm:p-5">
+            <h3 className="text-sm font-black text-neutral-800 mb-4 uppercase tracking-wider font-outfit">
               Sales by Location
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {salesByLocation.length > 0 ? (
                 salesByLocation.map((location, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">
+                    className="flex items-center justify-between group">
+                    <span className="text-[13px] text-neutral-600 font-medium">
                       {location.location}
                     </span>
-                    <span className="text-sm font-semibold text-neutral-900">
+                    <span className="text-[13px] font-black text-neutral-900 bg-neutral-50 px-2 py-0.5 rounded group-hover:bg-[#FAF7F2] transition-colors">
                       ₹{(location.amount / 1000).toFixed(1)}K
                     </span>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-neutral-500">
+                <p className="text-xs text-neutral-400 italic">
                   No location data available
                 </p>
               )}
@@ -560,52 +561,61 @@ export default function AdminDashboard() {
           </div>
 
           {/* Avg. Completed Order Value */}
-          <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-4 sm:p-6">
-            <h3 className="text-lg font-semibold text-neutral-900 mb-4">
-              Avg. Completed Order Value
+          <div className="bg-white rounded-xl shadow-sm border border-black/5 px-3 py-2 sm:p-5">
+            <h3 className="text-sm font-black text-neutral-800 mb-4 uppercase tracking-wider font-outfit">
+              Avg. Order Value
             </h3>
-            <GaugeChart
-              value={stats.avgCompletedOrderValue}
-              maxValue={521}
-              label="Average Order Value"
-            />
+            <div className="flex justify-center -mt-4">
+              <GaugeChart
+                value={stats.avgCompletedOrderValue}
+                maxValue={521}
+                label=""
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <ErrorBoundary fallback={<div className="text-sm text-red-600 p-4">Chart failed to load</div>}>
-          <OrderChart
-            title="Order - Dec 2025"
-            data={orderDataDec2025}
-            maxValue={3}
-            height={400}
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gapx-3 py-2 sm:gap-5">
+        <ErrorBoundary fallback={<div className="text-xs text-red-600 px-3 py-2">Chart failed to load</div>}>
+          <div className="bg-white rounded-xl shadow-sm border border-black/5 px-3 py-2 overflow-hidden">
+            <OrderChart
+              title="Order - Dec 2025"
+              data={orderDataDec2025}
+              maxValue={3}
+              height={300}
+            />
+          </div>
         </ErrorBoundary>
-        <ErrorBoundary fallback={<div className="text-sm text-red-600 p-4">Chart failed to load</div>}>
-          <OrderChart
-            title="Order - 2025"
-            data={orderData2025}
-            maxValue={80}
-            height={400}
-          />
+        <ErrorBoundary fallback={<div className="text-xs text-red-600 px-3 py-2">Chart failed to load</div>}>
+          <div className="bg-white rounded-xl shadow-sm border border-black/5 px-3 py-2 overflow-hidden">
+            <OrderChart
+              title="Order - 2025"
+              data={orderData2025}
+              maxValue={80}
+              height={300}
+            />
+          </div>
         </ErrorBoundary>
       </div>
 
       {/* Tables Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gapx-3 py-2 sm:gap-5">
         {/* View New Orders Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-          <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
-            <h2 className="text-base sm:text-lg font-semibold">
-              View New Orders
+        <div className="bg-white rounded-xl shadow-md border border-black/5 overflow-hidden font-poppins">
+          <div className="bg-[#8B3D28] text-white px-4 sm:px-6 py-2.5 flex items-center justify-between">
+            <h2 className="text-sm font-black uppercase tracking-widest font-outfit">
+              New Orders
             </h2>
+            <button className="text-[10px] font-bold bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-colors uppercase">
+              View All
+            </button>
           </div>
 
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-200">
+          <div className="px-4 py-2 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-neutral-700">Show</span>
+              <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-tighter">Show</span>
               <input
                 type="number"
                 value={entriesPerPage}
@@ -614,157 +624,54 @@ export default function AdminDashboard() {
                   setEntriesPerPage(Math.max(1, Math.min(100, value)));
                   setCurrentPage(1);
                 }}
-                className="w-16 px-2 py-1 border border-neutral-300 rounded text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                className="w-12 px-1.5 py-0.5 border border-neutral-200 rounded text-[11px] font-bold text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
                 min="1"
                 max="100"
               />
-              <span className="text-sm text-neutral-700">entries</span>
+            </div>
+            <div className="relative">
+              <input 
+                 type="text" 
+                 placeholder="Filter orders..." 
+                 className="text-[11px] px-3 py-1 bg-white border border-neutral-200 rounded-full w-32 focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
+              />
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
-              <thead className="bg-neutral-50 border-b border-neutral-200">
+            <table className="w-full min-w-[500px]">
+              <thead className="bg-[#FAF7F2] border-b border-neutral-100">
                 <tr>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    <div className="flex items-center gap-2">
-                      ID
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className="text-neutral-400 cursor-pointer">
-                        <path
-                          d="M7 10L12 5L17 10M7 14L12 19L17 14"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    User Details
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    <div className="flex items-center gap-2">
-                      O. Date
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className="text-neutral-400 cursor-pointer">
-                        <path
-                          d="M7 10L12 5L17 10M7 14L12 19L17 14"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    <div className="flex items-center gap-2">
-                      Status
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className="text-neutral-400 cursor-pointer">
-                        <path
-                          d="M7 10L12 5L17 10M7 14L12 19L17 14"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    <div className="flex items-center gap-2">
-                      Amount
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className="text-neutral-400 cursor-pointer">
-                        <path
-                          d="M7 10L12 5L17 10M7 14L12 19L17 14"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    Action
-                  </th>
+                  <th className="px-4 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Order ID</th>
+                  <th className="px-4 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Customer</th>
+                  <th className="px-4 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Date</th>
+                  <th className="px-4 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Status</th>
+                  <th className="px-4 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Amount</th>
+                  <th className="px-4 py-2 text-center text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Action</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-neutral-200">
+              <tbody className="bg-white divide-y divide-neutral-50">
                 {displayedNewOrders.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="px-4 sm:px-6 py-8 text-center text-sm text-neutral-500">
-                      No data available in table
-                    </td>
+                    <td colSpan={6} className="px-4 py-4 text-center text-xs text-neutral-400 italic">No orders found</td>
                   </tr>
                 ) : (
                   displayedNewOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-neutral-50">
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
-                        {order.orderNumber || order.id}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
-                        {order.customerName}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
-                        {new Date(order.orderDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-neutral-600 bg-neutral-50">
+                    <tr key={order.id} className="hover:bg-neutral-50/50 transition-colors">
+                      <td className="px-4 py-2.5 text-[12px] font-bold text-neutral-700">#{order.orderNumber || order.id.slice(-6)}</td>
+                      <td className="px-4 py-2.5 text-[12px] font-medium text-neutral-600 truncate max-w-[120px]">{order.customerName}</td>
+                      <td className="px-4 py-2.5 text-[11px] text-neutral-500">{new Date(order.orderDate).toLocaleDateString()}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tight bg-blue-50 text-[#8B3D28] border border-blue-100">
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
-                        ₹ {order.amount.toFixed(2)}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3">
-                        <button
-                          className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded transition-colors"
-                          aria-label="View order">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                              d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="3"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
+                      <td className="px-4 py-2.5 text-[12px] font-black text-neutral-900">₹{(order.amount || 0).toFixed(0)}</td>
+                      <td className="px-4 py-2.5 text-center">
+                        <button className="text-[#A54B31] hover:scale-110 transition-transform p-1.5" aria-label="View order">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
                           </svg>
                         </button>
                       </td>
@@ -775,197 +682,71 @@ export default function AdminDashboard() {
             </table>
           </div>
 
-          <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
-            <div className="text-xs sm:text-sm text-neutral-700">
-              Showing {startIndexNewOrders + 1} to{" "}
-              {Math.min(endIndexNewOrders, newOrders.length)} of{" "}
-              {newOrders.length} entries
-            </div>
-            <div className="flex items-center gap-2">
+          <div className="px-4 py-2.5 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/30">
+            <span className="text-[10px] font-bold text-neutral-400">
+              {startIndexNewOrders + 1}-{Math.min(endIndexNewOrders, newOrders.length)} of {newOrders.length}
+            </span>
+            <div className="flex gap-1">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className={`p-2 border border-neutral-300 rounded ${currentPage === 1
-                  ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                  : "text-neutral-700 hover:bg-neutral-50"
-                  }`}
-                aria-label="Previous page">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M15 18L9 12L15 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                className="p-1 border border-neutral-200 rounded disabled:opacity-30 hover:bg-white transition-colors">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M15 18L9 12L15 6" /></svg>
               </button>
               <button
-                onClick={() =>
-                  setCurrentPage((prev) =>
-                    Math.min(totalPagesNewOrders, prev + 1)
-                  )
-                }
+                onClick={() => setCurrentPage((prev) => Math.min(totalPagesNewOrders, prev + 1))}
                 disabled={currentPage === totalPagesNewOrders}
-                className={`p-2 border border-neutral-300 rounded ${currentPage === totalPagesNewOrders
-                  ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                  : "text-neutral-700 hover:bg-neutral-50"
-                  }`}
-                aria-label="Next page">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M9 18L15 12L9 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                className="p-1 border border-neutral-200 rounded disabled:opacity-30 hover:bg-white transition-colors">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M9 18L15 12L9 6" /></svg>
               </button>
             </div>
           </div>
         </div>
 
-        {/* View Top Seller Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-          <div className="bg-teal-600 text-white px-4 sm:px-6 py-3">
-            <h2 className="text-base sm:text-lg font-semibold">
-              View Top Seller
+        {/* View Top Seller Table - Similarly Compact */}
+        <div className="bg-white rounded-xl shadow-md border border-black/5 overflow-hidden font-poppins">
+          <div className="bg-[#A54B31] text-white px-4 sm:px-6 py-2.5 flex items-center justify-between">
+            <h2 className="text-sm font-black uppercase tracking-widest font-outfit">
+              Top Sellers
             </h2>
-          </div>
-
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-200">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-neutral-700">Show</span>
-              <input
-                type="number"
-                value={entriesPerPage}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value) || 10;
-                  setEntriesPerPage(Math.max(1, Math.min(100, value)));
-                  setCurrentPage(1);
-                }}
-                className="w-16 px-2 py-1 border border-neutral-300 rounded text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                min="1"
-                max="100"
-              />
-              <span className="text-sm text-neutral-700">entries</span>
-            </div>
+            <button className="text-[10px] font-bold bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-colors uppercase">
+              Ranking
+            </button>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
-              <thead className="bg-neutral-50 border-b border-neutral-200">
+            <table className="w-full min-w-[500px]">
+              <thead className="bg-[#FAF7F2] border-b border-neutral-100">
                 <tr>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    <div className="flex items-center gap-2">
-                      ID
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className="text-neutral-400 cursor-pointer">
-                        <path
-                          d="M7 10L12 5L17 10M7 14L12 19L17 14"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    Seller Name
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    Store Name
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    <div className="flex items-center gap-2">
-                      Total Revenue
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className="text-neutral-400 cursor-pointer">
-                        <path
-                          d="M7 10L12 5L17 10M7 14L12 19L17 14"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                    Action
-                  </th>
+                  <th className="px-4 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Seller</th>
+                  <th className="px-4 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Store</th>
+                  <th className="px-4 py-2 text-left text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Revenue</th>
+                  <th className="px-4 py-2 text-center text-[10px] font-black text-neutral-500 uppercase tracking-wider font-outfit">Action</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-neutral-200">
+              <tbody className="bg-white divide-y divide-neutral-50">
                 {displayedTopSellers.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="px-4 sm:px-6 py-8 text-center text-sm text-neutral-500">
-                      No top sellers data available
-                    </td>
+                    <td colSpan={4} className="px-4 py-4 text-center text-xs text-neutral-400 italic">No data</td>
                   </tr>
                 ) : (
                   displayedTopSellers.map((seller) => (
-                    <tr key={seller.sellerId} className="hover:bg-neutral-50">
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
-                        {seller.sellerId}
+                    <tr key={seller.sellerId} className="hover:bg-neutral-50/50 transition-colors">
+                      <td className="px-4 py-2.5">
+                        <div className="flex flex-col">
+                          <span className="text-[12px] font-black text-neutral-800 tracking-tight">{seller.sellerName}</span>
+                          <span className="text-[10px] text-neutral-400">ID: {seller.sellerId.slice(-4)}</span>
+                        </div>
                       </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
-                        {seller.sellerName}
+                      <td className="px-4 py-2.5 text-[11px] font-bold text-neutral-600 italic">"{seller.storeName}"</td>
+                      <td className="px-4 py-2.5">
+                         <span className="text-[13px] font-black text-[#8B3D28]">₹{(seller.totalRevenue / 1).toFixed(0)}</span>
                       </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
-                        {seller.storeName}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
-                        ₹ {seller.totalRevenue.toFixed(2)}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3">
-                        <button
-                          className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded transition-colors"
-                          aria-label="View seller">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                              d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <circle
-                              cx="12"
-                              cy="12"
-                              r="3"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
+                      <td className="px-4 py-2.5 text-center">
+                        <button className="text-[#8B3D28] hover:scale-110 transition-transform p-1.5" aria-label="View seller">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
                           </svg>
                         </button>
                       </td>
@@ -975,80 +756,28 @@ export default function AdminDashboard() {
               </tbody>
             </table>
           </div>
-
-          <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
-            <div className="text-xs sm:text-sm text-neutral-700">
-              Showing {startIndexTopSellers + 1} to{" "}
-              {Math.min(endIndexTopSellers, topSellers.length)} of{" "}
-              {topSellers.length} entries
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className={`p-2 border border-neutral-300 rounded ${currentPage === 1
-                  ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                  : "text-neutral-700 hover:bg-neutral-50"
-                  }`}
-                aria-label="Previous page">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M15 18L9 12L15 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-              <span className="px-3 py-2 border border-neutral-300 rounded text-sm text-neutral-700 bg-white">
-                {currentPage}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) =>
-                    Math.min(totalPagesTopSellers, prev + 1)
-                  )
-                }
-                disabled={currentPage === totalPagesTopSellers}
-                className={`p-2 border border-neutral-300 rounded ${currentPage === totalPagesTopSellers
-                  ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                  : "text-neutral-700 hover:bg-neutral-50"
-                  }`}
-                aria-label="Next page">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M9 18L15 12L9 6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
+          <div className="px-4 py-3 bg-neutral-50/30 text-center">
+             <button className="text-[10px] font-black text-[#A54B31] uppercase tracking-widest hover:underline transition-all">Download Detailed Sales Report</button>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="text-center text-sm text-neutral-500 py-4">
-        Copyright Â© 2025. Developed By{" "}
-        <a href="#" className="text-teal-600 hover:text-teal-700">
-          Village Basket
-        </a>
+      {/* Footer - Mini */}
+      <div className="text-center py-4 relative group">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-neutral-200 group-hover:w-24 transition-all duration-500 rounded-full"></div>
+        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mb-1">Generated by System</p>
+        <p className="text-[11px] text-neutral-300 font-bold">
+          Village Basket &copy; 2025 | Premium Admin Interface
+        </p>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 

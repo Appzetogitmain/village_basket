@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 export default function AdminCustomerAppPolicy() {
   const [policyContent, setPolicyContent] = useState(`Welcome to Village Basket!
@@ -55,27 +55,27 @@ Last updated: December 2025`);
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="bg-white px-4 sm:px-6 py-4 border-b border-neutral-200">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-white px-3 py-2.5 border-b border-neutral-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gapx-3 py-2">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Customer App Policy</h1>
+            <h1 className="text-lg sm:text-xl font-black text-neutral-900 font-outfit uppercase tracking-tight">Customer App Policy</h1>
           </div>
-          <div className="text-sm text-neutral-600">
-            <span className="text-blue-600">Home</span> / <span className="text-neutral-900">Customer App Policy</span>
+          <div className="text-[12px] font-bold text-neutral-500">
+            <span className="text-[#8B3D28]">Home</span> / <span className="text-neutral-900">Customer App Policy</span>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-neutral-50">
+      <div className="flex-1 overflow-y-auto px-3 py-2 sm:p-3 bg-neutral-50">
         <div className="max-w-4xl mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Policy Content Section */}
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-              <div className="bg-teal-600 px-4 sm:px-6 py-3">
+              <div className="bg-[#A54B31] px-3 py-2">
                 <h2 className="text-white text-lg font-semibold">Policy Content</h2>
               </div>
-              <div className="p-4 sm:p-6">
+              <div className="px-3 py-2 sm:p-3">
                 <div>
                   <label className="block text-sm font-bold text-neutral-800 mb-2">
                     Policy Text <span className="text-red-500">*</span>
@@ -87,7 +87,7 @@ Last updated: December 2025`);
                     placeholder="Enter Customer App Policy content..."
                     rows={25}
                     required
-                    className="w-full px-4 py-3 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-y font-mono"
+                    className="w-full px-4 py-3 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] resize-y font-mono"
                   />
                   <p className="mt-2 text-xs text-neutral-500">
                     You can format the policy content using plain text. Use line breaks and spacing to organize the content.
@@ -98,12 +98,12 @@ Last updated: December 2025`);
 
             {/* Preview Section */}
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-              <div className="bg-teal-600 px-4 sm:px-6 py-3">
+              <div className="bg-[#A54B31] px-3 py-2">
                 <h2 className="text-white text-lg font-semibold">Preview</h2>
               </div>
-              <div className="p-4 sm:p-6">
+              <div className="px-3 py-2 sm:p-3">
                 <div className="prose max-w-none">
-                  <div className="whitespace-pre-wrap text-sm text-neutral-700 bg-neutral-50 p-4 rounded border border-neutral-200 min-h-[200px] max-h-[400px] overflow-y-auto">
+                  <div className="whitespace-pre-wrap text-sm text-neutral-700 bg-neutral-50 px-3 py-2 rounded border border-neutral-200 min-h-[200px] max-h-[400px] overflow-y-auto">
                     {policyContent || 'Policy content will appear here...'}
                   </div>
                 </div>
@@ -111,17 +111,17 @@ Last updated: December 2025`);
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-4">
+            <div className="flex justify-end gapx-3 py-2">
               <button
                 type="button"
                 onClick={() => setPolicyContent('')}
-                className="px-6 py-2.5 border border-neutral-300 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+                className="px-6 py-2.5 border border-neutral-300 rounded-lg text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider hover:bg-neutral-50 transition-colors"
               >
                 Clear
               </button>
               <button
                 type="submit"
-                className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-2.5 rounded-lg text-base font-medium transition-colors"
+                className="bg-[#A54B31] hover:opacity-90 text-white px-8 py-2.5 rounded-lg text-[#8B3D28]ase font-medium transition-colors"
               >
                 Update Policy
               </button>
@@ -132,5 +132,12 @@ Last updated: December 2025`);
     </div>
   );
 }
+
+
+
+
+
+
+
 
 

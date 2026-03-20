@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   getAllSystemUsers,
   createSystemUser,
@@ -301,11 +301,11 @@ export default function AdminSystemUser() {
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Page Header */}
-      <div className="p-6 pb-0">
+      <div className="p-3 pb-0">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold text-neutral-800">System User</h1>
-          <div className="text-sm text-blue-500">
-            <span className="text-blue-500 hover:underline cursor-pointer">Home</span>{' '}
+          <div className="text-sm text-[#8B3D28]">
+            <span className="text-[#8B3D28] hover:underline cursor-pointer">Home</span>{' '}
             <span className="text-neutral-400">/</span> Dashboard
           </div>
         </div>
@@ -313,46 +313,46 @@ export default function AdminSystemUser() {
 
       {/* Page Content */}
       <div className="flex-1 px-6 pb-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 h-full">
           {/* Left Panel: Add System User */}
           <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col">
-            <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg">
+            <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg">
               <h2 className="text-lg font-semibold">Add System User</h2>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center justify-between">
+              <div className="px-3 py-2 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center justify-between">
                 <p className="text-sm">{error}</p>
                 <button
                   onClick={() => setError('')}
                   className="text-red-700 hover:text-red-900 ml-4 text-lg font-bold"
                   type="button"
                 >
-                  Ã—
+                  ×
                 </button>
               </div>
             )}
 
             {/* Success Message */}
             {successMessage && (
-              <div className="p-4 bg-green-50 border-l-4 border-green-500 text-green-700 flex items-center justify-between">
+              <div className="px-3 py-2 bg-green-50 border-l-4 border-green-500 text-[#A54B31] flex items-center justify-between">
                 <p className="text-sm">{successMessage}</p>
                 <button
                   onClick={() => setSuccessMessage('')}
-                  className="text-green-700 hover:text-green-900 ml-4 text-lg font-bold"
+                  className="text-[#A54B31] hover:text-green-900 ml-4 text-lg font-bold"
                   type="button"
                 >
-                  Ã—
+                  ×
                 </button>
               </div>
             )}
 
-            <div className="p-6 flex-1 flex flex-col">
+            <div className="p-3 flex-1 flex flex-col">
               <div className="space-y-4 flex-1">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                       Select role <span className="text-red-500">*</span>
                     </label>
                     <select
@@ -360,7 +360,7 @@ export default function AdminSystemUser() {
                       value={formData.role}
                       onChange={handleInputChange}
                       disabled={loading}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white"
                     >
                       <option value="">Select role</option>
                       {roles.map((role) => (
@@ -372,7 +372,7 @@ export default function AdminSystemUser() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                       First Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -382,12 +382,12 @@ export default function AdminSystemUser() {
                       onChange={handleInputChange}
                       placeholder="Enter First Name"
                       disabled={loading}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                       Last Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -397,12 +397,12 @@ export default function AdminSystemUser() {
                       onChange={handleInputChange}
                       placeholder="Enter Last Name"
                       disabled={loading}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                       Mobile <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -413,12 +413,12 @@ export default function AdminSystemUser() {
                       placeholder="Enter 10-digit Mobile"
                       disabled={loading}
                       maxLength={10}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -428,12 +428,12 @@ export default function AdminSystemUser() {
                       onChange={handleInputChange}
                       placeholder="Enter Email"
                       disabled={loading}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                       Password {editingId === null && <span className="text-red-500">*</span>}
                     </label>
                     <input
@@ -443,12 +443,12 @@ export default function AdminSystemUser() {
                       onChange={handleInputChange}
                       placeholder={editingId === null ? "Enter Password" : "Leave blank to keep current"}
                       disabled={loading}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                       Confirm Password {editingId === null && <span className="text-red-500">*</span>}
                     </label>
                     <input
@@ -458,7 +458,7 @@ export default function AdminSystemUser() {
                       onChange={handleInputChange}
                       placeholder={editingId === null ? "Enter Confirm Password" : "Leave blank to keep current"}
                       disabled={loading}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                     />
                   </div>
                 </div>
@@ -470,7 +470,7 @@ export default function AdminSystemUser() {
                     <button
                       onClick={handleAddSystemUser}
                       disabled={loading}
-                      className="flex-1 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded text-sm font-medium transition-colors"
+                      className="flex-1 bg-[#A54B31] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded text-sm font-medium transition-colors"
                     >
                       {loading ? 'Updating...' : 'Update System User'}
                     </button>
@@ -486,7 +486,7 @@ export default function AdminSystemUser() {
                   <button
                     onClick={handleAddSystemUser}
                     disabled={loading}
-                    className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded text-sm font-medium transition-colors"
+                    className="w-full bg-[#A54B31] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded text-sm font-medium transition-colors"
                   >
                     {loading ? 'Adding...' : 'Add System User'}
                   </button>
@@ -497,12 +497,12 @@ export default function AdminSystemUser() {
 
           {/* Right Panel: View System User */}
           <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col">
-            <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg">
+            <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg">
               <h2 className="text-lg font-semibold">View System User</h2>
             </div>
-            <div className="p-6 flex-1 flex flex-col">
+            <div className="p-3 flex-1 flex flex-col">
               {/* Search and Entries Per Page */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gapx-3 py-2 mb-4">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-neutral-700">Show</span>
                   <select
@@ -512,7 +512,7 @@ export default function AdminSystemUser() {
                       setCurrentPage(1);
                     }}
                     disabled={loading}
-                    className="px-2 py-1 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="px-2 py-1 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   >
                     <option value={10}>10</option>
                     <option value={25}>25</option>
@@ -530,7 +530,7 @@ export default function AdminSystemUser() {
                   }}
                   placeholder="Search..."
                   disabled={loading}
-                  className="px-3 py-1.5 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="px-3 py-1.5 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                 />
               </div>
 
@@ -538,8 +538,8 @@ export default function AdminSystemUser() {
               {loading && (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-                    <p className="mt-2 text-sm text-neutral-600">Loading...</p>
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#A54B31]"></div>
+                    <p className="mt-2 text-[12px] font-bold text-neutral-500">Loading...</p>
                   </div>
                 </div>
               )}
@@ -551,7 +551,7 @@ export default function AdminSystemUser() {
                     <thead>
                       <tr className="bg-neutral-50 border-b border-neutral-200">
                         <th
-                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-neutral-100"
+                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-[#FAF7F2]"
                           onClick={() => handleSort('_id')}
                         >
                           <div className="flex items-center">
@@ -560,7 +560,7 @@ export default function AdminSystemUser() {
                           </div>
                         </th>
                         <th
-                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-neutral-100"
+                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-[#FAF7F2]"
                           onClick={() => handleSort('firstName')}
                         >
                           <div className="flex items-center">
@@ -569,7 +569,7 @@ export default function AdminSystemUser() {
                           </div>
                         </th>
                         <th
-                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-neutral-100"
+                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-[#FAF7F2]"
                           onClick={() => handleSort('mobile')}
                         >
                           <div className="flex items-center">
@@ -578,7 +578,7 @@ export default function AdminSystemUser() {
                           </div>
                         </th>
                         <th
-                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-neutral-100"
+                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-[#FAF7F2]"
                           onClick={() => handleSort('email')}
                         >
                           <div className="flex items-center">
@@ -587,7 +587,7 @@ export default function AdminSystemUser() {
                           </div>
                         </th>
                         <th
-                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-neutral-100"
+                          className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 cursor-pointer hover:bg-[#FAF7F2]"
                           onClick={() => handleSort('role')}
                         >
                           <div className="flex items-center">
@@ -601,7 +601,7 @@ export default function AdminSystemUser() {
                     <tbody>
                       {displayedUsers.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="px-4 py-8 text-center text-sm text-neutral-500">
+                          <td colSpan={6} className="px-4 py-4 text-center text-sm text-neutral-500">
                             No system users found
                           </td>
                         </tr>
@@ -620,7 +620,7 @@ export default function AdminSystemUser() {
                                 <button
                                   onClick={() => handleEdit(user.id)}
                                   disabled={loading}
-                                  className="p-1.5 bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded transition-colors"
+                                  className="p-1.5 bg-[#8B3D28] hover:bg-[#8B3D28] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded transition-colors"
                                   title="Edit"
                                 >
                                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -651,8 +651,8 @@ export default function AdminSystemUser() {
 
               {/* Pagination */}
               {!loading && totalPages > 1 && (
-                <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-neutral-200">
-                  <div className="text-sm text-neutral-600">
+                <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gapx-3 py-2 pt-4 border-t border-neutral-200">
+                  <div className="text-[12px] font-bold text-neutral-500">
                     Showing {displayedUsers.length > 0 ? (currentPage - 1) * entriesPerPage + 1 : 0} to {Math.min(currentPage * entriesPerPage, totalUsers)} of {totalUsers} entries
                   </div>
                   <div className="flex items-center gap-2">
@@ -671,7 +671,7 @@ export default function AdminSystemUser() {
                         onClick={() => setCurrentPage(page)}
                         disabled={loading}
                         className={`px-3 py-1.5 border rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${currentPage === page
-                            ? 'bg-teal-600 text-white border-teal-600'
+                            ? 'bg-[#A54B31] text-white border-[#A54B31]'
                             : 'border-neutral-300 hover:bg-neutral-50'
                           }`}
                       >
@@ -697,12 +697,19 @@ export default function AdminSystemUser() {
 
       {/* Footer */}
       <div className="text-center text-sm text-neutral-500 py-4 px-6">
-        Copyright Â© 2025. Developed By{' '}
-        <a href="#" className="text-teal-600 hover:text-teal-700">
+        Copyright © 2025. Developed By{' '}
+        <a href="#" className="text-[#A54B31] hover:text-teal-700">
           Village Basket
         </a>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 

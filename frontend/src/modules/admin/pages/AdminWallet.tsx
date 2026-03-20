@@ -136,8 +136,8 @@ export default function AdminWallet() {
     };
 
     return (
-        <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="px-3 py-2 md:p-3 max-w-7xl mx-auto space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gapx-3 py-2">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Admin Wallet & Finance</h1>
                     <p className="text-gray-500">Manage transactions, track earnings, and process withdrawals.</p>
@@ -153,19 +153,19 @@ export default function AdminWallet() {
 
             {/* Stats Grid */}
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gapx-3 py-2">
                 <StatsCard
                     title="Total Platform Earning"
                     value={`₹${stats?.totalGMV?.toLocaleString('en-IN') || '0'}`}
                     icon={TrendingUpIcon}
-                    color="text-blue-600"
+                    color="text-[#8B3D28]"
                     bg="bg-blue-50"
                 />
                 <StatsCard
                     title="Current Platform Balance"
                     value={`₹${stats?.currentAccountBalance?.toLocaleString('en-IN') || '0'}`}
                     icon={WalletIcon}
-                    color="text-green-600"
+                    color="text-[#8B3D28]"
                     bg="bg-green-50"
                 />
                 <StatsCard
@@ -215,7 +215,7 @@ export default function AdminWallet() {
                     />
                 </div>
 
-                <div className="p-6">
+                <div className="p-3">
                     {activeTab === 'transactions' && (
                         <div className="space-y-4">
                             {/* Filters */}
@@ -268,7 +268,7 @@ export default function AdminWallet() {
                                                         </div>
                                                     </td>
                                                     <td className="py-3 px-4">
-                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${trx.type === 'Credit' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${trx.type === 'Credit' ? 'bg-green-100 text-[#A54B31]' : 'bg-red-100 text-red-700'
                                                             }`}>
                                                             {trx.type}
                                                         </span>
@@ -276,9 +276,9 @@ export default function AdminWallet() {
                                                     <td className="py-3 px-4 text-sm text-gray-600">
                                                         {trx.description}
                                                     </td>
-                                                    <td className={`py-3 px-4 text-right font-medium ${trx.type === 'Credit' ? 'text-green-600' : 'text-red-600'
+                                                    <td className={`py-3 px-4 text-right font-medium ${trx.type === 'Credit' ? 'text-[#8B3D28]' : 'text-red-600'
                                                         }`}>
-                                                        {trx.type === 'Credit' ? '+' : '-'}₹{trx.amount.toFixed(2)}
+                                                        {trx.type === 'Credit' ? '+' : '-'}₹{(trx.amount || 0).toFixed(2)}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -320,13 +320,13 @@ export default function AdminWallet() {
                                                         {earning.description}
                                                     </td>
                                                     <td className="py-3 px-4">
-                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${earning.status === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${earning.status === 'Paid' ? 'bg-green-100 text-[#A54B31]' : 'bg-yellow-100 text-yellow-700'
                                                             }`}>
                                                             {earning.status}
                                                         </span>
                                                     </td>
-                                                    <td className="py-3 px-4 text-right font-medium text-green-600">
-                                                        ₹{earning.amount.toFixed(2)}
+                                                    <td className="py-3 px-4 text-right font-medium text-[#8B3D28]">
+                                                        ₹{(earning.amount || 0).toFixed(2)}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -350,7 +350,7 @@ export default function AdminWallet() {
 
 function StatsCard({ title, value, icon: Icon, color, bg, label }: any) {
     return (
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-start justify-between">
+        <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-start justify-between">
             <div>
                 <p className="text-gray-500 text-sm font-medium mb-1">{title}</p>
                 <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
@@ -367,8 +367,8 @@ function TabButton({ active, onClick, label, icon: Icon, badge }: any) {
     return (
         <button
             onClick={onClick}
-            className={`flex items-center gap-2 px-6 py-4 font-medium text-sm transition relative whitespace-nowrap ${active
-                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
+            className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm transition relative whitespace-nowrap ${active
+                ? 'text-[#8B3D28] border-b-2 border-blue-600 bg-blue-50/50'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
         >
@@ -392,3 +392,10 @@ function EmptyState({ message }: { message: string }) {
         </div>
     );
 }
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 interface Subcategory {
     id: number;
@@ -142,17 +142,17 @@ export default function AdminSubcategoryOrder() {
     return (
         <div className="flex flex-col h-full bg-gray-50">
             {/* Page Content */}
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-3">
                 <div className="max-w-4xl mx-auto">
                     {/* Main Panel */}
                     <div className="bg-white rounded-lg shadow-sm border border-neutral-200">
                         {/* Header */}
-                        <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg">
+                        <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg">
                             <h2 className="text-lg font-semibold">Update Subcategory Order</h2>
                         </div>
 
                         {/* Form Content */}
-                        <div className="p-6">
+                        <div className="p-3">
                             {/* Category Selection */}
                             <div className="mb-6">
                                 <label className="block text-sm font-bold text-neutral-800 mb-2">
@@ -161,7 +161,7 @@ export default function AdminSubcategoryOrder() {
                                 <select
                                     value={selectedCategory}
                                     onChange={(e) => handleCategoryChange(e.target.value)}
-                                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                 >
                                     {CATEGORIES.map((category) => (
                                         <option key={category} value={category}>
@@ -187,7 +187,7 @@ export default function AdminSubcategoryOrder() {
                                                     handleDrop(e, index);
                                                 }}
                                                 onDragEnd={handleDragEnd}
-                                                className={`flex items-center justify-between p-4 bg-gray-100 rounded-lg cursor-move transition-all border-2 border-transparent ${draggedItem === index ? 'opacity-50' : 'hover:bg-gray-200'
+                                                className={`flex items-center justify-between px-3 py-2 bg-gray-100 rounded-lg cursor-move transition-all border-2 border-transparent ${draggedItem === index ? 'opacity-50' : 'hover:bg-gray-200'
                                                     }`}
                                             >
                                                 <span className="text-sm font-medium text-neutral-800 flex-1">
@@ -219,7 +219,7 @@ export default function AdminSubcategoryOrder() {
 
                             {/* Empty State */}
                             {selectedCategory !== 'Select category' && subcategories.length === 0 && (
-                                <div className="mb-6 text-center py-8 text-neutral-400">
+                                <div className="mb-6 text-center py-4 text-neutral-400">
                                     No subcategories found for this category.
                                 </div>
                             )}
@@ -228,7 +228,7 @@ export default function AdminSubcategoryOrder() {
                             <div className="bg-teal-50 px-4 py-3 rounded-lg flex gap-3">
                                 <button
                                     onClick={handleUpdateOrder}
-                                    className="flex-1 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded font-medium transition-colors"
+                                    className="flex-1 bg-[#A54B31] hover:opacity-90 text-white px-4 py-2 rounded font-medium transition-colors"
                                 >
                                     Update Subcategory Order
                                 </button>
@@ -245,12 +245,19 @@ export default function AdminSubcategoryOrder() {
             </div>
 
             {/* Footer */}
-            <footer className="text-center py-4 text-sm text-neutral-600 border-t border-neutral-200 bg-white">
-                Copyright Â© 2025. Developed By{' '}
-                <a href="#" className="text-blue-600 hover:underline">Village Basket</a>
+            <footer className="text-center py-4 text-[12px] font-bold text-neutral-500 border-t border-neutral-200 bg-white">
+                Copyright © 2025. Developed By{' '}
+                <a href="#" className="text-[#8B3D28] hover:underline">Village Basket</a>
             </footer>
         </div>
     );
 }
+
+
+
+
+
+
+
 
 

@@ -72,7 +72,7 @@ export default function AdminOrderDetail() {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={() => navigate('/admin/orders/all')}
-            className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
+            className="bg-[#A54B31] hover:opacity-90 text-white px-6 py-2 rounded-lg transition-colors"
           >
             Back to Orders
           </button>
@@ -88,7 +88,7 @@ export default function AdminOrderDetail() {
           <h2 className="text-xl font-bold text-neutral-900 mb-4">Order Not Found</h2>
           <button
             onClick={() => navigate('/admin/orders/all')}
-            className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
+            className="bg-[#A54B31] hover:opacity-90 text-white px-6 py-2 rounded-lg transition-colors"
           >
             Back to Orders
           </button>
@@ -126,11 +126,11 @@ export default function AdminOrderDetail() {
   ];
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="px-3 py-2 sm:p-3 lg:p-8">
       <div className="mb-6">
         <button
           onClick={() => navigate('/admin/orders/all')}
-          className="text-teal-600 hover:text-teal-700 mb-4 flex items-center gap-2"
+          className="text-[#A54B31] hover:text-teal-700 mb-4 flex items-center gap-2"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -141,21 +141,21 @@ export default function AdminOrderDetail() {
         <p className="text-neutral-600 mt-1">Order #{order.orderNumber}</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Status */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-3">
             <h2 className="text-lg font-semibold mb-4">Order Status</h2>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                 Current Status
               </label>
               <select
                 value={order.status}
                 onChange={(e) => handleStatusUpdate(e.target.value)}
                 disabled={updating}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
               >
                 {statusOptions.map((status) => (
                   <option key={status} value={status}>
@@ -164,7 +164,7 @@ export default function AdminOrderDetail() {
                 ))}
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 gapx-3 py-2 text-sm">
               <div>
                 <span className="text-neutral-600">Order Date:</span>
                 <span className="ml-2 font-medium">{formatDate(order.orderDate)}</span>
@@ -177,7 +177,7 @@ export default function AdminOrderDetail() {
           </div>
 
           {/* Order Items */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-3">
             <h2 className="text-lg font-semibold mb-4">Order Items</h2>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -219,7 +219,7 @@ export default function AdminOrderDetail() {
           </div>
 
           {/* Delivery Address */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-3">
             <h2 className="text-lg font-semibold mb-4">Delivery Address</h2>
             <div className="text-neutral-700">
               <p className="font-medium">{order.customerName}</p>
@@ -238,7 +238,7 @@ export default function AdminOrderDetail() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Customer Info */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-3">
             <h2 className="text-lg font-semibold mb-4">Customer Information</h2>
             <div className="space-y-2 text-sm">
               <div>
@@ -257,7 +257,7 @@ export default function AdminOrderDetail() {
           </div>
 
           {/* Order Summary */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-3">
             <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -275,7 +275,7 @@ export default function AdminOrderDetail() {
               {order.discount > 0 && (
                 <div className="flex justify-between text-red-600">
                   <span>Discount:</span>
-                  <span className="font-medium">-₹{order.discount.toFixed(2)}</span>
+                  <span className="font-medium">-₹{(order.discount || 0).toFixed(2)}</span>
                 </div>
               )}
               <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
@@ -287,7 +287,7 @@ export default function AdminOrderDetail() {
 
           {/* Delivery Information */}
           {deliveryBoy && (
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-3">
               <h2 className="text-lg font-semibold mb-4">Delivery Information</h2>
               <div className="space-y-2 text-sm">
                 <div>
@@ -311,7 +311,7 @@ export default function AdminOrderDetail() {
           )}
 
           {/* Payment Information */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-3">
             <h2 className="text-lg font-semibold mb-4">Payment Information</h2>
             <div className="space-y-2 text-sm">
               <div>
@@ -335,4 +335,11 @@ export default function AdminOrderDetail() {
     </div>
   );
 }
+
+
+
+
+
+
+
 

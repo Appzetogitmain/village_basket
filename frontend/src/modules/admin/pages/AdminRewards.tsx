@@ -176,13 +176,13 @@ export default function AdminRewards() {
   if (loading) {
     return (
       <div className="p-8 flex items-center justify-center min-h-[300px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-teal-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#A54B31]" />
       </div>
     );
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="px-3 py-2 sm:p-3 lg:p-8">
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Manage Rewards</h1>
@@ -191,7 +191,7 @@ export default function AdminRewards() {
         <div className="mt-4 sm:mt-0">
           <button
             onClick={() => handleOpenModal()}
-            className="inline-flex items-center justify-center rounded-md border border-transparent bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+            className="inline-flex items-center justify-center rounded-md border border-transparent bg-[#A54B31] px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:ring-offset-2"
           >
             + Add Reward Item
           </button>
@@ -241,7 +241,7 @@ export default function AdminRewards() {
                         </span>
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <button onClick={() => handleOpenModal(item)} className="text-teal-600 hover:text-teal-900 font-semibold">
+                        <button onClick={() => handleOpenModal(item)} className="text-[#A54B31] hover:text-teal-900 font-semibold">
                           Edit
                         </button>
                       </td>
@@ -251,7 +251,7 @@ export default function AdminRewards() {
               </table>
               {items.length === 0 && (
                 <div className="p-12 text-center">
-                  <div className="text-5xl mb-4">🎁</div>
+                  <div className="text-3xl mb-4">🎁</div>
                   <p className="text-gray-500 font-medium">No reward items yet. Add one to get started!</p>
                 </div>
               )}
@@ -262,10 +262,10 @@ export default function AdminRewards() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] bg-black bg-opacity-50 flex items-center justify-center px-3 py-2">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
+            <div className="flex justify-between items-center p-3 border-b border-gray-100">
               <h2 className="text-lg font-bold text-gray-900">
                 {editingItem ? "Edit Reward Item" : "Add Reward Item"}
               </h2>
@@ -279,7 +279,7 @@ export default function AdminRewards() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-3 space-y-5">
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Item Name *</label>
@@ -289,7 +289,7 @@ export default function AdminRewards() {
                   placeholder="e.g. Free Coffee, Discount Coupon"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="block w-full border border-gray-300 rounded-lg shadow-sm p-2.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                  className="block w-full border border-gray-300 rounded-lg shadow-sm p-2.5 text-sm focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                 />
               </div>
 
@@ -302,12 +302,12 @@ export default function AdminRewards() {
                   placeholder="Describe the reward item..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="block w-full border border-gray-300 rounded-lg shadow-sm p-2.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none resize-none"
+                  className="block w-full border border-gray-300 rounded-lg shadow-sm p-2.5 text-sm focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none resize-none"
                 />
               </div>
 
               {/* Coins & Stock */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gapx-3 py-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">🪙 Coins Required *</label>
                   <input
@@ -316,7 +316,7 @@ export default function AdminRewards() {
                     type="number"
                     value={formData.coinsRequired}
                     onChange={(e) => setFormData({ ...formData, coinsRequired: parseInt(e.target.value) || 1 })}
-                    className="block w-full border border-gray-300 rounded-lg shadow-sm p-2.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                    className="block w-full border border-gray-300 rounded-lg shadow-sm p-2.5 text-sm focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                   />
                 </div>
                 <div>
@@ -327,7 +327,7 @@ export default function AdminRewards() {
                     type="number"
                     value={formData.stock}
                     onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })}
-                    className="block w-full border border-gray-300 rounded-lg shadow-sm p-2.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                    className="block w-full border border-gray-300 rounded-lg shadow-sm p-2.5 text-sm focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                   />
                 </div>
               </div>
@@ -349,7 +349,7 @@ export default function AdminRewards() {
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="bg-white shadow text-xs font-semibold text-teal-700 border border-teal-200 px-2.5 py-1 rounded-lg hover:bg-teal-50 transition-colors"
+                        className="bg-white shadow text-xs font-semibold text-teal-700 border border-teal-200 px-2.5 py-1 rounded-lg hover:bg-[#FAF7F2] transition-colors"
                       >
                         Change
                       </button>
@@ -382,7 +382,7 @@ export default function AdminRewards() {
                   >
                     <div className="flex flex-col items-center gap-2">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${isDragging ? "bg-teal-100" : "bg-gray-100"}`}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={isDragging ? "text-teal-600" : "text-gray-400"}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={isDragging ? "text-[#A54B31]" : "text-gray-400"}>
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                           <polyline points="17 8 12 3 7 8" />
                           <line x1="12" y1="3" x2="12" y2="15" />
@@ -415,7 +415,7 @@ export default function AdminRewards() {
                   id="isActive"
                   checked={formData.isActive}
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded cursor-pointer"
+                  className="h-4 w-4 text-[#A54B31] focus:ring-[#8B3D28] border-gray-300 rounded cursor-pointer"
                 />
                 <label htmlFor="isActive" className="text-sm font-medium text-gray-900 cursor-pointer select-none">
                   Active — Show this item to customers
@@ -434,7 +434,7 @@ export default function AdminRewards() {
                 <button
                   type="submit"
                   disabled={submitting || uploading}
-                  className="bg-teal-600 border border-transparent py-2 px-5 rounded-lg text-sm font-semibold text-white shadow-sm hover:bg-teal-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="bg-[#A54B31] border border-transparent py-2 px-5 rounded-lg text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {(submitting || uploading) ? (
                     <>
@@ -456,3 +456,10 @@ export default function AdminRewards() {
     </div>
   );
 }
+
+
+
+
+
+
+

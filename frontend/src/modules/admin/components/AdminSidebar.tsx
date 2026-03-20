@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import panchayatArt from '@assets/panchayat_art.png';
+import villageBasketLogo from '@assets/village_basket-removebg-preview.png';
 
 interface SubMenuItem {
   label: string;
@@ -1033,23 +1035,38 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
     .filter((section) => section.items.length > 0);
 
   return (
-    <aside className="w-64 bg-teal-700 h-screen flex flex-col">
-      {/* Close button - only show on mobile */}
-      <div className="flex justify-end p-4 border-b border-teal-600 lg:hidden">
+    <aside className="w-60 bg-[#FAF7F2] h-screen flex flex-col font-poppins shadow-xl z-50 relative overflow-hidden border-r-[3px] border-[#8B3D28]">
+      {/* Village Panchayat Art Background - Subtle Overlay */}
+      <div 
+        className="absolute inset-x-0 bottom-0 top-0 opacity-[0.06] pointer-events-none z-0 bg-no-repeat bg-bottom bg-contain"
+        style={{ backgroundImage: `url(${panchayatArt})`, backgroundSize: '240px auto' }}
+      ></div>
+
+      {/* Decorative Brand Texture */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      {/* Sidebar Header with Logo & Close button */}
+      <div className="flex items-center justify-between p-3 px-4 border-b border-[#8B3D28]/10 relative z-10">
+        <div className="h-8">
+          <img 
+            src={villageBasketLogo} 
+            alt="Village Basket Admin" 
+            className="h-full w-auto object-contain brightness-90 saturate-150" 
+          />
+        </div>
         <button
           onClick={onClose}
-          className="p-2 text-teal-100 hover:text-white transition-colors"
+          className="p-1.5 text-[#8B3D28]/60 hover:text-[#8B3D28] hover:bg-[#8B3D28]/5 rounded-lg transition-all"
           aria-label="Close menu">
           <svg
-            width="24"
-            height="24"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
             <path
               d="M18 6L6 18M6 6L18 18"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -1058,23 +1075,23 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
       </div>
 
       {/* Search Bar */}
-      <div className="p-4 border-b border-teal-600">
+      <div className="p-3 border-b border-[#8B3D28]/10 relative z-10">
         <div className="relative">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search Menu Ctrl + F"
-            className="w-full px-3 py-2 pl-10 bg-teal-800 border border-teal-600 rounded text-white placeholder-teal-300 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+            placeholder="Search Menu..."
+            className="w-full px-3 py-1.5 pl-9 bg-white/50 border border-[#8B3D28]/40 rounded-lg text-[#8B3D28] placeholder-[#8B3D28]/40 text-xs focus:outline-none focus:ring-2 focus:ring-[#8B3D28]/20 transition-all font-medium backdrop-blur-sm"
           />
           <svg
-            width="18"
-            height="18"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-teal-300">
+            strokeWidth="2.5"
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B3D28]/30">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="M21 21L16.65 16.65"></path>
           </svg>
@@ -1082,36 +1099,34 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
       </div>
 
       {/* Dashboard Link */}
-      <div className="px-4 py-2 border-b border-teal-600">
+      <div className="px-3 py-2 border-b border-[#8B3D28]/10 relative z-10">
         <button
           onClick={() => handleNavigation("/admin")}
-          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors ${isActive("/admin")
-            ? "bg-teal-600 text-white"
-            : "text-teal-100 hover:bg-teal-600/50 hover:text-white"
+          className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-left transition-all ${isActive("/admin")
+            ? "bg-[#8B3D28] text-white shadow-md font-bold"
+            : "text-[#8B3D28]/70 hover:bg-[#8B3D28]/5 hover:text-[#8B3D28]"
             }`}>
           <svg
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round">
             <rect x="3" y="3" width="7" height="7"></rect>
             <rect x="14" y="3" width="7" height="7"></rect>
             <rect x="14" y="14" width="7" height="7"></rect>
             <rect x="3" y="14" width="7" height="7"></rect>
-            <circle cx="12" cy="12" r="1"></circle>
-            <path d="M12 6V12M12 18V12M6 12H12M18 12H12"></path>
           </svg>
-          <span className="text-sm font-medium">Dashboard</span>
+          <span className="text-[13px] font-semibold tracking-tight">Dashboard</span>
         </button>
       </div>
 
       {/* Navigation Menu */}
       <nav
-        className="flex-1 py-4 overflow-y-auto admin-sidebar-nav"
+        className="flex-1 py-3 overflow-y-auto admin-sidebar-nav scroll-smooth px-2 relative z-10"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
         <style>{`
           .admin-sidebar-nav::-webkit-scrollbar {
@@ -1119,11 +1134,11 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
           }
         `}</style>
         {filteredSections.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="mb-6">
-            <h3 className="px-4 mb-2 text-xs font-bold text-teal-200 uppercase tracking-wider">
+          <div key={sectionIndex} className="mb-4">
+            <h3 className="px-3 mb-1.5 text-[10px] font-black text-[#8B3D28] uppercase tracking-[0.15em] opacity-80 font-outfit">
               {section.title}
             </h3>
-            <ul className="space-y-1 px-2">
+            <ul className="space-y-0.5">
               {section.items.map((item) => {
                 const expanded = isExpanded(item.path);
                 const active =
@@ -1139,26 +1154,28 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
                           handleNavigation(item.path);
                         }
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${active
-                        ? "bg-teal-600 text-white"
-                        : "text-teal-100 hover:bg-teal-600/50 hover:text-white"
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-left transition-all ${active
+                        ? "bg-[#8B3D28] text-white shadow-md"
+                        : "text-[#8B3D28]/70 hover:bg-[#8B3D28]/5 hover:text-[#8B3D28]"
                         }`}>
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="flex-shrink-0">{item.icon}</span>
-                        <span className="text-sm font-medium truncate">
+                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                        <span className={`flex-shrink-0 transition-transform ${active ? 'scale-110' : ''}`}>
+                          {item.icon}
+                        </span>
+                        <span className={`text-[13px] font-medium truncate ${active ? 'font-bold' : ''}`}>
                           {item.label}
                         </span>
                       </div>
                       {item.hasSubmenu && (
                         <svg
-                          width="16"
-                          height="16"
+                          width="12"
+                          height="12"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="2"
+                          strokeWidth="3"
                           className={`transition-transform flex-shrink-0 ml-2 ${expanded ? "rotate-90" : ""
-                            } ${active ? "text-white" : "text-teal-200"}`}>
+                            } ${active ? "text-white" : "text-[#8B3D28]/30"}`}>
                           <path
                             d="M9 18L15 12L9 6"
                             strokeLinecap="round"
@@ -1167,7 +1184,7 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
                       )}
                     </button>
                     {item.hasSubmenu && expanded && (
-                      <ul className="mt-1 space-y-1 ml-4">
+                      <ul className="mt-0.5 space-y-0.5 ml-3 border-l border-white/10 pl-1">
                         {item.submenuItems &&
                           item.submenuItems.map((subItem) => {
                             const subActive =
@@ -1177,15 +1194,15 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
                               <li key={subItem.path}>
                                 <button
                                   onClick={() => handleNavigation(subItem.path)}
-                                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-left transition-colors ${subActive
-                                    ? "bg-teal-500 text-white"
-                                    : "text-teal-100 hover:bg-teal-600/50 hover:text-white"
+                                  className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg text-left transition-all ${subActive
+                                    ? "bg-[#8B3D28]/10 text-[#8B3D28] font-bold"
+                                    : "text-[#8B3D28]/60 hover:bg-[#8B3D28]/5 hover:text-[#8B3D28]"
                                     }`}>
                                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    <span className="flex-shrink-0">
+                                    <span className="flex-shrink-0 opacity-80 scale-90">
                                       {subItem.icon}
                                     </span>
-                                    <span className="text-sm font-medium truncate">
+                                    <span className="text-xs font-medium truncate">
                                       {subItem.label}
                                     </span>
                                   </div>
@@ -1203,5 +1220,9 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
         ))}
       </nav>
     </aside>
+
   );
 }
+
+
+

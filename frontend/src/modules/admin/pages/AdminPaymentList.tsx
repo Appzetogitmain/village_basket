@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   getPaymentMethodConfigs as getPaymentMethods,
   updatePaymentMethod,
@@ -151,8 +151,8 @@ export default function AdminPaymentList() {
         <h1 className="text-2xl font-semibold text-neutral-800">
           Payment Method
         </h1>
-        <div className="text-sm text-neutral-600">
-          <span className="text-teal-600 hover:text-teal-700 cursor-pointer">
+        <div className="text-[12px] font-bold text-neutral-500">
+          <span className="text-[#A54B31] hover:text-teal-700 cursor-pointer">
             Home
           </span>
           <span className="mx-2">/</span>
@@ -163,7 +163,7 @@ export default function AdminPaymentList() {
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mr-2"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#A54B31] mr-2"></div>
           <span className="text-neutral-600">Loading payment methods...</span>
         </div>
       )}
@@ -177,20 +177,20 @@ export default function AdminPaymentList() {
 
       {/* Payment Methods Grid */}
       {!loading && !error && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gapx-3 py-2 sm:gap-3">
           {paymentMethods.map((method) => (
             <div
               key={method._id}
               className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
               {/* Header */}
-              <div className="bg-teal-600 px-4 sm:px-6 py-3">
+              <div className="bg-[#A54B31] px-3 py-2">
                 <h2 className="text-white text-lg font-semibold">
                   {method.name}
                 </h2>
               </div>
 
               {/* Content */}
-              <div className="p-4 sm:p-6 space-y-4">
+              <div className="px-3 py-2 sm:p-3 space-y-4">
                 {/* Description */}
                 <div>
                   <label className="block text-sm font-bold text-neutral-800 mb-2">
@@ -203,7 +203,7 @@ export default function AdminPaymentList() {
                       handleUpdate(method._id, "description", e.target.value)
                     }
                     disabled={updating === method._id}
-                    className="w-full px-4 py-2.5 border border-neutral-300 rounded text-sm bg-neutral-50 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:bg-neutral-100 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2.5 border border-neutral-300 rounded text-sm bg-neutral-50 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] disabled:bg-neutral-100 disabled:cursor-not-allowed"
                   />
                 </div>
 
@@ -220,7 +220,7 @@ export default function AdminPaymentList() {
                         handleUpdate(method._id, "apiKey", e.target.value)
                       }
                       disabled={updating === method._id}
-                      className="w-full px-4 py-2.5 border border-neutral-300 rounded text-sm bg-neutral-50 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:bg-neutral-100 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-2.5 border border-neutral-300 rounded text-sm bg-neutral-50 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] disabled:bg-neutral-100 disabled:cursor-not-allowed"
                     />
                   </div>
                 )}
@@ -238,7 +238,7 @@ export default function AdminPaymentList() {
                         handleUpdate(method._id, "secretKey", e.target.value)
                       }
                       disabled={updating === method._id}
-                      className="w-full px-4 py-2.5 border border-neutral-300 rounded text-sm bg-neutral-50 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:bg-neutral-100 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-2.5 border border-neutral-300 rounded text-sm bg-neutral-50 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] disabled:bg-neutral-100 disabled:cursor-not-allowed"
                     />
                   </div>
                 )}
@@ -257,7 +257,7 @@ export default function AdminPaymentList() {
                       )
                     }
                     disabled={updating === method._id}
-                    className="w-full px-4 py-2.5 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:bg-neutral-100 disabled:cursor-not-allowed">
+                    className="w-full px-4 py-2.5 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] disabled:bg-neutral-100 disabled:cursor-not-allowed">
                     <option value="Active">Active</option>
                     <option value="InActive">InActive</option>
                   </select>
@@ -267,7 +267,7 @@ export default function AdminPaymentList() {
                 <button
                   onClick={() => handleUpdatePaymentMethod(method._id)}
                   disabled={updating === method._id}
-                  className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-neutral-400 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded text-sm font-medium transition-colors flex items-center justify-center">
+                  className="w-full bg-[#A54B31] hover:opacity-90 disabled:bg-neutral-400 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded text-sm font-medium transition-colors flex items-center justify-center">
                   {updating === method._id ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -285,12 +285,19 @@ export default function AdminPaymentList() {
 
       {/* Footer */}
       <div className="text-center text-sm text-neutral-500 py-4">
-        Copyright Â© 2025. Developed By{" "}
-        <a href="#" className="text-teal-600 hover:text-teal-700">
+        Copyright © 2025. Developed By{" "}
+        <a href="#" className="text-[#A54B31] hover:text-teal-700">
           Village Basket
         </a>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 

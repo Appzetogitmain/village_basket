@@ -66,7 +66,7 @@ export default function OrderChart({ title, data, maxValue, height = 400 }: Orde
           colors: '#6b7280',
           fontSize: '12px',
         },
-        formatter: (value) => value.toFixed(0),
+        formatter: (value) => (value || 0).toFixed(0),
       },
       max: maxValue, // Maintain consistent scale with prop
     },
@@ -118,5 +118,8 @@ export default function OrderChart({ title, data, maxValue, height = 400 }: Orde
     </div>
   );
 }
+
+
+
 
 

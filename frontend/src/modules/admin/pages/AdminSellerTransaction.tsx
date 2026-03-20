@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   getSellerTransactions,
   type SellerTransaction,
@@ -255,11 +255,11 @@ export default function AdminSellerTransaction() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="bg-teal-600 px-4 sm:px-6 py-4 rounded-t-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+      <div className="bg-[#A54B31] px-3 py-2.5 rounded-t-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <h1 className="text-white text-xl sm:text-2xl font-semibold">
           View Seller List
         </h1>
-        <button className="bg-white text-teal-600 border-2 border-teal-600 hover:bg-teal-50 px-4 py-2 rounded text-sm font-medium flex items-center gap-2 transition-colors">
+        <button className="bg-white text-[#A54B31] border-2 border-[#A54B31] hover:bg-[#FAF7F2] px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors">
           <svg
             width="16"
             height="16"
@@ -279,8 +279,8 @@ export default function AdminSellerTransaction() {
       {/* Main Content Card */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
         {/* Filters */}
-        <div className="p-4 sm:p-6 border-b border-neutral-200">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <div className="px-3 py-2 sm:p-3 border-b border-neutral-200">
+          <div className="flex flex-col lg:flex-row gapx-3 py-2 items-start lg:items-center justify-between">
             {/* Left Side Filters */}
             <div className="flex flex-col sm:flex-row gap-3 flex-1 flex-wrap">
               {/* From - To Date */}
@@ -316,7 +316,7 @@ export default function AdminSellerTransaction() {
                       value={fromDate}
                       onChange={(e) => setFromDate(e.target.value)}
                       placeholder="MM/DD/YYYY"
-                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[140px]"
+                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>
                   <span className="text-neutral-500">-</span>
@@ -347,7 +347,7 @@ export default function AdminSellerTransaction() {
                       value={toDate}
                       onChange={(e) => setToDate(e.target.value)}
                       placeholder="MM/DD/YYYY"
-                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[140px]"
+                      className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>
                   <button
@@ -370,7 +370,7 @@ export default function AdminSellerTransaction() {
                     setCurrentPage(1);
                   }}
                   disabled={loading}
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[130px] disabled:bg-neutral-100 disabled:cursor-not-allowed">
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[130px] disabled:bg-neutral-100 disabled:cursor-not-allowed">
                   <option value="all">All Sellers</option>
                   {sellers.map((seller) => (
                     <option key={seller._id} value={seller._id}>
@@ -391,7 +391,7 @@ export default function AdminSellerTransaction() {
                     setSelectedMethod(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[100px]">
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[100px]">
                   {methods.map((method) => (
                     <option
                       key={method}
@@ -414,7 +414,7 @@ export default function AdminSellerTransaction() {
                     setEntriesPerPage(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="px-2 py-1 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500">
+                  className="px-2 py-1 border border-neutral-300 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]">
                   <option value={10}>10</option>
                   <option value={25}>25</option>
                   <option value={50}>50</option>
@@ -425,7 +425,7 @@ export default function AdminSellerTransaction() {
               {/* Export Button */}
               <button
                 onClick={handleExport}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2 transition-colors">
+                className="bg-[#A54B31] hover:opacity-90 text-white px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors">
                 <svg
                   width="16"
                   height="16"
@@ -464,7 +464,7 @@ export default function AdminSellerTransaction() {
                     setCurrentPage(1);
                   }}
                   placeholder="Search:"
-                  className="px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 min-w-[150px]"
+                  className="px-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[150px]"
                 />
               </div>
             </div>
@@ -477,7 +477,7 @@ export default function AdminSellerTransaction() {
             <thead className="bg-neutral-50 border-b border-neutral-200">
               <tr>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("id")}>
                   <div className="flex items-center gap-2">
                     Id
@@ -498,7 +498,7 @@ export default function AdminSellerTransaction() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("sellerName")}>
                   <div className="flex items-center gap-2">
                     Seller Name
@@ -519,7 +519,7 @@ export default function AdminSellerTransaction() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("orderId")}>
                   <div className="flex items-center gap-2">
                     Order Id
@@ -540,7 +540,7 @@ export default function AdminSellerTransaction() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("orderItemId")}>
                   <div className="flex items-center gap-2">
                     Order Item Id
@@ -561,7 +561,7 @@ export default function AdminSellerTransaction() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("productName")}>
                   <div className="flex items-center gap-2">
                     Product Name
@@ -582,7 +582,7 @@ export default function AdminSellerTransaction() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("variation")}>
                   <div className="flex items-center gap-2">
                     Variation
@@ -603,7 +603,7 @@ export default function AdminSellerTransaction() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("flag")}>
                   <div className="flex items-center gap-2">
                     Flag
@@ -624,7 +624,7 @@ export default function AdminSellerTransaction() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("amount")}>
                   <div className="flex items-center gap-2">
                     Amount
@@ -645,7 +645,7 @@ export default function AdminSellerTransaction() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("remark")}>
                   <div className="flex items-center gap-2">
                     Remark
@@ -666,7 +666,7 @@ export default function AdminSellerTransaction() {
                   </div>
                 </th>
                 <th
-                  className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-neutral-100"
+                  className="px-3 py-2 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider cursor-pointer hover:bg-[#FAF7F2]"
                   onClick={() => handleSort("date")}>
                   <div className="flex items-center gap-2">
                     Date
@@ -691,9 +691,9 @@ export default function AdminSellerTransaction() {
             <tbody className="bg-white divide-y divide-neutral-200">
               {loading ? (
                 <tr>
-                  <td colSpan={10} className="px-4 sm:px-6 py-8 text-center">
+                  <td colSpan={10} className="px-4 sm:px-4 py-2.5 text-center">
                     <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600 mr-2"></div>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#A54B31] mr-2"></div>
                       Loading transactions...
                     </div>
                   </td>
@@ -702,7 +702,7 @@ export default function AdminSellerTransaction() {
                 <tr>
                   <td
                     colSpan={10}
-                    className="px-4 sm:px-6 py-8 text-center text-red-600">
+                    className="px-4 sm:px-4 py-2.5 text-center text-red-600">
                     {error}
                   </td>
                 </tr>
@@ -710,32 +710,32 @@ export default function AdminSellerTransaction() {
                 <tr>
                   <td
                     colSpan={10}
-                    className="px-4 sm:px-6 py-8 text-center text-sm text-neutral-500">
+                    className="px-4 sm:px-4 py-2.5 text-center text-sm text-neutral-500">
                     No transactions found
                   </td>
                 </tr>
               ) : (
                 displayedTransactions.map((transaction) => (
                   <tr key={transaction.id} className="hover:bg-neutral-50">
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900">
                       {transaction.id.slice(-6)}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900 font-medium">
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">
                       {transaction.sellerName}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {transaction.orderId || "-"}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {transaction.orderItemId || "-"}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {transaction.productName || transaction.type}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {transaction.variation || "-"}
                     </td>
-                    <td className="px-4 sm:px-6 py-3">
+                    <td className="px-3 py-2">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${transaction.flag === "credit"
                           ? "bg-green-100 text-green-800"
@@ -747,13 +747,13 @@ export default function AdminSellerTransaction() {
                           transaction.flag.slice(1)}
                       </span>
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900 font-medium">
-                      ₹{transaction.amount.toFixed(2)}
+                    <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">
+                      {(transaction.amount || 0).toFixed(2)}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {transaction.remark || transaction.status}
                     </td>
-                    <td className="px-4 sm:px-6 py-3 text-sm text-neutral-600">
+                    <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                       {new Date(transaction.date).toLocaleDateString()}
                     </td>
                   </tr>
@@ -764,7 +764,7 @@ export default function AdminSellerTransaction() {
         </div>
 
         {/* Pagination Footer */}
-        <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+        <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
           <div className="text-xs sm:text-sm text-neutral-700">
             Showing {startIndex + 1} to{" "}
             {Math.min(endIndex, filteredTransactions.length)} of{" "}
@@ -825,12 +825,19 @@ export default function AdminSellerTransaction() {
 
       {/* Footer */}
       <div className="text-center text-sm text-neutral-500 py-4">
-        Copyright Â© 2025. Developed By{" "}
-        <a href="#" className="text-teal-600 hover:text-teal-700">
+        Copyright © 2025. Developed By{" "}
+        <a href="#" className="text-[#A54B31] hover:text-teal-700">
           Village Basket
         </a>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 

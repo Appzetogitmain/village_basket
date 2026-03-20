@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   createTax,
   getTaxes,
@@ -91,7 +91,7 @@ export default function AdminTaxes() {
 
   const SortIcon = ({ column }: { column: string }) => (
     <span className="text-neutral-300 text-[10px]">
-      {sortColumn === column ? (sortDirection === "asc" ? "â†‘" : "â†“") : "â‡…"}
+      {sortColumn === column ? (sortDirection === "asc" ? "↑" : "↓") : "⇅"}
     </span>
   );
 
@@ -237,17 +237,17 @@ export default function AdminTaxes() {
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Page Content */}
-      <div className="flex-1 p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+      <div className="flex-1 p-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 h-full">
           {/* Left Panel: Add Tax */}
           <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col">
-            <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg">
+            <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg">
               <h2 className="text-lg font-semibold">Add Tax</h2>
             </div>
-            <div className="p-6 flex-1 flex flex-col">
+            <div className="p-3 flex-1 flex flex-col">
               <div className="space-y-4 flex-1">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                     Tax Title
                   </label>
                   <input
@@ -255,11 +255,11 @@ export default function AdminTaxes() {
                     value={taxTitle}
                     onChange={(e) => setTaxTitle(e.target.value)}
                     placeholder="Enter Tax Title"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                     Percentage
                   </label>
                   <input
@@ -270,7 +270,7 @@ export default function AdminTaxes() {
                     min="0"
                     max="100"
                     step="0.01"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                   />
                 </div>
               </div>
@@ -278,7 +278,7 @@ export default function AdminTaxes() {
                 <button
                   onClick={handleAddTax}
                   disabled={submitting}
-                  className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-neutral-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded font-medium transition-colors flex items-center justify-center">
+                  className="w-full bg-[#A54B31] hover:opacity-90 disabled:bg-neutral-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded font-medium transition-colors flex items-center justify-center">
                   {submitting ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -307,21 +307,21 @@ export default function AdminTaxes() {
 
           {/* Right Panel: View Tax */}
           <div className="bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col">
-            <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg">
+            <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg">
               <h2 className="text-lg font-semibold">View Tax</h2>
             </div>
 
             {/* Controls */}
-            <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-neutral-100">
+            <div className="px-3 py-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gapx-3 py-2 border-b border-neutral-100">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-neutral-600">Show</span>
+                <span className="text-[12px] font-bold text-neutral-500">Show</span>
                 <select
                   value={rowsPerPage}
                   onChange={(e) => {
                     setRowsPerPage(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none cursor-pointer">
+                  className="bg-white border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                   <option value={10}>10</option>
                   <option value={20}>20</option>
                   <option value={50}>50</option>
@@ -332,7 +332,7 @@ export default function AdminTaxes() {
                 <div className="relative">
                   <button
                     onClick={handleExport}
-                    className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors">
+                    className="bg-[#A54B31] hover:opacity-90 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors">
                     Export
                     <svg
                       width="10"
@@ -354,7 +354,7 @@ export default function AdminTaxes() {
                   </span>
                   <input
                     type="text"
-                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-teal-500 w-48"
+                    className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#8B3D28] w-48"
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -372,34 +372,34 @@ export default function AdminTaxes() {
                 <thead>
                   <tr className="bg-neutral-50 text-xs font-bold text-neutral-800">
                     <th
-                      className="p-4 w-16 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                      className="px-3 py-2 w-16 border border-neutral-200 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                       onClick={() => handleSort("id")}>
                       <div className="flex items-center justify-between">
                         Sr No <SortIcon column="id" />
                       </div>
                     </th>
                     <th
-                      className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                      className="px-3 py-2 border border-neutral-200 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                       onClick={() => handleSort("name")}>
                       <div className="flex items-center justify-between">
                         Tax Name <SortIcon column="name" />
                       </div>
                     </th>
                     <th
-                      className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                      className="px-3 py-2 border border-neutral-200 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                       onClick={() => handleSort("percentage")}>
                       <div className="flex items-center justify-between">
                         Tax Percentage <SortIcon column="percentage" />
                       </div>
                     </th>
                     <th
-                      className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                      className="px-3 py-2 border border-neutral-200 cursor-pointer hover:bg-[#FAF7F2] transition-colors"
                       onClick={() => handleSort("status")}>
                       <div className="flex items-center justify-between">
                         Status <SortIcon column="status" />
                       </div>
                     </th>
-                    <th className="p-4 border border-neutral-200">Action</th>
+                    <th className="px-3 py-2 border border-neutral-200">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -407,7 +407,7 @@ export default function AdminTaxes() {
                     <tr>
                       <td colSpan={5} className="p-8 text-center">
                         <div className="flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600 mr-2"></div>
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#A54B31] mr-2"></div>
                           Loading taxes...
                         </div>
                       </td>
@@ -431,16 +431,16 @@ export default function AdminTaxes() {
                       <tr
                         key={tax._id}
                         className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700">
-                        <td className="p-4 align-middle border border-neutral-200">
+                        <td className="px-3 py-2 align-middle border border-neutral-200">
                           {startIndex + index + 1}
                         </td>
-                        <td className="p-4 align-middle border border-neutral-200">
+                        <td className="px-3 py-2 align-middle border border-neutral-200">
                           {tax.name}
                         </td>
-                        <td className="p-4 align-middle border border-neutral-200">
+                        <td className="px-3 py-2 align-middle border border-neutral-200">
                           {tax.percentage}%
                         </td>
-                        <td className="p-4 align-middle border border-neutral-200">
+                        <td className="px-3 py-2 align-middle border border-neutral-200">
                           <span
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tax.status === "Active"
                               ? "bg-green-100 text-green-800"
@@ -449,12 +449,12 @@ export default function AdminTaxes() {
                             {tax.status}
                           </span>
                         </td>
-                        <td className="p-4 align-middle border border-neutral-200">
+                        <td className="px-3 py-2 align-middle border border-neutral-200">
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleEdit(tax)}
                               disabled={submitting}
-                              className="p-1.5 text-teal-600 hover:bg-teal-50 disabled:text-neutral-400 disabled:cursor-not-allowed rounded transition-colors"
+                              className="p-1.5 text-[#A54B31] hover:bg-[#FAF7F2] disabled:text-neutral-400 disabled:cursor-not-allowed rounded transition-colors"
                               title="Edit">
                               <svg
                                 width="16"
@@ -506,7 +506,7 @@ export default function AdminTaxes() {
             </div>
 
             {/* Pagination Footer */}
-            <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+            <div className="px-3 py-2 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
               <div className="text-xs sm:text-sm text-neutral-700">
                 Showing {startIndex + 1} to{" "}
                 {Math.min(endIndex, displayedTaxes.length)} of{" "}
@@ -518,9 +518,9 @@ export default function AdminTaxes() {
                     setCurrentPage((prev) => Math.max(1, prev - 1))
                   }
                   disabled={currentPage === 1}
-                  className={`p-2 border border-teal-600 rounded ${currentPage === 1
+                  className={`p-2 border border-[#A54B31] rounded ${currentPage === 1
                     ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                    : "text-teal-600 hover:bg-teal-50"
+                    : "text-[#A54B31] hover:bg-[#FAF7F2]"
                     }`}
                   aria-label="Previous page">
                   <svg
@@ -538,7 +538,7 @@ export default function AdminTaxes() {
                     />
                   </svg>
                 </button>
-                <button className="px-3 py-1.5 border border-teal-600 bg-teal-600 text-white rounded font-medium text-sm">
+                <button className="px-3 py-1.5 border border-[#A54B31] bg-[#A54B31] text-white rounded font-medium text-sm">
                   {currentPage}
                 </button>
                 <button
@@ -546,9 +546,9 @@ export default function AdminTaxes() {
                     setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                   }
                   disabled={currentPage === totalPages}
-                  className={`p-2 border border-teal-600 rounded ${currentPage === totalPages
+                  className={`p-2 border border-[#A54B31] rounded ${currentPage === totalPages
                     ? "text-neutral-400 cursor-not-allowed bg-neutral-50"
-                    : "text-teal-600 hover:bg-teal-50"
+                    : "text-[#A54B31] hover:bg-[#FAF7F2]"
                     }`}
                   aria-label="Next page">
                   <svg
@@ -573,13 +573,20 @@ export default function AdminTaxes() {
       </div>
 
       {/* Footer */}
-      <footer className="text-center py-4 text-sm text-neutral-600 border-t border-neutral-200 bg-white">
-        Copyright Â© 2025. Developed By{" "}
-        <a href="#" className="text-blue-600 hover:underline">
+      <footer className="text-center py-4 text-[12px] font-bold text-neutral-500 border-t border-neutral-200 bg-white">
+        Copyright © 2025. Developed By{" "}
+        <a href="#" className="text-[#8B3D28] hover:underline">
           Village Basket
         </a>
       </footer>
     </div>
   );
 }
+
+
+
+
+
+
+
 

@@ -84,7 +84,7 @@ function CatalogPanel<T extends { _id?: string; id?: string }>({
           {onAdd && (
             <button
               onClick={(e) => { e.stopPropagation(); onAdd(); }}
-              className="w-8 h-8 flex items-center justify-center bg-teal-50 text-teal-600 rounded-lg hover:bg-teal-600 hover:text-white transition-all duration-200 shadow-sm"
+              className="w-8 h-8 flex items-center justify-center bg-teal-50 text-[#A54B31] rounded-lg hover:bg-[#A54B31] hover:text-white transition-all duration-200 shadow-sm"
               title={`Manage ${title}`}
             >
               <PlusIcon />
@@ -97,7 +97,7 @@ function CatalogPanel<T extends { _id?: string; id?: string }>({
             placeholder={`Filter ${title.toLowerCase()}...`}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 focus:bg-white transition-all duration-200"
+            className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28]/20 focus:border-[#8B3D28] focus:bg-white transition-all duration-200"
           />
           <div className="absolute left-3 top-2.5 text-neutral-400 group-focus-within/search:text-teal-500 transition-colors">
             <SearchIcon />
@@ -111,12 +111,12 @@ function CatalogPanel<T extends { _id?: string; id?: string }>({
           <div className="flex flex-col items-center justify-center h-40 space-y-3">
             <div className="relative w-10 h-10">
               <div className="absolute inset-0 rounded-full border-2 border-teal-100"></div>
-              <div className="absolute inset-0 rounded-full border-2 border-teal-600 border-t-transparent animate-spin"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-[#A54B31] border-t-transparent animate-spin"></div>
             </div>
             <span className="text-xs font-medium text-neutral-400 animate-pulse">Fetching {title}...</span>
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 p-6 text-center">
+          <div className="flex flex-col items-center justify-center h-48 p-3 text-center">
             <div className="w-12 h-12 bg-neutral-50 rounded-full flex items-center justify-center mb-3 text-neutral-300">
               <FolderIcon />
             </div>
@@ -133,8 +133,8 @@ function CatalogPanel<T extends { _id?: string; id?: string }>({
                 className={`
                                     group/item p-3 rounded-xl cursor-pointer transition-all duration-200 border flex items-center gap-3
                                     ${isSelected
-                    ? "bg-teal-600 border-teal-600 shadow-lg shadow-teal-900/20 translate-x-1"
-                    : "bg-white border-neutral-100 hover:border-teal-200 hover:bg-teal-50/30"
+                    ? "bg-[#A54B31] border-[#A54B31] shadow-lg shadow-teal-900/20 translate-x-1"
+                    : "bg-white border-neutral-100 hover:border-teal-200 hover:bg-[#FAF7F2]/30"
                   }
                                 `}
               >
@@ -247,8 +247,8 @@ export default function AdminCatalogManager() {
     <div className="flex flex-col h-[calc(100vh-6rem)] -m-6 bg-white overflow-hidden">
       {/* Glossy Header */}
       <div className="bg-white/80 backdrop-blur-md border-b border-neutral-200 px-8 py-5 flex items-center justify-between z-20">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-teal-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-teal-600/20">
+        <div className="flex items-center gapx-3 py-2">
+          <div className="w-12 h-12 bg-[#A54B31] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-teal-600/20">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
               <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
@@ -258,13 +258,13 @@ export default function AdminCatalogManager() {
           <div>
             <h1 className="text-xl font-extrabold text-neutral-900 tracking-tight">Catalog Intelligence</h1>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <span className="w-2 h-2 rounded-full bg-[#8B3D28] animate-pulse"></span>
               <p className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Live Visual Hierarchy</p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gapx-3 py-2">
           <div className="hidden lg:flex items-center gap-3 mr-4">
             <button
               onClick={() => navigate("/admin/promo-strip")}
@@ -292,7 +292,7 @@ export default function AdminCatalogManager() {
             </button>
             <button
               onClick={() => navigate("/admin/bestseller-cards")}
-              className="flex flex-col items-center justify-center p-2 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-100 text-blue-600 transition-all hover:scale-105"
+              className="flex flex-col items-center justify-center p-2 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-100 text-[#8B3D28] transition-all hover:scale-105"
             >
               <div className="p-1 mb-1">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -315,7 +315,7 @@ export default function AdminCatalogManager() {
           </div>
           <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-neutral-50 rounded-full border border-neutral-100">
             <span className="text-xs font-bold text-neutral-400">STATUS:</span>
-            <span className="text-xs font-bold text-teal-600">CONNECTED</span>
+            <span className="text-xs font-bold text-[#A54B31]">CONNECTED</span>
           </div>
         </div>
       </div>
@@ -399,7 +399,7 @@ export default function AdminCatalogManager() {
                   {prod.productName}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className={`text-[10px] font-bold ${selectedProductId === prod._id ? "text-white/80" : "text-teal-600"}`}>₹{prod.price}</span>
+                  <span className={`text-[10px] font-bold ${selectedProductId === prod._id ? "text-white/80" : "text-[#A54B31]"}`}>₹{prod.price}</span>
                   {!prod.publish && <span className="text-[9px] font-bold px-1 rounded bg-orange-50 text-orange-600 border border-orange-100">DRAFT</span>}
                 </div>
               </div>
@@ -426,9 +426,9 @@ export default function AdminCatalogManager() {
 
       {/* Bottom Insight Bar */}
       <div className="h-14 bg-white border-t border-neutral-200 px-8 flex items-center justify-between z-10">
-        <div className="flex items-center gap-6 text-xs font-bold text-neutral-400">
+        <div className="flex items-center gap-3 text-xs font-bold text-neutral-400">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#A54B31]"></span>
             <span>TOTAL CATEGORIES: {categories.length}</span>
           </div>
           <div className="flex items-center gap-2">
@@ -463,3 +463,10 @@ export default function AdminCatalogManager() {
     </div>
   );
 }
+
+
+
+
+
+
+

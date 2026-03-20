@@ -95,7 +95,7 @@ export default function AdminBillingSettings() {
     if (loading) {
         return (
             <div className="flex items-center justify-center p-12">
-                <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-8 h-8 border-4 border-[#8B3D28] border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -114,7 +114,7 @@ export default function AdminBillingSettings() {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-6 py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-2.5 bg-[#8B3D28] text-white rounded-lg font-medium hover:opacity-90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {saving ? (
                         <>
@@ -129,9 +129,9 @@ export default function AdminBillingSettings() {
 
             <div className="space-y-6">
                 {/* General Billing Section */}
-                <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6">
+                <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-3">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">General Charges</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Platform/Handling Fee (₹)
@@ -143,7 +143,7 @@ export default function AdminBillingSettings() {
                                     min="0"
                                     value={platformFee}
                                     onChange={(e) => setPlatformFee(Number(e.target.value))}
-                                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                                     placeholder="e.g. 2"
                                 />
                             </div>
@@ -161,7 +161,7 @@ export default function AdminBillingSettings() {
                                     min="0"
                                     value={freeDeliveryThreshold}
                                     onChange={(e) => setFreeDeliveryThreshold(Number(e.target.value))}
-                                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                                     placeholder="e.g. 499"
                                 />
                             </div>
@@ -171,7 +171,7 @@ export default function AdminBillingSettings() {
                 </div>
 
                 {/* Delivery Configuration Section */}
-                <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-6">
+                <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-3">
                     <div className="flex justify-between items-start mb-6 pb-2 border-b">
                         <div>
                             <h2 className="text-lg font-semibold text-gray-900">Delivery Configuration</h2>
@@ -188,7 +188,7 @@ export default function AdminBillingSettings() {
                             </button>
                             <button
                                 onClick={() => setIsDistanceBased(true)}
-                                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${isDistanceBased ? 'bg-white text-green-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${isDistanceBased ? 'bg-white text-[#A54B31] shadow-sm' : 'text-gray-500 hover:text-gray-700'
                                     }`}
                             >
                                 Distance Based
@@ -212,7 +212,7 @@ export default function AdminBillingSettings() {
                                     min="0"
                                     value={deliveryCharges}
                                     onChange={(e) => setDeliveryCharges(Number(e.target.value))}
-                                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                                     placeholder="e.g. 40"
                                 />
                             </div>
@@ -224,7 +224,7 @@ export default function AdminBillingSettings() {
                             animate={{ opacity: 1 }}
                             className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"
                         >
-                            <div className="col-span-full bg-blue-50 border border-blue-100 rounded-lg p-3 text-sm text-blue-800 mb-2">
+                            <div className="col-span-full bg-blue-50 border border-blue-100 rounded-lg p-3 text-sm text-[#8B3D28] mb-2">
                                 <strong>Note:</strong> Distance calculation requires Google Maps API Key. Without a key, it may fallback to straight line distance.
                             </div>
 
@@ -239,7 +239,7 @@ export default function AdminBillingSettings() {
                                         min="0"
                                         value={baseCharge}
                                         onChange={(e) => setBaseCharge(Number(e.target.value))}
-                                        className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                                        className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                                     />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">Min charge for first X kms.</p>
@@ -256,7 +256,7 @@ export default function AdminBillingSettings() {
                                         step="0.1"
                                         value={baseDistance}
                                         onChange={(e) => setBaseDistance(Number(e.target.value))}
-                                        className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                                        className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">km</span>
                                 </div>
@@ -274,7 +274,7 @@ export default function AdminBillingSettings() {
                                         min="0"
                                         value={kmRate}
                                         onChange={(e) => setKmRate(Number(e.target.value))}
-                                        className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                                        className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                                     />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">Charged for every km after base distance.</p>
@@ -291,7 +291,7 @@ export default function AdminBillingSettings() {
                                         min="0"
                                         value={deliveryBoyKmRate}
                                         onChange={(e) => setDeliveryBoyKmRate(Number(e.target.value))}
-                                        className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                                        className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                                     />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">Amount paid to delivery partner per km.</p>
@@ -305,7 +305,7 @@ export default function AdminBillingSettings() {
                                     type="text"
                                     value={googleMapsKey}
                                     onChange={(e) => setGoogleMapsKey(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                                     placeholder="AIza..."
                                 />
                                 <p className="mt-1 text-xs text-gray-500">Required for accurate road distance calculation.</p>
@@ -317,3 +317,10 @@ export default function AdminBillingSettings() {
         </motion.div>
     );
 }
+
+
+
+
+
+
+

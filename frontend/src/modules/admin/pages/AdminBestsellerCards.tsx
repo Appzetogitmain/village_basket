@@ -288,13 +288,13 @@ export default function AdminBestsellerCards() {
     return (
         <div className="flex flex-col h-full bg-gray-50">
             {/* Page Header */}
-            <div className="p-6 pb-0">
+            <div className="p-3 pb-0">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-semibold text-neutral-800">
                         Bestseller Cards
                     </h1>
-                    <div className="text-sm text-blue-500">
-                        <span className="text-blue-500 hover:underline cursor-pointer">
+                    <div className="text-sm text-[#8B3D28]">
+                        <span className="text-[#8B3D28] hover:underline cursor-pointer">
                             Home
                         </span>{" "}
                         <span className="text-neutral-400">/</span> Bestseller Cards
@@ -306,7 +306,7 @@ export default function AdminBestsellerCards() {
             {(success || error) && (
                 <div className="px-6">
                     {success && (
-                        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+                        <div className="bg-green-50 border border-green-200 text-[#A54B31] px-4 py-3 rounded mb-4">
                             {success}
                         </div>
                     )}
@@ -320,16 +320,16 @@ export default function AdminBestsellerCards() {
 
             {/* Max Cards Info */}
             <div className="px-6 mb-4">
-                <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded text-sm">
+                <div className="bg-blue-50 border border-blue-200 text-[#8B3D28] px-4 py-2 rounded text-sm">
                     Active cards: {activeCardsCount} / {MAX_ACTIVE_CARDS} (Maximum {MAX_ACTIVE_CARDS} active cards allowed)
                 </div>
             </div>
 
             {/* Page Content */}
             <div className="flex-1 px-6 pb-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 h-full">
                     {/* Left Sidebar: Add/Edit Form */}
-                    <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 flex flex-col">
+                    <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-3 flex flex-col">
                         <h2 className="text-lg font-semibold text-neutral-800 mb-4">
                             {editingId ? "Edit Card" : "Add Card"}
                         </h2>
@@ -337,7 +337,7 @@ export default function AdminBestsellerCards() {
                         <div className="space-y-4 flex-1 overflow-y-auto">
                             {/* Name */}
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                     Card Name <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -345,13 +345,13 @@ export default function AdminBestsellerCards() {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="e.g., Fresh Vegetables"
-                                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                 />
                             </div>
 
                             {/* Header Category Filter */}
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                     Header Category
                                 </label>
                                 <select
@@ -360,7 +360,7 @@ export default function AdminBestsellerCards() {
                                         setSelectedHeader(e.target.value);
                                         setSelectedCategory("");
                                     }}
-                                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                 >
                                     <option value="">Select Header</option>
                                     {headerCategories.map(h => (
@@ -371,13 +371,13 @@ export default function AdminBestsellerCards() {
 
                             {/* Category */}
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                     Category <span className="text-red-500">*</span>
                                 </label>
                                 <select
                                     value={selectedCategory}
                                     onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                 >
                                     <option value="">Select a category</option>
                                     {filteredCategoriesForSelection.map((cat) => (
@@ -394,7 +394,7 @@ export default function AdminBestsellerCards() {
                             {/* Product Picker */}
                             {selectedCategory && (
                                 <div>
-                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                    <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                         Select Products ({selectedProductIds.length}/4)
                                     </label>
                                     <div className="border border-neutral-200 rounded-lg max-h-60 overflow-y-auto p-2 bg-neutral-50">
@@ -410,7 +410,7 @@ export default function AdminBestsellerCards() {
                                                         onClick={() => toggleProductSelection(product._id)}
                                                         className={`flex items-center gap-3 p-2 rounded cursor-pointer transition-colors ${selectedProductIds.includes(product._id)
                                                             ? "bg-teal-50 border border-teal-200"
-                                                            : "bg-white border border-transparent hover:bg-neutral-100"
+                                                            : "bg-white border border-transparent hover:bg-[#FAF7F2]"
                                                             }`}
                                                     >
                                                         <div className="w-8 h-8 rounded bg-gray-100 overflow-hidden flex-shrink-0">
@@ -427,7 +427,7 @@ export default function AdminBestsellerCards() {
                                                             <div className="text-[10px] text-neutral-500">₹{product.price}</div>
                                                         </div>
                                                         {selectedProductIds.includes(product._id) && (
-                                                            <div className="text-teal-600">
+                                                            <div className="text-[#A54B31]">
                                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                                                     <polyline points="20 6 9 17 4 12"></polyline>
                                                                 </svg>
@@ -443,7 +443,7 @@ export default function AdminBestsellerCards() {
 
                             {/* Order */}
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
                                     Display Order
                                 </label>
                                 <input
@@ -454,7 +454,7 @@ export default function AdminBestsellerCards() {
                                     }
                                     placeholder="Auto-assign"
                                     min="0"
-                                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+                                    className="w-full px-3 py-2 border border-neutral-300 rounded bg-white focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] outline-none"
                                 />
                                 <p className="text-xs text-neutral-500 mt-1">
                                     Leave empty to auto-assign at the end
@@ -468,9 +468,9 @@ export default function AdminBestsellerCards() {
                                         type="checkbox"
                                         checked={isActive}
                                         onChange={(e) => setIsActive(e.target.checked)}
-                                        className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                                        className="h-4 w-4 text-[#A54B31] focus:ring-[#8B3D28] border-gray-300 rounded"
                                     />
-                                    <span className="ml-2 text-sm font-medium text-neutral-700">
+                                    <span className="ml-2 text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider">
                                         Active (Show on home page)
                                     </span>
                                 </label>
@@ -484,7 +484,7 @@ export default function AdminBestsellerCards() {
                                 disabled={loading}
                                 className={`w-full px-4 py-2 rounded font-medium transition-colors ${loading
                                     ? "bg-gray-400 cursor-not-allowed text-white"
-                                    : "bg-teal-600 hover:bg-teal-700 text-white"
+                                    : "bg-[#A54B31] hover:opacity-90 text-white"
                                     }`}
                             >
                                 {loading
@@ -506,14 +506,14 @@ export default function AdminBestsellerCards() {
 
                     {/* Right Section: View Cards Table */}
                     <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-neutral-200 flex flex-col">
-                        <div className="bg-teal-600 text-white px-6 py-4 rounded-t-lg">
+                        <div className="bg-[#A54B31] text-white px-4 py-2.5 rounded-t-lg">
                             <h2 className="text-lg font-semibold">View Cards</h2>
                         </div>
 
                         {/* Controls */}
-                        <div className="p-4 border-b border-neutral-100">
+                        <div className="px-3 py-2 border-b border-neutral-100">
                             <div className="flex items-center gap-2">
-                                <span className="text-sm text-neutral-600">Show</span>
+                                <span className="text-[12px] font-bold text-neutral-500">Show</span>
                                 <input
                                     type="number"
                                     value={rowsPerPage}
@@ -521,9 +521,9 @@ export default function AdminBestsellerCards() {
                                         setRowsPerPage(Number(e.target.value));
                                         setCurrentPage(1);
                                     }}
-                                    className="w-16 px-2 py-1.5 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-teal-500 focus:outline-none"
+                                    className="w-16 px-2 py-1.5 border border-neutral-300 rounded text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none"
                                 />
-                                <span className="text-sm text-neutral-600">entries</span>
+                                <span className="text-[12px] font-bold text-neutral-500">entries</span>
                             </div>
                         </div>
 
@@ -532,11 +532,11 @@ export default function AdminBestsellerCards() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-neutral-50 text-xs font-bold text-neutral-800 border-b border-neutral-200">
-                                        <th className="p-4">Order</th>
-                                        <th className="p-4">Name</th>
-                                        <th className="p-4">Category</th>
-                                        <th className="p-4">Status</th>
-                                        <th className="p-4">Action</th>
+                                        <th className="px-3 py-2">Order</th>
+                                        <th className="px-3 py-2">Name</th>
+                                        <th className="px-3 py-2">Category</th>
+                                        <th className="px-3 py-2">Status</th>
+                                        <th className="px-3 py-2">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -564,14 +564,14 @@ export default function AdminBestsellerCards() {
                                                 key={card._id}
                                                 className="hover:bg-neutral-50 transition-colors text-sm text-neutral-700 border-b border-neutral-200"
                                             >
-                                                <td className="p-4">{card.order}</td>
-                                                <td className="p-4 font-medium">{card.name}</td>
-                                                <td className="p-4">
+                                                <td className="px-3 py-2">{card.order}</td>
+                                                <td className="px-3 py-2 font-medium">{card.name}</td>
+                                                <td className="px-3 py-2">
                                                     {typeof card.category === "string"
                                                         ? card.category
                                                         : card.category?.name || "Category not found"}
                                                 </td>
-                                                <td className="p-4">
+                                                <td className="px-3 py-2">
                                                     <span
                                                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${card.isActive
                                                             ? "bg-green-100 text-green-800"
@@ -581,7 +581,7 @@ export default function AdminBestsellerCards() {
                                                         {card.isActive ? "Active" : "Inactive"}
                                                     </span>
                                                 </td>
-                                                <td className="p-4">
+                                                <td className="px-3 py-2">
                                                     <div className="flex items-center gap-2">
                                                         <button
                                                             onClick={() => handleEdit(card)}
@@ -632,8 +632,8 @@ export default function AdminBestsellerCards() {
 
                         {/* Pagination */}
                         {totalPages > 1 && (
-                            <div className="p-4 border-t border-neutral-100 flex justify-between items-center">
-                                <div className="text-sm text-neutral-600">
+                            <div className="px-3 py-2 border-t border-neutral-100 flex justify-between items-center">
+                                <div className="text-[12px] font-bold text-neutral-500">
                                     Showing {startIndex + 1} to{" "}
                                     {Math.min(endIndex, cards.length)} of {cards.length} entries
                                 </div>
@@ -669,4 +669,11 @@ export default function AdminBestsellerCards() {
         </div>
     );
 }
+
+
+
+
+
+
+
 

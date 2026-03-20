@@ -37,7 +37,7 @@ export default function AdminRewardOrders() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <div className="px-3 py-2 sm:p-3 lg:p-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-bold text-gray-900">Reward Orders</h1>
@@ -77,8 +77,8 @@ export default function AdminRewardOrders() {
                         <select
                           value={order.status}
                           onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                          className={`rounded border-gray-300 text-sm focus:ring-teal-500 focus:border-teal-500 ${order.status === 'Pending' ? 'text-yellow-700 bg-yellow-50' :
-                            order.status === 'Fulfilled' ? 'text-green-700 bg-green-50' : 'text-red-700 bg-red-50'
+                          className={`rounded border-gray-300 text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28] ${order.status === 'Pending' ? 'text-yellow-700 bg-yellow-50' :
+                            order.status === 'Fulfilled' ? 'text-[#A54B31] bg-green-50' : 'text-red-700 bg-red-50'
                             }`}
                         >
                           <option value="Pending">Pending</option>
@@ -100,3 +100,10 @@ export default function AdminRewardOrders() {
     </div>
   );
 }
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getAllSellers, Seller as SellerType } from '../../../services/api/sellerService';
 import SellerServiceMap from '../components/SellerServiceMap';
 
@@ -99,19 +99,19 @@ export default function AdminSellerLocation() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <h1 className="text-2xl font-semibold text-neutral-800">Seller Locations</h1>
-        <div className="text-sm text-neutral-600">
-          <span className="text-teal-600 hover:text-teal-700 cursor-pointer">Home</span>
+        <div className="text-[12px] font-bold text-neutral-500">
+          <span className="text-[#A54B31] hover:text-teal-700 cursor-pointer">Home</span>
           <span className="mx-2">/</span>
           <span className="text-neutral-800">Seller Locations</span>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-4 sm:p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-white rounded-lg shadow-sm border border-neutral-200 px-3 py-2 sm:p-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
               Search Sellers
             </label>
             <input
@@ -119,19 +119,19 @@ export default function AdminSellerLocation() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name, store, city, or address..."
-              className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
             />
           </div>
 
           {/* Status Filter */}
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
+            <label className="block text-[11px] font-black text-neutral-600 font-outfit uppercase tracking-wider mb-2">
               Filter by Status
             </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-              className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              className="w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
             >
               <option value="All">All Status</option>
               <option value="Approved">Approved</option>
@@ -143,10 +143,10 @@ export default function AdminSellerLocation() {
       </div>
 
       {/* Main Content - Map and List */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gapx-3 py-2 sm:gap-3">
         {/* Map Section - Takes 2 columns */}
         <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-          <div className="bg-teal-600 px-4 sm:px-6 py-3">
+          <div className="bg-[#A54B31] px-3 py-2">
             <h2 className="text-white text-lg font-semibold">Seller Locations Map</h2>
           </div>
           <div className="h-96 sm:h-[600px] w-full">
@@ -169,12 +169,12 @@ export default function AdminSellerLocation() {
             )}
           </div>
           {selectedSeller && (
-            <div className="p-4 sm:p-6 border-t border-neutral-200 bg-teal-50">
+            <div className="px-3 py-2 sm:p-3 border-t border-neutral-200 bg-teal-50">
               <h3 className="font-semibold text-neutral-900 mb-2">Selected Seller</h3>
               <p className="text-sm text-neutral-700">
                 <span className="font-medium">{selectedSeller.storeName}</span> - {selectedSeller.sellerName}
               </p>
-              <p className="text-sm text-neutral-600 mt-1">
+              <p className="text-[12px] font-bold text-neutral-500 mt-1">
                 {selectedSeller.address}, {selectedSeller.city}
               </p>
               {selectedSeller.latitude && selectedSeller.longitude && (
@@ -188,14 +188,14 @@ export default function AdminSellerLocation() {
 
         {/* Sellers List - Takes 1 column */}
         <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-          <div className="bg-teal-600 px-4 sm:px-6 py-3">
+          <div className="bg-[#A54B31] px-3 py-2">
             <h2 className="text-white text-lg font-semibold">
               Sellers ({filteredSellers.length})
             </h2>
           </div>
           <div className="max-h-[600px] overflow-y-auto">
             {filteredSellers.length === 0 ? (
-              <div className="p-6 text-center text-neutral-500">
+              <div className="p-3 text-center text-neutral-500">
                 <p>No sellers found with location data.</p>
                 <p className="text-sm mt-2">Make sure sellers have latitude and longitude set.</p>
               </div>
@@ -205,8 +205,8 @@ export default function AdminSellerLocation() {
                   <div
                     key={seller._id}
                     onClick={() => handleSellerClick(seller)}
-                    className={`p-4 cursor-pointer transition-colors ${selectedSeller?._id === seller._id
-                      ? 'bg-teal-50 border-l-4 border-teal-600'
+                    className={`px-3 py-2 cursor-pointer transition-colors ${selectedSeller?._id === seller._id
+                      ? 'bg-teal-50 border-l-4 border-[#A54B31]'
                       : 'hover:bg-neutral-50'
                       }`}
                   >
@@ -227,7 +227,7 @@ export default function AdminSellerLocation() {
                     </div>
                     {seller.address && (
                       <p className="text-xs text-neutral-500 mt-2 line-clamp-2">
-                        ðŸ“ {seller.address}
+                        📍 {seller.address}
                         {seller.city && `, ${seller.city}`}
                       </p>
                     )}
@@ -237,8 +237,8 @@ export default function AdminSellerLocation() {
                       </p>
                     )}
                     <div className="mt-2 flex items-center gap-2 text-xs text-neutral-500">
-                      <span>ðŸ“ž {seller.phone}</span>
-                      {seller.email && <span>âœ‰ï¸ {seller.email}</span>}
+                      <span>📞 {seller.phone}</span>
+                      {seller.email && <span>✉️ {seller.email}</span>}
                     </div>
                   </div>
                 ))}
@@ -250,12 +250,19 @@ export default function AdminSellerLocation() {
 
       {/* Footer */}
       <div className="text-center text-sm text-neutral-500 py-4">
-        Copyright Â© 2025. Developed By{' '}
-        <a href="#" className="text-teal-600 hover:text-teal-700">
+        Copyright © 2025. Developed By{' '}
+        <a href="#" className="text-[#A54B31] hover:text-teal-700">
           Village Basket
         </a>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 
