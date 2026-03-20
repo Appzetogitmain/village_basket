@@ -290,7 +290,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+          transition={{ duration: 0.1, max: 1, ease: "easeOut" }}
           style={{
             background: 'rgba(255, 255, 255, 1)',
             backdropFilter: 'blur(10px)',
