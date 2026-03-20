@@ -1,6 +1,7 @@
 import { useState, ReactNode } from 'react';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
+import adminArt from '@assets/admin_art.png';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -42,8 +43,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Header */}
         <AdminHeader onMenuClick={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
-        {/* Page Content - Made more compact */}
-        <main className="flex-1 overflow-y-auto p-2 sm:p-3 md:p-4 bg-transparent">{children}</main>
+        {/* Page Content - With Bottom Warli Art Watermark */}
+        <main className="flex-1 overflow-y-auto p-2 sm:p-3 md:p-4 bg-transparent relative group">
+          <div className="relative z-10">{children}</div>
+          
+          {/* Production-level Art Integration: Management Theme - Seamless Bottom Border */}
+          <div className="pointer-events-none absolute -bottom-4 left-0 w-full h-[200px] opacity-[0.14] z-0 transition-all duration-700 group-hover:opacity-[0.25]">
+            <div 
+              className="w-full h-full bg-repeat-x mix-blend-multiply"
+              style={{ 
+                backgroundImage: `url(${adminArt})`,
+                backgroundPosition: 'center bottom',
+                backgroundSize: 'auto 100%',
+              }}
+            />
+          </div>
+        </main>
       </div>
     </div>
   );

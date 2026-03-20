@@ -37,55 +37,18 @@ const menuSections: MenuSection[] = [
         label: "Catalog Manager",
         path: "/admin/catalog-manager",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z" opacity="0.4" />
+            <path d="M2 2v20h20V2H2zm18 18H4V4h16v16z" />
           </svg>
         ),
       },
-      /* {
-        label: "Sections",
-        path: "/admin/catalog/sections",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="3" y1="9" x2="21" y2="9"></line>
-            <line x1="9" y1="21" x2="9" y2="9"></line>
-          </svg>
-        ),
-      }, */
       {
         label: "Categories",
         path: "/admin/category",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="currentColor" fillOpacity="0.2" />
           </svg>
         ),
       },
@@ -93,18 +56,9 @@ const menuSections: MenuSection[] = [
         label: "Subcategories",
         path: "/admin/subcategory",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            <line x1="12" y1="11" x2="12" y2="17"></line>
-            <line x1="9" y1="14" x2="15" y2="14"></line>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" fill="currentColor" fillOpacity="0.2" />
+            <path d="M12 11v6m-3-3h6" strokeWidth="3" />
           </svg>
         ),
       },
@@ -112,18 +66,9 @@ const menuSections: MenuSection[] = [
         label: "Products",
         path: "/admin/product/list",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" fill="currentColor" fillOpacity="0.2" />
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
           </svg>
         ),
       },
@@ -131,17 +76,9 @@ const menuSections: MenuSection[] = [
         label: "Taxes",
         path: "/admin/product/taxes",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <line x1="12" y1="1" x2="12" y2="23"></line>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" fill="currentColor" fillOpacity="0.2" />
+            <path d="M12 2v20m5-17H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
           </svg>
         ),
       },
@@ -149,17 +86,9 @@ const menuSections: MenuSection[] = [
         label: "Brand",
         path: "/admin/brand",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" fill="currentColor" fillOpacity="0.2" />
+            <path d="M12 8v8m-4-4h8" />
           </svg>
         ),
       },
@@ -172,16 +101,9 @@ const menuSections: MenuSection[] = [
         label: "Header Category",
         path: "/admin/category/header",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="6" rx="1" fill="currentColor" fillOpacity="0.2" />
+            <path d="M3 13h18M3 18h18" />
           </svg>
         ),
       },
@@ -189,17 +111,9 @@ const menuSections: MenuSection[] = [
         label: "Promo Strip",
         path: "/admin/promo-strip",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-            <path d="M3 9H21M9 3V21"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2" fill="currentColor" fillOpacity="0.2" />
+            <path d="M12 6v12M2 12h20" />
           </svg>
         ),
       },
@@ -207,18 +121,9 @@ const menuSections: MenuSection[] = [
         label: "Lowest Prices",
         path: "/admin/lowest-prices",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z"></path>
-            <path d="M2 17L12 22L22 17"></path>
-            <path d="M2 12L12 17L22 12"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5l10-5-10-5z" fill="currentColor" fillOpacity="0.2" />
+            <path d="M2 17l10 5l10-5M2 12l10 5l10-5" />
           </svg>
         ),
       },
@@ -226,16 +131,8 @@ const menuSections: MenuSection[] = [
         label: "Bestseller Cards",
         path: "/admin/bestseller-cards",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87l1.18 6.88L12 17.77l-6.18 3.25L7 14.14L2 9.27l6.91-1.01L12 2z" fill="currentColor" fillOpacity="0.2" />
           </svg>
         ),
       },
@@ -243,39 +140,19 @@ const menuSections: MenuSection[] = [
         label: "Home Sections",
         path: "/admin/home-section",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"></path>
-            <path d="M9 22V12H15V22"></path>
-            <path d="M9 12H15"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 21h18M3 7h18M3 14h18" />
+            <rect x="4" y="2" width="16" height="3" rx="1" fill="currentColor" fillOpacity="0.2" />
           </svg>
         ),
       },
-
       {
         label: "Shop by Store",
         path: "/admin/shop-by-store",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"></path>
-            <path d="M9 22V12H15V22"></path>
-            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-            <path d="M8 7H16M8 11H16M8 15H12"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" fill="currentColor" fillOpacity="0.2" />
+            <path d="M9 22V12h6v10" />
           </svg>
         ),
       },
@@ -283,17 +160,9 @@ const menuSections: MenuSection[] = [
         label: "Coupon",
         path: "/admin/coupon",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M21 5H3C1.89543 5 1 5.89543 1 7V11C2.10457 11 3 11.8954 3 13C3 14.1046 2.10457 15 1 15V19C1 20.1046 1.89543 21 3 21H21C22.1046 21 23 20.1046 23 19V15C21.8954 15 21 14.1046 21 13C21 11.8954 21.8954 11 21 11V7C23 5.89543 22.1046 5 21 5Z"></path>
-            <line x1="10" y1="5" x2="10" y2="21"></line>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 5H9a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3z" fill="currentColor" fillOpacity="0.2" />
+            <path d="M9 12h6" />
           </svg>
         ),
       },
@@ -301,80 +170,32 @@ const menuSections: MenuSection[] = [
   },
   {
     title: "Seller Management",
-
     items: [
       {
         label: "Manage Seller",
         path: "/admin/manage-seller",
         hasSubmenu: true,
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13"></path>
-            <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88"></path>
-            <path d="M16 7H22M19 4V10"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" fill="currentColor" fillOpacity="0.2" />
+            <circle cx="12" cy="7" r="4" />
           </svg>
         ),
         submenuItems: [
           {
             label: "Manage Seller List",
             path: "/admin/manage-seller/list",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13"></path>
-                <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88"></path>
-                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                <path d="M8 7H16M8 11H16M8 15H12"></path>
-              </svg>
-            ),
+            icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z" /></svg>,
           },
           {
             label: "Seller Transaction",
             path: "/admin/manage-seller/transaction",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 6V12M12 18V12"></path>
-                <path d="M8 12H16"></path>
-                <path d="M8 8L12 4L16 8"></path>
-                <path d="M8 16L12 20L16 16"></path>
-                <path d="M16 8L12 4L8 8"></path>
-                <path d="M16 16L12 20L8 16"></path>
-              </svg>
-            ),
+            icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5l10-5-10-5zM2 17l10 5l10-5M2 12l10 5l10-5" /></svg>,
           },
         ],
       },
     ],
   },
-
   {
     title: "Delivery Section",
     items: [
@@ -383,206 +204,46 @@ const menuSections: MenuSection[] = [
         path: "/admin/manage-location",
         hasSubmenu: true,
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="currentColor" fillOpacity="0.2" />
+            <circle cx="12" cy="10" r="3" />
           </svg>
         ),
         submenuItems: [
           {
             label: "Seller Location",
             path: "/admin/manage-location/seller-location",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-                <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-              </svg>
-            ),
+            icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" /></svg>,
           },
         ],
       },
-
       {
         label: "Delivery Boy",
         path: "/admin/delivery-boy",
         hasSubmenu: true,
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13"></path>
-            <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88"></path>
-            <path d="M20 7H22M21 6V8"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="1" y="3" width="15" height="13" fill="currentColor" fillOpacity="0.2" />
+            <polygon points="16 8 20 8 23 11 23 16 16 16" fill="currentColor" fillOpacity="0.4" />
           </svg>
         ),
         submenuItems: [
           {
             label: "Manage Delivery Boy",
             path: "/admin/delivery-boy/manage",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <rect x="1" y="3" width="15" height="13"></rect>
-                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"></path>
-                <path d="M14 2V8H20"></path>
-                <path d="M8 11H16M8 15H12"></path>
-              </svg>
-            ),
+            icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>,
           },
           {
             label: "Fund Transfer",
             path: "/admin/delivery-boy/fund-transfer",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 6V12M12 18V12"></path>
-                <path d="M8 12H16"></path>
-                <path d="M8 8L12 4L16 8"></path>
-                <path d="M8 16L12 20L16 16"></path>
-                <path d="M16 8L12 4L8 8"></path>
-                <path d="M16 16L12 20L8 16"></path>
-              </svg>
-            ),
+            icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 2.1L6.6 7.3 11.8 12.5l1.4-1.4-2.8-2.8H21v-2h-10.6l2.8-2.8-1.4-1.4zM12.2 21.9l5.2-5.2-5.2-5.2-1.4 1.4 2.8 2.8H3v2h10.6l-2.8 2.8 1.4 1.4z" /></svg>,
           },
           {
             label: "Cash Collection",
             path: "/admin/delivery-boy/cash-collection",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 6V12M12 18V12"></path>
-                <path d="M8 12H16"></path>
-                <path d="M12 18L10 20L12 22L14 20L12 18Z"></path>
-                <path d="M10 20H14"></path>
-                <path d="M12 20V22"></path>
-              </svg>
-            ),
+            icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.82v-1.91c-1.84-.44-3.52-1.51-3.52-3.71h2.12c0 1.25 1.12 1.95 2.81 1.95 1.78 0 2.53-.94 2.53-1.6 0-1.12-1-1.69-3-2.31-2.12-.67-4.12-1.61-4.12-4.11 0-2 1.62-3.3 3.41-3.76V3h2.82v1.89c1.62.33 3.09 1.46 3.09 3.49h-2.12c0-1-.87-1.76-2.47-1.76-1.55 0-2.43.76-2.43 1.61 0 .91.82 1.42 2.65 2.04 2.47.8 4.47 1.71 4.47 4.39 0 2.01-1.42 3.12-3.41 3.52z" /></svg>,
           },
         ],
-      },
-    ],
-  },
-  {
-    title: "Miscellaneous",
-    items: [
-
-      {
-        label: "Users",
-        path: "/admin/users",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13"></path>
-            <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88"></path>
-          </svg>
-        ),
-      },
-      {
-        label: "Notification",
-        path: "/admin/notification",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8C6 11.3137 4 14 4 17H20C20 14 18 11.3137 18 8Z"></path>
-            <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"></path>
-            <circle cx="18" cy="8" r="3" fill="currentColor"></circle>
-          </svg>
-        ),
-      },
-
-
-      {
-        label: "FAQ",
-        path: "/admin/faq",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <rect
-              x="3"
-              y="3"
-              width="18"
-              height="18"
-              rx="2"
-              strokeDasharray="4 2"></rect>
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M12 9V12M12 15H12.01"></path>
-          </svg>
-        ),
       },
     ],
   },
@@ -594,193 +255,20 @@ const menuSections: MenuSection[] = [
         path: "/admin/orders",
         hasSubmenu: true,
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1H4L6.68 14.39C6.77144 14.8504 7.02191 15.264 7.38755 15.5583C7.75318 15.8526 8.2107 16.009 8.68 16H19C19.4693 16.009 19.9268 15.8526 20.2925 15.5583C20.6581 15.264 20.9086 14.8504 21 14.39L22.54 6.62C22.6214 6.22389 22.6172 5.81177 22.528 5.41838C22.4388 5.02499 22.2672 4.66078 22.026 4.35277C21.7848 4.04476 21.4805 3.80134 21.1372 3.63988C20.794 3.47841 20.4208 3.40296 20.044 3.42H5.82M1 1L3 3M1 1V5"></path>
-            <circle cx="12" cy="12" r="1"></circle>
-            <path d="M12 6V12"></path>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
           </svg>
         ),
         submenuItems: [
-          {
-            label: "All Order",
-            path: "/admin/orders/all",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <circle cx="9" cy="21" r="1"></circle>
-                <circle cx="20" cy="21" r="1"></circle>
-                <path d="M1 1H4L6.68 14.39C6.77144 14.8504 7.02191 15.264 7.38755 15.5583C7.75318 15.8526 8.2107 16.009 8.68 16H19C19.4693 16.009 19.9268 15.8526 20.2925 15.5583C20.6581 15.264 20.9086 14.8504 21 14.39L22.54 6.62C22.6214 6.22389 22.6172 5.81177 22.528 5.41838C22.4388 5.02499 22.2672 4.66078 22.026 4.35277C21.7848 4.04476 21.4805 3.80134 21.1372 3.63988C20.794 3.47841 20.4208 3.40296 20.044 3.42H5.82M1 1L3 3M1 1V5"></path>
-              </svg>
-            ),
-          },
-          {
-            label: "Pending Order",
-            path: "/admin/orders/pending",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-            ),
-          },
-          {
-            label: "Received Order",
-            path: "/admin/orders/received",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-            ),
-          },
-          {
-            label: "Processed Order",
-            path: "/admin/orders/processed",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-            ),
-          },
-          {
-            label: "Shipped Order",
-            path: "/admin/orders/shipped",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                <line x1="4" y1="22" x2="4" y2="15"></line>
-              </svg>
-            ),
-          },
-          {
-            label: "Out For Delivery",
-            path: "/admin/orders/out-for-delivery",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <rect x="1" y="3" width="15" height="13"></rect>
-                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-              </svg>
-            ),
-          },
-          {
-            label: "Delivered Order",
-            path: "/admin/orders/delivered",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-            ),
-          },
-          {
-            label: "Cancelled Order",
-            path: "/admin/orders/cancelled",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-              </svg>
-            ),
-          },
-          {
-            label: "Return",
-            path: "/admin/return",
-            icon: (
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z"></path>
-                <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21"></path>
-                <path d="M8 12L12 8L16 12M12 8V16"></path>
-              </svg>
-            ),
-          },
+          { label: "All Order", path: "/admin/orders/all", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" /></svg> },
+          { label: "Pending Order", path: "/admin/orders/pending", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 14.5h-2v-5h2v5zm0-7h-2v-2h2v2z" /></svg> },
+          { label: "Received Order", path: "/admin/orders/received", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg> },
+          { label: "Processed Order", path: "/admin/orders/processed", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg> },
+          { label: "Shipped Order", path: "/admin/orders/shipped", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3v12h2v4h10v-4h3l4-4V8zM5 14V6h10v8H5zm10 4H7v-2h8v2zm5-4h-3v-4h2.27L20 12.73V14z" /></svg> },
+          { label: "Out For Delivery", path: "/admin/orders/out-for-delivery", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3v12h2v4h10v-4h3l4-4V8zM17 12.73L18.27 14H17v-1.27z" /></svg> },
+          { label: "Delivered Order", path: "/admin/orders/delivered", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg> },
+          { label: "Cancelled Order", path: "/admin/orders/cancelled", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" /></svg> },
+          { label: "Return", path: "/admin/return", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" /></svg> },
         ],
       },
     ],
@@ -792,37 +280,15 @@ const menuSections: MenuSection[] = [
         label: "Manage Rewards",
         path: "/admin/rewards",
         icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <circle cx="12" cy="8" r="7"></circle>
-            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87l1.18 6.88L12 17.77l-6.18 3.25L7 14.14L2 9.27l6.91-1.01L12 2z" />
           </svg>
         ),
       },
       {
         label: "Reward Orders",
         path: "/admin/reward-orders",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        ),
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" /></svg>,
       },
     ],
   },
@@ -832,142 +298,42 @@ const menuSections: MenuSection[] = [
       {
         label: "Wallet & Earnings",
         path: "/admin/wallet",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M20 7h-9a2 2 0 0 0-2 2v1m0 4v9a2 2 0 0 0 2 2h4" />
-            <path d="M19 13h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1" />
-            <path d="M6 7H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h15v4H6.5" />
-          </svg>
-        ),
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" /></svg>,
       },
     ],
   },
   {
-
     title: "Setting",
     items: [
       {
         label: "Billing & Charges",
         path: "/admin/billing-settings",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-            <line x1="2" y1="10" x2="22" y2="10"></line>
-            <line x1="12" y1="15" x2="12" y2="15"></line>
-          </svg>
-        ),
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21 7.28V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-2.28c.59-.35 1-.98 1-1.72V9c0-.74-.41-1.37-1-1.72zM20 9v6h-7V9h7zM5 19V5h14v2h-6c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h6v2H5z" /></svg>,
       },
       {
         label: "Payment List",
         path: "/admin/payment-list",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-            <path d="M8 7H16M8 11H16M8 15H12"></path>
-            <circle cx="18" cy="6" r="1.5" fill="currentColor"></circle>
-            <rect x="16" y="4" width="4" height="4" rx="0.5"></rect>
-          </svg>
-        ),
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z" /></svg>,
       },
       {
         label: "SMS Gateway",
         path: "/admin/sms-gateway",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"></path>
-            <path d="M8 9H16M8 13H12"></path>
-          </svg>
-        ),
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z" /></svg>,
       },
       {
         label: "System User",
         path: "/admin/system-user",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13"></path>
-            <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88"></path>
-          </svg>
-        ),
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>,
       },
       {
         label: "Customer App Policy",
         path: "/admin/customer-app-policy",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"></path>
-            <path d="M14 2V8H20"></path>
-            <path d="M9 15L11 17L15 13"></path>
-          </svg>
-        ),
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" /></svg>,
       },
       {
         label: "Delivery App Policy",
         path: "/admin/delivery-app-policy",
-        icon: (
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"></path>
-            <path d="M14 2V8H20"></path>
-            <path d="M9 15L11 17L15 13"></path>
-          </svg>
-        ),
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" /></svg>,
       },
     ],
   },
@@ -980,249 +346,138 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const isActive = (path: string) => {
-    if (path === "/admin") {
-      return location.pathname === "/admin" || location.pathname === "/admin/";
-    }
+    if (path === "/admin") return location.pathname === "/admin";
     return location.pathname === path || location.pathname.startsWith(path + "/");
   };
 
   const isSubmenuActive = (submenuItems?: SubMenuItem[]) => {
     if (!submenuItems) return false;
-    return submenuItems.some(
-      (item) =>
-        location.pathname === item.path ||
-        location.pathname.startsWith(item.path + "/")
-    );
+    return submenuItems.some((item) => location.pathname === item.path || location.pathname.startsWith(item.path + "/"));
   };
 
   const handleNavigation = (path: string) => {
     navigate(path);
-    if (onClose && window.innerWidth < 1024) {
-      onClose();
-    }
+    if (onClose && window.innerWidth < 1024) onClose();
   };
 
-  const toggleMenu = (path: string) => {
+  const toggleSubmenu = (path: string) => {
     setExpandedMenus((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(path)) {
-        newSet.delete(path);
-      } else {
-        newSet.add(path);
-      }
+      if (newSet.has(path)) newSet.delete(path);
+      else newSet.add(path);
       return newSet;
     });
   };
 
   const isExpanded = (path: string) => {
-    const menuItem = menuSections
-      .flatMap((section) => section.items)
-      .find((item) => item.path === path);
-    return (
-      expandedMenus.has(path) ||
-      (menuItem?.submenuItems && isSubmenuActive(menuItem.submenuItems))
-    );
+    const menuItem = menuSections.flatMap((s) => s.items).find((i) => i.path === path);
+    return expandedMenus.has(path) || (menuItem?.submenuItems && isSubmenuActive(menuItem.submenuItems));
   };
 
-  // Filter menu items based on search query
   const filteredSections = menuSections
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) =>
-        item.label.toLowerCase().includes(searchQuery.toLowerCase())
-      ),
+      items: section.items.filter((item) => item.label.toLowerCase().includes(searchQuery.toLowerCase())),
     }))
     .filter((section) => section.items.length > 0);
 
   return (
-    <aside className="w-60 bg-[#FAF7F2] h-screen flex flex-col font-poppins shadow-xl z-50 relative overflow-hidden border-r-[3px] border-[#8B3D28]">
-      {/* Village Panchayat Art Background - Subtle Overlay */}
-      <div 
-        className="absolute inset-x-0 bottom-0 top-0 opacity-[0.06] pointer-events-none z-0 bg-no-repeat bg-bottom bg-contain"
-        style={{ backgroundImage: `url(${panchayatArt})`, backgroundSize: '240px auto' }}
-      ></div>
-
-      {/* Decorative Brand Texture */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
-      {/* Sidebar Header with Logo & Close button */}
-      <div className="flex items-center justify-between p-3 px-4 border-b border-[#8B3D28]/10 relative z-10">
+    <aside className="w-60 h-screen flex flex-col font-poppins shadow-xl z-50 relative overflow-hidden border-r-[3px] border-[#8B3D28]">
+      {/* HEADER SECTION - Cream Background */}
+      <div className="flex items-center justify-between p-3 px-4 border-b border-[#8B3D28]/10 relative z-20 bg-[#FAF7F2]">
         <div className="h-8">
-          <img 
-            src={villageBasketLogo} 
-            alt="Village Basket Admin" 
-            className="h-full w-auto object-contain brightness-90 saturate-150" 
-          />
+          <img src={villageBasketLogo} alt="Logo" className="h-full w-auto object-contain brightness-90 saturate-150" />
         </div>
-        <button
-          onClick={onClose}
-          className="p-1.5 text-[#8B3D28]/60 hover:text-[#8B3D28] hover:bg-[#8B3D28]/5 rounded-lg transition-all"
-          aria-label="Close menu">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M18 6L6 18M6 6L18 18"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+        <button onClick={onClose} className="p-1.5 text-[#8B3D28]/60 hover:text-[#8B3D28] hover:bg-[#8B3D28]/5 rounded-lg transition-all">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6L18 18" /></svg>
+        </button>
+      </div>
+
+      {/* BODY SECTION - Solid Dark Terracotta */}
+      <div className="flex-1 bg-[#8B3D28] relative flex flex-col overflow-hidden">
+        {/* Warli Art Overlay - Very Subtle */}
+        <div 
+          className="absolute inset-x-0 bottom-0 top-0 opacity-[0.08] pointer-events-none z-0 bg-no-repeat bg-bottom bg-contain invert brightness-[2] contrast-50 sepia-[.1]"
+          style={{ backgroundImage: `url(${panchayatArt})`, backgroundSize: '240px auto' }}
+        ></div>
+        
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+
+        {/* Search */}
+        <div className="p-3 border-b border-white/10 relative z-10">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search Menu..."
+              className="w-full px-3 py-1.5 pl-9 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/30 text-xs focus:outline-none focus:ring-2 focus:ring-white/20 transition-all font-medium"
             />
-          </svg>
-        </button>
-      </div>
-
-      {/* Search Bar */}
-      <div className="p-3 border-b border-[#8B3D28]/10 relative z-10">
-        <div className="relative">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search Menu..."
-            className="w-full px-3 py-1.5 pl-9 bg-white/50 border border-[#8B3D28]/40 rounded-lg text-[#8B3D28] placeholder-[#8B3D28]/40 text-xs focus:outline-none focus:ring-2 focus:ring-[#8B3D28]/20 transition-all font-medium backdrop-blur-sm"
-          />
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B3D28]/30">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="M21 21L16.65 16.65"></path>
-          </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">
+              <circle cx="11" cy="11" r="8"></circle><path d="M21 21L16.65 16.65"></path>
+            </svg>
+          </div>
         </div>
-      </div>
 
-      {/* Dashboard Link */}
-      <div className="px-3 py-2 border-b border-[#8B3D28]/10 relative z-10">
-        <button
-          onClick={() => handleNavigation("/admin")}
-          className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-left transition-all ${isActive("/admin")
-            ? "bg-[#8B3D28] text-white shadow-md font-bold"
-            : "text-[#8B3D28]/70 hover:bg-[#8B3D28]/5 hover:text-[#8B3D28]"
-            }`}>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-          <span className="text-[13px] font-semibold tracking-tight">Dashboard</span>
-        </button>
-      </div>
+        {/* Dashboard Link */}
+        <div className="px-3 py-2 border-b border-white/10 relative z-10">
+          <button
+            onClick={() => handleNavigation("/admin")}
+            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-left transition-all ${isActive("/admin")
+              ? "bg-[#FAF7F2] text-[#8B3D28] shadow-lg font-bold"
+              : "text-white/70 hover:bg-white/5 hover:text-white"
+              }`}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z" /></svg>
+            <span className="text-[13px] font-semibold tracking-tight">Dashboard</span>
+          </button>
+        </div>
 
-      {/* Navigation Menu */}
-      <nav
-        className="flex-1 py-3 overflow-y-auto admin-sidebar-nav scroll-smooth px-2 relative z-10"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-        <style>{`
-          .admin-sidebar-nav::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
-        {filteredSections.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="mb-4">
-            <h3 className="px-3 mb-1.5 text-[10px] font-black text-[#8B3D28] uppercase tracking-[0.15em] opacity-80 font-outfit">
-              {section.title}
-            </h3>
-            <ul className="space-y-0.5">
-              {section.items.map((item) => {
-                const expanded = isExpanded(item.path);
-                const active =
-                  isActive(item.path) || isSubmenuActive(item.submenuItems);
-
-                return (
-                  <li key={item.path}>
-                    <button
-                      onClick={() => {
-                        if (item.hasSubmenu) {
-                          toggleMenu(item.path);
-                        } else {
-                          handleNavigation(item.path);
-                        }
-                      }}
-                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-left transition-all ${active
-                        ? "bg-[#8B3D28] text-white shadow-md"
-                        : "text-[#8B3D28]/70 hover:bg-[#8B3D28]/5 hover:text-[#8B3D28]"
-                        }`}>
-                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                        <span className={`flex-shrink-0 transition-transform ${active ? 'scale-110' : ''}`}>
-                          {item.icon}
-                        </span>
-                        <span className={`text-[13px] font-medium truncate ${active ? 'font-bold' : ''}`}>
-                          {item.label}
-                        </span>
-                      </div>
-                      {item.hasSubmenu && (
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="3"
-                          className={`transition-transform flex-shrink-0 ml-2 ${expanded ? "rotate-90" : ""
-                            } ${active ? "text-white" : "text-[#8B3D28]/30"}`}>
-                          <path
-                            d="M9 18L15 12L9 6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"></path>
-                        </svg>
-                      )}
-                    </button>
-                    {item.hasSubmenu && expanded && (
-                      <ul className="mt-0.5 space-y-0.5 ml-3 border-l border-white/10 pl-1">
-                        {item.submenuItems &&
-                          item.submenuItems.map((subItem) => {
-                            const subActive =
-                              location.pathname === subItem.path ||
-                              location.pathname.startsWith(subItem.path + "/");
+        {/* Nav */}
+        <nav className="flex-1 py-3 overflow-y-auto admin-sidebar-nav scroll-smooth px-2 relative z-10" style={{ scrollbarWidth: "none" }}>
+          <style>{`.admin-sidebar-nav::-webkit-scrollbar { display: none; }`}</style>
+          {filteredSections.map((section, idx) => (
+            <div key={idx} className="mb-4">
+              <h3 className="px-3 mb-1.5 text-[10px] font-black text-white/40 uppercase tracking-widest font-outfit">{section.title}</h3>
+              <ul className="space-y-0.5">
+                {section.items.map((item) => {
+                  const expanded = isExpanded(item.path);
+                  const active = isActive(item.path) || isSubmenuActive(item.submenuItems);
+                  return (
+                    <li key={item.path} className="px-1">
+                      <button
+                        onClick={() => item.hasSubmenu ? toggleSubmenu(item.path) : handleNavigation(item.path)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all group ${active ? "bg-[#FAF7F2] text-[#8B3D28] shadow-lg" : "text-white/80 hover:bg-white/5 hover:text-white"}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className={`flex-shrink-0 transition-transform group-hover:scale-110 ${active ? "text-[#8B3D28]" : "text-white/60"}`}>{item.icon}</span>
+                          <span className="text-[13px] font-bold tracking-tight">{item.label}</span>
+                        </div>
+                        {item.hasSubmenu && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className={`transition-transform duration-300 ${expanded ? "rotate-90" : ""}`}><path d="M9 18l6-6-6-6" /></svg>}
+                      </button>
+                      {item.hasSubmenu && expanded && (
+                        <ul className="mt-1 pl-9 space-y-1 relative">
+                          <div className="absolute left-4 top-0 bottom-0 w-[1px] bg-white/10"></div>
+                          {item.submenuItems?.map((sub) => {
+                            const subActive = isActive(sub.path);
                             return (
-                              <li key={subItem.path}>
-                                <button
-                                  onClick={() => handleNavigation(subItem.path)}
-                                  className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg text-left transition-all ${subActive
-                                    ? "bg-[#8B3D28]/10 text-[#8B3D28] font-bold"
-                                    : "text-[#8B3D28]/60 hover:bg-[#8B3D28]/5 hover:text-[#8B3D28]"
-                                    }`}>
-                                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    <span className="flex-shrink-0 opacity-80 scale-90">
-                                      {subItem.icon}
-                                    </span>
-                                    <span className="text-xs font-medium truncate">
-                                      {subItem.label}
-                                    </span>
-                                  </div>
+                              <li key={sub.path}>
+                                <button onClick={() => handleNavigation(sub.path)} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${subActive ? "text-[#FAF7F2] bg-white/10" : "text-white/50 hover:text-white hover:bg-white/5"}`}>
+                                  <span className={subActive ? "text-white" : "text-white/40"}>{sub.icon}</span>
+                                  <span>{sub.label}</span>
                                 </button>
                               </li>
                             );
                           })}
-                      </ul>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
-      </nav>
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      </div>
     </aside>
-
   );
 }
-
-
-
