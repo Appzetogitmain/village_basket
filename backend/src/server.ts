@@ -42,7 +42,7 @@ app.set("io", io);
 // Routes
 app.get("/", (_req: Request, res: Response) => {
   res.json({
-    message: "Apna Sabji Wala API Server is running!",
+    message: "Village Basket API Server is running!",
     version: "1.0.0",
     socketIO: "Listening for WebSocket connections",
   });
@@ -73,7 +73,7 @@ async function startServer() {
   initializeFirebaseAdmin();
 
   httpServer.listen(PORT, () => {
-    console.log("\n\x1b[32m✓\x1b[0m \x1b[1mApna Sabji Wala Server Started\x1b[0m");
+    console.log("\n\x1b[32m✓\x1b[0m \x1b[1mVillage Basket Server Started\x1b[0m");
     console.log(`   \x1b[36mPort:\x1b[0m http://localhost:${PORT}`);
     console.log(
       `   \x1b[36mEnvironment:\x1b[0m ${process.env.NODE_ENV || "development"}`

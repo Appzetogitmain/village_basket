@@ -304,7 +304,7 @@ export const getHelpSupport = asyncHandler(
       { label: "Call Support", value: "+91 7846940429", icon: "phone" },
       {
         label: "Email Support",
-        value: "support@apnasabjiwala.com",
+        value: "support@villagebasket.com",
         icon: "email",
       },
       { label: "Live Chat", value: "Available 24/7", icon: "chat" },

@@ -1,7 +1,7 @@
 {
-  "name": "apna-sabji-wala-backend",
+  "name": "village-basket-backend",
   "version": "1.0.0",
-  "description": "apna sabji wala Backend API Server",
+  "description": "Village Basket Backend API Server",
   "main": "dist/src/server.js",
   "scripts": {
     "build": "tsc",

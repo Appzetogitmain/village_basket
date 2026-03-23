@@ -23,16 +23,16 @@ export default cloudinary;
 
 // Folder structure constants
 export const CLOUDINARY_FOLDERS = {
-  PRODUCTS: "apnasabjiwala/products",
-  PRODUCT_GALLERY: "apnasabjiwala/products/gallery",
-  CATEGORIES: "apnasabjiwala/categories",
-  SUBCATEGORIES: "apnasabjiwala/subcategories",
-  COUPONS: "apnasabjiwala/coupons",
-  SELLERS: "apnasabjiwala/sellers",
-  SELLER_PROFILE: "apnasabjiwala/sellers/profile",
-  SELLER_DOCUMENTS: "apnasabjiwala/sellers/documents",
-  DELIVERY: "apnasabjiwala/delivery",
-  DELIVERY_DOCUMENTS: "apnasabjiwala/delivery/documents",
-  STORES: "apnasabjiwala/stores",
-  USERS: "apnasabjiwala/users",
+  PRODUCTS: "village_basket/products",
+  PRODUCT_GALLERY: "village_basket/products/gallery",
+  CATEGORIES: "village_basket/categories",
+  SUBCATEGORIES: "village_basket/subcategories",
+  COUPONS: "village_basket/coupons",
+  SELLERS: "village_basket/sellers",
+  SELLER_PROFILE: "village_basket/sellers/profile",
+  SELLER_DOCUMENTS: "village_basket/sellers/documents",
+  DELIVERY: "village_basket/delivery",
+  DELIVERY_DOCUMENTS: "village_basket/delivery/documents",
+  STORES: "village_basket/stores",
+  USERS: "village_basket/users",
 } as const;

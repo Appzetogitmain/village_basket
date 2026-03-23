@@ -402,8 +402,8 @@ AppSettingsSchema.statics.getSettings = async function () {
   let settings = await this.findOne();
   if (!settings) {
     settings = await this.create({
-      appName: "Apna Sabji Wala",
-      contactEmail: "contact@apnasabjiwala.com",
+      appName: "Village Basket",
+      contactEmail: "contact@villagebasket.com",
       contactPhone: "1234567890",
     });
   }
