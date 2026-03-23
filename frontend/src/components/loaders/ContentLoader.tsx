@@ -7,7 +7,7 @@ const ContentLoader: React.FC = () => {
   const [animationData, setAnimationData] = useState<any>(null);
 
   useEffect(() => {
-    fetch('/animations/loading.json')
+    fetch('/animations/Basket.json')
       .then(res => res.json())
       .then(data => setAnimationData(data))
       .catch(err => console.error('Failed to load animation:', err));

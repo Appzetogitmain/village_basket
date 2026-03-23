@@ -198,13 +198,13 @@ function copyShopByStoreImages() {
   });
 }
 
-// Copy Apna Sabji Wala logo
-function copyApnaSabjiWalaLogo() {
+// Copy Village Basket logo
+function copyVillageBasketLogo() {
   const apnasabjiwalaPath = path.join(assetsDir, 'apnasabjiwala.png');
   if (fs.existsSync(apnasabjiwalaPath)) {
     const destPath = path.join(publicAssetsDir, 'apnasabjiwala.png');
     fs.copyFileSync(apnasabjiwalaPath, destPath);
-    console.log('Copied Apna Sabji Wala logo: apnasabjiwala.png');
+    console.log('Copied Village Basket logo: apnasabjiwala.png');
   }
 }
 
@@ -233,7 +233,7 @@ copyProductImages();
 copyBannerImage();
 copyShopByStoreImages();
 copyLoginVideo();
-copyApnaSabjiWalaLogo();
+copyVillageBasketLogo();
 copyDeliveryIcon();
 console.log('Image copy completed!');
 
