@@ -30,7 +30,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   // Check if location is required for current route
   const requiresLocation = () => {
-    const publicRoutes = ['/login', '/signup', '/seller/login', '/seller/signup', '/delivery/login', '/delivery/signup', '/admin/login'];
+    const publicRoutes = ['/user/login', '/seller/login', '/seller/signup', '/delivery/login', '/delivery/signup', '/admin/login'];
     // Don't require location on login/signup pages
     if (publicRoutes.includes(location.pathname)) {
       return false;
@@ -72,7 +72,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   // Handle search input change
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    if (location.pathname === '/search') {
+    if (location.pathname === '/user/search') {
       // Update URL params when on search page
       if (value.trim()) {
         setSearchParams({ q: value });
@@ -82,7 +82,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     } else {
       // Navigate to search page with query
       if (value.trim()) {
-        navigate(`/search?q=${encodeURIComponent(value)}`);
+        navigate(`/user/search?q=${encodeURIComponent(value)}`);
       }
     }
   };
@@ -93,7 +93,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   // Reset scroll position when navigating to any page (smooth, no flash)
   // BUT skip for Home page if there's a saved scroll position to restore
   useEffect(() => {
-    const isHomePage = location.pathname === '/' || location.pathname === '/user/home';
+    const isHomePage = location.pathname === '/user' || location.pathname === '/user/home' || location.pathname === '/user/';
 
     // Home page handles its own scroll restoration and reset logic
     if (isHomePage) {
@@ -111,7 +111,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }, [location.pathname]);
 
   // Track categories active state for rotation
-  const isCategoriesActive = isActive('/categories') || location.pathname.startsWith('/category/');
+  const isCategoriesActive = isActive('/user/categories') || location.pathname.startsWith('/user/category/');
 
   useEffect(() => {
     if (isCategoriesActive && !prevCategoriesActive) {
@@ -125,10 +125,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
     }
   }, [isCategoriesActive, prevCategoriesActive]);
 
-  const isProductDetailPage = location.pathname.startsWith('/product/');
-  const isSearchPage = location.pathname === '/search';
-  const isCheckoutPage = location.pathname === '/checkout' || location.pathname.startsWith('/checkout/') || location.pathname === '/daily-service/checkout' || location.pathname.startsWith('/daily-service/checkout');
-  const isHomePage = location.pathname === '/' || location.pathname === '/user/home';
+  const isProductDetailPage = location.pathname.startsWith('/user/product/');
+  const isSearchPage = location.pathname === '/user/search';
+  const isCheckoutPage = location.pathname === '/user/checkout' || location.pathname.startsWith('/user/checkout/') || location.pathname === '/user/daily-service/checkout' || location.pathname.startsWith('/user/daily-service/checkout');
+  const isHomePage = location.pathname === '/user' || location.pathname === '/user/' || location.pathname === '/user/home';
   const showHeader = !isCheckoutPage;
   const showSearchBar = isSearchPage;
   const showFooter = !isCheckoutPage && !isProductDetailPage;
@@ -149,14 +149,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
               {/* Home */}
               <Link
-                to="/"
-                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${isActive('/')
+                to="/user"
+                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${(isActive('/user') || isActive('/user/'))
                   ? 'bg-white/20 text-[#FFCC00] shadow-md font-bold scale-105'
                   : 'hover:bg-white/10 text-white/90'
                   }`}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {isActive('/') ? (
+                  {(isActive('/user') || isActive('/user/')) ? (
                     <>
                       <path d="M2 12L12 4L22 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="white" fillOpacity="0.2" />
                       <rect x="4" y="12" width="16" height="8" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
@@ -173,14 +173,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
               {/* Order Again */}
               <Link
-                to="/order-again"
-                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${isActive('/order-again')
+                to="/user/order-again"
+                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${isActive('/user/order-again')
                   ? 'bg-white/20 text-[#FFCC00] shadow-md font-bold scale-105'
                   : 'hover:bg-white/10 text-white/90'
                   }`}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {isActive('/order-again') ? (
+                  {isActive('/user/order-again') ? (
                     <path d="M5 8V6C5 4.34315 6.34315 3 8 3H16C17.6569 3 19 4.34315 19 6V8H21C21.5523 8 22 8.44772 22 9V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V9C2 8.44772 2.44772 8 3 8H5Z" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
                   ) : (
                     <path d="M5 8V6C5 4.34315 6.34315 3 8 3H16C17.6569 3 19 4.34315 19 6V8H21C21.5523 8 22 8.44772 22 9V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V9C2 8.44772 2.44772 8 3 8H5Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" fill="none" />
@@ -191,14 +191,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
               {/* Categories */}
               <Link
-                to="/categories"
-                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${(isActive('/categories') || location.pathname.startsWith('/category/'))
+                to="/user/categories"
+                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${(isActive('/user/categories') || location.pathname.startsWith('/user/category/'))
                   ? 'bg-white/20 text-[#FFCC00] shadow-md font-bold scale-105'
                   : 'hover:bg-white/10 text-white/90'
                   }`}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {(isActive('/categories') || location.pathname.startsWith('/category/')) ? (
+                  {(isActive('/user/categories') || location.pathname.startsWith('/user/category/')) ? (
                     <>
                       <circle cx="7" cy="7" r="2.5" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" />
                       <circle cx="17" cy="7" r="2.5" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" />
@@ -219,14 +219,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
               {/* Profile */}
               <Link
-                to="/account"
-                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${isActive('/account')
+                to="/user/account"
+                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${isActive('/user/account')
                   ? 'bg-white/20 text-[#FFCC00] shadow-md font-bold scale-105'
                   : 'hover:bg-white/10 text-white/90'
                   }`}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {isActive('/account') ? (
+                  {isActive('/user/account') ? (
                     <>
                       <circle cx="12" cy="8" r="4" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" />
                       <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="white" fillOpacity="0.2" />
@@ -254,7 +254,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               {/* Main Header Row */}
               <div className="px-4 md:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
                 {/* Logo */}
-                <Link to="/" className="flex-shrink-0">
+                <Link to="/user" className="flex-shrink-0">
                   <img
                     src={brandLogo}
                     alt="Village Basket"
@@ -279,7 +279,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 {/* Right Actions */}
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => navigate('/search')}
+                    onClick={() => navigate('/user/search')}
                     className="md:hidden text-white p-1 hover:bg-white/10 rounded-full transition-colors"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -288,7 +288,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     </svg>
                   </button>
                   <button
-                    onClick={() => navigate('/checkout')}
+                    onClick={() => navigate('/user/checkout')}  
                     className="text-white p-1 hover:bg-white/10 rounded-full transition-colors relative"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -298,7 +298,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     </svg>
                   </button>
                   <button
-                    onClick={() => navigate('/account')}
+                    onClick={() => navigate('/user/account')}  
                     className="hidden md:flex text-white p-1 hover:bg-white/10 rounded-full transition-colors"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -346,7 +346,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 className="w-full max-w-full"
                 style={{ minHeight: '100%' }}
                 onAnimationComplete={() => {
-                  const isHomePage = location.pathname === '/' || location.pathname === '/user/home';
+                  const isHomePage = location.pathname === '/user' || location.pathname === '/user/' || location.pathname === '/user/home';
 
                   // Home page handles its own scroll (either restoration or starting from top)
                   if (isHomePage) {
@@ -401,34 +401,34 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 className="pointer-events-auto h-[54px] bg-[#8B3D28]/95 backdrop-blur-md rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.3)] border border-white/10 flex items-center justify-around px-2 relative"
               >
                 {/* Home */}
-                <Link to="/" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div animate={{ scale: isActive('/') ? 1.1 : 1, y: isActive('/') ? -1 : 0 }} transition={{ duration: 0.2 }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/') ? 'white' : 'none'} stroke={isActive('/') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <Link to="/user" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
+                  <motion.div animate={{ scale: (isActive('/user') || isActive('/user/')) ? 1.1 : 1, y: (isActive('/user') || isActive('/user/')) ? -1 : 0 }} transition={{ duration: 0.2 }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={(isActive('/user') || isActive('/user/')) ? 'white' : 'none'} stroke={(isActive('/user') || isActive('/user/')) ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 9.5L12 3l9 6.5V20c0 1-1 2-2 2H5c-1 0-2-1-2-2V9.5z" />
                       <polyline points="9 22 9 12 15 12 15 22" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/') ? 'text-white' : 'text-white/50'}`}>
+                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${(isActive('/user') || isActive('/user/')) ? 'text-white' : 'text-white/50'}`}>
                     HOME
                   </span>
                 </Link>
 
                 {/* Orders */}
-                <Link to="/order-again" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div animate={{ scale: isActive('/order-again') ? 1.1 : 1, y: isActive('/order-again') ? -1 : 0 }} transition={{ duration: 0.2 }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/order-again') ? 'white' : 'none'} stroke={isActive('/order-again') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <Link to="/user/order-again" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
+                  <motion.div animate={{ scale: isActive('/user/order-again') ? 1.1 : 1, y: isActive('/user/order-again') ? -1 : 0 }} transition={{ duration: 0.2 }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/user/order-again') ? 'white' : 'none'} stroke={isActive('/user/order-again') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
                       <line x1="3" y1="6" x2="21" y2="6" />
                       <path d="M16 10a4 4 0 01-8 0" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/order-again') ? 'text-white' : 'text-white/50'}`}>
+                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/user/order-again') ? 'text-white' : 'text-white/50'}`}>
                     ORDERS
                   </span>
                 </Link>
 
                 {/* Categories */}
-                <Link to="/categories" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
+                <Link to="/user/categories" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
                   <motion.div
                     animate={{
                       scale: isCategoriesActive ? 1.1 : 1,
@@ -450,14 +450,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 </Link>
 
                 {/* Profile */}
-                <Link to="/account" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div animate={{ scale: isActive('/account') ? 1.1 : 1, y: isActive('/account') ? -1 : 0 }} transition={{ duration: 0.2 }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/account') ? 'white' : 'none'} stroke={isActive('/account') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <Link to="/user/account" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
+                  <motion.div animate={{ scale: isActive('/user/account') ? 1.1 : 1, y: isActive('/user/account') ? -1 : 0 }} transition={{ duration: 0.2 }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/user/account') ? 'white' : 'none'} stroke={isActive('/user/account') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
                       <circle cx="12" cy="7" r="4" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/account') ? 'text-white' : 'text-white/50'}`}>
+                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/user/account') ? 'text-white' : 'text-white/50'}`}>
                     ACCOUNT
                   </span>
                 </Link>

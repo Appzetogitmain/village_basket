@@ -102,7 +102,7 @@ export default function Wishlist() {
             </p>
             
             <Button 
-              onClick={() => navigate('/')} 
+              onClick={() => navigate('/user')} 
               className="bg-[#4A7C59] hover:bg-[#3D664A] text-white rounded-xl h-10 px-8 text-[11px] font-black uppercase tracking-[0.2em] shadow-lg shadow-[#4A7C59]/20 active:scale-95 transition-all"
             >
               Start Shopping

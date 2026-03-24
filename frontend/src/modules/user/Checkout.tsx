@@ -90,7 +90,7 @@ export default function Checkout() {
   // Redirect if empty
   useEffect(() => {
     if (!cartLoading && cart.items.length === 0 && !showOrderSuccess) {
-      navigate('/');
+      navigate('/user');
     }
   }, [cart.items.length, cartLoading, navigate, showOrderSuccess]);
 

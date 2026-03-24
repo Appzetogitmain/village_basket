@@ -281,7 +281,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
 
   const handleSearchClick = () => {
     // Navigate directly - the global useRouteLoader hook handles the transition animation
-    navigate('/search');
+    navigate('/user/search');
   };
 
   const handleTabClick = (tabId: string) => {
@@ -334,7 +334,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
           </div>
 
           <button
-            onClick={() => navigate('/checkout')}
+            onClick={() => navigate('/user/checkout')}
             className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 shadow-lg flex items-center justify-center text-white relative active:scale-95 transition-all"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -384,7 +384,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
 
         {/* Delivery Address Pill */}
         <div 
-          onClick={() => navigate('/location')}
+          onClick={() => navigate('/user/location')}
           className="flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2.5 py-1.5 border border-white/5 active:scale-[0.98] transition-all cursor-pointer relative z-20"
         >
           <div className="w-4 h-4 rounded-full bg-[#4A7C59] flex items-center justify-center shadow-sm">

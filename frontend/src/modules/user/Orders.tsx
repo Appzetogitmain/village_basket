@@ -61,7 +61,7 @@ export default function Orders() {
               Start shopping to see your village treasures here!
             </p>
             <button 
-              onClick={() => navigate('/')} 
+              onClick={() => navigate('/user')} 
               className="bg-[#4A7C59] text-white rounded-xl h-9 px-6 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-[#4A7C59]/20"
             >
               Start Shopping
@@ -71,7 +71,7 @@ export default function Orders() {
           orders.map((order) => (
             <div
               key={order.id}
-              onClick={() => navigate(`/orders/${order.id}`)}
+              onClick={() => navigate(`/user/orders/${order.id}`)}
               className="village-card paper-texture organic-radius p-3 active:scale-[0.98] transition-all cursor-pointer bg-white relative shadow-sm border border-neutral-100/50"
             >
               <div className="flex justify-between items-start mb-1">

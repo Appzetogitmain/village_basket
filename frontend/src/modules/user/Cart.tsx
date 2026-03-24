@@ -14,7 +14,7 @@ export default function Cart() {
   const totalAmount = cart.total + deliveryFee + platformFee;
 
   const handleCheckout = () => {
-    navigate('/checkout');
+    navigate('/user/checkout');
   };
 
   if (cart.items.length === 0) {
@@ -23,7 +23,7 @@ export default function Cart() {
         <div className="text-6xl md:text-8xl mb-4">🛒</div>
         <h2 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2">Your cart is empty</h2>
         <p className="text-neutral-600 mb-6 md:mb-8 md:text-lg">Add some items to get started!</p>
-        <Link to="/">
+        <Link to="/user">
           <Button variant="default" size="lg" className="md:px-8 md:py-3 md:text-lg bg-[#8B3D28] hover:bg-[#722F1E] font-black font-poppins uppercase tracking-widest">
             Start Shopping
           </Button>
