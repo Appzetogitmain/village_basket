@@ -16,6 +16,8 @@ import WishlistButton from '../../components/WishlistButton';
 import { getCoupons, validateCoupon, Coupon as ApiCoupon } from '../../services/api/customerCouponService';
 import { appConfig } from '../../services/configService';
 import { getAddresses, updateAddress } from '../../services/api/customerAddressService';
+import { getActiveDeliverySlots } from '../../services/api/admin/adminDeliverySlotService';
+import type { DeliverySlotSelection } from '../../types/order';
 import GoogleMapsLocationPicker from '../../components/GoogleMapsLocationPicker';
 import { getProducts } from '../../services/api/customerProductService';
 import { useWishlist } from '../../context/WishlistContext';
@@ -65,7 +67,6 @@ export default function Checkout() {
   const [gstin, setGstin] = useState<string>('');
   const [showCancellationPolicy, setShowCancellationPolicy] = useState(false);
   const [giftPackaging, setGiftPackaging] = useState<boolean>(false);
-  const [deliveryShift, setDeliveryShift] = useState<DeliveryShift | null>(null);
 
   // Profile completion modal state
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -82,6 +83,12 @@ export default function Checkout() {
   // Razorpay Payment State
   const [showRazorpayCheckout, setShowRazorpayCheckout] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'UPI'>('UPI');
+
+  // Delivery Slot State
+  const [availableSlots, setAvailableSlots] = useState<Array<{ _id: string; name: string; label: string; startTime: string; endTime: string }>>([]);
+  const [selectedSlot, setSelectedSlot] = useState<DeliverySlotSelection | null>(null);
+  const [slotsLoading, setSlotsLoading] = useState(false);
 
 
   // Check if user has placeholder data (needs profile completion)
@@ -131,6 +138,22 @@ export default function Checkout() {
       }
     };
     fetchInitialData();
+  }, []);
+
+  // Fetch active delivery slots
+  useEffect(() => {
+    const fetchSlots = async () => {
+      setSlotsLoading(true);
+      try {
+        const res = await getActiveDeliverySlots();
+        if (res.success) setAvailableSlots(res.data);
+      } catch (e) {
+        console.error('Failed to load delivery slots', e);
+      } finally {
+        setSlotsLoading(false);
+      }
+    };
+    fetchSlots();
   }, []);
 
   // Fetch similar products dynamically
@@ -326,8 +349,8 @@ export default function Checkout() {
     }
 
     // Check if delivery shift is selected
-    if (!deliveryShift) {
-      showGlobalToast('Please select a delivery shift', 'error');
+    if (!selectedSlot) {
+      showGlobalToast('Please select a delivery slot', 'error');
       return;
     }
 
@@ -376,24 +399,31 @@ export default function Checkout() {
       },
       totalAmount: grandTotal,
       address: addressWithLocation,
-      status: 'Pending', // Changed from 'Placed' to 'Pending' until payment is complete
+      status: paymentMethod === 'COD' ? 'Received' : 'Pending', // COD is received immediately, UPI is pending until payment
+      paymentMethod: paymentMethod, // Pass selected payment method
       createdAt: new Date().toISOString(),
       tipAmount: finalTipAmount,
       gstin: gstin || undefined,
       couponCode: selectedCoupon?.code || undefined,
       giftPackaging: giftPackaging,
-      deliveryShift: deliveryShift,
+      deliverySlot: selectedSlot || undefined,
     };
 
     try {
-      // Create the order first (with Pending status)
+      // Create the order
       const placedId = await addOrder(order);
       if (placedId) {
-        // Set the pending order ID and trigger Razorpay payment
-        setPendingOrderId(placedId);
-        setShowRazorpayCheckout(true);
-        // Note: Cart will be cleared and success shown only after successful payment
-        // See the RazorpayCheckout onSuccess handler (lines 1840-1846)
+        if (paymentMethod === 'COD') {
+          // For COD, success is immediate
+          setPlacedOrderId(placedId);
+          setShowOrderSuccess(true);
+          clearCart();
+          showGlobalToast('Order placed successfully!', 'success');
+        } else {
+          // For UPI, trigger Razorpay
+          setPendingOrderId(placedId);
+          setShowRazorpayCheckout(true);
+        }
       }
     } catch (error: any) {
       console.error("Order placement failed", error);
@@ -736,13 +766,25 @@ export default function Checkout() {
               </p>
             </div>
 
-            {/* Order Placed Message */}
+            {/* Order Placed Message with Details */}
             <div
               className="mt-12 text-center"
               style={{ animation: 'slideUp 0.5s ease-out 0.8s both' }}
             >
-              <h3 className="text-3xl font-black font-poppins text-[#8B3D28] mb-2">Order Placed!</h3>
-              <p className="text-gray-600">Your order is on the way</p>
+              <div className="flex flex-col items-center gap-2 mb-4">
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] bg-neutral-50 px-3 py-1 rounded-full border border-neutral-100">
+                  ID: {placedOrderId}
+                </span>
+                <div className={`px-4 py-1.5 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-sm border-b-4 ${
+                  paymentMethod === 'COD' 
+                    ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                    : 'bg-green-50 text-green-700 border-green-200'
+                }`}>
+                  Payment: {paymentMethod === 'COD' ? 'Cash on Delivery' : 'Paid Online'}
+                </div>
+              </div>
+              <h3 className="text-3xl font-black font-poppins text-[#8B3D28] mb-2 tracking-tight">Order Placed!</h3>
+              <p className="text-gray-500 font-medium italic">"Your organic harvest is on its way to you..."</p>
             </div>
 
             {/* Action Button */}
@@ -966,45 +1008,81 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* Delivery Shift Selection */}
+      {/* Delivery Time Slot Selection */}
       <div className="px-4 md:px-6 lg:px-8 py-4 bg-white border-b border-neutral-200">
         <h2 className="text-sm font-bold text-neutral-900 mb-3 flex items-center gap-2">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
             <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
-          Choose Delivery Shift <span className="text-red-500 font-bold">*</span>
+          Choose Delivery Time Slot
+          {availableSlots.length > 0 && <span className="text-red-500 font-bold">*</span>}
         </h2>
-        
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => setDeliveryShift('morning')}
-            className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${
-              deliveryShift === 'morning'
-                ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
-                : 'border-neutral-100 bg-neutral-50 text-neutral-500 hover:border-neutral-200'
-            }`}
-          >
-            <span className="text-xl">🌅</span>
-            <span className="text-xs font-bold font-poppins">Morning Shift</span>
-            <span className="text-[10px] opacity-80 font-medium">05:00 - 09:00 AM</span>
-          </button>
-          
-          <button
-            onClick={() => setDeliveryShift('evening')}
-            className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${
-              deliveryShift === 'evening'
-                ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
-                : 'border-neutral-100 bg-neutral-50 text-neutral-500 hover:border-neutral-200'
-            }`}
-          >
-            <span className="text-xl">🌆</span>
-            <span className="text-xs font-bold font-poppins">Evening Shift</span>
-            <span className="text-[10px] opacity-80 font-medium">05:00 - 09:00 PM</span>
-          </button>
-        </div>
-        {!deliveryShift && (
-          <p className="text-[10px] text-red-500 mt-2 font-medium italic">* Selection is mandatory for delivery</p>
+
+        {slotsLoading ? (
+          <div className="flex items-center gap-2 py-3">
+            <div className="w-4 h-4 border-2 border-[#8B3D28] border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs text-neutral-500">Loading available slots...</span>
+          </div>
+        ) : availableSlots.length === 0 ? (
+          <div className="text-center py-4 bg-neutral-50 rounded-xl border border-neutral-200">
+            <p className="text-xs text-neutral-500 font-medium">No delivery slots available. We'll deliver at the earliest!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {availableSlots.map(slot => {
+              const isSelected = selectedSlot?.slotId === slot._id;
+              const getIcon = (name: string) => {
+                const n = (name || '').toLowerCase();
+                if (n.includes('morning') || n.includes('early')) return '🌅';
+                if (n.includes('afternoon') || n.includes('noon')) return '☀️';
+                if (n.includes('evening')) return '🌆';
+                if (n.includes('night')) return '🌙';
+                return '🕐';
+              };
+              return (
+                <button
+                  key={slot._id}
+                  onClick={() => setSelectedSlot({
+                    slotId: slot._id,
+                    name: slot.name,
+                    label: slot.label,
+                    timeRange: slot.label,
+                  })}
+                  className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${
+                    isSelected
+                      ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
+                      : 'border-neutral-100 bg-neutral-50 text-neutral-600 hover:border-neutral-200'
+                  }`}
+                >
+                  <span className="text-xl">{getIcon(slot.name)}</span>
+                  <span className="text-xs font-bold font-poppins text-center leading-tight">{slot.name || 'Delivery Slot'}</span>
+                  <span className="text-[10px] opacity-80 font-medium">{slot.label}</span>
+                  {isSelected && (
+                    <span className="flex items-center gap-1 text-[10px] font-bold text-[#8B3D28]">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      Selected
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {availableSlots.length > 0 && !selectedSlot && (
+          <p className="text-[10px] text-amber-600 mt-2 font-medium">Please select a delivery time slot to proceed</p>
+        )}
+        {selectedSlot && (
+          <div className="mt-2 flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+            <span className="text-xs text-green-700 font-semibold">
+              Slot: {selectedSlot.name} · {selectedSlot.label}
+            </span>
+          </div>
         )}
       </div>
 
@@ -1095,6 +1173,74 @@ export default function Checkout() {
           </button>
         </div>
       )}
+
+      {/* Payment Method Selection */}
+      <div className="px-4 md:px-6 lg:px-8 py-4 border-b border-neutral-200 bg-stone-50/30">
+        <h2 className="text-sm font-bold text-neutral-900 mb-3 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <line x1="2" y1="10" x2="22" y2="10" />
+          </svg>
+          Payment Method
+        </h2>
+        <div className="grid grid-cols-2 gap-3">
+          {/* UPI Option */}
+          <button
+            onClick={() => setPaymentMethod('UPI')}
+            className={`p-3.5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all relative overflow-hidden ${
+              paymentMethod === 'UPI'
+                ? 'border-[#8B3D28] bg-white text-[#8B3D28] shadow-sm'
+                : 'border-neutral-100 bg-white text-neutral-500 opacity-80'
+            }`}
+          >
+            <div className={`p-2 rounded-full ${paymentMethod === 'UPI' ? 'bg-[#8B3D28]/10 text-[#8B3D28]' : 'bg-neutral-50 text-neutral-400'}`}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <span className="text-xs font-black font-poppins uppercase tracking-wider">UPI / Online</span>
+            <p className="text-[9px] font-medium opacity-60">Pay via App / Card</p>
+            {paymentMethod === 'UPI' && (
+              <div className="absolute top-0 right-0 p-1">
+                <div className="bg-[#8B3D28] text-white rounded-bl-lg p-0.5">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+              </div>
+            )}
+          </button>
+
+          {/* COD Option */}
+          <button
+            onClick={() => setPaymentMethod('COD')}
+            className={`p-3.5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all relative overflow-hidden ${
+              paymentMethod === 'COD'
+                ? 'border-[#8B3D28] bg-white text-[#8B3D28] shadow-sm'
+                : 'border-neutral-100 bg-white text-neutral-500 opacity-80'
+            }`}
+          >
+            <div className={`p-2 rounded-full ${paymentMethod === 'COD' ? 'bg-[#8B3D28]/10 text-[#8B3D28]' : 'bg-neutral-50 text-neutral-400'}`}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <rect x="2" y="6" width="20" height="12" rx="2" />
+                <circle cx="12" cy="12" r="2" />
+                <path d="M6 12h.01M18 12h.01" />
+              </svg>
+            </div>
+            <span className="text-xs font-black font-poppins uppercase tracking-wider">Cash on Delivery</span>
+            <p className="text-[9px] font-medium opacity-60">Pay at your doorstep</p>
+            {paymentMethod === 'COD' && (
+              <div className="absolute top-0 right-0 p-1">
+                <div className="bg-[#8B3D28] text-white rounded-bl-lg p-0.5">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </div>
+              </div>
+            )}
+          </button>
+        </div>
+      </div>
 
       {/* Bill details */}
       <div className="px-4 md:px-6 lg:px-8 py-2.5 md:py-3 border-b border-neutral-200">
@@ -1193,17 +1339,17 @@ export default function Checkout() {
           )}
 
           {/* Delivery Shift */}
-          {deliveryShift && (
+          {selectedSlot && (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
                   <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
-                <span className="text-xs text-neutral-700">Delivery Shift</span>
+                <span className="text-xs text-neutral-700">Delivery Slot</span>
               </div>
               <span className="text-xs font-bold text-[#8B3D28] font-poppins uppercase">
-                {deliveryShift === 'morning' ? 'Morning (5-9 AM)' : 'Evening (5-9 PM)'}
+                {selectedSlot.name}
               </span>
             </div>
           )}

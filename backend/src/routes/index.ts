@@ -45,6 +45,7 @@ import {
   cancelOrder,
   updateOrderNotes,
 } from "../modules/customer/controllers/customerOrderController";
+import { getActiveDeliverySlotsForCustomer } from "../modules/admin/controllers/adminDeliverySlotController";
 
 const router = Router();
 
@@ -108,6 +109,7 @@ router.post("/customer/orders/:id/cancel", authenticate, requireUserType("Custom
 router.patch("/customer/orders/:id/notes", authenticate, requireUserType("Customer"), updateOrderNotes);
 
 router.use("/customer/coupons", customerCouponRoutes);
+router.get("/customer/delivery-slots", getActiveDeliverySlotsForCustomer);
 router.use("/customer/addresses", customerAddressRoutes);
 router.use("/customer/home", customerHomeRoutes);
 router.use("/customer/cart", customerCartRoutes);

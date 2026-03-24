@@ -74,6 +74,9 @@ import * as lowestPricesController from "../modules/admin/controllers/adminLowes
 // PromoStrip Controllers
 import * as promoStripController from "../modules/admin/controllers/adminPromoStripController";
 
+// Delivery Slot Controllers
+import * as deliverySlotController from "../modules/admin/controllers/adminDeliverySlotController";
+
 const router = Router();
 
 // All routes require admin authentication
@@ -353,5 +356,12 @@ router.get("/promo-strips/:id", promoStripController.getPromoStripById);
 router.post("/promo-strips", promoStripController.createPromoStrip);
 router.put("/promo-strips/:id", promoStripController.updatePromoStrip);
 router.delete("/promo-strips/:id", promoStripController.deletePromoStrip);
+
+// ==================== Delivery Slot Routes ====================
+router.get("/delivery-slots", deliverySlotController.getAllDeliverySlots);
+router.post("/delivery-slots", deliverySlotController.createDeliverySlot);
+router.put("/delivery-slots/:id", deliverySlotController.updateDeliverySlot);
+router.patch("/delivery-slots/:id/status", deliverySlotController.toggleDeliverySlotStatus);
+router.delete("/delivery-slots/:id", deliverySlotController.deleteDeliverySlot);
 
 export default router;

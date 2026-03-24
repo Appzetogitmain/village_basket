@@ -7,8 +7,10 @@ export interface IOrder extends Document {
   orderDate: Date;
   orderType: "INSTANT";
   deliverySlot?: {
+    slotId?: string;
     date: Date;
     timeRange: string;
+    label?: string;
   };
 
   // Customer Info
@@ -122,8 +124,10 @@ const OrderSchema = new Schema<IOrder>(
       default: "INSTANT",
     },
     deliverySlot: {
+      slotId: { type: String, trim: true },
       date: Date,
-      timeRange: String,
+      timeRange: { type: String, trim: true },
+      label: { type: String, trim: true },
     },
 
     // Customer Info

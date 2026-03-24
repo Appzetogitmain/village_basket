@@ -83,7 +83,19 @@ const Icons = {
             <line x1="12" y1="9" x2="12" y2="13" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
-    )
+    ),
+    CreditCard: ({ size = 24, className = "" }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+            <line x1="1" y1="10" x2="23" y2="10" />
+        </svg>
+    ),
+    ShieldCheck: ({ size = 24, className = "" }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <path d="M9 12l2 2 4-4" />
+        </svg>
+    ),
 };
 
 type DeliveryOrderStatus = 'Pending' | 'Ready for pickup' | 'Picked up' | 'Out for Delivery' | 'Delivered' | 'Cancelled' | 'Returned';
@@ -794,7 +806,7 @@ export default function DeliveryOrderDetail() {
                 </div>
 
                 {/* Delivery Earning Card - Show only if delivered or has earning */}
-                {(order.status === 'Delivered' || (order.deliveryEarning && order.deliveryEarning > 0)) && (
+                {(order.status === 'Delivered' || (order.deliveryEarning ? order.deliveryEarning > 0 : false)) && (
                     <div className="bg-gradient-to-br from-[#4A7C59] to-[#3D664A] organic-radius p-4 shadow-lg shadow-[#4A7C59]/20 text-white relative overflow-hidden group">
                         <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
                         <div className="flex justify-between items-center relative z-10">
@@ -810,6 +822,53 @@ export default function DeliveryOrderDetail() {
                         </div>
                     </div>
                 )}
+
+                {/* Payment Information Card */}
+                <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm overflow-hidden relative">
+                    <div className="flex items-baseline justify-between mb-4">
+                        <h3 className="text-village-umber text-[10px] font-black uppercase tracking-[0.2em] opacity-80 flex items-center gap-2">
+                            <Icons.CreditCard size={14} className="text-[#8B3D28]/40" />
+                            Payment Method
+                        </h3>
+                        <div className="h-[2px] w-12 bg-village-umber/5 rounded-full"></div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                                order.paymentMethod === 'COD' 
+                                    ? 'bg-amber-50 text-amber-600' 
+                                    : 'bg-green-50 text-green-600'
+                            }`}>
+                                {order.paymentMethod === 'COD' ? <Icons.Truck size={18} /> : <Icons.ShieldCheck size={18} />}
+                            </div>
+                            <div className="flex flex-col">
+                                <p className="text-[11px] font-black text-village-umber uppercase tracking-tight leading-none">
+                                    {order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online / Paid'}
+                                </p>
+                                <span className={`text-[8px] font-bold uppercase tracking-widest mt-1.5 ${
+                                    order.paymentStatus === 'Paid' ? 'text-green-500' : 'text-amber-500'
+                                }`}>
+                                    {order.paymentStatus === 'Paid' ? 'Verified Paid' : 'Collect from Customer'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="text-right">
+                            <p className="text-village-umber text-sm font-black">₹{order.totalAmount?.toFixed(2) || '0.00'}</p>
+                            <p className="text-[7px] font-bold text-stone-400 uppercase tracking-widest">Total Bill</p>
+                        </div>
+                    </div>
+
+                    {order.paymentMethod === 'COD' && order.status !== 'Delivered' && (
+                        <div className="mt-4 p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl flex items-center gap-2">
+                             <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
+                             <p className="text-[9px] font-black text-amber-700 uppercase tracking-tighter">
+                                Action Required: Collect Cash before Delivery
+                             </p>
+                        </div>
+                    )}
+                </div>
 
                 {/* Order Items */}
                 <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm">

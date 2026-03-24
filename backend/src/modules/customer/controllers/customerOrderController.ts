@@ -26,7 +26,7 @@ export const createOrder = async (req: Request, res: Response) => {
             session = null;
         }
 
-        const { items, address, paymentMethod, fees } = req.body;
+        const { items, address, paymentMethod, fees, deliverySlot } = req.body;
         const userId = req.user!.userId;
 
         // Log incoming request for debugging
@@ -137,6 +137,15 @@ export const createOrder = async (req: Request, res: Response) => {
                 latitude: deliveryLat,
                 longitude: deliveryLng,
             },
+            // Save selected delivery slot if provided
+            ...(deliverySlot && {
+                deliverySlot: {
+                    slotId: deliverySlot.slotId || undefined,
+                    date: deliverySlot.date ? new Date(deliverySlot.date) : new Date(),
+                    timeRange: deliverySlot.timeRange || deliverySlot.label || '',
+                    label: deliverySlot.label || deliverySlot.timeRange || '',
+                }
+            }),
             paymentMethod: paymentMethod || 'COD',
             paymentStatus: 'Pending',
             status: 'Received',
