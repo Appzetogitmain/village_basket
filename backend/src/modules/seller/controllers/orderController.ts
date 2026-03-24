@@ -6,6 +6,7 @@ import Seller from "../../../models/Seller";
 import WalletTransaction from "../../../models/WalletTransaction";
 import { notifyDeliveryBoysOfNewOrder } from "../../../services/orderNotificationService";
 import { Server as SocketIOServer } from "socket.io";
+import Delivery from "../../../models/Delivery";
 
 /**
  * Get seller's orders with filters, sorting, and pagination
@@ -207,7 +208,7 @@ export const getOrderById = asyncHandler(
       invoiceNumber: order.invoiceNumber || order.orderNumber || 'N/A',
       orderDate: order.orderDate ? order.orderDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
       deliveryDate: order.estimatedDeliveryDate ? order.estimatedDeliveryDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-      timeSlot: order.timeSlot || 'N/A',
+      timeSlot: order.deliverySlot?.label || order.timeSlot || 'N/A',
       status: order.status === 'On the way' ? 'Out For Delivery' : order.status,
       customerName: (order.customer as any)?.name || order.customerName || '',
       customerEmail: (order.customer as any)?.email || order.customerEmail || '',
@@ -309,24 +310,29 @@ export const updateOrderStatus = asyncHandler(
     if (status === 'Delivered' && previousStatus !== 'Delivered') {
       const seller = await Seller.findById(sellerId);
       if (seller) {
-        // Calculate net earning (sale amount - commission)
-        // Commission is stored in seller model
+        // Calculate only this seller's items total in this order
+        const sellerItems = await OrderItem.find({ order: id, seller: sellerId });
+        const sellerSubtotal = sellerItems.reduce((acc, item) => acc + (item.total || 0), 0);
+
+        // Calculate net earning (seller items total - commission)
         const commissionRate = (seller.commission || 0) / 100;
-        const commissionAmount = order.grandTotal * commissionRate;
-        const netEarning = order.grandTotal - commissionAmount;
+        const commissionAmount = sellerSubtotal * commissionRate;
+        const netEarning = sellerSubtotal - commissionAmount;
 
-        seller.balance = (seller.balance || 0) + netEarning;
-        await seller.save();
+        if (netEarning > 0) {
+          seller.balance = (seller.balance || 0) + netEarning;
+          await seller.save();
 
-        // Log transaction
-        await WalletTransaction.create({
-          sellerId,
-          amount: netEarning,
-          type: 'Credit',
-          description: `Earnings from Order #${order.orderId}`,
-          reference: `ORD-${order.orderId}-${Date.now()}`,
-          status: 'Completed'
-        });
+          // Log transaction
+          await WalletTransaction.create({
+            sellerId,
+            amount: netEarning,
+            type: 'Credit',
+            description: `Earnings from Order #${order.orderNumber} (Item Total: ₹${sellerSubtotal})`,
+            reference: `ORD-${order.orderNumber}-${sellerId}-${Date.now()}`,
+            status: 'Completed'
+          });
+        }
       }
     }
 
@@ -361,10 +367,7 @@ export const updateOrderStatus = asyncHandler(
 export const getDeliveryBoys = asyncHandler(
   async (req: Request, res: Response) => {
     // Only fetch delivery boys who are active
-    const { Delivery } = await import("../../../models/Delivery"); // Just ensuring import if not already at top
-    // Alternatively require standard import at the top
-    const dbModel = require("../../../models/Delivery").default;
-    const deliveryBoys = await dbModel.find({ status: "Active" }).select("name mobile email isOnline location");
+    const deliveryBoys = await Delivery.find({ status: "Active" }).select("name mobile email isOnline location");
 
     return res.status(200).json({
       success: true,

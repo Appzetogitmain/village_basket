@@ -10,6 +10,7 @@ import ourStoryImg from '@assets/landing_page/our_story.png';
 import farmImg1 from '@assets/landing_page/farm_image_1.png';
 import farmImg2 from '@assets/landing_page/farm_image_2.png';
 import farmImg3 from '@assets/landing_page/farm_image_3.png';
+import heroProduceImg from '@assets/landing_page/hero_produce.png';
 
 /* ─── Reveal Component ───────────────────────────── */
 function Reveal({ children, width = "fit-content", delay = 0 }: { children: React.ReactNode, width?: "fit-content" | "100%", delay?: number }) {
@@ -221,7 +222,7 @@ export default function LandingPage() {
   const navLinks = [
     { label: 'Categories', href: '#categories' },
     { label: 'Why Us', href: '#why-us' },
-    { label: 'Features', href: '#app-features' },
+    { label: 'App', href: '#download-app' },
     { label: 'Our Story', href: '#our-story' },
     { label: 'Contact', href: '#contact' }
   ];
@@ -330,28 +331,55 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Hero Visual */}
+          {/* Hero Visual - Premium Focus */}
           <div className="relative hidden lg:flex items-center justify-center">
-            <div className="w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-[#8B3D28]/8 flex items-center justify-center relative">
-              <div className="w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-[#8B3D28]/12 flex items-center justify-center">
-                <span className="text-[140px]">🧺</span>
-              </div>
-              {/* Floating badges - Simplified animations */}
-              <div className="absolute top-8 -right-4 bg-white rounded-2xl shadow-md px-4 py-3 flex items-center gap-2 z-10 border border-[#4A7C59]/10">
-                <span className="text-xl">🌿</span>
-                <div>
-                  <p className="text-[9px] font-black text-[#3E2723] uppercase tracking-widest">100% Organic</p>
-                  <p className="text-[11px] font-bold text-[#4A7C59]">Farm Fresh</p>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="relative z-10"
+            >
+              {/* Image Frame */}
+              <div className="w-[440px] h-[440px] bg-white p-4 rounded-[4.5rem] shadow-[0_30px_80px_rgba(139,61,40,0.12)] relative group">
+                <div className="w-full h-full rounded-[3.5rem] overflow-hidden bg-stone-50">
+                  <motion.img
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.8 }}
+                    src={heroProduceImg}
+                    alt="Fresh Produce"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
+
+                {/* Elegant Floating Badges */}
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -top-6 -right-6 bg-[#4A7C59] text-white rounded-[2rem] shadow-xl px-6 py-4 flex items-center gap-3 z-20 border-4 border-white"
+                >
+                  <span className="text-2xl">🌿</span>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest leading-none mb-1 opacity-80">Strictly</p>
+                    <p className="text-sm font-bold">Organic</p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  animate={{ y: [0, 10, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  className="absolute -bottom-6 -left-6 bg-white text-[#8B3D28] rounded-[2rem] shadow-xl px-6 py-4 flex items-center gap-3 z-20 border border-[#8B3D28]/10"
+                >
+                  <span className="text-2xl">🚚</span>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-[#3E2723]/40 leading-none mb-1">Morning & Evening</p>
+                    <p className="text-sm font-black text-[#3E2723]">Daily Shifts</p>
+                  </div>
+                </motion.div>
+
+                {/* Soft backdrop glow */}
+                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#8B3D28]/5 rounded-full blur-3xl"></div>
               </div>
-              <div className="absolute bottom-12 -left-4 bg-white rounded-2xl shadow-md px-4 py-3 flex items-center gap-2 z-10 border border-[#8B3D28]/10">
-                <span className="text-xl">🚚</span>
-                <div>
-                  <p className="text-[9px] font-black text-[#3E2723] uppercase tracking-widest">On-time</p>
-                  <p className="text-[11px] font-bold text-[#8B3D28]">Daily Shifts</p>
-                </div>
-              </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -365,10 +393,10 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
             {[
-              { title: 'Fresh Veggies', icon: '🌽', img: veggiesImg },
-              { title: 'Dairy & Staples', icon: '🥛', img: dairyImg },
-              { title: 'Pure Spices', icon: '🌶️', img: spicesImg },
-              { title: 'Organic Fruits', icon: '🍎', img: fruitsImg },
+              { title: 'Fresh Veggies', img: veggiesImg, icon: '' },
+              { title: 'Dairy & Staples', img: dairyImg, icon: '' },
+              { title: 'Pure Spices', img: spicesImg, icon: '' },
+              { title: 'Organic Fruits', img: fruitsImg, icon: '' },
             ].map((cat) => (
               <div key={cat.title} className="group cursor-pointer">
                 <div className="relative overflow-hidden rounded-[2rem] mb-4 aspect-square shadow-sm">
@@ -406,6 +434,93 @@ export default function LandingPage() {
               <p className="text-[#3E2723]/60 leading-relaxed text-sm">{item.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── 4. Download Our App ──────────────────────────── (Repositioned & Refined) */}
+      <section id="download-app" className="py-24 px-4 sm:px-6 relative overflow-hidden bg-white">
+        <div className="max-w-7xl mx-auto bg-[#FAF7F2] rounded-[4rem] p-8 md:p-20 relative shadow-[0_10px_60px_rgba(139,61,40,0.06)] overflow-hidden border border-[#8B3D28]/5 group">
+          {/* Decorative floating shapes */}
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#8B3D28]/3 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-14">
+            <div className="flex-1 text-center lg:text-left">
+              <span className="inline-block bg-[#8B3D28]/10 text-[#8B3D28] px-5 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.2em] mb-8">Better on Mobile</span>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#3E2723] mb-8 leading-[1.05] tracking-tight">
+                Pure Freshness, <br />
+                <span className="text-[#8B3D28]">One Tap Away.</span>
+              </h2>
+              <p className="text-[#3E2723]/60 text-lg mb-12 max-w-xl leading-relaxed font-medium">
+                Download the VillageBasket app for a seamless farm-to-table journey. Get real-time harvest alerts, shift delivery tracking, and exclusive rewards.
+              </p>
+
+              {/* Store Buttons - Improved with White Theme */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-12">
+                <a href="#" className="bg-white border border-[#3E2723]/10 px-8 py-3.5 rounded-2xl flex items-center gap-4 hover:shadow-lg hover:border-[#3E2723]/20 transition-all active:scale-95 group/btn">
+                  <div className="text-[#3E2723]">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.5 12c0 2.2-1.4 4.1-3.3 4.9.4.5.7 1.1.7 1.8 0 1.2-.8 2.2-1.9 2.2h-2c-1.1 0-1.9-1-1.9-2.2 0-.7.3-1.3.7-1.8-1.9-.8-3.3-2.7-3.3-4.9 0-2.9 2.4-5.2 5.3-5.2 2.9 0 5.3 2.3 5.3 5.2zM12 2.5c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5z" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] text-[#3E2723]/40 font-black uppercase tracking-widest leading-none mb-1">Download on the</p>
+                    <p className="text-lg text-[#3E2723] font-black leading-none">App Store</p>
+                  </div>
+                </a>
+                <a href="#" className="bg-white border border-[#3E2723]/10 px-8 py-3.5 rounded-2xl flex items-center gap-4 hover:shadow-lg hover:border-[#3E2723]/20 transition-all active:scale-95 group/btn">
+                  <div className="text-[#4A7C59]">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3.5 3h17c.8 0 1.5.7 1.5 1.5v15c0 .8-.7 1.5-1.5 1.5h-17c-.8 0-1.5-.7-1.5-1.5v-15c0-.8.7-1.5 1.5-1.5zm11.2 5.5l-4.7-2.7v5.4l4.7-2.7zm-4.7 6.3l4.7-2.7-4.7-2.7v5.4z" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] text-[#3E2723]/40 font-black uppercase tracking-widest leading-none mb-1">Get it on</p>
+                    <p className="text-lg text-[#3E2723] font-black leading-none">Google Play</p>
+                  </div>
+                </a>
+              </div>
+
+              {/* Trust Badge */}
+              <div className="flex items-center gap-3 py-4 border-t border-[#3E2723]/5 inline-flex">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-amber-100 flex items-center justify-center text-[10px] font-black shadow-sm">👤</div>
+                  ))}
+                </div>
+                <p className="text-xs text-[#3E2723]/30 font-bold uppercase tracking-widest leading-none">Join 50,000+ village partners</p>
+              </div>
+            </div>
+
+            {/* Visual Right - Refined with lighter frame */}
+            <div className="flex-1 w-full lg:w-auto flex justify-center lg:justify-end relative">
+              <div className="relative w-full max-w-[360px]">
+                {/* QR Code Optimized */}
+                <div className="absolute top-10 -left-6 transform -translate-x-1/2 hidden md:block bg-white p-5 rounded-3xl shadow-xl z-20 border border-[#8B3D28]/5 animate-bounce" style={{ animationDuration: '5s' }}>
+                  <div className="w-20 h-20 bg-stone-50 rounded-xl grid grid-cols-4 grid-rows-4 gap-1 p-2">
+                    {[...Array(16)].map((_, i) => (
+                      <div key={i} className={`rounded-sm ${(i * 17) % 4 === 0 ? 'bg-[#3E2723]' : 'bg-[#FAF7F2]'}`}></div>
+                    ))}
+                  </div>
+                  <p className="text-[8px] font-black text-center mt-3 text-[#3E2723]/30 uppercase tracking-[0.2em]">Scan to Get App</p>
+                </div>
+                {/* App Frame - Modern Cream/White style */}
+                <div className="w-[280px] h-[560px] bg-white rounded-[3.5rem] p-3 shadow-[0_30px_70px_rgba(139,61,40,0.15)] border-4 border-[#8B3D28]/10 mx-auto rotate-2 group-hover:rotate-0 transition-transform duration-1000">
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-[#FAF7F2] rounded-b-2xl z-20"></div>
+                  <div className="w-full h-full rounded-[2.8rem] overflow-hidden bg-[#FAF7F2] relative">
+                    <img src={veggiesImg} alt="App" className="w-full h-full object-cover opacity-90" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#3E2723]/90 via-[#3E2723]/20 to-transparent"></div>
+                    <div className="absolute bottom-10 left-6 right-6 text-white">
+                      <p className="text-[9px] font-black text-[#E5A93D] uppercase tracking-widest mb-1 opacity-80">Farmer Connect</p>
+                      <h4 className="text-xl font-black mb-3 leading-tight tracking-tight">Village Basket <br /> Harvest Tracker.</h4>
+                      <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+                        <div className="w-3/4 h-full bg-[#E5A93D] shadow-[0_0_10px_#E5A93D]"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -568,7 +683,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── 10. Footer ──────────────────────────────────── */}
+
+      {/* ── 11. Footer ──────────────────────────────────── */}
       <footer className="bg-[#3E2723] text-white py-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
