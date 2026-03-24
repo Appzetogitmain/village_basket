@@ -1,46 +1,51 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IDeliverySlot extends Document {
-  date: Date; // The specific date for this slot (e.g., 2023-10-27)
-  startTime: string; // "07:00 AM"
-  endTime: string; // "09:00 AM"
-  maxCapacity: number;
-  bookedCount: number;
+  name: string;          // e.g., "Morning Slot", "Evening Slot"
+  startTime: string;     // "07:00" (24h)
+  endTime: string;       // "10:00" (24h)
+  label: string;         // Display string e.g., "7 AM - 10 AM"
+  maxOrders: number;     // Max orders this slot can handle per day
   isActive: boolean;
+  sortOrder: number;     // For display ordering
   createdAt: Date;
   updatedAt: Date;
 }
 
 const DeliverySlotSchema = new Schema<IDeliverySlot>(
   {
-    date: {
-      type: Date,
-      required: true,
-      index: true,
+    name: {
+      type: String,
+      required: [true, "Slot name is required"],
+      trim: true,
     },
     startTime: {
       type: String,
-      required: true,
+      required: [true, "Start time is required"],
       trim: true,
     },
     endTime: {
       type: String,
-      required: true,
+      required: [true, "End time is required"],
       trim: true,
     },
-    maxCapacity: {
-      type: Number,
-      required: true,
-      default: 20,
+    label: {
+      type: String,
+      required: [true, "Label is required"],
+      trim: true,
     },
-    bookedCount: {
+    maxOrders: {
       type: Number,
-      required: true,
-      default: 0,
+      default: 50,
+      min: 1,
     },
     isActive: {
       type: Boolean,
       default: true,
+    },
+    sortOrder: {
+      type: Number,
+      default: 0,
     },
   },
   {
@@ -48,9 +53,10 @@ const DeliverySlotSchema = new Schema<IDeliverySlot>(
   }
 );
 
-// Compound index to ensure unique slots per day
-DeliverySlotSchema.index({ date: 1, startTime: 1, endTime: 1 }, { unique: true });
+DeliverySlotSchema.index({ isActive: 1, sortOrder: 1 });
 
-const DeliverySlot = mongoose.models.DeliverySlot || mongoose.model<IDeliverySlot>("DeliverySlot", DeliverySlotSchema);
+const DeliverySlot =
+  mongoose.models.DeliverySlot ||
+  mongoose.model<IDeliverySlot>("DeliverySlot", DeliverySlotSchema);
 
 export default DeliverySlot;

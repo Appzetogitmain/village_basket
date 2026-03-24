@@ -156,6 +156,7 @@ const AdminBillingSettings = lazy(() => import("./modules/admin/pages/AdminBilli
 const AdminRewards = lazy(() => import("./modules/admin/pages/AdminRewards"));
 const AdminRewardOrders = lazy(() => import("./modules/admin/pages/AdminRewardOrders"));
 const UserRewards = lazy(() => import("./modules/user/Rewards"));
+const AdminDeliverySlots = lazy(() => import("./modules/admin/pages/AdminDeliverySlots"));
 
 function App() {
   // Initialize push notifications on app load
@@ -381,6 +382,7 @@ function App() {
                                         <Route path="billing-settings" element={<AdminBillingSettings />} />
                                         <Route path="rewards" element={<AdminRewards />} />
                                         <Route path="reward-orders" element={<AdminRewardOrders />} />
+                                        <Route path="delivery-slots" element={<AdminDeliverySlots />} />
                                       </Routes>
                                     </Suspense>
                                   </AdminLayout>

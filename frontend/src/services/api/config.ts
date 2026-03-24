@@ -49,9 +49,26 @@ const getRole = (url?: string): string => {
   const currentPath = window.location.pathname;
   const targetUrl = url || "";
 
-  if (currentPath.includes("/admin") || targetUrl.includes("/admin/")) return "admin";
-  if (currentPath.includes("/seller") || targetUrl.includes("/seller/") || targetUrl.includes("/sellers")) return "seller";
-  if (currentPath.includes("/delivery") || targetUrl.includes("/delivery/")) return "delivery";
+  // The order of these checks matters, but strict checks should be used to avoid
+  // partial matches (e.g. "/delivery/location/sellers-in-radius" catching on "/sellers")
+
+  // Check currentPath primarily for the app context
+  if (currentPath.startsWith("/admin")) return "admin";
+  if (currentPath.startsWith("/seller")) return "seller";
+  if (currentPath.startsWith("/delivery")) return "delivery";
+
+  // Fallback to targetUrl matching carefully
+  if (targetUrl.startsWith("/admin/") || targetUrl.match(/^\/api\/v\d+\/admin/)) return "admin";
+  
+  if (
+      targetUrl.startsWith("/seller/") || 
+      targetUrl.match(/^\/api\/v\d+\/seller/) ||
+      // Need a stricter check for /sellers endpoint, ensure it's at the boundary
+      targetUrl.match(/^\/sellers\b/) || 
+      targetUrl.match(/^\/api\/v\d+\/sellers\b/)
+  ) return "seller";
+
+  if (targetUrl.startsWith("/delivery/") || targetUrl.match(/^\/api\/v\d+\/delivery/)) return "delivery";
 
   return "customer";
 };

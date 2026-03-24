@@ -280,15 +280,13 @@ export const updateOrderStatus = asyncHandler(
     order.status = status;
     await order.save();
 
-    // Trigger delivery notification if seller accepts the order
+    // Previously: Trigger delivery notification if seller accepts the order. 
+    // Now Disabled because of the new client requirement: Sellers will MANUALLY assign the delivery boy.
+    /* 
     if (status === 'Accepted' && previousStatus !== 'Accepted') {
       try {
         const io: SocketIOServer = (req.app.get("io") as SocketIOServer);
         if (io) {
-          // Need to fetch full order with details for the notification service
-          // Using lean() to get a plain JS object which is what the service expects mostly,
-          // but checking the service implementation, it uses .items mainly for seller location.
-          // We should ensure the passed order object has populated items with sellers.
           const fullOrder = await Order.findById(order._id)
             .populate({
               path: 'items',
@@ -303,9 +301,9 @@ export const updateOrderStatus = asyncHandler(
         }
       } catch (notifyError) {
         console.error('Error notifying delivery boys on seller acceptance:', notifyError);
-        // Don't fail the request, just log
       }
     }
+    */
 
     // If order is delivered, credit seller's balance
     if (status === 'Delivered' && previousStatus !== 'Delivered') {
@@ -352,6 +350,99 @@ export const updateOrderStatus = asyncHandler(
       data: {
         id: order._id,
         status: order.status,
+      },
+    });
+  }
+);
+
+/**
+ * Get all available delivery boys for assignment
+ */
+export const getDeliveryBoys = asyncHandler(
+  async (req: Request, res: Response) => {
+    // Only fetch delivery boys who are active
+    const { Delivery } = await import("../../../models/Delivery"); // Just ensuring import if not already at top
+    // Alternatively require standard import at the top
+    const dbModel = require("../../../models/Delivery").default;
+    const deliveryBoys = await dbModel.find({ status: "Active" }).select("name mobile email isOnline location");
+
+    return res.status(200).json({
+      success: true,
+      message: "Delivery boys fetched successfully",
+      data: deliveryBoys,
+    });
+  }
+);
+
+/**
+ * Manually assign a delivery boy by the seller
+ */
+export const assignDeliveryBoy = asyncHandler(
+  async (req: Request, res: Response) => {
+    const sellerId = (req as any).user.userId;
+    const { id: orderId } = req.params;
+    const { deliveryBoyId } = req.body;
+
+    if (!deliveryBoyId) {
+      return res.status(400).json({ success: false, message: "Delivery Boy ID is required" });
+    }
+
+    // Check if this seller has items in this order
+    const sellerItems = await OrderItem.findOne({ order: orderId, seller: sellerId });
+    if (!sellerItems) {
+      return res.status(404).json({ success: false, message: "Order not found or you are not authorized" });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // Actually assign
+    order.deliveryBoy = deliveryBoyId;
+    order.deliveryBoyStatus = "Assigned";
+    order.assignedAt = new Date();
+
+    // Typically assigned implies it is processed
+    if (order.status === 'Pending' || order.status === 'Received' || order.status === 'Accepted') {
+      order.status = 'Processed';
+    }
+
+    await order.save();
+
+    // Push notification to delivery boy and customer
+    try {
+      const io: SocketIOServer = (req.app.get("io") as SocketIOServer);
+      if (io) {
+          // Instead of broadcasting to all, alert just this one
+          io.to(`delivery-${deliveryBoyId}`).emit('order-assigned-manually', {
+              orderId,
+              message: `You have been manually assigned to order #${order.orderNumber}`
+          });
+      }
+      
+      const { sendTaskAvailableNotification } = await import("../../../services/notificationService");
+      await sendTaskAvailableNotification(deliveryBoyId, orderId, order.orderNumber);
+
+      const { sendOrderStatusNotification } = await import("../../../services/notificationService");
+      await sendOrderStatusNotification(
+        order.orderNumber,
+        order._id.toString(),
+        order.customer.toString(),
+        order.status,
+        order.total
+      );
+    } catch (err) {
+      console.error("Error notifying assign:", err);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Delivery partner assigned successfully",
+      data: {
+        id: order._id,
+        status: order.status,
+        deliveryBoy: deliveryBoyId,
       },
     });
   }

@@ -121,6 +121,15 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
           platformFee: order.fees?.platformFee || 0,
         },
         deliveryShift: order.deliveryShift,
+        // Pass the new delivery slot if selected
+        ...(order.deliverySlot && {
+          deliverySlot: {
+            slotId: order.deliverySlot.slotId,
+            label: order.deliverySlot.label,
+            timeRange: order.deliverySlot.timeRange,
+            date: new Date().toISOString(),
+          }
+        }),
       };
 
       const response = await createOrder(payload);

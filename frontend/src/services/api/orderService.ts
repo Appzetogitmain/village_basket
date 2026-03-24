@@ -111,3 +111,19 @@ export const updateOrderStatus = async (id: string, data: UpdateOrderStatusData)
   return response.data;
 };
 
+/**
+ * Get available delivery boys
+ */
+export const getAvailableDeliveryBoys = async (): Promise<ApiResponse<{ _id: string; name: string; mobile: string; isOnline: boolean }[]>> => {
+  const response = await api.get<ApiResponse<{ _id: string; name: string; mobile: string; isOnline: boolean }[]>>('/orders/delivery-boys');
+  return response.data;
+};
+
+/**
+ * Assign a delivery boy to an order
+ */
+export const assignDeliveryBoy = async (orderId: string, deliveryBoyId: string): Promise<ApiResponse<{ id: string; status: string; deliveryBoy: string }>> => {
+  const response = await api.post<ApiResponse<{ id: string; status: string; deliveryBoy: string }>>(`/orders/${orderId}/assign-delivery`, { deliveryBoyId });
+  return response.data;
+};
+

@@ -8,6 +8,8 @@ import GoogleMapsTracking from "../../components/GoogleMapsTracking";
 import { useDeliveryTracking } from "../../hooks/useDeliveryTracking";
 import DeliveryPartnerCard from "../../components/DeliveryPartnerCard";
 import { cancelOrder, updateOrderNotes, getSellerLocationsForOrder, refreshDeliveryOtp } from "../../services/api/customerOrderService";
+import { useAuth } from "../../context/AuthContext";
+import RazorpayCheckout from "../../components/RazorpayCheckout";
 
 // Icon Components
 const ArrowLeftIcon = ({ className }: { className?: string }) => (
@@ -444,10 +446,12 @@ export default function OrderDetail() {
   const [searchParams] = useSearchParams();
   const confirmed = searchParams.get("confirmed") === "true";
   const { getOrderById, fetchOrderById, loading: contextLoading } = useOrders();
+  const { user } = useAuth();
   const [order, setOrder] = useState<any>(id ? getOrderById(id) : undefined);
   const [loading, setLoading] = useState(!order);
   const navigate = useNavigate();
   const [showConfirmation, setShowConfirmation] = useState(confirmed);
+  const [showRazorpay, setShowRazorpay] = useState(false);
   const [orderStatus, setOrderStatus] = useState<OrderStatus>(
     order?.status || "Received"
   );
@@ -885,7 +889,7 @@ export default function OrderDetail() {
           }
           destinationName={
             order?.status === 'Picked up' || order?.status === 'Out for Delivery'
-              ? order?.deliveryAddress?.address?.split(',')[0] || order?.address?.split(',')[0] || "Delivery Address"
+              ? (order?.deliveryAddress?.address?.split(',')[0] || order?.address?.address?.split(',')[0] || "Delivery Address")
               : sellerLocations.length > 0
                 ? "Sellers & Delivery Address"
                 : "Delivery Address"
@@ -925,26 +929,36 @@ export default function OrderDetail() {
 
       {/* Scrollable Content - High Density */}
       <div className="px-3 py-3 space-y-3 pb-24">
-        {/* Payment Card */}
-        <motion.div
-          className="village-card paper-texture organic-radius p-3 bg-white shadow-sm border-none"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}>
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[11px] font-black text-village-umber uppercase tracking-tight mb-0.5">
-                Payment Pending: ₹{order.totalAmount?.toFixed(0) || "0"}
-              </p>
-              <p className="text-[9px] text-neutral-400 font-bold leading-tight italic">
-                Pay now or at delivery using Cash/UPI
-              </p>
+        {/* Payment Card - Only show if not Paid and order is not Delivered/Cancelled */}
+        {order.paymentStatus !== "Paid" && 
+         !['Delivered', 'Cancelled', 'Returned'].includes(orderStatus) && (
+          <motion.div
+            className="village-card paper-texture organic-radius p-3 bg-white shadow-sm border-none"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[11px] font-black text-village-umber uppercase tracking-tight mb-0.5">
+                  {order.paymentMethod === 'COD' ? 'Pay at Delivery' : 'Payment Pending'}: ₹{order.totalAmount?.toFixed(0) || "0"}
+                </p>
+                <p className="text-[9px] text-neutral-400 font-bold leading-tight italic">
+                  {order.paymentMethod === 'COD' 
+                    ? 'Handover cash or show UPI scan to partner'
+                    : 'Pay now for a contactless delivery experience'}
+                </p>
+              </div>
+              {order.paymentMethod !== 'COD' && (
+                <Button 
+                  onClick={() => setShowRazorpay(true)}
+                  className="bg-[#4A7C59] hover:bg-[#3D664A] text-white rounded-lg h-7 px-4 text-[9px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all flex-shrink-0"
+                >
+                  Pay Now
+                </Button>
+              )}
             </div>
-            <Button className="bg-[#4A7C59] hover:bg-[#3D664A] text-white rounded-lg h-7 px-4 text-[9px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all flex-shrink-0">
-              Pay Now
-            </Button>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
 
         {/* Promo Carousel */}
         <PromoCarousel />
@@ -1321,7 +1335,39 @@ export default function OrderDetail() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <RazorpayCheckoutWrapper
+        show={showRazorpay}
+        order={order}
+        user={user}
+        onHide={() => setShowRazorpay(false)}
+        onRefresh={handleRefresh}
+      />
     </div>
   );
 }
+
+const RazorpayCheckoutWrapper = ({ order, user, show, onHide, onRefresh }: any) => {
+  if (!show || !order || !user) return null;
+  
+  return (
+    <RazorpayCheckout
+      orderId={order.id}
+      amount={order.totalAmount}
+      customerDetails={{
+        name: user.name || 'Customer',
+        email: user.email || '',
+        phone: user.phone || '',
+      }}
+      onSuccess={(paymentId) => {
+        onHide();
+        onRefresh();
+      }}
+      onFailure={(error) => {
+        onHide();
+        alert(error || "Payment failed");
+      }}
+    />
+  );
+};
 

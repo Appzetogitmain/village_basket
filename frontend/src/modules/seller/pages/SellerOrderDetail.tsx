@@ -1,6 +1,6 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getOrderById, updateOrderStatus, OrderDetail } from '../../../services/api/orderService';
+import { getOrderById, updateOrderStatus, OrderDetail, getAvailableDeliveryBoys, assignDeliveryBoy } from '../../../services/api/orderService';
 import jsPDF from 'jspdf';
 
 export default function SellerOrderDetail() {
@@ -11,6 +11,11 @@ export default function SellerOrderDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [orderStatus, setOrderStatus] = useState<string>('Out For Delivery');
+  
+  // Delivery Boy states
+  const [availableDeliveryBoys, setAvailableDeliveryBoys] = useState<{ _id: string; name: string; mobile: string; isOnline: boolean }[]>([]);
+  const [selectedDeliveryBoy, setSelectedDeliveryBoy] = useState<string>('');
+  const [assigningLoading, setAssigningLoading] = useState(false);
 
   // Fetch order detail from API
   useEffect(() => {
@@ -34,7 +39,17 @@ export default function SellerOrderDetail() {
       }
     };
 
+    const fetchDeliveryBoys = async () => {
+      try {
+        const res = await getAvailableDeliveryBoys();
+        if (res.success) setAvailableDeliveryBoys(res.data);
+      } catch (err) {
+        console.error("Failed to fetch delivery boys", err);
+      }
+    };
+
     fetchOrderDetail();
+    fetchDeliveryBoys();
   }, [id]);
 
   // Handle status update
@@ -51,6 +66,37 @@ export default function SellerOrderDetail() {
       }
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to update order status');
+    }
+  };
+
+  const handleAssignDeliveryBoy = async () => {
+    if (!orderDetail || !selectedDeliveryBoy) {
+      alert("Please select a delivery partner first");
+      return;
+    }
+    
+    setAssigningLoading(true);
+    try {
+      const response = await assignDeliveryBoy(orderDetail.id, selectedDeliveryBoy);
+      if (response.success) {
+        alert("Delivery partner manually assigned successfully!");
+        setOrderStatus(response.data.status);
+        
+        // Refresh order details to show new delivery boy info
+        const freshOrder = await getOrderById(orderDetail.id);
+        if (freshOrder.success && freshOrder.data) {
+           setOrderDetail( ताजा => ({ ...freshOrder.data }));
+           // Or just simply:
+           setOrderDetail(freshOrder.data);
+        }
+        
+      } else {
+        alert(response.message || 'Failed to assign delivery partner');
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to assign delivery partner');
+    } finally {
+      setAssigningLoading(false);
     }
   };
 
@@ -419,6 +465,37 @@ export default function SellerOrderDetail() {
               Print Invoice
             </button>
           </div>
+          
+          {/* Manual Delivery Boy Assignment Section */}
+          {(orderStatus === 'Accepted' || orderStatus === 'Processed') && (
+             <div className="mt-6 border-t border-neutral-200 pt-5 w-full">
+               <h3 className="text-sm font-semibold text-neutral-800 mb-3">
+                  Assign Delivery Partner {orderDetail?.deliveryBoyName ? <span className="text-teal-700 ml-1 text-xs"> (Currently: {orderDetail.deliveryBoyName})</span> : ''}
+               </h3>
+               <div className="flex flex-col sm:flex-row gap-3 items-center">
+                 <select
+                   value={selectedDeliveryBoy}
+                   onChange={(e) => setSelectedDeliveryBoy(e.target.value)}
+                   className="flex-1 w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm text-neutral-900 bg-white/90 focus:outline-none focus:ring-2 focus:ring-[#4A7C59]"
+                 >
+                   <option value="">Select a Delivery Partner...</option>
+                   {availableDeliveryBoys.map((boy) => (
+                     <option key={boy._id} value={boy._id}>
+                       {boy.name} ({boy.mobile}) {boy.isOnline ? '🟢 Online' : '⚪ Offline'}
+                     </option>
+                   ))}
+                 </select>
+                 
+                 <button
+                   onClick={handleAssignDeliveryBoy}
+                   disabled={!selectedDeliveryBoy || assigningLoading}
+                   className="w-full sm:w-auto bg-[#e67e22] hover:bg-[#d35400] disabled:opacity-50 text-white px-6 py-2 rounded-lg transition-colors font-medium shadow-sm whitespace-nowrap"
+                 >
+                   {assigningLoading ? 'Assigning...' : 'Assign Partner'}
+                 </button>
+               </div>
+             </div>
+          )}
         </div>
       </div>
 
@@ -472,6 +549,16 @@ export default function SellerOrderDetail() {
               </div>
               <div className="text-sm text-neutral-600 mb-3">
                 <span className="font-medium">Time Slot:</span> {orderDetail.timeSlot}
+              </div>
+              <div className="flex items-center gap-2 lg:justify-end mb-2">
+                <span className="text-sm font-medium text-neutral-700">Payment:</span>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${
+                  orderDetail.paymentMethod === 'COD' 
+                    ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                    : 'bg-green-50 text-green-700 border-green-200'
+                }`}>
+                  {orderDetail.paymentMethod || 'COD'} ({orderDetail.paymentStatus || 'Pending'})
+                </span>
               </div>
               <div className="flex items-center gap-2 lg:justify-end">
                 <span className="text-sm font-medium text-neutral-700">Order Status:</span>
