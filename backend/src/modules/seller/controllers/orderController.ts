@@ -4,6 +4,7 @@ import OrderItem from "../../../models/OrderItem";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import Seller from "../../../models/Seller";
 import WalletTransaction from "../../../models/WalletTransaction";
+import Delivery from "../../../models/Delivery";
 import { notifyDeliveryBoysOfNewOrder } from "../../../services/orderNotificationService";
 import { Server as SocketIOServer } from "socket.io";
 
@@ -123,7 +124,6 @@ export const getOrderById = asyncHandler(
     const { id } = req.params;
 
     // First check if this seller has items in this order
-    // First check if this seller has items in this order
     const sellerItems = await OrderItem.find({ order: id, seller: sellerId })
       .populate("seller", "storeName")
       .populate("product");
@@ -150,7 +150,6 @@ export const getOrderById = asyncHandler(
     // Get only this seller's order items
     const orderItems = sellerItems;
 
-    // Format order items for frontend
     // Format order items for frontend
     const formattedItems = orderItems.map(item => {
       let unit = item.variation || 'N/A';
@@ -280,8 +279,8 @@ export const updateOrderStatus = asyncHandler(
     order.status = status;
     await order.save();
 
-    // Previously: Trigger delivery notification if seller accepts the order. 
-    // Now Disabled because of the new client requirement: Sellers will MANUALLY assign the delivery boy.
+    // Trigger delivery notification if seller accepts the order.
+    // Note: If manual assignment is preferred, this could be conditional or disabled.
     /* 
     if (status === 'Accepted' && previousStatus !== 'Accepted') {
       try {
@@ -360,11 +359,11 @@ export const updateOrderStatus = asyncHandler(
  */
 export const getDeliveryBoys = asyncHandler(
   async (req: Request, res: Response) => {
-    // Only fetch delivery boys who are active
-    const { Delivery } = await import("../../../models/Delivery"); // Just ensuring import if not already at top
-    // Alternatively require standard import at the top
-    const dbModel = require("../../../models/Delivery").default;
-    const deliveryBoys = await dbModel.find({ status: "Active" }).select("name mobile email isOnline location");
+    // Only fetch delivery boys who are active and online
+    const deliveryBoys = await Delivery.find({ 
+      status: "Active",
+      isOnline: true 
+    }).select("name mobile email isOnline location");
 
     return res.status(200).json({
       success: true,
