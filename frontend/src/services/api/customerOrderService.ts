@@ -34,6 +34,7 @@ export interface CreateOrderData {
         deliveryFee: number;
         platformFee: number;
     };
+    deliveryShift?: string;
 }
 
 export interface OrderResponse {

@@ -673,7 +673,7 @@ export default function DeliveryOrderDetail() {
                                                     <div className="flex items-center gap-1.5 mt-2">
                                                         <div className={`w-1 h-1 rounded-full ${withinRange ? 'bg-[#4A7C59]' : 'bg-stone-300'}`}></div>
                                                         <p className={`text-[8px] font-black uppercase tracking-widest ${withinRange ? 'text-[#4A7C59]' :
-                                                                distance < 1000 ? 'text-amber-600' : 'text-stone-400'
+                                                            distance < 1000 ? 'text-amber-600' : 'text-stone-400'
                                                             }`}>
                                                             {distance < 1000 ? `${distance}M DISTANCE` : `${(distance / 1000).toFixed(1)}KM DISTANCE`}
                                                         </p>
@@ -687,8 +687,8 @@ export default function DeliveryOrderDetail() {
                                                 onClick={() => handleSellerPickup(seller.sellerId)}
                                                 disabled={!withinRange || isLoading}
                                                 className={`w-full py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all ${withinRange && !isLoading
-                                                        ? 'bg-[#4A7C59] text-white shadow-lg shadow-[#4A7C59]/20 active:scale-[0.98]'
-                                                        : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                                                    ? 'bg-[#4A7C59] text-white shadow-lg shadow-[#4A7C59]/20 active:scale-[0.98]'
+                                                    : 'bg-stone-200 text-stone-400 cursor-not-allowed'
                                                     }`}
                                             >
                                                 {isLoading ? 'Wait...' : withinRange ? 'Confirm Collection' : 'Move Closer to Confirm'}
@@ -749,7 +749,7 @@ export default function DeliveryOrderDetail() {
 
                 {/* Customer Details */}
                 <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm">
-                     <div className="flex items-baseline justify-between mb-4">
+                    <div className="flex items-baseline justify-between mb-4">
                         <h3 className="text-village-umber text-[10px] font-black uppercase tracking-[0.2em] opacity-80 flex items-center gap-2">
                             <Icons.User size={14} className="text-[#8B3D28]/40" />
                             Delivery Contact
@@ -773,9 +773,9 @@ export default function DeliveryOrderDetail() {
                                 <Icons.Phone size={18} />
                             </button>
                         </div>
-                        
+
                         <div className="bg-stone-50/50 p-3 rounded-2xl border border-stone-100 flex gap-3">
-                             <div className="p-2 bg-stone-100 rounded-xl flex items-center justify-center text-[#8B3D28]/60 self-start">
+                            <div className="p-2 bg-stone-100 rounded-xl flex items-center justify-center text-[#8B3D28]/60 self-start">
                                 <Icons.MapPin size={16} />
                             </div>
                             <div className="flex flex-col flex-1">
@@ -865,15 +865,15 @@ export default function DeliveryOrderDetail() {
                 <div className="fixed bottom-24 left-4 right-4 z-40">
                     <div className="village-card paper-texture organic-radius p-5 shadow-2xl border-none ring-1 ring-[#8B3D28]/10">
                         <div className="flex items-center justify-between mb-4">
-                             <div className="flex flex-col">
+                            <div className="flex flex-col">
                                 <p className="text-[#8B3D28] text-[10px] font-black uppercase tracking-[0.2em]">Secure Handover</p>
                                 <p className="text-stone-400 text-[8px] font-bold uppercase tracking-widest mt-1">Confirm OTP with Recipient</p>
-                             </div>
-                             {customerProximity && (
+                            </div>
+                            {customerProximity && (
                                 <div className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${customerProximity.withinRange ? 'bg-[#4A7C59]/10 text-[#4A7C59]' : 'bg-red-50 text-red-400'}`}>
                                     {customerProximity.distance < 1000 ? `${customerProximity.distance}M` : `${(customerProximity.distance / 1000).toFixed(1)}KM`}
                                 </div>
-                             )}
+                            )}
                         </div>
 
                         {/* 4-digit OTP Input */}
@@ -884,10 +884,10 @@ export default function DeliveryOrderDetail() {
                                 onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 4))}
                                 placeholder="----"
                                 disabled={!showOtpInput}
-                                className={`w-full max-w-[180px] px-6 py-3.5 rounded-2xl text-[20px] font-black text-center tracking-[0.5em] focus:outline-none transition-all shadow-inner ${showOtpInput 
-                                    ? 'bg-stone-50 border-2 border-[#8B3D28]/20 text-village-umber' 
+                                className={`w-full max-w-[180px] px-6 py-3.5 rounded-2xl text-[20px] font-black text-center tracking-[0.5em] focus:outline-none transition-all shadow-inner ${showOtpInput
+                                    ? 'bg-stone-50 border-2 border-[#8B3D28]/20 text-village-umber'
                                     : 'bg-stone-100 border-2 border-stone-200 text-stone-300 shadow-none'
-                                }`}
+                                    }`}
                                 maxLength={4}
                             />
                         </div>
@@ -898,8 +898,8 @@ export default function DeliveryOrderDetail() {
                                     onClick={handleSendOtp}
                                     disabled={!getOtpEnabled || otpSending}
                                     className={`flex-1 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all ${getOtpEnabled && !otpSending
-                                            ? 'bg-[#8B3D28] text-white shadow-lg shadow-[#8B3D28]/20 active:scale-[0.98]'
-                                            : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                                        ? 'bg-[#8B3D28] text-white shadow-lg shadow-[#8B3D28]/20 active:scale-[0.98]'
+                                        : 'bg-stone-200 text-stone-400 cursor-not-allowed'
                                         }`}
                                 >
                                     {otpSending ? 'Sending...' : getOtpEnabled ? 'Generate OTP' : 'Arrive at Location'}

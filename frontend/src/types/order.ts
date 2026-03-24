@@ -23,6 +23,8 @@ export interface OrderFees {
   deliveryFee?: number;
 }
 
+export type DeliveryShift = 'morning' | 'evening';
+
 export interface Order {
   id: string;
   items: CartItem[];
@@ -39,6 +41,7 @@ export interface Order {
   gstin?: string;
   couponCode?: string;
   giftPackaging?: boolean;
+  deliveryShift?: DeliveryShift;
 }
 
 

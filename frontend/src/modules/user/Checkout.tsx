@@ -8,7 +8,7 @@ import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 
 // import { products } from '../../data/products'; // Removed
-import { OrderAddress, Order } from '../../types/order';
+import { OrderAddress, Order, DeliveryShift } from '../../types/order';
 import PartyPopper from './components/PartyPopper';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '../../components/ui/sheet';
 import WishlistButton from '../../components/WishlistButton';
@@ -65,6 +65,7 @@ export default function Checkout() {
   const [gstin, setGstin] = useState<string>('');
   const [showCancellationPolicy, setShowCancellationPolicy] = useState(false);
   const [giftPackaging, setGiftPackaging] = useState<boolean>(false);
+  const [deliveryShift, setDeliveryShift] = useState<DeliveryShift | null>(null);
 
   // Profile completion modal state
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -324,6 +325,12 @@ export default function Checkout() {
       return;
     }
 
+    // Check if delivery shift is selected
+    if (!deliveryShift) {
+      showGlobalToast('Please select a delivery shift', 'error');
+      return;
+    }
+
     // Check if user needs to complete their profile first
     if (!bypassProfileCheck && isPlaceholderUser) {
       setProfileFormData({ name: user?.name === 'User' ? '' : (user?.name || ''), email: user?.email?.endsWith('@villagebasket.temp') ? '' : (user?.email || '') });
@@ -375,6 +382,7 @@ export default function Checkout() {
       gstin: gstin || undefined,
       couponCode: selectedCoupon?.code || undefined,
       giftPackaging: giftPackaging,
+      deliveryShift: deliveryShift,
     };
 
     try {
@@ -958,6 +966,48 @@ export default function Checkout() {
         </div>
       </div>
 
+      {/* Delivery Shift Selection */}
+      <div className="px-4 md:px-6 lg:px-8 py-4 bg-white border-b border-neutral-200">
+        <h2 className="text-sm font-bold text-neutral-900 mb-3 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+            <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          Choose Delivery Shift <span className="text-red-500 font-bold">*</span>
+        </h2>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setDeliveryShift('morning')}
+            className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${
+              deliveryShift === 'morning'
+                ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
+                : 'border-neutral-100 bg-neutral-50 text-neutral-500 hover:border-neutral-200'
+            }`}
+          >
+            <span className="text-xl">🌅</span>
+            <span className="text-xs font-bold font-poppins">Morning Shift</span>
+            <span className="text-[10px] opacity-80 font-medium">05:00 - 09:00 AM</span>
+          </button>
+          
+          <button
+            onClick={() => setDeliveryShift('evening')}
+            className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${
+              deliveryShift === 'evening'
+                ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
+                : 'border-neutral-100 bg-neutral-50 text-neutral-500 hover:border-neutral-200'
+            }`}
+          >
+            <span className="text-xl">🌆</span>
+            <span className="text-xs font-bold font-poppins">Evening Shift</span>
+            <span className="text-[10px] opacity-80 font-medium">05:00 - 09:00 PM</span>
+          </button>
+        </div>
+        {!deliveryShift && (
+          <p className="text-[10px] text-red-500 mt-2 font-medium italic">* Selection is mandatory for delivery</p>
+        )}
+      </div>
+
       {/* You might also like */}
       <div className="px-4 md:px-6 lg:px-8 py-2.5 md:py-3 border-b border-neutral-200">
         <h2 className="text-sm font-semibold text-neutral-900 mb-2">You might also like</h2>
@@ -1139,6 +1189,22 @@ export default function Checkout() {
                 <span className="text-xs text-neutral-700">Gift Packaging</span>
               </div>
               <span className="text-xs font-medium text-neutral-900">₹{giftPackagingFee}</span>
+            </div>
+          )}
+
+          {/* Delivery Shift */}
+          {deliveryShift && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                <span className="text-xs text-neutral-700">Delivery Shift</span>
+              </div>
+              <span className="text-xs font-bold text-[#8B3D28] font-poppins uppercase">
+                {deliveryShift === 'morning' ? 'Morning (5-9 AM)' : 'Evening (5-9 PM)'}
+              </span>
             </div>
           )}
 

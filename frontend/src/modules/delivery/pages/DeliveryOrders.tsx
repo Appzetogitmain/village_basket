@@ -5,23 +5,23 @@ import VillageLoader from '../../../components/VillageLoader';
 
 // Icons
 const Icons = {
-    ChevronLeft: ({ size = 20, className = "" }) => (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <path d="M15 18l-6-6 6-6" />
-        </svg>
-    ),
-    Package: ({ size = 20, className = "" }) => (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <path d="M21 7.5L12 3L3 7.5v9l9 4.5l9-4.5v-9z" />
-            <path d="M3 7.5l9 4.5l9-4.5" />
-            <path d="M12 12v9" />
-        </svg>
-    ),
-    Navigation: ({ size = 16, className = "" }) => (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <polygon points="3 11 22 2 13 21 11 13 3 11" />
-        </svg>
-    )
+  ChevronLeft: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  ),
+  Package: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M21 7.5L12 3L3 7.5v9l9 4.5l9-4.5v-9z" />
+      <path d="M3 7.5l9 4.5l9-4.5" />
+      <path d="M12 12v9" />
+    </svg>
+  ),
+  Navigation: ({ size = 16, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polygon points="3 11 22 2 13 21 11 13 3 11" />
+    </svg>
+  )
 };
 
 export default function DeliveryOrders() {
@@ -70,17 +70,17 @@ export default function DeliveryOrders() {
 
       {/* Local Header */}
       <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
-          <button
-              onClick={() => navigate(-1)}
-              className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
-          >
-              <Icons.ChevronLeft size={20} />
-          </button>
-          <div className="ml-2 flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">Logistics</span>
-              <span className="font-black text-[12px] text-white tracking-wide mt-1">Today's Active Drops</span>
-          </div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
+        >
+          <Icons.ChevronLeft size={20} />
+        </button>
+        <div className="ml-2 flex flex-col">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">Logistics</span>
+          <span className="font-black text-[12px] text-white tracking-wide mt-1">Today's Active Drops</span>
+        </div>
       </div>
 
       <div className="px-6 py-6 relative z-10">
@@ -105,10 +105,10 @@ export default function DeliveryOrders() {
                 </div>
 
                 <div className="flex items-center gap-3 mb-4 p-3 bg-stone-50/50 rounded-2xl border border-stone-100/50">
-                    <div className="w-8 h-8 rounded-xl bg-stone-100 flex items-center justify-center text-[#8B3D28]/30">
-                        <Icons.Navigation size={14} />
-                    </div>
-                    <p className="text-village-umber text-[10px] font-black leading-tight line-clamp-1 opacity-70">{order.address}</p>
+                  <div className="w-8 h-8 rounded-xl bg-stone-100 flex items-center justify-center text-[#8B3D28]/30">
+                    <Icons.Navigation size={14} />
+                  </div>
+                  <p className="text-village-umber text-[10px] font-black leading-tight line-clamp-1 opacity-70">{order.address}</p>
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t border-dashed border-stone-100">
@@ -116,14 +116,14 @@ export default function DeliveryOrders() {
                     <span className="text-[10px] font-black text-stone-300">₹</span>
                     <p className="text-village-umber text-sm font-black tracking-tighter">{order.totalAmount}</p>
                   </div>
-                  
+
                   <div className="flex items-center gap-4">
                     <div className="flex -space-x-2">
-                        {[1,2].map(i => (
-                            <div key={i} className="w-5 h-5 rounded-lg bg-stone-100 border-2 border-white ring-1 ring-stone-50 shadow-sm flex items-center justify-center">
-                                <Icons.Package size={10} className="text-[#8B3D28]/30" />
-                            </div>
-                        ))}
+                      {[1, 2].map(i => (
+                        <div key={i} className="w-5 h-5 rounded-lg bg-stone-100 border-2 border-white ring-1 ring-stone-50 shadow-sm flex items-center justify-center">
+                          <Icons.Package size={10} className="text-[#8B3D28]/30" />
+                        </div>
+                      ))}
                     </div>
                     <p className="text-stone-400 text-[8px] font-black uppercase tracking-widest">
                       {order.items.length} Parcel Content{order.items.length > 1 ? 's' : ''}
@@ -132,9 +132,9 @@ export default function DeliveryOrders() {
                 </div>
 
                 {order.estimatedDeliveryTime && (
-                   <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden pointer-events-none opacity-5">
-                       <Icons.Package size={100} className="text-[#8B3D28] -mr-10 -mt-10" />
-                   </div>
+                  <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden pointer-events-none opacity-5">
+                    <Icons.Package size={100} className="text-[#8B3D28] -mr-10 -mt-10" />
+                  </div>
                 )}
               </div>
             ))}
@@ -142,7 +142,7 @@ export default function DeliveryOrders() {
         ) : (
           <div className="village-card paper-texture organic-radius p-10 min-h-[300px] border-none shadow-sm flex flex-col items-center justify-center text-center">
             <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mb-6 text-stone-100">
-                <Icons.Package size={32} />
+              <Icons.Package size={32} />
             </div>
             <p className="text-stone-300 text-[10px] font-black uppercase tracking-[0.2em]">No Manifest Records</p>
             <p className="text-stone-200 text-[8px] font-bold uppercase tracking-widest mt-2">Active runs will appear here</p>
