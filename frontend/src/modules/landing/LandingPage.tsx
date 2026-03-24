@@ -11,6 +11,9 @@ import farmImg1 from '@assets/landing_page/farm_image_1.png';
 import farmImg2 from '@assets/landing_page/farm_image_2.png';
 import farmImg3 from '@assets/landing_page/farm_image_3.png';
 import heroProduceImg from '@assets/landing_page/hero_produce.png';
+import appHomeImg from '@assets/landing_page/app_home.png';
+import appCheckoutImg from '@assets/landing_page/app_checkout.png';
+import appTrackingImg from '@assets/landing_page/app_tracking.png';
 
 /* ─── Reveal Component ───────────────────────────── */
 function Reveal({ children, width = "fit-content", delay = 0 }: { children: React.ReactNode, width?: "fit-content" | "100%", delay?: number }) {
@@ -103,16 +106,18 @@ function ImageSlider({ images }: { images: string[] }) {
 /* ─── App Mockup Component ───────────────────────────────── */
 function AppMockupSlider() {
   const [activeAppSlide, setActiveAppSlide] = useState(0);
+  const screenshots = [appHomeImg, appCheckoutImg, appTrackingImg];
+
   useEffect(() => {
     const timer = setInterval(() => {
-      setActiveAppSlide((prev) => (prev + 1) % 3);
+      setActiveAppSlide((prev) => (prev + 1) % screenshots.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [screenshots.length]);
 
   return (
     <div className="order-2 lg:order-1 relative flex justify-center h-[600px] w-full items-center">
-      {[0, 1, 2].map((idx) => {
+      {screenshots.map((src, idx) => {
         let diff = idx - activeAppSlide;
         if (diff < -1) diff += 3;
         if (diff > 1) diff -= 3;
@@ -122,75 +127,44 @@ function AppMockupSlider() {
         return (
           <div
             key={idx}
-            className={`absolute transition-all duration-700 ease-in-out cursor-pointer ${isCenter ? 'z-30 scale-100 opacity-100 translate-x-0' :
+            className={`absolute transition-all duration-1000 ease-in-out cursor-pointer ${isCenter ? 'z-30 scale-100 opacity-100 translate-x-0' :
               isLeft ? 'z-20 scale-[0.85] opacity-50 -translate-x-[30%] sm:-translate-x-[40%]' :
                 'z-20 scale-[0.85] opacity-50 translate-x-[30%] sm:translate-x-[40%]'
               }`}
             onClick={() => setActiveAppSlide(idx)}
           >
-            <div className="w-[280px] h-[580px] bg-[#3E2723] rounded-[3rem] p-3 shadow-2xl border-4 border-gray-200 relative">
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-28 h-6 bg-gray-200 rounded-b-2xl z-20"></div>
-              <div className="w-full h-full rounded-[2rem] overflow-hidden bg-[#FAF7F2] relative flex flex-col items-center">
-                {idx === 0 && (
-                  <div className="w-full h-full flex flex-col p-4 pt-14">
-                    <div className="w-full flex justify-between items-center mb-6">
-                      <div className="bg-white p-1 rounded-lg shadow-sm"><img src={brandLogo} alt="Logo" className="w-[80px]" /></div>
-                      <div className="w-8 h-8 rounded-full bg-white shadow flex justify-center items-center font-black">👤</div>
-                    </div>
-                    <h4 className="font-black text-[#3E2723] text-lg mb-4 text-left w-full">Fresh Arrivals</h4>
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div className="aspect-square bg-white rounded-xl shadow-sm border border-[#8B3D28]/10 flex flex-col p-2">
-                        <div className="w-full h-20 bg-[#4A7C59]/20 rounded-lg mb-2"></div>
-                        <div className="w-3/4 h-2 bg-gray-200 rounded mb-1"></div>
-                        <div className="w-1/2 h-2 bg-gray-200 rounded"></div>
-                      </div>
-                      <div className="aspect-square bg-white rounded-xl shadow-sm border border-[#8B3D28]/10 flex flex-col p-2">
-                        <div className="w-full h-20 bg-[#E5A93D]/20 rounded-lg mb-2"></div>
-                        <div className="w-3/4 h-2 bg-gray-200 rounded mb-1"></div>
-                        <div className="w-1/2 h-2 bg-gray-200 rounded"></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {/* ... existing screen 2 and 3 logic ... */}
-                {idx === 1 && (
-                  <div className="w-full h-full flex flex-col p-4 pt-14">
-                    <div className="text-center mb-6">
-                      <h4 className="font-black text-[#3E2723] text-lg">Checkout</h4>
-                    </div>
-                    <div className="w-full bg-white rounded-xl shadow-sm p-4 mb-4 border border-[#8B3D28]/10">
-                      <h5 className="font-black text-xs text-[#8B3D28] mb-3 uppercase">Delivery Shift</h5>
-                      <div className="w-full bg-amber-50 border border-amber-200 rounded-lg p-3 mb-2 flex items-center justify-between">
-                        <div>
-                          <p className="font-black text-[10px] text-amber-800 text-left">Morning</p>
-                          <p className="font-bold text-[8px] text-amber-600">5:00 - 9:00 AM</p>
-                        </div>
-                        <div className="w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center text-white text-[8px]">✓</div>
-                      </div>
-                    </div>
-                    <div className="mt-auto w-full bg-[#8B3D28] text-white text-center py-4 rounded-xl font-black text-[10px] uppercase shadow-lg">Complete Payment</div>
-                  </div>
-                )}
-                {idx === 2 && (
-                  <div className="w-full h-full flex flex-col p-4 bg-[#4A7C59]/5 relative">
-                    <div className="absolute inset-x-0 top-0 h-48 bg-[#4A7C59] flex flex-col justify-center items-center text-white rounded-b-[2rem] pt-8">
-                      <span className="text-3xl mb-2">🎉</span>
-                      <h4 className="font-black text-lg">Confirmed</h4>
-                    </div>
-                    <div className="mt-40 w-full bg-white rounded-2xl shadow-xl p-5 relative z-10 border border-[#4A7C59]/10">
-                      <h5 className="font-black text-[10px] text-gray-500 uppercase tracking-widest mb-4">Tracking</h5>
-                      <div className="flex gap-3 mb-4">
-                        <div className="flex flex-col items-center"><div className="w-2 h-2 rounded-full bg-[#4A7C59]"></div><div className="w-0.5 h-6 bg-[#4A7C59]"></div><div className="w-2 h-2 rounded-full border-2 border-[#4A7C59]"></div></div>
-                        <div className="flex-1 text-left"><p className="font-black text-[10px]">Harvested</p><p className="font-black text-[10px] mt-3">Out for delivery</p></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+            <div className="w-[280px] h-[580px] bg-[#3E2723] rounded-[3.5rem] p-3 shadow-2xl border-4 border-gray-100 relative overflow-hidden group">
+              {/* Device Notch */}
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-28 h-6 bg-gray-100 rounded-b-2xl z-20"></div>
+              
+              {/* Screen Content */}
+              <div className="w-full h-full rounded-[2.8rem] overflow-hidden bg-white relative flex flex-col items-center">
+                <motion.img
+                  initial={{ scale: 1.1 }}
+                  animate={{ scale: isCenter ? 1 : 1.1 }}
+                  transition={{ duration: 1.5 }}
+                  src={src}
+                  alt={`App Screen ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* Overlay for inactive screens */}
+                {!isCenter && <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]"></div>}
               </div>
             </div>
           </div>
         );
       })}
+      
+      {/* Slide Indicators */}
+      <div className="absolute -bottom-10 flex gap-2">
+        {screenshots.map((_, i) => (
+          <div 
+            key={i} 
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${i === activeAppSlide ? 'bg-[#8B3D28] w-6' : 'bg-[#8B3D28]/20'}`}
+          />
+        ))}
+      </div>
     </div>
   );
 }
