@@ -77,7 +77,7 @@ export default function SpiritualStore() {
             {/* Search and Share icons */}
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <button
-                onClick={() => navigate('/search')}
+                onClick={() => navigate('/user/search')}
                 className="w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-lg bg-white/70 shadow-sm hover:bg-white/80 transition-colors border border-white/20"
                 aria-label="Search"
               >

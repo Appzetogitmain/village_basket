@@ -33,7 +33,7 @@ const DailyServiceCheckout: React.FC = () => {
         <p className="text-stone-400 text-[10px] font-bold uppercase tracking-tight mb-8 max-w-[200px]">
           Add some village fresh productions to start your service.
         </p>
-        <Button onClick={() => navigate('/')} className="bg-village-green text-white px-8 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">
+        <Button onClick={() => navigate('/user')} className="bg-village-green text-white px-8 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">
           Go To Store
         </Button>
       </div>

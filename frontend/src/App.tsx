@@ -25,6 +25,9 @@ import RouteTransition from "./components/RouteTransition";
 import { useEffect } from "react";
 import { initializePushNotifications, setupForegroundNotificationHandler } from "./services/pushNotificationService";
 
+// Landing page - load immediately
+import LandingPage from "./modules/landing/LandingPage";
+
 // Critical routes - load immediately (Home, Cart, Checkout)
 import Home from "./modules/user/Home";
 import Checkout from "./modules/user/Checkout";
@@ -188,9 +191,12 @@ function App() {
                         <IconLoader />
                         <RouteLoaderTrigger />
                         <Routes>
+                          {/* Landing Page */}
+                          <Route path="/" element={<LandingPage />} />
+
                           {/* Public Routes */}
                           <Route
-                            path="/login"
+                            path="/user/login"
                             element={
                               <PublicRoute>
                                 <Suspense fallback={null}>
@@ -385,42 +391,43 @@ function App() {
                             }
                           />
 
-                          {/* Main App Routes */}
+                          {/* Main User App Routes — all nested under /user */}
                           <Route
-                            path="/*"
+                            path="/user/*"
                             element={
                               <AppLayout>
                                 <Suspense fallback={null}>
                                   <Routes>
-                                    <Route path="/" element={<Home />} />
-                                    <Route path="/user/home" element={<Home />} />
-                                    <Route path="/search" element={<Search />} />
-                                    <Route path="/orders" element={<Orders />} />
-                                    <Route path="/orders/:id" element={<OrderDetail />} />
-                                    <Route path="/order-again" element={<OrderAgain />} />
-                                    <Route path="/account" element={<Account />} />
-                                    <Route path="/about-us" element={<AboutUs />} />
-                                    <Route path="/faq" element={<FAQ />} />
-                                    <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-                            <Route path="/daily-service/checkout" element={<ProtectedRoute><DailyServiceCheckout /></ProtectedRoute>} />
-                                    <Route path="/categories" element={<Categories />} />
-                                    <Route path="/category/:id" element={<Category />} />
-                                    <Route path="/address-book" element={<AddressBook />} />
-                                    <Route path="/checkout" element={<Checkout />} />
-                                    <Route path="/checkout/address" element={<CheckoutAddress />} />
-                                    <Route path="/product/:id" element={<ProductDetail />} />
-                                    <Route path="/invoice/:id" element={<Invoice />} />
-                                    <Route path="/addresses" element={<Addresses />} />
-                                    <Route path="/store/:slug" element={<StorePage />} />
-                                    <Route path="/store/spiritual" element={<SpiritualStore />} />
-                                    <Route path="/store/pharma" element={<PharmaStore />} />
-                                    <Route path="/store/e-gifts" element={<EGiftStore />} />
-                                    <Route path="/store/pet" element={<PetStore />} />
-                                    <Route path="/store/sports" element={<SportsStore />} />
-                                    <Route path="/store/fashion-basics" element={<FashionStore />} />
-                                    <Route path="/store/toy" element={<ToyStore />} />
-                                    <Route path="/store/hobby" element={<HobbyStore />} />
-                                    <Route path="/rewards" element={<UserRewards />} />
+                                    <Route path="" element={<Home />} />
+                                    <Route path="home" element={<Home />} />
+                                    <Route path="search" element={<Search />} />
+                                    <Route path="orders" element={<Orders />} />
+                                    <Route path="orders/:id" element={<OrderDetail />} />
+                                    <Route path="order-again" element={<OrderAgain />} />
+                                    <Route path="account" element={<Account />} />
+                                    <Route path="about-us" element={<AboutUs />} />
+                                    <Route path="faq" element={<FAQ />} />
+                                    <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+                                    <Route path="daily-service/checkout" element={<ProtectedRoute><DailyServiceCheckout /></ProtectedRoute>} />
+                                    <Route path="categories" element={<Categories />} />
+                                    <Route path="category/:id" element={<Category />} />
+                                    <Route path="address-book" element={<AddressBook />} />
+                                    <Route path="checkout" element={<Checkout />} />
+                                    <Route path="checkout/address" element={<CheckoutAddress />} />
+                                    <Route path="product/:id" element={<ProductDetail />} />
+                                    <Route path="invoice/:id" element={<Invoice />} />
+                                    <Route path="addresses" element={<Addresses />} />
+                                    <Route path="store/:slug" element={<StorePage />} />
+                                    <Route path="store/spiritual" element={<SpiritualStore />} />
+                                    <Route path="store/pharma" element={<PharmaStore />} />
+                                    <Route path="store/e-gifts" element={<EGiftStore />} />
+                                    <Route path="store/pet" element={<PetStore />} />
+                                    <Route path="store/sports" element={<SportsStore />} />
+                                    <Route path="store/fashion-basics" element={<FashionStore />} />
+                                    <Route path="store/toy" element={<ToyStore />} />
+                                    <Route path="store/hobby" element={<HobbyStore />} />
+                                    <Route path="location" element={<Suspense fallback={null}><Addresses /></Suspense>} />
+                                    <Route path="rewards" element={<UserRewards />} />
                                   </Routes>
                                 </Suspense>
                               </AppLayout>

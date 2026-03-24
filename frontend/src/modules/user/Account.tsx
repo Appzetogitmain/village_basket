@@ -63,7 +63,7 @@ export default function Account() {
 
   const handleLogout = () => {
     authLogout();
-    navigate('/login');
+    navigate('/user/login');
   };
 
   const handleGstSubmit = (e: React.FormEvent) => {
@@ -116,7 +116,7 @@ export default function Account() {
         <div className="px-6 md:px-8 mt-6">
           <div className="max-w-md mx-auto">
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/user/login')}
               className="w-full py-4 rounded-xl font-bold text-base bg-[#8B3D28] text-white hover:bg-[#8B3D28]/95 transition-all shadow-xl shadow-[#8B3D28]/20 active:scale-[0.98] uppercase tracking-wider"
             >
               Login / Signup
