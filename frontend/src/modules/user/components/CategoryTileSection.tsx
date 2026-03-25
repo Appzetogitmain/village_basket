@@ -36,30 +36,30 @@ export default function CategoryTileSection({
       // Navigate to subcategory page or category with subcategory filter
       if (tile.categoryId) {
         navigate(
-          `/category/${tile.categoryId}?subcategory=${tile.subcategoryId || tile.id
+          `/user/category/${tile.categoryId}?subcategory=${tile.subcategoryId || tile.id
           }`
         );
       } else if (tile.slug) {
-        navigate(`/category/${tile.slug}`);
+        navigate(`/user/category/${tile.slug}`);
       } else {
-        navigate(`/category/subcategory/${tile.subcategoryId || tile.id}`);
+        navigate(`/user/category/subcategory/${tile.subcategoryId || tile.id}`);
       }
       return;
     }
     if (tile.type === "shop" || tile.type === "seller" || (tile as any).sellerId) {
-      navigate(`/store/${tile.categoryId || (tile as any).sellerId || tile.id}`);
+      navigate(`/user/store/${tile.categoryId || (tile as any).sellerId || tile.id}`);
       return;
     }
     if (tile.type === "category") {
-      navigate(`/category/${tile.slug || tile.categoryId || tile.id}`);
+      navigate(`/user/category/${tile.slug || tile.categoryId || tile.id}`);
       return;
     }
     if (tile.categoryId) {
-      navigate(`/category/${tile.categoryId}`);
+      navigate(`/user/category/${tile.categoryId}`);
       return;
     }
     if (tile.productId) {
-      navigate(`/product/${tile.productId}`);
+      navigate(`/user/product/${tile.productId}`);
       return;
     }
     // Otherwise just log for now
@@ -117,24 +117,24 @@ export default function CategoryTileSection({
                   to={
                     tile.subcategoryId || tile.type === "subcategory"
                       ? tile.categoryId
-                        ? `/category/${tile.categoryId}?subcategory=${tile.subcategoryId || tile.id
+                        ? `/user/category/${tile.categoryId}?subcategory=${tile.subcategoryId || tile.id
                         }`
                         : tile.slug
-                          ? `/category/${tile.slug}`
-                          : `/category/subcategory/${tile.subcategoryId || tile.id
+                          ? `/user/category/${tile.slug}`
+                          : `/user/category/subcategory/${tile.subcategoryId || tile.id
                           }`
                       : tile.productId
-                        ? `/product/${tile.productId}`
+                        ? `/user/product/${tile.productId}`
                         : isShopOrSeller
-                          ? `/store/${tile.categoryId || (tile as any).sellerId || tile.id}`
+                          ? `/user/store/${tile.categoryId || (tile as any).sellerId || tile.id}`
                           : tile.type === "category"
                             ? tile.slug
-                              ? `/category/${tile.slug}`
+                              ? `/user/category/${tile.slug}`
                               : tile.categoryId
-                                ? `/category/${tile.categoryId}`
+                                ? `/user/category/${tile.categoryId}`
                                 : "#"
                             : tile.categoryId
-                               ? `/category/${tile.categoryId}`
+                               ? `/user/category/${tile.categoryId}`
                                : "#"
                   }
                   onClick={(e) => {

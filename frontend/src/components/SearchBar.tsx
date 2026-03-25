@@ -4,7 +4,7 @@ export default function SearchBar() {
   const navigate = useNavigate();
 
   const handleSearchClick = () => {
-    navigate('/search');
+    navigate('/user/search');
   };
 
   return (

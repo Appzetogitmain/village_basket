@@ -49,7 +49,7 @@ const DailyServiceCheckout: React.FC = () => {
       // Simulate API call or just local creation
       createSubscription(selectedPlanId, selectedTimeSlot);
       showToast('Daily Service Started Successfully!', 'success');
-      navigate('/account', { state: { activeTab: 'subscriptions' } });
+      navigate('/user/account', { state: { activeTab: 'subscriptions' } });
     } catch (err) {
       showToast('Failed to start service', 'error');
     } finally {

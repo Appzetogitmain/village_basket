@@ -28,7 +28,7 @@ export function useWishlist(productId?: string) {
     }
 
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate('/user/login');
       return;
     }
 

@@ -9,7 +9,7 @@ const DailyServiceBasketBar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  if (dailyServiceCart.length === 0 || location.pathname === '/daily-service/checkout') return null;
+  if (dailyServiceCart.length === 0 || location.pathname === '/user/daily-service/checkout') return null;
 
   const totalItems = dailyServiceCart.reduce((acc: number, item: SubscriptionItem) => acc + item.quantity, 0);
   const totalDailyPrice = dailyServiceCart.reduce((acc: number, item: SubscriptionItem) => acc + (item.pricePerDay * item.quantity), 0);
@@ -23,7 +23,7 @@ const DailyServiceBasketBar: React.FC = () => {
         className="fixed bottom-[74px] left-4 right-4 z-[45]"
       >
         <div 
-          onClick={() => navigate('/daily-service/checkout')}
+          onClick={() => navigate('/user/daily-service/checkout')}
           className="bg-white/95 backdrop-blur-md border border-village-green/20 rounded-2xl p-2.5 shadow-2xl flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
         >
           <div className="flex items-center gap-2.5">

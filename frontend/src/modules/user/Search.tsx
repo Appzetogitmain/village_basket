@@ -48,7 +48,7 @@ export default function Search() {
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       setLocalSearchQuery(transcript);
-      navigate(`/search?q=${encodeURIComponent(transcript)}`);
+      navigate(`/user/search?q=${encodeURIComponent(transcript)}`);
     };
 
     recognition.onerror = (event: any) => {
@@ -66,7 +66,7 @@ export default function Search() {
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (localSearchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(localSearchQuery)}`);
+      navigate(`/user/search?q=${encodeURIComponent(localSearchQuery)}`);
     }
   };
 
@@ -242,7 +242,7 @@ export default function Search() {
                   <div
                     key={item.id || item._id}
                     className="bg-white/40 backdrop-blur-sm rounded-lg border-2 border-green-600 p-3 cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => navigate(item.type === 'category' ? `/category/${item.id || item._id}` : `/product/${item.id || item._id}`)}
+                    onClick={() => navigate(item.type === 'category' ? `/user/category/${item.id || item._id}` : `/user/product/${item.id || item._id}`)}
                   >
                     <div className="w-full h-24 rounded-lg mb-2 overflow-hidden bg-neutral-50 flex items-center justify-center">
                       {item.image || item.imageUrl ? (
@@ -266,7 +266,7 @@ export default function Search() {
 
           {/* See all products - Placeholder or link to popular items */}
           <div className="px-4 md:px-6 lg:px-8 py-2 md:py-4">
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 cursor-pointer" onClick={() => navigate('/categories')}>
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2 cursor-pointer" onClick={() => navigate('/user/categories')}>
               <span className="text-sm md:text-base text-neutral-700 font-medium whitespace-nowrap">Browse all categories ▸</span>
             </div>
           </div>
@@ -277,7 +277,7 @@ export default function Search() {
               <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6">Cooking ideas</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                 {cookingIdeas.map((idea, idx) => (
-                  <div key={idea.id || idea._id || idx} className="relative rounded-lg overflow-hidden aspect-[4/3] bg-neutral-100 cursor-pointer" onClick={() => navigate(`/product/${idea.productId || idea.id}`)}>
+                  <div key={idea.id || idea._id || idx} className="relative rounded-lg overflow-hidden aspect-[4/3] bg-neutral-100 cursor-pointer" onClick={() => navigate(`/user/product/${idea.productId || idea.id}`)}>
                     {idea.image && <img src={idea.image} alt={idea.title} className="w-full h-full object-cover" />}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     <div className="absolute bottom-2 left-2 right-2 text-white text-xs font-bold line-clamp-2">{idea.title}</div>

@@ -720,7 +720,7 @@ export default function OrderDetail() {
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-4">
             Order Not Found
           </h1>
-          <Link to="/orders">
+          <Link to="/user/orders">
             <Button>Back to Orders</Button>
           </Link>
         </div>
@@ -1097,8 +1097,8 @@ export default function OrderDetail() {
           <SectionItem
             icon={HelpCircleIcon}
             title="Need Help?"
-            subtitle="Chat with support"
-            onClick={() => navigate("/support")}
+            subtitle="Visit FAQ"
+            onClick={() => navigate("/user/faq")}
           />
           <SectionItem
             icon={CircleSlashIcon}
@@ -1110,7 +1110,7 @@ export default function OrderDetail() {
 
         {/* Secondary Actions */}
         <div className="flex gap-2.5 mt-2">
-          <Link to="/orders" className="flex-1">
+          <Link to="/user/orders" className="flex-1">
             <button className="w-full h-8 bg-neutral-100 text-neutral-500 text-[10px] font-black uppercase tracking-widest rounded-lg active:scale-95 transition-all">
               View All Orders
             </button>

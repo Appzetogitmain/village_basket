@@ -49,7 +49,7 @@ export default function Addresses() {
                     <h1 className="text-xl font-black text-neutral-900 font-poppins uppercase tracking-tight">Saved Addresses</h1>
                 </div>
                 <Button
-                    onClick={() => navigate('/checkout/address')}
+                    onClick={() => navigate('/user/checkout/address')}
                     className="bg-[#8B3D28] text-white rounded-lg text-xs py-1.5 h-auto font-black font-poppins uppercase tracking-widest hover:bg-[#722F1E]"
                 >
                     ADD NEW
@@ -111,7 +111,7 @@ export default function Addresses() {
                         <div className="text-6xl mb-4">📍</div>
                         <h2 className="text-lg font-black text-neutral-900 mb-2 font-poppins">No saved addresses</h2>
                         <p className="text-sm mb-6 text-neutral-600 font-medium">Add an address to start ordering</p>
-                        <Button onClick={() => navigate('/checkout/address')} className="bg-[#8B3D28] text-white rounded-full px-8 font-black font-poppins uppercase tracking-widest hover:bg-[#722F1E]">
+                        <Button onClick={() => navigate('/user/checkout/address')} className="bg-[#8B3D28] text-white rounded-full px-8 font-black font-poppins uppercase tracking-widest hover:bg-[#722F1E]">
                             Add New Address
                         </Button>
                     </div>

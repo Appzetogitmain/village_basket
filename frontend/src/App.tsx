@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy, startTransition } from "react";
 import { CartProvider } from "./context/CartContext";
 import { OrdersProvider } from "./context/OrdersContext";
@@ -193,6 +193,10 @@ function App() {
                         <Routes>
                           {/* Landing Page */}
                           <Route path="/" element={<LandingPage />} />
+                          
+                          {/* Top-level redirects to nested /user routes */}
+                          <Route path="/checkout" element={<Navigate to="/user/checkout" replace />} />
+                          <Route path="/checkout/*" element={<Navigate to="/user/checkout" replace />} />
 
                           {/* Public Routes */}
                           <Route

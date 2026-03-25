@@ -141,7 +141,7 @@ export default function AddressBook() {
         </div>
         <div className="ml-auto">
           <button
-            onClick={() => navigate("/checkout/address")}
+            onClick={() => navigate("/user/checkout/address")}
             className="px-3 py-1.5 text-sm font-black text-white bg-[#8B3D28] rounded-full hover:bg-[#722F1E] font-poppins uppercase tracking-wider"
           >
             Add new
@@ -167,7 +167,7 @@ export default function AddressBook() {
               Save an address to checkout faster next time.
             </p>
             <button
-              onClick={() => navigate("/checkout/address")}
+              onClick={() => navigate("/user/checkout/address")}
               className="px-4 py-2 text-sm font-black text-white bg-[#8B3D28] rounded-full hover:bg-[#722F1E] font-poppins uppercase tracking-widest"
             >
               Add address

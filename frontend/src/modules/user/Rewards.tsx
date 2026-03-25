@@ -19,7 +19,7 @@ export default function Rewards() {
 
   useEffect(() => {
     if (!user) {
-      navigate("/login");
+      navigate("/user/login");
       return;
     }
     fetchData();
