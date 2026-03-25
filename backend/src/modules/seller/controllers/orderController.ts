@@ -5,9 +5,7 @@ import { asyncHandler } from "../../../utils/asyncHandler";
 import Seller from "../../../models/Seller";
 import WalletTransaction from "../../../models/WalletTransaction";
 import Delivery from "../../../models/Delivery";
-import { notifyDeliveryBoysOfNewOrder } from "../../../services/orderNotificationService";
 import { Server as SocketIOServer } from "socket.io";
-import Delivery from "../../../models/Delivery";
 
 /**
  * Get seller's orders with filters, sorting, and pagination
@@ -280,31 +278,6 @@ export const updateOrderStatus = asyncHandler(
     order.status = status;
     await order.save();
 
-    // Trigger delivery notification if seller accepts the order.
-    // Note: If manual assignment is preferred, this could be conditional or disabled.
-    /* 
-    if (status === 'Accepted' && previousStatus !== 'Accepted') {
-      try {
-        const io: SocketIOServer = (req.app.get("io") as SocketIOServer);
-        if (io) {
-          const fullOrder = await Order.findById(order._id)
-            .populate({
-              path: 'items',
-              populate: { path: 'seller' }
-            })
-            .lean();
-
-          if (fullOrder) {
-            await notifyDeliveryBoysOfNewOrder(io, fullOrder);
-            console.log(`Delivery notification triggered for Accepted order ${order.orderNumber}`);
-          }
-        }
-      } catch (notifyError) {
-        console.error('Error notifying delivery boys on seller acceptance:', notifyError);
-      }
-    }
-    */
-
     // If order is delivered, credit seller's balance
     if (status === 'Delivered' && previousStatus !== 'Delivered') {
       const seller = await Seller.findById(sellerId);
@@ -360,11 +333,9 @@ export const updateOrderStatus = asyncHandler(
   }
 );
 
-/**
- * Get all available delivery boys for assignment
- */
+
 export const getDeliveryBoys = asyncHandler(
-  async (req: Request, res: Response) => {
+  async (_req: Request, res: Response) => {
     // Only fetch delivery boys who are active and online
     const deliveryBoys = await Delivery.find({
       status: "Active",

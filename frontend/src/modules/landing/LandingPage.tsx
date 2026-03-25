@@ -14,6 +14,9 @@ import heroProduceImg from '@assets/landing_page/hero_produce.png';
 import appHomeImg from '@assets/landing_page/app_home.png';
 import appCheckoutImg from '@assets/landing_page/app_checkout.png';
 import appTrackingImg from '@assets/landing_page/app_tracking.png';
+import appScrnshot1 from '@assets/landing_page/app_scrnshot.png';
+import appScrnshot2 from '@assets/landing_page/app_category_scrnshot.png';
+import appScrnshot3 from '@assets/landing_page/app_orders_scrnshot.png';
 
 /* ─── Reveal Component ───────────────────────────── */
 function Reveal({ children, width = "fit-content", delay = 0 }: { children: React.ReactNode, width?: "fit-content" | "100%", delay?: number }) {
@@ -104,9 +107,29 @@ function ImageSlider({ images }: { images: string[] }) {
 }
 
 /* ─── App Mockup Component ───────────────────────────────── */
-function AppMockupSlider() {
+function AppMockupSlider({
+  images,
+  width = "w-[280px]",
+  height = "h-[580px]",
+  padding = "p-3",
+  innerPadding = "p-0",
+  objectFit = "object-cover",
+  borderRadiusOuter = "rounded-[3.5rem]",
+  borderRadiusInner = "rounded-[2.8rem]",
+  borderWidth = "border-4"
+}: {
+  images: string[],
+  width?: string,
+  height?: string,
+  padding?: string,
+  innerPadding?: string,
+  objectFit?: "object-cover" | "object-contain",
+  borderRadiusOuter?: string,
+  borderRadiusInner?: string,
+  borderWidth?: string
+}) {
   const [activeAppSlide, setActiveAppSlide] = useState(0);
-  const screenshots = [appHomeImg, appCheckoutImg, appTrackingImg];
+  const screenshots = images;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -116,7 +139,7 @@ function AppMockupSlider() {
   }, [screenshots.length]);
 
   return (
-    <div className="order-2 lg:order-1 relative flex justify-center h-[600px] w-full items-center">
+    <div className="relative flex justify-center h-[600px] w-full items-center">
       {screenshots.map((src, idx) => {
         let diff = idx - activeAppSlide;
         if (diff < -1) diff += 3;
@@ -128,26 +151,26 @@ function AppMockupSlider() {
           <div
             key={idx}
             className={`absolute transition-all duration-1000 ease-in-out cursor-pointer ${isCenter ? 'z-30 scale-100 opacity-100 translate-x-0' :
-              isLeft ? 'z-20 scale-[0.85] opacity-50 -translate-x-[30%] sm:-translate-x-[40%]' :
-                'z-20 scale-[0.85] opacity-50 translate-x-[30%] sm:translate-x-[40%]'
+              isLeft ? 'z-20 scale-[0.85] opacity-50 -translate-x-[30%]' :
+                'z-20 scale-[0.85] opacity-50 translate-x-[30%]'
               }`}
             onClick={() => setActiveAppSlide(idx)}
           >
-            <div className="w-[280px] h-[580px] bg-[#3E2723] rounded-[3.5rem] p-3 shadow-2xl border-4 border-gray-100 relative overflow-hidden group">
+            <div className={`${width} ${height} bg-[#3E2723] ${borderRadiusOuter} ${padding} shadow-2xl ${borderWidth} border-gray-100 relative overflow-hidden group`}>
               {/* Device Notch */}
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-28 h-6 bg-gray-100 rounded-b-2xl z-20"></div>
-              
+
               {/* Screen Content */}
-              <div className="w-full h-full rounded-[2.8rem] overflow-hidden bg-white relative flex flex-col items-center">
+              <div className={`w-full h-full ${borderRadiusInner} overflow-hidden bg-white relative flex flex-col items-center justify-center ${innerPadding}`}>
                 <motion.img
-                  initial={{ scale: 1.1 }}
-                  animate={{ scale: isCenter ? 1 : 1.1 }}
-                  transition={{ duration: 1.5 }}
+                  initial={{ scale: 1 }}
+                  animate={{ scale: isCenter ? 1 : 0.95 }}
+                  transition={{ duration: 0.8 }}
                   src={src}
                   alt={`App Screen ${idx + 1}`}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full ${objectFit}`}
                 />
-                
+
                 {/* Overlay for inactive screens */}
                 {!isCenter && <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]"></div>}
               </div>
@@ -155,12 +178,12 @@ function AppMockupSlider() {
           </div>
         );
       })}
-      
+
       {/* Slide Indicators */}
       <div className="absolute -bottom-10 flex gap-2">
         {screenshots.map((_, i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${i === activeAppSlide ? 'bg-[#8B3D28] w-6' : 'bg-[#8B3D28]/20'}`}
           />
         ))}
@@ -465,33 +488,30 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Visual Right - Refined with lighter frame */}
+            {/* Visual Right - App Screenshots Slider */}
             <div className="flex-1 w-full lg:w-auto flex justify-center lg:justify-end relative">
-              <div className="relative w-full max-w-[360px]">
-                {/* QR Code Optimized */}
-                <div className="absolute top-10 -left-6 transform -translate-x-1/2 hidden md:block bg-white p-5 rounded-3xl shadow-xl z-20 border border-[#8B3D28]/5 animate-bounce" style={{ animationDuration: '5s' }}>
-                  <div className="w-20 h-20 bg-stone-50 rounded-xl grid grid-cols-4 grid-rows-4 gap-1 p-2">
+              <div className="relative w-full">
+                {/* QR Code Case - Positioned relative to the slider container */}
+                <div className="absolute top-10 left-0 lg:-left-12 transform -translate-x-1/2 hidden md:block bg-white p-4 rounded-3xl shadow-xl z-40 border border-[#8B3D28]/5 animate-bounce" style={{ animationDuration: '5s' }}>
+                  <div className="w-16 h-16 bg-stone-50 rounded-xl grid grid-cols-4 grid-rows-4 gap-1 p-2">
                     {[...Array(16)].map((_, i) => (
                       <div key={i} className={`rounded-sm ${(i * 17) % 4 === 0 ? 'bg-[#3E2723]' : 'bg-[#FAF7F2]'}`}></div>
                     ))}
                   </div>
-                  <p className="text-[8px] font-black text-center mt-3 text-[#3E2723]/30 uppercase tracking-[0.2em]">Scan to Get App</p>
+                  <p className="text-[7px] font-black text-center mt-2 text-[#3E2723]/30 uppercase tracking-[0.2em]">Scan for App</p>
                 </div>
-                {/* App Frame - Modern Cream/White style */}
-                <div className="w-[280px] h-[560px] bg-white rounded-[3.5rem] p-3 shadow-[0_30px_70px_rgba(139,61,40,0.15)] border-4 border-[#8B3D28]/10 mx-auto rotate-2 group-hover:rotate-0 transition-transform duration-1000">
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-[#FAF7F2] rounded-b-2xl z-20"></div>
-                  <div className="w-full h-full rounded-[2.8rem] overflow-hidden bg-[#FAF7F2] relative">
-                    <img src={veggiesImg} alt="App" className="w-full h-full object-cover opacity-90" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#3E2723]/90 via-[#3E2723]/20 to-transparent"></div>
-                    <div className="absolute bottom-10 left-6 right-6 text-white">
-                      <p className="text-[9px] font-black text-[#E5A93D] uppercase tracking-widest mb-1 opacity-80">Farmer Connect</p>
-                      <h4 className="text-xl font-black mb-3 leading-tight tracking-tight">Village Basket <br /> Harvest Tracker.</h4>
-                      <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
-                        <div className="w-3/4 h-full bg-[#E5A93D] shadow-[0_0_10px_#E5A93D]"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+
+                <AppMockupSlider
+                  images={[appScrnshot1, appScrnshot2, appScrnshot3]}
+                  width="w-[240px]"
+                  height="h-[480px]"
+                  padding="p-1.5"
+                  innerPadding="p-1"
+                  objectFit="object-contain"
+                  borderRadiusOuter="rounded-[3rem]"
+                  borderRadiusInner="rounded-[2.5rem]"
+                  borderWidth="border-[2px]"
+                />
               </div>
             </div>
           </div>
@@ -554,7 +574,9 @@ export default function LandingPage() {
       {/* ── 7. App Features ─────────────────────────────── */}
       <section id="app-features" className="py-24 px-4 sm:px-6 max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <AppMockupSlider />
+          <div className="order-2 lg:order-1 w-full">
+            <AppMockupSlider images={[appHomeImg, appCheckoutImg, appTrackingImg]} />
+          </div>
           {/* Features Text */}
           <div className="order-1 lg:order-2">
             <p className="text-[#8B3D28] text-xs font-black uppercase tracking-[0.25em] mb-3">Seamless Experience</p>
