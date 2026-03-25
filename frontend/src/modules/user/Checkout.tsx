@@ -146,7 +146,28 @@ export default function Checkout() {
       setSlotsLoading(true);
       try {
         const res = await getActiveDeliverySlots();
-        if (res.success) setAvailableSlots(res.data);
+        if (res.success) {
+          // Sort slots based on the order: Early morning, morning, afternoon, evening, night
+          const getSlotPriority = (name: string) => {
+            const n = (name || '').toLowerCase();
+            if (n.includes('early')) return 0;
+            if (n.includes('morning')) return 1;
+            if (n.includes('afternoon') || n.includes('noon')) return 2;
+            if (n.includes('evening')) return 3;
+            if (n.includes('night')) return 4;
+            return 5;
+          };
+
+          const sortedSlots = [...res.data].sort((a, b) => {
+            const priorityA = getSlotPriority(a.name);
+            const priorityB = getSlotPriority(b.name);
+            if (priorityA !== priorityB) return priorityA - priorityB;
+            // Fallback to startTime if names have the same priority
+            return (a.startTime || '').localeCompare(b.startTime || '');
+          });
+
+          setAvailableSlots(sortedSlots);
+        }
       } catch (e) {
         console.error('Failed to load delivery slots', e);
       } finally {

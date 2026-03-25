@@ -18,7 +18,7 @@ export default function Account() {
   const { showToast } = useToast();
   const [testNotifLoading, setTestNotifLoading] = useState(false);
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<'profile' | 'subscriptions'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile'>('profile');
 
   useEffect(() => {
     if (location.state && (location.state as any).activeTab) {
@@ -177,28 +177,14 @@ export default function Account() {
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Profile Section Header */}
       <div className="px-4 -mt-6 mb-6">
-        <div className="flex bg-white rounded-2xl p-1.5 border border-stone-100 shadow-xl max-w-md mx-auto">
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'profile' ? 'bg-village-umber text-white shadow-md' : 'text-stone-400'
-              }`}
-          >
-            My Profile
-          </button>
-          <button
-            onClick={() => setActiveTab('subscriptions')}
-            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'subscriptions' ? 'bg-village-green text-white shadow-md' : 'text-stone-400'
-              }`}
-          >
-            Daily Service
-          </button>
+        <div className="bg-white rounded-2xl p-4 border border-stone-100 shadow-xl max-w-md mx-auto text-center">
+            <span className="text-[10px] font-black text-village-umber uppercase tracking-[0.2em]">Account Management</span>
         </div>
       </div>
 
       <div className="px-4 max-w-2xl mx-auto">
-        {activeTab === 'profile' ? (
           <div className="space-y-6">
             {/* Quick Actions */}
             <div className="grid grid-cols-2 gap-3">
@@ -292,10 +278,7 @@ export default function Account() {
             </div>
             <p className="text-center text-[10px] text-stone-300 font-bold uppercase tracking-widest pb-10">Version 2.4.0 • Village Basket</p>
           </div>
-        ) : (
-          <DailyServiceList />
-        )}
-      </div>
+          </div>
 
       {showGstModal && (
         <>

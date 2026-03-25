@@ -653,12 +653,6 @@ export default function ProductDetail() {
             </svg>
           </button>
 
-          {/* Daily Service Selection */}
-          <DailyServiceSelector
-            isSubscriptionMode={isSubscriptionMode}
-            onModeToggle={setIsSubscriptionMode}
-            dailyPrice={variantPrice}
-          />
         </div>
 
         {/* Expanded Product Details Section */}
@@ -1079,67 +1073,7 @@ export default function ProductDetail() {
           {/* Right side - Add to cart button or Quantity Stepper */}
           <div className="flex items-center">
             <AnimatePresence mode="wait">
-              {isSubscriptionMode ? (
-                !isDailyInCart ? (
-                  <motion.button
-                    key="add-daily"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    onClick={() => {
-                      if (!isAuthenticated) {
-                        navigate('/login', { state: { from: routerLocation.pathname } });
-                        return;
-                      }
-
-                      addToDailyServiceCart({
-                        productId: product.id || product._id,
-                        productName: product.name,
-                        productImage: currentImage,
-                        variantId: selectedVariant?._id,
-                        variantName: variantTitle,
-                        quantity: 1,
-                        pricePerDay: variantPrice,
-                      });
-                      showToast(`Added to Daily Service Basket!`, 'success');
-                    }}
-                    className="px-5 h-9 bg-village-green text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-village-green/20 active:scale-95 transition-all"
-                  >
-                    Add to Daily Basket
-                  </motion.button>
-                ) : (
-                  <motion.div
-                    key="daily-stepper"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="flex items-center gap-2.5 bg-village-green/5 border border-village-green/10 rounded-xl px-1.5 py-1 h-9 shadow-inner"
-                  >
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => updateDailyServiceCartQuantity(currentProductId, dailyInCartQty - 1, selectedVariant?._id)}
-                      className="w-6 h-6 flex items-center justify-center text-village-green font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-village-green/10 p-0 leading-none text-sm bg-white"
-                    >
-                      <span>−</span>
-                    </motion.button>
-                    <motion.span
-                      key={dailyInCartQty}
-                      initial={{ scale: 1.2, y: -2 }}
-                      animate={{ scale: 1, y: 0 }}
-                      className="text-xs font-black text-village-green min-w-[1.25rem] text-center"
-                    >
-                      {dailyInCartQty}
-                    </motion.span>
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => updateDailyServiceCartQuantity(currentProductId, dailyInCartQty + 1, selectedVariant?._id)}
-                      className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-green"
-                    >
-                      <span>+</span>
-                    </motion.button>
-                  </motion.div>
-                )
-              ) : inCartQty === 0 ? (
+              {inCartQty === 0 ? (
                 <motion.div
                   key="add-button"
                   initial={{ opacity: 0, scale: 0.9 }}

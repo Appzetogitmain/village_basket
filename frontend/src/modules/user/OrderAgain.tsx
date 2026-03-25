@@ -110,7 +110,7 @@ export default function OrderAgain() {
               return (
                 <div
                   key={order.id}
-                  onClick={() => navigate(`/orders/${order.id}`)}
+                  onClick={() => navigate(`/user/orders/${order.id}`)}
                   className="village-card paper-texture organic-radius p-3 active:scale-[0.98] transition-all cursor-pointer bg-white relative shadow-sm border border-neutral-100/50"
                 >
                   <div className="flex justify-between items-start mb-1">
@@ -189,7 +189,7 @@ export default function OrderAgain() {
 
             return (
               <div key={product.id} className="village-card paper-texture organic-radius overflow-hidden flex flex-col bg-white min-w-[155px] max-w-[155px] snap-start">
-                <div onClick={() => navigate(`/product/${product.id}`)} className="relative aspect-square w-full bg-neutral-50 flex items-center justify-center p-3 cursor-pointer">
+                <div onClick={() => navigate(`/user/product/${product.id}`)} className="relative aspect-square w-full bg-neutral-50 flex items-center justify-center p-3 cursor-pointer">
                   <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain drop-shadow-md" />
                   {discount > 0 && (
                     <div className="absolute top-2 left-0 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-r-sm shadow-sm">

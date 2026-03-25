@@ -114,7 +114,7 @@ export default function PetStore() {
                   className="bg-white rounded-lg overflow-hidden flex flex-col relative"
                   style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}
                 >
-                  <Link to={`/product/${product.id}`} className="relative block">
+                  <Link to={`/user/product/${product.id}`} className="relative block">
                     <div className="w-full h-20 bg-neutral-100 flex items-center justify-center overflow-hidden relative">
                       {product.imageUrl ? (
                         <img
@@ -142,7 +142,7 @@ export default function PetStore() {
                     </div>
 
                     <div className="flex items-start justify-between gap-1 mb-0.5">
-                      <Link to={`/product/${product.id}`} className="flex-1 min-w-0">
+                      <Link to={`/user/product/${product.id}`} className="flex-1 min-w-0">
                         <h3 className="text-[10px] font-black text-neutral-900 line-clamp-2 leading-tight uppercase">
                           {product.name}
                         </h3>
@@ -249,7 +249,7 @@ export default function PetStore() {
                   </AnimatePresence>
 
                   <Link
-                    to={`/category/pet`}
+                    to={`/user/category/pet`}
                     className="w-full bg-green-100 text-green-700 text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 hover:bg-green-200 transition-colors mt-1"
                   >
                     <span>See more like this</span>

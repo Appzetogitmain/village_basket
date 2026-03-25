@@ -132,7 +132,7 @@ export default function SpiritualStore() {
                   style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)' }}
                 >
                   {/* Product Image */}
-                  <Link to={`/product/${product.id}`} className="relative block">
+                  <Link to={`/user/product/${product.id}`} className="relative block">
                     <div className="w-full h-20 bg-neutral-100 flex items-center justify-center overflow-hidden relative">
                       {product.imageUrl ? (
                         <img
@@ -163,7 +163,7 @@ export default function SpiritualStore() {
                     </div>
 
                     {/* Product Name */}
-                    <Link to={`/product/${product.id}`} className="mb-0.5">
+                    <Link to={`/user/product/${product.id}`} className="mb-0.5">
                       <h3 className="text-[10px] font-bold text-neutral-900 line-clamp-2 leading-tight">
                         {product.name}
                       </h3>
@@ -283,7 +283,7 @@ export default function SpiritualStore() {
 
                     {/* Bottom Link */}
                     <Link
-                      to={`/category/spiritual`}
+                      to={`/user/category/spiritual`}
                       className="w-full bg-green-100 text-green-700 text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 hover:bg-green-200 transition-colors mt-1"
                     >
                       <span>See more like this</span>

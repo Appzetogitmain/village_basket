@@ -13,6 +13,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const path = typeof window !== 'undefined' ? window.location.pathname : '';
   const [animationData, setAnimationData] = useState<any>(null);
   const [lockedPath, setLockedPath] = useState<string>(path);
+  const [currentAnimationName, setCurrentAnimationName] = useState<string>('bullock_cart.json');
 
   useEffect(() => {
     if (!isRouteLoading && !forceShow) {
@@ -26,35 +27,27 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const currentPath = (isRouteLoading || forceShow) ? lockedPath : path;
 
   useEffect(() => {
-    let animationName = 'Basket.json';
+    // List of rotating Indian Village animations provided by the user
+    const ROTATING_ANIMATIONS = [
+      'indian_woman_vegetables.json',
+      'india_man_mango_plucking.json',
+      'indian_man_choose_fruits.json',
+      'indian_man_spices.json'
+    ];
 
-    if (currentPath.includes('/login')) {
-      animationName = 'login_animation.json';
-    } else if (
-      currentPath === '/' || 
-      currentPath === '/user/home' || 
-      currentPath.includes('/categories') || 
-      currentPath.includes('/category') || 
-      currentPath.includes('/about-us') || 
-      currentPath.includes('/faq') || 
-      currentPath.includes('/help') ||
-      currentPath.includes('/search')
-    ) {
-      animationName = 'Apple tree.json';
-    } else if (
-      currentPath.includes('/cart') || 
-      currentPath.includes('/checkout') || 
-      currentPath.includes('/wishlist') || 
-      currentPath.includes('/orders') || 
-      currentPath.includes('/order-again') || 
-      currentPath.includes('/wallet') || 
-      currentPath.includes('/rewards')
-    ) {
-      animationName = 'Thanksgiving basket.json';
+    let animationName = 'bullock_cart.json'; // Default to the iconic bullock cart
+
+    // Home & Root page always use the Bullock Cart as the primary "Load" experience
+    // Added /user and /user/ to ensure the redirect after login defaults to bullock cart
+    if (currentPath === '/' || currentPath === '/user' || currentPath === '/user/' || currentPath === '/user/home') {
+      animationName = 'bullock_cart.json';
     } else {
-      animationName = 'Basket.json'; // Default for product details, store, account, address, and all others
+      // For all other route transitions, pick one of the other 4 "village life" scenes at random
+      const index = Math.floor(Math.random() * ROTATING_ANIMATIONS.length);
+      animationName = ROTATING_ANIMATIONS[index];
     }
 
+    setCurrentAnimationName(animationName);
     fetch(`/animations/${animationName}`)
       .then(res => res.json())
       .then(data => setAnimationData(data))
@@ -62,7 +55,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   }, [currentPath]);
 
   const show = isRouteLoading || forceShow;
-  
+
   // Detect themes using currentPath
   const isDelivery = currentPath.includes('/delivery');
   const isAdmin = currentPath.includes('/admin');
@@ -75,25 +68,25 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
     exit: { opacity: 0, scale: 1.1 }
   };
 
+  const currentAnimation = currentAnimationName;
+  const isExtraLarge = currentAnimation === 'indian_man_spices.json' ||
+    currentAnimation === 'indian_woman_vegetables.json' ||
+    currentAnimation === 'bullock_cart.json';
+
   const renderAnimation = () => {
-    // 14. LOGIN: LOTTIE ANIMATION (Original)
-    if (currentPath.includes('/login')) {
-      return (
-        <div className="w-64 h-64 flex items-center justify-center transform -translate-y-4">
-          {animationData ? (
-            <Lottie animationData={animationData} loop={true} />
-          ) : (
-            <div className="w-16 h-16 border-4 border-amber-600 border-t-transparent rounded-full animate-spin" />
-          )}
-        </div>
-      );
+    const isRotatingVariant = currentAnimation !== 'bullock_cart.json';
+
+    // Tailored sizes for different animation types
+    let sizeClasses = "w-[600px] h-[600px]"; // Primary animations scale (Bullock Cart, Spices, Vegetables)
+    
+    if (isRotatingVariant && !isExtraLarge) {
+      sizeClasses = "w-[400px] h-[400px]"; // Slightly reduced scale for mango and fruit scenes for better framing
     }
 
-    // Return Lottie animation globally for all User frontend routes.
     return (
-      <div className="w-48 h-48 flex items-center justify-center">
+      <div className={`${sizeClasses} flex items-center justify-center`}>
         {animationData ? (
-          <Lottie animationData={animationData} loop={true} />
+          <Lottie animationData={animationData} loop={true} className="w-full h-full" />
         ) : (
           <div className="w-12 h-12 border-4 border-village-green border-t-transparent rounded-full animate-spin" />
         )}
@@ -122,7 +115,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
     if (currentPath.includes('/faq') || currentPath.includes('/help')) return { h2: "Village Support", p: "Resolving your queries" };
     if (currentPath.includes('/about-us')) return { h2: "Our Village Story", p: "The roots of the brand" };
     if (currentPath.includes('/login')) return { h2: "Welcome Back", p: "Lighting the way for you" };
-    
+
     return { h2: "Village Basket", p: "Bringing the village to you" };
   };
 
@@ -143,16 +136,16 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
             zIndex: 10000
           }}
         >
-          <div className="flex flex-col items-center justify-center p-4 max-w-xs w-full">
+          <div className="flex flex-col items-center justify-center p-4 max-w-2xl w-full">
             <motion.div
               variants={containerVariants}
               initial="initial"
               animate="animate"
               exit="exit"
-              className="flex flex-col items-center justify-center space-y-8"
+              className={`flex flex-col items-center justify-center ${isExtraLarge ? 'space-y-0' : 'space-y-2'} translate-y-12`} // Repositioned for larger scale
             >
               {/* Animation Container */}
-              <div className="relative h-40 flex items-center justify-center">
+              <div className={`relative ${isExtraLarge ? 'min-h-[600px]' : 'min-h-[480px]'} flex items-center justify-center`}>
                 {/* Speed Lines Effects */}
                 <div className="absolute inset-0 pointer-events-none">
                   {[...Array(4)].map((_, i) => (
@@ -178,39 +171,20 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
                 </div>
 
                 {renderAnimation()}
-                
+
                 {/* Ground Shadow */}
                 <motion.div
-                  className="absolute bottom-4 w-20 h-2 bg-black/5 rounded-[50%] blur-[2px]"
+                  className="absolute bottom-4 w-28 h-2 bg-black/5 rounded-[50%] blur-[2px]"
                   animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
               </div>
 
-              {/* Branding & Status Text */}
-              <div className="text-center space-y-3">
-                <motion.h2 
-                  className="text-stone-800 font-black text-xs uppercase tracking-[0.4em] italic leading-none"
-                  animate={{ opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {text.h2}
-                </motion.h2>
-                
-                <div className="flex flex-col items-center gap-3">
-                  <div className="h-[2px] w-12 bg-stone-100 relative overflow-hidden rounded-full">
-                    <motion.div 
-                      className="absolute inset-y-0 left-0 bg-village-green"
-                      animate={{ left: ['-100%', '100%'] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                      style={{ width: '50%' }}
-                    />
-                  </div>
-                  
-                  <p className="text-village-green/60 text-[9px] font-bold uppercase tracking-[0.2em] leading-none">
-                    {text.p}
-                  </p>
-                </div>
+              {/* Status Text (Single Line) */}
+              <div className={`text-center ${isExtraLarge ? '-mt-24' : ''}`}>
+                <p className="text-village-green font-bold text-[10px] uppercase tracking-[0.2em] leading-none opacity-60">
+                  {text.p}
+                </p>
               </div>
             </motion.div>
           </div>

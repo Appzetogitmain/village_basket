@@ -288,7 +288,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     </svg>
                   </button>
                   <button
-                    onClick={() => navigate('/user/checkout')}  
+                    onClick={() => navigate('/user/checkout')}
                     className="text-white p-1 hover:bg-white/10 rounded-full transition-colors relative"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -298,7 +298,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     </svg>
                   </button>
                   <button
-                    onClick={() => navigate('/user/account')}  
+                    onClick={() => navigate('/user/account')}
                     className="hidden md:flex text-white p-1 hover:bg-white/10 rounded-full transition-colors"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -398,31 +398,65 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <motion.nav
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="pointer-events-auto h-[54px] bg-[#8B3D28]/95 backdrop-blur-md rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.3)] border border-white/10 flex items-center justify-around px-2 relative"
+                className="pointer-events-auto h-[74px] bg-[#8B3D28]/95 backdrop-blur-md rounded-2xl shadow-[0_8px_35px_rgba(0,0,0,0.4)] border border-white/10 flex items-center justify-around px-2 relative overflow-hidden"
               >
+                {/* Active Indicator Layer (Sliding Pill) */}
+                <div className="absolute inset-0 px-2 flex items-center justify-around pointer-events-none">
+                  {['home', 'orders', 'categories', 'account'].map((tab) => {
+                    const isTabActive =
+                      (tab === 'home' && (isActive('/user') || isActive('/user/'))) ||
+                      (tab === 'orders' && isActive('/user/order-again')) ||
+                      (tab === 'categories' && isCategoriesActive) ||
+                      (tab === 'account' && isActive('/user/account'));
+
+                    return (
+                      <div key={tab} className="flex-1 flex items-center justify-center relative">
+                        {isTabActive && (
+                          <motion.div
+                            layoutId="mobileActiveTab"
+                            className="w-[64px] h-[64px] bg-[#FFF9F0] shadow-2xl rounded-[20px]"
+                            initial={false}
+                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
                 {/* Home */}
                 <Link to="/user" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div animate={{ scale: (isActive('/user') || isActive('/user/')) ? 1.1 : 1, y: (isActive('/user') || isActive('/user/')) ? -1 : 0 }} transition={{ duration: 0.2 }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill={(isActive('/user') || isActive('/user/')) ? 'white' : 'none'} stroke={(isActive('/user') || isActive('/user/')) ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <motion.div
+                    animate={{
+                      scale: (isActive('/user') || isActive('/user/')) ? 1.05 : 1,
+                    }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={(isActive('/user') || isActive('/user/')) ? '#8B3D28' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-300">
                       <path d="M3 9.5L12 3l9 6.5V20c0 1-1 2-2 2H5c-1 0-2-1-2-2V9.5z" />
                       <polyline points="9 22 9 12 15 12 15 22" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${(isActive('/user') || isActive('/user/')) ? 'text-white' : 'text-white/50'}`}>
+                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${(isActive('/user') || isActive('/user/')) ? 'text-[#8B3D28]' : 'text-white/40'}`}>
                     HOME
                   </span>
                 </Link>
 
                 {/* Orders */}
                 <Link to="/user/order-again" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div animate={{ scale: isActive('/user/order-again') ? 1.1 : 1, y: isActive('/user/order-again') ? -1 : 0 }} transition={{ duration: 0.2 }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/user/order-again') ? 'white' : 'none'} stroke={isActive('/user/order-again') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <motion.div
+                    animate={{
+                      scale: isActive('/user/order-again') ? 1.05 : 1,
+                    }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isActive('/user/order-again') ? '#8B3D28' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-300">
                       <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
                       <line x1="3" y1="6" x2="21" y2="6" />
                       <path d="M16 10a4 4 0 01-8 0" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/user/order-again') ? 'text-white' : 'text-white/50'}`}>
+                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isActive('/user/order-again') ? 'text-[#8B3D28]' : 'text-white/40'}`}>
                     ORDERS
                   </span>
                 </Link>
@@ -431,33 +465,40 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <Link to="/user/categories" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
                   <motion.div
                     animate={{
-                      scale: isCategoriesActive ? 1.1 : 1,
-                      y: isCategoriesActive ? -1 : 0,
+                      scale: isCategoriesActive ? 1.05 : 1,
                       rotate: categoriesRotation
                     }}
-                    transition={{ duration: 0.4 }}
+                    transition={{
+                      rotate: { duration: 0.5, ease: "backOut" },
+                      scale: { duration: 0.2 }
+                    }}
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isCategoriesActive ? 'white' : 'none'} stroke={isCategoriesActive ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isCategoriesActive ? '#8B3D28' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-300">
                       <rect x="3" y="3" width="7" height="7" />
                       <rect x="14" y="3" width="7" height="7" />
                       <rect x="14" y="14" width="7" height="7" />
                       <rect x="3" y="14" width="7" height="7" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isCategoriesActive ? 'text-white' : 'text-white/50'}`}>
+                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isCategoriesActive ? 'text-[#8B3D28]' : 'text-white/40'}`}>
                     CATEGORIES
                   </span>
                 </Link>
 
                 {/* Profile */}
                 <Link to="/user/account" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div animate={{ scale: isActive('/user/account') ? 1.1 : 1, y: isActive('/user/account') ? -1 : 0 }} transition={{ duration: 0.2 }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill={isActive('/user/account') ? 'white' : 'none'} stroke={isActive('/user/account') ? 'white' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <motion.div
+                    animate={{
+                      scale: isActive('/user/account') ? 1.05 : 1,
+                    }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isActive('/user/account') ? '#8B3D28' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-300">
                       <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
                       <circle cx="12" cy="7" r="4" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[8px] mt-1 font-black font-poppins tracking-tighter ${isActive('/user/account') ? 'text-white' : 'text-white/50'}`}>
+                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isActive('/user/account') ? 'text-[#8B3D28]' : 'text-white/40'}`}>
                     ACCOUNT
                   </span>
                 </Link>

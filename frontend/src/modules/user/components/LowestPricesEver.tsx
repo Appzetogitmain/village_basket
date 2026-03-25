@@ -58,7 +58,7 @@ const ProductCard = memo(({
     >
       <div
         className="village-card white-paper-texture organic-radius overflow-hidden flex flex-col relative h-full bg-white shadow-[0_8px_16px_rgba(0,0,0,0.06)] border border-neutral-100/50 transition-all hover:shadow-xl active:scale-[0.98]"
-        onClick={() => navigate(`/product/${product.id}`)}
+        onClick={() => navigate(`/user/product/${product.id}`)}
       >
         {/* Image Section */}
         <div className="relative w-full aspect-square bg-gradient-to-b from-neutral-50 to-white flex items-center justify-center p-2">

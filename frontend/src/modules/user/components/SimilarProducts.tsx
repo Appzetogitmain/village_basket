@@ -29,7 +29,7 @@ export default function SimilarProducts({ products, currentProductId }: SimilarP
             return (
               <div
                 key={product.id}
-                onClick={() => navigate(`/product/${product.id}`)}
+                onClick={() => navigate(`/user/product/${product.id}`)}
                 className="flex-shrink-0 w-32 bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
               >
                 {/* Image */}

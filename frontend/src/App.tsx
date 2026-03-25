@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { Suspense, lazy, startTransition } from "react";
 import { CartProvider } from "./context/CartContext";
 import { OrdersProvider } from "./context/OrdersContext";
@@ -10,7 +10,6 @@ import { ToastProvider } from "./context/ToastContext";
 import { LoadingProvider } from "./context/LoadingContext";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { WishlistProvider } from "./context/WishlistContext";
-import DailyServiceBasketBar from './modules/user/components/DailyServiceBasketBar';
 
 import { AxiosLoadingInterceptor } from "./context/AxiosLoadingInterceptor";
 import IconLoader from "./components/loaders/IconLoader";
@@ -32,7 +31,6 @@ import LandingPage from "./modules/landing/LandingPage";
 import Home from "./modules/user/Home";
 import Checkout from "./modules/user/Checkout";
 import Wishlist from './modules/user/Wishlist';
-import DailyServiceCheckout from './modules/user/DailyServiceCheckout';
 
 import CheckoutAddress from "./modules/user/CheckoutAddress";
 import ProductDetail from "./modules/user/ProductDetail";
@@ -158,6 +156,16 @@ const AdminRewardOrders = lazy(() => import("./modules/admin/pages/AdminRewardOr
 const UserRewards = lazy(() => import("./modules/user/Rewards"));
 const AdminDeliverySlots = lazy(() => import("./modules/admin/pages/AdminDeliverySlots"));
 
+const ProductRedirect = () => {
+  const { id } = useParams();
+  return <Navigate to={`/user/product/${id}`} replace />;
+};
+
+const CategoryRedirect = () => {
+  const { id } = useParams();
+  return <Navigate to={`/user/category/${id}`} replace />;
+};
+
 function App() {
   // Initialize push notifications on app load
   useEffect(() => {
@@ -187,7 +195,6 @@ function App() {
                           v7_startTransition: true,
                           v7_relativeSplatPath: true,
                         }}>
-                        <DailyServiceBasketBar />
                         <IconLoader />
                         <RouteLoaderTrigger />
                         <Routes>
@@ -197,6 +204,16 @@ function App() {
                           {/* Top-level redirects to nested /user routes */}
                           <Route path="/checkout" element={<Navigate to="/user/checkout" replace />} />
                           <Route path="/checkout/*" element={<Navigate to="/user/checkout" replace />} />
+                          <Route path="/product/:id" element={<ProductRedirect />} />
+                          <Route path="/category/:id" element={<CategoryRedirect />} />
+                          <Route path="/login" element={<Navigate to="/user/login" replace />} />
+                          <Route path="/home" element={<Navigate to="/user/home" replace />} />
+                          <Route path="/search" element={<Navigate to="/user/search" replace />} />
+                          <Route path="/wishlist" element={<Navigate to="/user/wishlist" replace />} />
+                          <Route path="/orders" element={<Navigate to="/user/orders" replace />} />
+                          <Route path="/account" element={<Navigate to="/user/account" replace />} />
+                          <Route path="/addresses" element={<Navigate to="/user/addresses" replace />} />
+                          <Route path="/rewards" element={<Navigate to="/user/rewards" replace />} />
 
                           {/* Public Routes */}
                           <Route
@@ -412,7 +429,6 @@ function App() {
                                     <Route path="about-us" element={<AboutUs />} />
                                     <Route path="faq" element={<FAQ />} />
                                     <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-                                    <Route path="daily-service/checkout" element={<ProtectedRoute><DailyServiceCheckout /></ProtectedRoute>} />
                                     <Route path="categories" element={<Categories />} />
                                     <Route path="category/:id" element={<Category />} />
                                     <Route path="address-book" element={<AddressBook />} />

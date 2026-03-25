@@ -180,7 +180,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                     categoryId: categoryId,
                     productId: productId,
                     subcategoryImages: card.images || [], // Explicitly map backend images
-                    slug: product ? `product/${productId}` : (subCategory?.slug || categoryId), // Use product path or category path
+                    slug: product ? `user/product/${productId}` : (subCategory?.slug || categoryId), // Use product path or category path
                     imageUrl: product?.mainImage || subCategory?.image || subCategory?.subcategoryImage,
                     bgColor: "bg-white",
                     type: product ? 'product' : 'category'
@@ -559,7 +559,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
       // Convert to string if it's an object
       const idString = typeof productId === 'string' ? productId : String(productId);
       if (idString && idString !== 'fallback' && idString.length > 0) {
-        navigate(`/product/${idString}`);
+        navigate(`/user/product/${idString}`);
       }
     }
   };
@@ -649,7 +649,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
             return (
               <div key={`${card.id || 'promo'}-${index}`} className="flex-shrink-0 w-[125px] promo-card">
                 <Link
-                  to={card.type === 'product' ? `/product/${card.productId}` : (card.slug || card.categoryId ? `/category/${card.slug || card.categoryId}` : "#")}
+                  to={card.type === 'product' ? `/user/product/${card.productId}` : (card.slug || card.categoryId ? `/user/category/${card.slug || card.categoryId}` : "#")}
                   className="h-[140px] bg-white rounded-[1.5rem] p-3 flex flex-col overflow-hidden relative shadow-md no-underline group active:scale-[0.98] transition-all"
                 >
                   <div className="bg-[#4A7C59] text-white text-[7px] font-black px-1.5 py-0.5 rounded-full inline-block uppercase tracking-tighter mb-2 self-start ring-2 ring-[#4A7C59]/10">

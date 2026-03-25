@@ -4,7 +4,7 @@ import { sendOTP, verifyOTP } from '../../services/api/auth/customerAuthService'
 import { useAuth } from '../../context/AuthContext';
 import OTPInput from '../../components/OTPInput';
 import Lottie from 'lottie-react';
-import groceryAnimation from '../../../assets/animation/Grocery-animation.json';
+import loginAnimation from '../../../assets/login/login_screen2.json';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -61,63 +61,62 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen w-screen bg-white flex flex-col items-center justify-center p-4 overflow-hidden fixed inset-0">
+    <div className="h-screen w-screen bg-white flex flex-col items-center p-0 overflow-y-auto overflow-x-hidden fixed inset-0">
 
-      {/* Main Card */}
-      <div className="w-full max-w-md relative z-10">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-6 left-6 z-50 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center text-neutral-600 hover:bg-neutral-50 transition-colors"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
 
-        {/* Animation Section */}
-        <div className="w-full bg-white p-4 pb-0 flex flex-col items-center">
-          {/* Logo */}
-          <div className="mb-1">
-            <img
-              src="/assets/village_basket-removebg-preview.png"
-              alt="Village_basket"
-              className="h-16 w-auto object-contain drop-shadow-sm"
-            />
-          </div>
-
-          {/* Lottie Animation */}
-          <div className="w-40 h-40 sm:w-48 sm:h-48">
-            <Lottie animationData={groceryAnimation} loop={true} />
-          </div>
-
-          <h2 className="text-xl font-bold text-neutral-800 text-center mt-[-10px] mb-1">
-            {showOTP ? 'Verification' : 'Welcome Back!'}
-          </h2>
-          <p className="text-neutral-500 text-center text-[13px] mb-4 px-6 leading-tight">
-            {showOTP
-              ? `Enter code sent to +91 ${mobileNumber}`
-              : 'Groceries delivered in 15 mins. Login to continue.'}
-          </p>
+      {/* Top Animation Section - Truly Edge-to-Edge (Brute Force) */}
+      <div className="w-screen h-[80vh] relative overflow-hidden p-0 m-0 flex justify-center">
+        <div className="w-[120vw] h-full absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
+          <Lottie
+            animationData={loginAnimation}
+            loop={true}
+            className="w-full h-full object-cover scale-[1.5] translate-y-[-5%]"
+          />
         </div>
+      </div>
 
-        {/* Input Section */}
-        <div className="px-6 pb-6">
+      {/* Content Section - Bottom Part */}
+      <div className="w-full max-w-md px-8 flex flex-col items-center justify-center flex-1 py-6">
+
+        {showOTP && (
+          <div className="text-center mb-8">
+            <h2 className="text-xl font-bold text-neutral-800 uppercase tracking-widest">Verification</h2>
+            <p className="text-neutral-500 text-sm mt-1">
+              Enter code sent to +91 {mobileNumber}
+            </p>
+          </div>
+        )}
+
+        {/* Input Form */}
+        <div className="w-full space-y-4">
           {!showOTP ? (
-            <div className="space-y-3">
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <span className="text-neutral-400 font-medium text-base">+91</span>
+            <div className="space-y-4">
+              <div className="flex h-11 bg-white border-2 border-neutral-100 rounded-xl overflow-hidden focus-within:border-[#8B3D28]/30 transition-all shadow-sm">
+                <div className="w-16 flex items-center justify-center border-r-2 border-neutral-50 bg-neutral-50/30">
+                  <span className="text-neutral-600 font-black text-base">+91</span>
                 </div>
                 <input
                   type="tel"
                   value={mobileNumber}
                   onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  className="block w-full pl-14 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-base font-medium text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all"
                   placeholder="Enter mobile number"
+                  className="flex-1 px-4 py-2 outline-none text-neutral-800 font-bold text-base placeholder:text-neutral-300 placeholder:font-medium"
                   maxLength={10}
                   disabled={loading}
                 />
               </div>
 
               {error && (
-                <div className="p-2.5 bg-red-50 border border-red-100 rounded-xl flex items-center gap-2 text-xs text-red-600 animate-fadeIn">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                    <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    <circle cx="12" cy="16" r="1" fill="currentColor" />
-                  </svg>
+                <div className="text-center text-[9px] text-red-500 bg-red-50/50 py-1.5 rounded-lg border border-red-100/50 uppercase font-bold tracking-tighter">
                   {error}
                 </div>
               )}
@@ -125,14 +124,15 @@ export default function Login() {
               <button
                 onClick={handleContinue}
                 disabled={mobileNumber.length !== 10 || loading}
-                className={`w-full py-3.5 rounded-xl font-bold text-base shadow-md hover:shadow-lg transform active:scale-95 transition-all duration-200 ${mobileNumber.length === 10 && !loading
-                  ? 'bg-gradient-to-r from-green-600 to-green-500 text-white'
-                  : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-                  }`}
+                className={`w-full h-11 rounded-xl font-black tracking-[0.2em] uppercase text-xs active:scale-95 transition-all duration-300 shadow-md flex items-center justify-center ${
+                  mobileNumber.length === 10 && !loading
+                    ? 'bg-village-green text-white shadow-village-green/20' 
+                    : 'bg-neutral-400 text-white'
+                }`}
               >
                 {loading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     <span>Processing...</span>
                   </div>
                 ) : (
@@ -142,52 +142,41 @@ export default function Login() {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex justify-center scale-90">
+              <div className="flex justify-center scale-100 mb-1">
                 <OTPInput onComplete={handleOTPComplete} disabled={loading} />
               </div>
 
-              {error && (
-                <div className="text-center text-xs text-red-600 bg-red-50 py-1.5 px-3 rounded-lg">
-                  {error}
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-1">
+              <div className="flex gap-4">
                 <button
                   onClick={() => {
                     setShowOTP(false);
                     setError('');
                   }}
                   disabled={loading}
-                  className="flex-1 py-2.5 px-3 rounded-xl font-semibold text-xs bg-neutral-100 text-neutral-600 hover:bg-neutral-200 transition-colors"
+                  className="flex-1 h-10 rounded-xl bg-neutral-50 text-neutral-500 font-black text-[9px] uppercase tracking-widest hover:bg-neutral-100 transition-colors"
                 >
                   Change No.
                 </button>
                 <button
                   onClick={handleContinue}
                   disabled={loading}
-                  className="flex-1 py-2.5 px-3 rounded-xl font-semibold text-xs bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-colors"
+                  className="flex-1 h-10 rounded-xl bg-neutral-50 text-[#8B3D28] border border-[#8B3D28]/10 font-black text-[9px] uppercase tracking-widest hover:bg-neutral-100 transition-colors"
                 >
-                  {loading ? 'Sending...' : 'Resend OTP'}
+                  {loading ? 'Sending...' : 'Resend Code'}
                 </button>
               </div>
             </div>
           )}
+        </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-[10px] text-neutral-400">
-              By continuing, you agree to our <br /> <a href="#" className="text-green-600 hover:underline">Terms</a> & <a href="#" className="text-green-600 hover:underline">Privacy Policy</a>
-            </p>
-          </div>
+        {/* Footer Text */}
+        <div className="mt-auto pt-4 text-center w-full">
+          <p className="text-[8.5px] text-neutral-400 font-bold opacity-80 max-w-[180px] mx-auto leading-relaxed uppercase tracking-tighter">
+            Access your saved addresses from Village Basket automatically!
+          </p>
         </div>
       </div>
 
-      {/* Footer Branding */}
-      <div className="absolute bottom-6 left-0 right-0 text-center">
-        <p className="text-xs font-medium text-neutral-500 opacity-60 uppercase tracking-widest">
-          Powered by Village Basket
-        </p>
-      </div>
 
       <style>{`
         @keyframes blob {
