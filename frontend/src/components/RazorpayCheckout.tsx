@@ -121,12 +121,12 @@ const RazorpayCheckout: React.FC<RazorpayCheckoutProps> = ({
 
     return (
         <div className="fixed inset-0 bg-[#3E2723]/5 backdrop-blur-[2px] flex items-center justify-center z-[100] transition-all duration-700">
-            <div className="bg-[#FEFBF6] rounded-[4rem] px-20 py-24 max-w-lg w-full mx-4 shadow-[0_40px_100px_-20px_rgba(139,61,40,0.12)] border border-white/50 relative overflow-hidden font-poppins text-center">
+            <div className="bg-[#FEFBF6] rounded-[2rem] px-6 py-10 max-w-[320px] w-full mx-4 shadow-[0_20px_60px_-10px_rgba(139,61,40,0.12)] border border-white/50 relative overflow-hidden font-poppins text-center">
                 <div className="relative z-10 flex flex-col items-center">
                     {/* Floating Premium Logo */}
-                    <div className="mb-14 relative">
-                        <div className="absolute inset-0 bg-[#8B3D28]/10 rounded-full blur-3xl animate-pulse"></div>
-                        <div className="w-36 h-36 bg-white rounded-[2.5rem] flex items-center justify-center relative shadow-[0_20px_50px_-10px_rgba(0,0,0,0.06)] border border-[#8B3D28]/5 p-8">
+                    <div className="mb-4 relative">
+                        <div className="absolute inset-0 bg-[#8B3D28]/10 rounded-full blur-lg animate-pulse"></div>
+                        <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center relative shadow-[0_5px_15px_-5px_rgba(0,0,0,0.06)] border border-[#8B3D28]/5 p-3">
                             <img
                                 src={brandLogo}
                                 alt="Village Basket"
@@ -136,33 +136,33 @@ const RazorpayCheckout: React.FC<RazorpayCheckoutProps> = ({
                     </div>
 
                     {/* Elegant Minimal Typography */}
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <h2 className="text-3xl font-black text-[#3E2723] tracking-tight lowercase">
+                    <div className="space-y-4">
+                        <div className="space-y-1">
+                            <h2 className="text-lg font-black text-[#3E2723] tracking-tight lowercase">
                                 Securing <span className="text-[#8B3D28]">harvest...</span>
                             </h2>
-                            <p className="text-[#8B3D28] font-bold tracking-[0.4em] text-[11px] uppercase opacity-60">
+                            <p className="text-[#8B3D28] font-bold tracking-[0.2em] text-[8px] uppercase opacity-60">
                                 Premium Secure Payment
                             </p>
                         </div>
 
-                        <div className="flex items-center justify-center gap-3 pt-4">
-                            <span className="w-12 h-[1px] bg-[#3E2723]/10"></span>
-                            <div className="flex gap-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#8B3D28]/30 animate-bounce"></div>
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#8B3D28]/50 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#8B3D28]/30 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                        <div className="flex items-center justify-center gap-2 pt-1.5">
+                            <span className="w-6 h-[1px] bg-[#3E2723]/10"></span>
+                            <div className="flex gap-1">
+                                <div className="w-1 h-1 rounded-full bg-[#8B3D28]/30 animate-bounce"></div>
+                                <div className="w-1 h-1 rounded-full bg-[#8B3D28]/50 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                <div className="w-1 h-1 rounded-full bg-[#8B3D28]/30 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
                             </div>
-                            <span className="w-12 h-[1px] bg-[#3E2723]/10"></span>
+                            <span className="w-6 h-[1px] bg-[#3E2723]/10"></span>
                         </div>
                     </div>
                 </div>
 
                 {/* Subtle Security Detail */}
-                <div className="mt-16 flex items-center justify-center gap-3 opacity-20 filter grayscale">
-                    <span className="text-xs font-black tracking-widest uppercase">Verified</span>
-                    <span className="text-sm">🛡️</span>
-                    <span className="text-xs font-black tracking-widest uppercase">Encrypted</span>
+                <div className="mt-8 flex items-center justify-center gap-2 opacity-20 filter grayscale">
+                    <span className="text-[8px] font-black tracking-widest uppercase">Verified</span>
+                    <span className="text-[10px]">🛡️</span>
+                    <span className="text-[8px] font-black tracking-widest uppercase">Encrypted</span>
                 </div>
             </div>
         </div>

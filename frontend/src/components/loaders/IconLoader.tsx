@@ -39,7 +39,8 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
 
     // Home & Root page always use the Bullock Cart as the primary "Load" experience
     // Added /user and /user/ to ensure the redirect after login defaults to bullock cart
-    if (currentPath === '/' || currentPath === '/user' || currentPath === '/user/' || currentPath === '/user/home') {
+    // Added /login check per user request
+    if (currentPath === '/' || currentPath === '/user' || currentPath === '/user/' || currentPath === '/user/home' || currentPath.includes('/login')) {
       animationName = 'bullock_cart.json';
     } else {
       // For all other route transitions, pick one of the other 4 "village life" scenes at random
@@ -54,7 +55,12 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
       .catch(err => console.error('Failed to load animation:', err));
   }, [currentPath]);
 
-  const show = isRouteLoading || forceShow;
+  // Detect excluded paths (No loaders for Delivery, Admin, or Seller portals)
+  const isExcludedPath = currentPath.startsWith('/delivery') ||
+    currentPath.startsWith('/admin') ||
+    currentPath.startsWith('/seller');
+
+  const show = (isRouteLoading || forceShow) && !isExcludedPath;
 
   // Detect themes using currentPath
   const isDelivery = currentPath.includes('/delivery');
@@ -78,9 +84,9 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
 
     // Tailored sizes for different animation types
     let sizeClasses = "w-[600px] h-[600px]"; // Primary animations scale (Bullock Cart, Spices, Vegetables)
-    
+
     if (isRotatingVariant && !isExtraLarge) {
-      sizeClasses = "w-[400px] h-[400px]"; // Slightly reduced scale for mango and fruit scenes for better framing
+      sizeClasses = "w-[300px] h-[300px]"; // Further reduced scale for mango and fruit scenes for more compactness
     }
 
     return (
@@ -181,7 +187,16 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
               </div>
 
               {/* Status Text (Single Line) */}
-              <div className={`text-center ${isExtraLarge ? '-mt-24' : ''}`}>
+              <div className={`text-center ${(() => {
+                const marginMap: Record<string, string> = {
+                  'bullock_cart.json': '-mt-24',
+                  'indian_woman_vegetables.json': '-mt-24',
+                  'indian_man_spices.json': '-mt-72',
+                  'india_man_mango_plucking.json': 'mt-0', // Default for small ones
+                  'indian_man_choose_fruits.json': 'mt-0', // Default for small ones
+                };
+                return marginMap[currentAnimation] || '';
+              })()}`}>
                 <p className="text-village-green font-bold text-[10px] uppercase tracking-[0.2em] leading-none opacity-60">
                   {text.p}
                 </p>

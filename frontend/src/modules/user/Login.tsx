@@ -124,11 +124,10 @@ export default function Login() {
               <button
                 onClick={handleContinue}
                 disabled={mobileNumber.length !== 10 || loading}
-                className={`w-full h-11 rounded-xl font-black tracking-[0.2em] uppercase text-xs active:scale-95 transition-all duration-300 shadow-md flex items-center justify-center ${
-                  mobileNumber.length === 10 && !loading
-                    ? 'bg-village-green text-white shadow-village-green/20' 
-                    : 'bg-neutral-400 text-white'
-                }`}
+                className={`w-full h-11 rounded-xl font-black tracking-[0.2em] uppercase text-xs active:scale-95 transition-all duration-300 shadow-md flex items-center justify-center ${mobileNumber.length === 10 && !loading
+                  ? 'bg-[#8B3D28] text-white shadow-[#8B3D28]/20'
+                  : 'bg-neutral-400 text-white'
+                  }`}
               >
                 {loading ? (
                   <div className="flex items-center gap-2">
@@ -169,10 +168,16 @@ export default function Login() {
           )}
         </div>
 
-        {/* Footer Text */}
-        <div className="mt-auto pt-4 text-center w-full">
-          <p className="text-[8.5px] text-neutral-400 font-bold opacity-80 max-w-[180px] mx-auto leading-relaxed uppercase tracking-tighter">
-            Access your saved addresses from Village Basket automatically!
+        {/* Sign Up Link */}
+        <div className="mt-auto py-6 text-center w-full">
+          <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest leading-relaxed">
+            New to Village Basket?{' '}
+            <button
+              onClick={() => navigate('/user/signup')}
+              className="text-[#8B3D28] hover:underline"
+            >
+              Sign Up
+            </button>
           </p>
         </div>
       </div>

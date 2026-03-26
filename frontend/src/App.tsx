@@ -45,6 +45,7 @@ const Categories = lazy(() => import("./modules/user/Categories"));
 const Category = lazy(() => import("./modules/user/Category"));
 const Invoice = lazy(() => import("./modules/user/Invoice"));
 const Login = lazy(() => import("./modules/user/Login"));
+const SignUp = lazy(() => import("./modules/user/SignUp"));
 
 const AboutUs = lazy(() => import("./modules/user/AboutUs"));
 const FAQ = lazy(() => import("./modules/user/FAQ"));
@@ -226,6 +227,16 @@ function App() {
                               </PublicRoute>
                             }
                           />
+                          <Route
+                            path="/user/signup"
+                            element={
+                              <PublicRoute>
+                                <Suspense fallback={null}>
+                                  <SignUp />
+                                </Suspense>
+                              </PublicRoute>
+                            }
+                          />
 
                           <Route
                             path="/seller/login"
@@ -382,7 +393,7 @@ function App() {
                                         <Route path="delivery-app-policy" element={<AdminDeliveryAppPolicy />} />
                                         <Route path="users" element={<AdminUsers />} />
                                         <Route path="faq" element={<AdminFAQ />} />
-                                        <Route path="home-section" element={<AdminHomeSection readOnly={true} />} />
+                                        <Route path="home-section" element={<AdminHomeSection />} />
                                         <Route path="bestseller-cards" element={<AdminBestsellerCards />} />
                                         <Route path="promo-strip" element={<AdminPromoStrip />} />
                                         <Route path="lowest-prices" element={<AdminLowestPrices />} />

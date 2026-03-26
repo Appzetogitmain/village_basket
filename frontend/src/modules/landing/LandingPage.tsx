@@ -290,7 +290,7 @@ export default function LandingPage() {
             >
               <span>🌾</span> Farm to Doorstep
             </motion.div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-[#3E2723] leading-[1.1] mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-[#3E2723] leading-[1.1] mb-6">
               Fresh From the<br />
               <span className="text-[#8B3D28]">Village,</span> at{' '}
               <span className="text-[#4A7C59]">Your Doorstep</span>
@@ -302,14 +302,14 @@ export default function LandingPage() {
 
             {/* Shift Pills */}
             <div className="flex flex-wrap gap-3 mb-10">
-              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-4 py-2.5 rounded-2xl shadow-sm">
+              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-2 md:px-4 md:py-2.5 rounded-2xl shadow-sm">
                 <span className="text-xl">☀️</span>
                 <div>
                   <p className="text-[10px] font-black text-amber-800 uppercase tracking-widest">Morning Shift</p>
                   <p className="text-[11px] font-bold text-amber-700">5:00 AM – 9:00 AM</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-4 py-2.5 rounded-2xl shadow-sm">
+              <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-2 md:px-4 md:py-2.5 rounded-2xl shadow-sm">
                 <span className="text-xl">🌙</span>
                 <div>
                   <p className="text-[10px] font-black text-indigo-800 uppercase tracking-widest">Evening Shift</p>
@@ -318,13 +318,42 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 mb-10 lg:mb-0">
               <Link to="/user" className="px-8 py-4 bg-[#8B3D28] text-white font-black rounded-2xl shadow-xl hover:bg-[#7a3323] active:scale-95 transition-all text-sm uppercase tracking-wider">
                 Start Shopping →
               </Link>
               <a href="#our-story" className="px-8 py-4 bg-white border-2 border-[#8B3D28] text-[#8B3D28] font-black rounded-2xl hover:bg-[#8B3D28]/5 active:scale-95 transition-all text-sm uppercase tracking-wider">
                 Our Story
               </a>
+            </div>
+
+            {/* Mobile Hero Visual - Hidden on Desktop */}
+            <div className="lg:hidden mt-8 w-full max-w-sm mx-auto">
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="relative bg-white p-3 rounded-[3rem] shadow-[0_20px_40px_rgba(139,61,40,0.1)] border border-[#8B3D28]/5"
+              >
+                <div className="w-full aspect-square rounded-[2.5rem] overflow-hidden bg-stone-50 relative">
+                  <img
+                    src={heroProduceImg}
+                    alt="Fresh Produce"
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Subtle gradient overlay to make image pop */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+                </div>
+
+                {/* Floating Badge for Mobile */}
+                <div className="absolute -bottom-4 -right-2 bg-[#4A7C59] text-white rounded-[1.5rem] shadow-lg px-4 py-2 flex items-center gap-2 z-20 border-2 border-white">
+                  <span className="text-lg">🌿</span>
+                  <div>
+                    <p className="text-[8px] font-black uppercase tracking-widest leading-none mb-0.5 opacity-80">Strictly</p>
+                    <p className="text-xs font-bold leading-none">Organic</p>
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </div>
 
@@ -388,7 +417,7 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-black text-[#3E2723] mb-4">Village Harvest</h2>
             <p className="text-[#3E2723]/60 max-w-2xl mx-auto">Discover our range of authentic, unadulterated products straight from the heart of rural farms.</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 lg:gap-8">
             {[
               { title: 'Fresh Veggies', img: veggiesImg, icon: '' },
               { title: 'Dairy & Staples', img: dairyImg, icon: '' },

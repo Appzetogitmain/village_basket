@@ -83,9 +83,9 @@ export default function LocationPermissionRequest({
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#8B3D28]/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
-              className="w-8 h-8 text-orange-600"
+              className="w-8 h-8 text-[#8B3D28]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -127,7 +127,7 @@ export default function LocationPermissionRequest({
               <button
                 onClick={handleAllowLocation}
                 disabled={isLocationLoading}
-                className="w-full py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[#8B3D28] text-white rounded-lg font-semibold hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLocationLoading ? (
                   <>
@@ -165,7 +165,7 @@ export default function LocationPermissionRequest({
                   </p>
                   <button
                     onClick={clearLocation}
-                    className="text-xs text-orange-600 font-medium hover:underline"
+                    className="text-xs text-[#8B3D28] font-medium hover:underline"
                   >
                     Reset and ask again
                   </button>
@@ -197,7 +197,7 @@ export default function LocationPermissionRequest({
               <button
                 onClick={handleSaveManualLocation}
                 disabled={!manualAddress || manualLat === 0}
-                className="flex-1 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 bg-[#8B3D28] text-white rounded-lg font-semibold hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save Location
               </button>

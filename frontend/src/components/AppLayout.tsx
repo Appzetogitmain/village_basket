@@ -414,7 +414,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                         {isTabActive && (
                           <motion.div
                             layoutId="mobileActiveTab"
-                            className="w-[64px] h-[64px] bg-[#FFF9F0] shadow-2xl rounded-[20px]"
+                            className="w-[61px] h-[61px] bg-[#FFF9F0] shadow-2xl rounded-[18px]"
                             initial={false}
                             transition={{ type: "spring", stiffness: 400, damping: 30 }}
                           />

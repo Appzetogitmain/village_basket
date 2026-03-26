@@ -82,7 +82,7 @@ export default function SellerLogin() {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 font-poppins relative"
       style={{
         backgroundColor: 'var(--village-cream, #FAF7F2)',
@@ -91,7 +91,7 @@ export default function SellerLogin() {
       {/* Texture Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
 
-      {loading && <VillageLoader />}
+
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
@@ -106,7 +106,7 @@ export default function SellerLogin() {
       {/* Login Card */}
       <div className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white overflow-hidden relative z-10">
         {/* Header Section */}
-        <div className="relative pt-8 pb-6 px-6 text-center bg-gradient-to-br from-village-green to-[#3D664A] overflow-hidden">
+        <div className="relative pt-8 pb-6 px-6 text-center bg-gradient-to-br from-[#8B3D28] to-[#A54B31] overflow-hidden">
           {/* Decorative Circles */}
           <div className="absolute -top-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
           <div className="absolute top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
@@ -138,7 +138,7 @@ export default function SellerLogin() {
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   Mobile Number
                 </label>
-                <div className="flex items-center bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-200 transition-all">
+                <div className="flex items-center bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded-lg overflow-hidden focus-within:border-[#8B3D28] focus-within:ring-2 focus-within:ring-[#8B3D28]/20 transition-all">
                   <div className="px-3 py-2.5 text-sm font-medium text-neutral-600 border-r border-neutral-300 bg-white/40">
                     +91
                   </div>
@@ -164,7 +164,7 @@ export default function SellerLogin() {
                 onClick={handleMobileLogin}
                 disabled={mobileNumber.length !== 10 || loading}
                 className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${mobileNumber.length === 10 && !loading
-                  ? 'bg-[#4A7C59] text-white hover:bg-teal-700 shadow-md'
+                  ? 'bg-[#8B3D28] text-white hover:opacity-90 shadow-md'
                   : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
                   }`}
               >
@@ -221,7 +221,7 @@ export default function SellerLogin() {
                     }
                   }}
                   disabled={loading}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#4A7C59] text-white hover:bg-teal-700 transition-colors"
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#8B3D28] text-white hover:opacity-90 transition-colors"
                 >
                   {loading ? 'Sending...' : 'Resend OTP'}
                 </button>
@@ -239,7 +239,7 @@ export default function SellerLogin() {
               Don't have a seller account?{' '}
               <button
                 onClick={() => navigate('/seller/signup')}
-                className="text-[#4A7C59] hover:text-teal-700 font-semibold"
+                className="text-[#8B3D28] hover:opacity-80 font-semibold"
               >
                 Sign Up
               </button>

@@ -4,7 +4,6 @@ import { sendOTP, verifyOTP } from '../../../services/api/auth/adminAuthService'
 import OTPInput from '../../../components/OTPInput';
 import { useAuth } from '../../../context/AuthContext';
 import villageBasketLogo from '@assets/village_basket-removebg-preview.png';
-import VillageLoader from '../../../components/VillageLoader';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -53,16 +52,6 @@ export default function AdminLogin() {
     }
   };
 
-  const handleVillageBasketLogin = () => {
-    // Handle Village Basket login logic here
-    navigate("/admin");
-  };
-
-  const handleSellerLogin = () => {
-    // Navigate to seller login page
-    navigate("/seller/login");
-  };
-
   return (
     <div className="min-h-screen bg-[#FAF7F2] font-poppins relative flex flex-col items-center justify-center px-4 py-4 overflow-hidden">
       {/* Background texture overlay */}
@@ -72,8 +61,6 @@ export default function AdminLogin() {
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#8B3D28]/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#8B3D28]/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      {loading && <VillageLoader />}
-      
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
@@ -205,7 +192,7 @@ export default function AdminLogin() {
                 <button
                   onClick={handleMobileLogin}
                   disabled={loading}
-                  className="flex-1 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-[#8B3D28] text-white hover:bg-[#1B5E20] transition-all shadow-md font-outfit">
+                  className="flex-1 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest bg-[#8B3D28] text-white hover:opacity-90 transition-all shadow-md font-outfit">
                   {loading ? "Sending..." : "Resend OTP"}
                 </button>
               </div>
@@ -224,10 +211,3 @@ export default function AdminLogin() {
     </div>
   );
 }
-
-
-
-
-
-
-

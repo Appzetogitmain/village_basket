@@ -77,7 +77,7 @@ export default function DeliveryLogin() {
 
 
   return (
-    <div 
+    <div
       className="h-screen w-screen overflow-hidden flex flex-col items-center justify-center px-6 relative font-poppins"
       style={{
         backgroundColor: 'var(--village-cream, #FAF7F2)',
@@ -88,7 +88,7 @@ export default function DeliveryLogin() {
       }}
     >
       {/* Village Loader Overlay */}
-      {loading && <VillageLoader />}
+
 
       {/* Texture Overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
@@ -99,7 +99,7 @@ export default function DeliveryLogin() {
         <div className="relative pt-12 pb-10 px-8 text-center bg-[#8B3D28] overflow-hidden">
           <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
           <div className="absolute -top-10 -left-10 w-24 h-24 bg-white/5 rounded-full blur-2xl"></div>
-          
+
           <div className="relative z-10 flex flex-col items-center">
             <div className="w-24 h-24 bg-white rounded-3xl shadow-xl p-3 flex items-center justify-center mb-6 border border-white/20 transform hover:scale-105 transition-transform duration-500 group">
               <img
@@ -113,9 +113,9 @@ export default function DeliveryLogin() {
               PARTNER HUB
             </h1>
             <div className="inline-block bg-white/10 px-4 py-1.5 rounded-full backdrop-blur-md border border-white/10 mt-1">
-               <p className="text-white/60 text-[8px] font-black uppercase tracking-[0.3em] leading-none">
-                 Strategic Logistics
-               </p>
+              <p className="text-white/60 text-[8px] font-black uppercase tracking-[0.3em] leading-none">
+                Strategic Logistics
+              </p>
             </div>
           </div>
         </div>
