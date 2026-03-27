@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import brandLogo from '@assets/village_basket-removebg-preview.png';
-import dairyImg from '@assets/landing_page/dairy.jpg';
+import dryfruitsImg from '@assets/landing_page/dryfruits.jpg';
 import veggiesImg from '@assets/landing_page/fresh_veggies.jpg';
 import fruitsImg from '@assets/landing_page/fruits.jpg';
-import spicesImg from '@assets/landing_page/spices.jpg';
+import gheeImg from '@assets/landing_page/ghee.jpg';
 import ourStoryImg from '@assets/landing_page/our_story.png';
 import farmImg1 from '@assets/landing_page/farm_image_1.png';
 import farmImg2 from '@assets/landing_page/farm_image_2.png';
@@ -73,7 +73,7 @@ function StatItem({ label, target, colorClass, started, textColorClass }: { labe
   const count = useCounter(target, 2000, started);
   return (
     <div className={`border-l-4 ${colorClass} pl-5`}>
-      <p className="text-4xl font-black text-[#3E2723]">{count.toLocaleString('en-IN')}+</p>
+      <p className="text-3xl sm:text-4xl font-black text-[#3E2723]">{count.toLocaleString('en-IN')}+</p>
       <p className={`text-xs font-black uppercase tracking-widest ${textColorClass} mt-1`}>{label}</p>
     </div>
   );
@@ -88,7 +88,7 @@ function ImageSlider({ images }: { images: string[] }) {
   }, [images.length]);
 
   return (
-    <div className="relative w-full h-[400px] lg:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
+    <div className="relative w-full h-[300px] sm:h-[380px] md:h-[440px] lg:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
       {images.map((src, idx) => (
         <img
           key={idx}
@@ -97,11 +97,6 @@ function ImageSlider({ images }: { images: string[] }) {
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
         />
       ))}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
-        {images.map((_, idx) => (
-          <div key={idx} className={`w-3 h-3 rounded-full transition-all ${idx === currentSlide ? 'bg-white scale-125' : 'bg-white/50'}`}></div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -139,7 +134,7 @@ function AppMockupSlider({
   }, [screenshots.length]);
 
   return (
-    <div className="relative flex justify-center h-[600px] w-full items-center">
+    <div className="relative flex justify-center h-[420px] sm:h-[520px] md:h-[580px] w-full items-center overflow-hidden">
       {screenshots.map((src, idx) => {
         let diff = idx - activeAppSlide;
         if (diff < -1) diff += 3;
@@ -150,15 +145,19 @@ function AppMockupSlider({
         return (
           <div
             key={idx}
-            className={`absolute transition-all duration-1000 ease-in-out cursor-pointer ${isCenter ? 'z-30 scale-100 opacity-100 translate-x-0' :
-              isLeft ? 'z-20 scale-[0.85] opacity-50 -translate-x-[30%]' :
-                'z-20 scale-[0.85] opacity-50 translate-x-[30%]'
+            className={`absolute transition-all duration-1000 ease-in-out cursor-pointer ${isCenter
+              ? 'z-30 scale-100 opacity-100 translate-x-0'
+              : isLeft
+                ? 'z-20 scale-[0.80] opacity-40 -translate-x-[55%] sm:-translate-x-[40%]'
+                : 'z-20 scale-[0.80] opacity-40 translate-x-[55%] sm:translate-x-[40%]'
               }`}
             onClick={() => setActiveAppSlide(idx)}
           >
-            <div className={`${width} ${height} bg-[#3E2723] ${borderRadiusOuter} ${padding} shadow-2xl ${borderWidth} border-gray-100 relative overflow-hidden group`}>
+            <div
+              className={`w-[180px] h-[360px] sm:w-[220px] sm:h-[440px] md:${width} md:${height} bg-[#3E2723] ${borderRadiusOuter} ${padding} shadow-2xl ${borderWidth} border-gray-100 relative overflow-hidden group`}
+            >
               {/* Device Notch */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-28 h-6 bg-gray-100 rounded-b-2xl z-20"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 sm:w-28 h-5 sm:h-6 bg-gray-100 rounded-b-2xl z-20"></div>
 
               {/* Screen Content */}
               <div className={`w-full h-full ${borderRadiusInner} overflow-hidden bg-white relative flex flex-col items-center justify-center ${innerPadding}`}>
@@ -180,11 +179,11 @@ function AppMockupSlider({
       })}
 
       {/* Slide Indicators */}
-      <div className="absolute -bottom-10 flex gap-2">
+      <div className="absolute -bottom-8 sm:-bottom-10 flex gap-2">
         {screenshots.map((_, i) => (
           <div
             key={i}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${i === activeAppSlide ? 'bg-[#8B3D28] w-6' : 'bg-[#8B3D28]/20'}`}
+            className={`h-2 rounded-full transition-all duration-300 ${i === activeAppSlide ? 'bg-[#8B3D28] w-6' : 'bg-[#8B3D28]/20 w-2'}`}
           />
         ))}
       </div>
@@ -215,6 +214,13 @@ export default function LandingPage() {
 
   // Stats section
   const { ref: statsRef, inView: statsInView } = useInView(0.4);
+
+  // Automatic Screen Cycling for Features Stack
+  const [featureIter, setFeatureIter] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setFeatureIter(i => (i + 1) % 3), 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   const navLinks = [
     { label: 'Categories', href: '#categories' },
@@ -419,21 +425,25 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 lg:gap-8">
             {[
-              { title: 'Fresh Veggies', img: veggiesImg, icon: '' },
-              { title: 'Dairy & Staples', img: dairyImg, icon: '' },
-              { title: 'Pure Spices', img: spicesImg, icon: '' },
-              { title: 'Organic Fruits', img: fruitsImg, icon: '' },
+              { title: 'Fresh Veggies', img: veggiesImg, path: '/user/category/vegetables' },
+              { title: 'Dryfruits', img: dryfruitsImg, path: '/user/category/dryfruits' },
+              { title: 'Oil & Ghee', img: gheeImg, path: '/user/category/oil-and-ghee' },
+              { title: 'Organic Fruits', img: fruitsImg, path: '/user/category/fruits' },
             ].map((cat) => (
-              <div key={cat.title} className="group cursor-pointer">
-                <div className="relative overflow-hidden rounded-[2rem] mb-4 aspect-square shadow-sm">
-                  <img src={cat.img} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <span className="text-3xl mb-2 block">{cat.icon}</span>
-                    <h3 className="font-black text-lg tracking-wide">{cat.title}</h3>
+              <Link key={cat.title} to={cat.path} className="group cursor-pointer block">
+                <div className="relative overflow-hidden rounded-[2rem] mb-4 aspect-square shadow-xl group-hover:shadow-[#8B3D28]/10 transition-all border border-[#8B3D28]/5">
+                  <img src={cat.img} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#3E2723]/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                  <div className="absolute bottom-6 left-6 right-6 text-white transform group-hover:-translate-y-2 transition-transform duration-500 text-left">
+                    <h3 className="font-bold text-lg sm:text-xl tracking-wide leading-tight max-w-[120px] sm:max-w-[150px]">{cat.title}</h3>
+                  </div>
+                  
+                  {/* Premium Hover Detail */}
+                  <div className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100">
+                    <span className="text-white text-lg font-black">→</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
           <div className="mt-12 text-center">
@@ -520,8 +530,8 @@ export default function LandingPage() {
             {/* Visual Right - App Screenshots Slider */}
             <div className="flex-1 w-full lg:w-auto flex justify-center lg:justify-end relative">
               <div className="relative w-full">
-                {/* QR Code Case - Positioned relative to the slider container */}
-                <div className="absolute top-10 left-0 lg:-left-12 transform -translate-x-1/2 hidden md:block bg-white p-4 rounded-3xl shadow-xl z-40 border border-[#8B3D28]/5 animate-bounce" style={{ animationDuration: '5s' }}>
+                {/* QR Code Case - Only visible on large screens to avoid overlap */}
+                <div className="absolute top-10 left-0 lg:-left-12 transform -translate-x-1/2 hidden lg:block bg-white p-4 rounded-3xl shadow-xl z-40 border border-[#8B3D28]/5 animate-bounce" style={{ animationDuration: '5s' }}>
                   <div className="w-16 h-16 bg-stone-50 rounded-xl grid grid-cols-4 grid-rows-4 gap-1 p-2">
                     {[...Array(16)].map((_, i) => (
                       <div key={i} className={`rounded-sm ${(i * 17) % 4 === 0 ? 'bg-[#3E2723]' : 'bg-[#FAF7F2]'}`}></div>
@@ -603,24 +613,126 @@ export default function LandingPage() {
       {/* ── 7. App Features ─────────────────────────────── */}
       <section id="app-features" className="py-24 px-4 sm:px-6 max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="order-2 lg:order-1 w-full">
-            <AppMockupSlider images={[appHomeImg, appCheckoutImg, appTrackingImg]} />
+          <div className="order-2 lg:order-1 w-full relative h-[500px] sm:h-[620px] md:h-[680px] flex items-center justify-center overflow-visible">
+            {/* Ambient Background Glows */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-[#8B3D28]/3 rounded-full blur-[120px] -z-10"></div>
+
+            {/* The "Premium Stack" of Screenshots */}
+            <div className="relative w-full max-w-[200px] sm:max-w-[260px] md:max-w-[280px] aspect-[9/19]">
+              {/* Back Screenshot (Category) - Tilted Left */}
+              <motion.div 
+                animate={{ y: [0, -10, 0], x: [0, -5, 0], rotate: [-12, -14, -12] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-6 sm:top-10 -left-10 sm:-left-16 md:-left-20 w-full h-full bg-[#3E2723] rounded-[2.5rem] sm:rounded-[3rem] shadow-xl border border-white/20 p-1.5 sm:p-2 overflow-hidden opacity-30 -z-10"
+              >
+                <div className="w-full h-full rounded-[1.8rem] sm:rounded-[2.5rem] p-1 overflow-hidden">
+                  <div className="w-full h-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative">
+                    <AnimatePresence mode="wait">
+                      <motion.img 
+                        key={featureIter}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1 }}
+                        src={[appScrnshot2, appScrnshot3, appScrnshot1][featureIter]} 
+                        alt="App Screen" 
+                        className="w-full h-full object-cover grayscale-[30%]" 
+                      />
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Middle Screenshot (Orders) - Tilted Right */}
+              <motion.div 
+                animate={{ y: [0, 8, 0], x: [0, 6, 0], rotate: [8, 10, 8] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                className="absolute top-12 sm:top-20 -right-10 sm:-right-16 md:-right-20 w-full h-full bg-[#3E2723] rounded-[2.5rem] sm:rounded-[3rem] shadow-xl border border-white/20 p-1.5 sm:p-2 overflow-hidden opacity-40 -z-10"
+              >
+                <div className="w-full h-full rounded-[1.8rem] sm:rounded-[2.5rem] p-1 overflow-hidden">
+                  <div className="w-full h-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative">
+                    <AnimatePresence mode="wait">
+                      <motion.img 
+                        key={featureIter}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1 }}
+                        src={[appScrnshot3, appScrnshot1, appScrnshot2][featureIter]} 
+                        alt="App Screen" 
+                        className="w-full h-full object-cover grayscale-[20%]" 
+                      />
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Front Main Screenshot (Home) - Centered & Sharp (Matching Download-App slider) */}
+              <motion.div 
+                whileHover={{ scale: 1.02, rotate: 0 }}
+                animate={{ y: [0, -5, 0], rotate: [0, -1, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="relative z-10 w-full h-full bg-[#3E2723] p-1.5 rounded-[2.2rem] sm:rounded-[3.2rem] shadow-[0_40px_80px_-15px_rgba(62,39,35,0.25)] border-[2px] border-gray-100 cursor-pointer group"
+              >
+                <div className="w-full h-full rounded-[1.8rem] sm:rounded-[2.5rem] bg-white p-1 overflow-hidden relative">
+                  <div className="w-full h-full rounded-[1.5rem] sm:rounded-[2.2rem] overflow-hidden relative">
+                    <AnimatePresence mode="wait">
+                      <motion.img 
+                        key={featureIter}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1 }}
+                        src={[appScrnshot1, appScrnshot2, appScrnshot3][featureIter]} 
+                        alt="App Screen" 
+                        className="w-full h-full object-cover" 
+                      />
+                    </AnimatePresence>
+                  </div>
+                  {/* Subtle glass reflection overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
+                </div>
+
+                {/* Floating "Premium" Tooltip on the Phone */}
+                <div className="absolute top-12 -right-4 sm:-right-8 bg-[#4A7C59] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 z-30 border-2 border-white">
+                  <span>✨</span> Verified Pure
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Floating Glassmorphism Badges - Repositioned */}
+            <motion.div
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-[15%] right-0 md:-right-10 z-20 bg-white/80 backdrop-blur-xl border border-white p-3 rounded-2xl shadow-xl hidden md:flex items-center gap-3"
+            >
+              <div className="w-8 h-8 bg-[#4A7C59] text-white rounded-lg flex items-center justify-center text-sm shadow-md">🛍️</div>
+              <p className="text-[11px] font-black text-[#3E2723]">Quick Buy</p>
+            </motion.div>
+
+            <motion.div
+              animate={{ y: [0, -12, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="absolute bottom-[10%] left-0 md:-left-12 z-20 bg-white/80 backdrop-blur-xl border border-white p-3 rounded-2xl shadow-xl flex items-center gap-3"
+            >
+              <div className="w-8 h-8 bg-[#8B3D28] text-white rounded-lg flex items-center justify-center text-sm shadow-md">🔔</div>
+              <p className="text-[11px] font-black text-[#3E2723]">Live Alerts</p>
+            </motion.div>
+
           </div>
           {/* Features Text */}
           <div className="order-1 lg:order-2">
-            <p className="text-[#8B3D28] text-xs font-black uppercase tracking-[0.25em] mb-3">Seamless Experience</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#3E2723] mb-8">Shopping made simple.</h2>
-            <div className="space-y-8">
+            <p className="text-[#8B3D28] text-xs font-black uppercase tracking-[0.25em] mb-3">Modern Village Lifestyle</p>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#3E2723] mb-8 leading-tight">Effortless Tech for <br /><span className="text-[#4A7C59]">Timeless Purity.</span></h2>
+            <div className="space-y-6">
               {[
-                { title: 'Easy Ordering', desc: 'Browse hundreds of village products and add to your cart with a single tap.' },
-                { title: 'Shift Delivery Selection', desc: 'Working professionals love this! Choose between Morning (5-9 AM) or Evening (5-9 PM) delivery.' },
-                { title: 'Real-time Tracking', desc: 'Track your village partner as they bring fresh produce straight to your door.' },
-                { title: 'Secure Payments', desc: 'Pay safely online or choose Cash on Delivery. Your data is strictly encrypted.' },
+                { title: 'Intuitive Experience', desc: 'A clean, simple interface designed for everyone—from urban chefs to village elders.' },
+                { title: 'Personalized Delivery', desc: 'Working professionals love our flexible time slots. Your harvest, your time.' },
+                { title: 'Direct Transparency', desc: 'Know exactly where your food comes from with our partner farmer profiles.' },
+                { title: 'Universal Security', desc: 'World-class payment encryption paired with simple, accessible checkout options.' },
               ].map((feat, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#8B3D28] text-white flex items-center justify-center font-black flex-shrink-0 mt-1 shadow-md">
-                    {i + 1}
-                  </div>
+                <div key={i} className="flex gap-4 group">
+                  <div className="w-2 h-10 bg-[#8B3D28]/10 group-hover:bg-[#8B3D28] transition-colors rounded-full mt-1"></div>
                   <div>
                     <h3 className="font-black text-[#3E2723] text-lg mb-1">{feat.title}</h3>
                     <p className="text-[#3E2723]/70 text-sm leading-relaxed">{feat.desc}</p>
@@ -629,7 +741,7 @@ export default function LandingPage() {
               ))}
             </div>
             <div className="mt-10">
-              <Link to="/user" className="inline-block bg-[#4A7C59] text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-[#3d664a] transition-colors shadow-lg shadow-[#4A7C59]/20">Explore Features Online</Link>
+              <Link to="/user" className="inline-block bg-[#4A7C59] text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#3d664a] transition-all hover:shadow-xl hover:-translate-y-1 shadow-lg shadow-[#4A7C59]/10">Launch Digital Market →</Link>
             </div>
           </div>
         </div>
@@ -661,7 +773,7 @@ export default function LandingPage() {
       <section id="contact" className="py-24 px-4 sm:px-6 max-w-7xl mx-auto">
         <div className="bg-[#8B3D28] rounded-[3rem] p-8 md:p-16 relative overflow-hidden shadow-2xl">
           <div className="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
-          <div className="relative z-10 flex flex-col md:flex-row gap-12 text-white">
+          <div className="relative z-10 flex flex-col lg:flex-row gap-10 lg:gap-12 text-white">
             <div className="flex-1">
               <h2 className="text-3xl sm:text-5xl font-black mb-4">Get in Touch</h2>
               <p className="text-white/70 leading-relaxed mb-8 max-w-sm">
