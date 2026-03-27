@@ -89,7 +89,7 @@ export default function SellerSubCategory() {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-xl font-black text-village-umber uppercase tracking-tight">SubCategory</h1>
                 <div className="flex items-center gap-1 text-sm">
-                    <span className="text-[#4A7C59] font-medium cursor-pointer hover:underline">Home</span> <span className="text-neutral-400">/</span> <span className="text-neutral-600">SubCategory</span>
+                    <span className="text-[#8B3D28] font-medium cursor-pointer hover:underline">Home</span> <span className="text-neutral-400">/</span> <span className="text-neutral-600">SubCategory</span>
                 </div>
             </div>
 
@@ -109,7 +109,7 @@ export default function SellerSubCategory() {
                                 setRowsPerPage(Number(e.target.value));
                                 setCurrentPage(1);
                             }}
-                            className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer"
+                            className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer"
                         >
                             <option value={10}>10 entries</option>
                             <option value={20}>20 entries</option>
@@ -129,10 +129,10 @@ export default function SellerSubCategory() {
                             <button
                                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                 disabled={currentPage === 1}
-                                className={`p-2 border border-teal-600 rounded ${
+                                className={`p-2 border border-[#8B3D28] rounded ${
                                     currentPage === 1
                                         ? 'text-neutral-400 cursor-not-allowed bg-white/40'
-                                        : 'text-[#4A7C59] hover:bg-teal-50'
+                                        : 'text-[#8B3D28] hover:bg-white/40'
                                 }`}
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -143,10 +143,10 @@ export default function SellerSubCategory() {
                                 <button
                                     key={page}
                                     onClick={() => setCurrentPage(page)}
-                                    className={`px-3 py-1.5 border border-teal-600 rounded font-medium text-sm ${
+                                    className={`px-3 py-1.5 border border-[#8B3D28] rounded font-medium text-sm ${
                                         currentPage === page
-                                            ? 'bg-[#4A7C59] text-white'
-                                            : 'text-[#4A7C59] hover:bg-teal-50'
+                                            ? 'bg-[#8B3D28] text-white'
+                                            : 'text-[#8B3D28] hover:bg-white/40'
                                     }`}
                                 >
                                     {page}
@@ -155,10 +155,10 @@ export default function SellerSubCategory() {
                             <button
                                 onClick={() => setCurrentPage(prev => Math.min(displayTotalPages, prev + 1))}
                                 disabled={currentPage === displayTotalPages}
-                                className={`p-2 border border-teal-600 rounded ${
+                                className={`p-2 border border-[#8B3D28] rounded ${
                                     currentPage === displayTotalPages
                                         ? 'text-neutral-400 cursor-not-allowed bg-white/40'
-                                        : 'text-[#4A7C59] hover:bg-teal-50'
+                                        : 'text-[#8B3D28] hover:bg-white/40'
                                 }`}
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

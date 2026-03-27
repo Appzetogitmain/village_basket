@@ -299,7 +299,7 @@ export default function SellerProductList() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                 <option value="All Category">All Category</option>
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
@@ -315,7 +315,7 @@ export default function SellerProductList() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                 <option value="All Products">All Products</option>
                 <option value="Published">Published</option>
                 <option value="Unpublished">Unpublished</option>
@@ -328,7 +328,7 @@ export default function SellerProductList() {
               <select
                 value={stockFilter}
                 onChange={(e) => setStockFilter(e.target.value)}
-                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                 <option value="All Products">All Products</option>
                 <option value="In Stock">In Stock</option>
                 <option value="Out of Stock">Out of Stock</option>
@@ -341,7 +341,7 @@ export default function SellerProductList() {
               <select
                 value={rowsPerPage}
                 onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#4A7C59] focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
@@ -392,7 +392,7 @@ export default function SellerProductList() {
                 link.click();
                 document.body.removeChild(link);
               }}
-              className="bg-[#4A7C59] hover:bg-teal-700 text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors">
+              className="bg-[#8B3D28] hover:bg-[#723221] text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors">
               <svg
                 width="16"
                 height="16"
@@ -426,7 +426,7 @@ export default function SellerProductList() {
               </span>
               <input
                 type="text"
-                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#4A7C59] w-48"
+                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#8B3D28] w-48"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder=""
@@ -438,7 +438,7 @@ export default function SellerProductList() {
         {/* Loading State */}
         {loading && (
           <div className="p-8 text-center text-neutral-400">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-2"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B3D28] mx-auto mb-2"></div>
             Loading products...
           </div>
         )}
@@ -449,7 +449,7 @@ export default function SellerProductList() {
             <p>{error}</p>
             <button
               onClick={fetchProducts}
-              className="mt-4 px-4 py-2 bg-[#4A7C59] text-white rounded hover:bg-teal-700">
+              className="mt-4 px-4 py-2 bg-[#8B3D28] text-white rounded hover:bg-[#723221]">
               Retry
             </button>
           </div>
@@ -697,10 +697,10 @@ export default function SellerProductList() {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className={`p-2 border border-teal-600 rounded ${
+              className={`p-2 border border-[#8B3D28] rounded ${
                 currentPage === 1
                   ? "text-neutral-400 cursor-not-allowed bg-white/40"
-                  : "text-[#4A7C59] hover:bg-teal-50"
+                  : "text-[#8B3D28] hover:bg-white/40"
               }`}
               aria-label="Previous page">
               <svg
@@ -723,10 +723,10 @@ export default function SellerProductList() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-1.5 border border-teal-600 rounded font-medium text-sm ${
+                  className={`px-3 py-1.5 border border-[#8B3D28] rounded font-medium text-sm ${
                     currentPage === page
-                      ? "bg-[#4A7C59] text-white"
-                      : "text-[#4A7C59] hover:bg-teal-50"
+                      ? "bg-[#8B3D28] text-white"
+                      : "text-[#8B3D28] hover:bg-white/40"
                   }`}>
                   {page}
                 </button>
@@ -737,10 +737,10 @@ export default function SellerProductList() {
                 setCurrentPage((prev) => Math.min(displayTotalPages, prev + 1))
               }
               disabled={currentPage === displayTotalPages}
-              className={`p-2 border border-teal-600 rounded ${
+              className={`p-2 border border-[#8B3D28] rounded ${
                 currentPage === displayTotalPages
                   ? "text-neutral-400 cursor-not-allowed bg-white/40"
-                  : "text-[#4A7C59] hover:bg-teal-50"
+                  : "text-[#8B3D28] hover:bg-white/40"
               }`}
               aria-label="Next page">
               <svg

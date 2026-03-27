@@ -118,7 +118,7 @@ export default function SellerOrderDetail() {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={() => navigate('/seller/orders')}
-            className="bg-[#4A7C59] hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
+            className="bg-[#8B3D28] hover:bg-[#723221] text-white px-6 py-2 rounded-lg transition-colors"
           >
             Back to Orders
           </button>
@@ -134,7 +134,7 @@ export default function SellerOrderDetail() {
           <h2 className="text-xl font-bold text-neutral-900 mb-4">Order Not Found</h2>
           <button
             onClick={() => navigate('/seller/orders')}
-            className="bg-[#4A7C59] hover:bg-teal-700 text-white px-6 py-2 rounded-lg transition-colors"
+            className="bg-[#8B3D28] hover:bg-[#723221] text-white px-6 py-2 rounded-lg transition-colors"
           >
             Back to Orders
           </button>
@@ -177,7 +177,7 @@ export default function SellerOrderDetail() {
     };
 
     // Header - Company Info
-    doc.setFillColor(22, 163, 74); // Green color
+    doc.setFillColor(139, 61, 40); // Brown color (#8B3D28)
     doc.rect(margin, yPos, contentWidth, 15, 'F');
 
     doc.setTextColor(255, 255, 255);
@@ -400,7 +400,7 @@ export default function SellerOrderDetail() {
     <div className="min-h-screen bg-white/40 pb-8">
       {/* Order Action Section */}
       <div className="bg-white/90 backdrop-blur-md border-white/20 mb-6 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-        <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3">
+        <div className="bg-[#8B3D28] text-white px-4 sm:px-6 py-3">
           <h2 className="text-base sm:text-lg font-semibold">Order Action Section</h2>
         </div>
         <div className="bg-white/40 px-4 sm:px-6 py-4">
@@ -410,7 +410,7 @@ export default function SellerOrderDetail() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleStatusUpdate('Accepted')}
-                    className="flex-1 bg-[#4A7C59] hover:bg-[#3a6346] text-white px-6 py-2 rounded-lg transition-colors font-medium shadow-sm"
+                    className="flex-1 bg-[#8B3D28] hover:bg-[#723221] text-white px-6 py-2 rounded-lg transition-colors font-medium shadow-sm"
                   >
                     Accept Order
                   </button>
@@ -429,7 +429,7 @@ export default function SellerOrderDetail() {
                 <select
                   value={orderStatus}
                   onChange={(e) => handleStatusUpdate(e.target.value)}
-                  className="w-full sm:w-64 px-4 py-2 border border-neutral-300 rounded-lg text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:border-teal-500"
+                  className="w-full sm:w-64 px-4 py-2 border border-neutral-300 rounded-lg text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   disabled={orderStatus === 'Rejected' || orderStatus === 'Cancelled' || orderStatus === 'Delivered'}
                 >
                   <option value="Accepted">Accepted</option>
@@ -442,7 +442,7 @@ export default function SellerOrderDetail() {
             </div>
             <button
               onClick={handleExportPDF}
-              className="flex items-center gap-2 bg-[#4A7C59] hover:bg-[#3a6346] text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+              className="flex items-center gap-2 bg-[#8B3D28] hover:bg-[#723221] text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -455,7 +455,7 @@ export default function SellerOrderDetail() {
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 bg-[#4A7C59] hover:bg-[#3a6346] text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+              className="flex items-center gap-2 bg-[#8B3D28] hover:bg-[#723221] text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="6 9 6 2 18 2 18 9" />
@@ -470,13 +470,13 @@ export default function SellerOrderDetail() {
           {(orderStatus === 'Accepted' || orderStatus === 'Processed') && (
              <div className="mt-6 border-t border-neutral-200 pt-5 w-full">
                <h3 className="text-sm font-semibold text-neutral-800 mb-3">
-                  Assign Delivery Partner {orderDetail?.deliveryBoyName ? <span className="text-teal-700 ml-1 text-xs"> (Currently: {orderDetail.deliveryBoyName})</span> : ''}
+                  Assign Delivery Partner {orderDetail?.deliveryBoyName ? <span className="text-[#8B3D28] ml-1 text-xs"> (Currently: {orderDetail.deliveryBoyName})</span> : ''}
                </h3>
                <div className="flex flex-col sm:flex-row gap-3 items-center">
                  <select
                    value={selectedDeliveryBoy}
                    onChange={(e) => setSelectedDeliveryBoy(e.target.value)}
-                   className="flex-1 w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm text-neutral-900 bg-white/90 focus:outline-none focus:ring-2 focus:ring-[#4A7C59]"
+                   className="flex-1 w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm text-neutral-900 bg-white/90 focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
                  >
                    <option value="">Select a Delivery Partner...</option>
                    {availableDeliveryBoys.map((boy) => (
@@ -501,7 +501,7 @@ export default function SellerOrderDetail() {
 
       {/* View Order Details Section */}
       <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-        <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-3">
+        <div className="bg-[#8B3D28] text-white px-4 sm:px-6 py-3">
           <h2 className="text-base sm:text-lg font-semibold">View Order Details</h2>
         </div>
         <div className="bg-white/90 backdrop-blur-md border-white/20 px-4 sm:px-6 py-6">
@@ -510,12 +510,12 @@ export default function SellerOrderDetail() {
             {/* Left: Company Info */}
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-[#4A7C59] rounded flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#8B3D28] rounded flex items-center justify-center">
                   <span className="text-white text-xs font-bold">A</span>
                 </div>
                 <div>
-                  <div className="text-xs text-[#4A7C59] font-semibold">Village Basket</div>
-                  <div className="text-[10px] text-[#4A7C59]">in 10 Minutes</div>
+                  <div className="text-xs text-[#8B3D28] font-semibold">Village Basket</div>
+                  <div className="text-[10px] text-[#8B3D28]">in 10 Minutes</div>
                 </div>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">Village Basket</h1>
@@ -614,7 +614,7 @@ export default function SellerOrderDetail() {
       <footer className="mt-6 px-4 sm:px-6 text-center py-4 bg-neutral-100 rounded-lg">
         <p className="text-xs sm:text-sm text-neutral-600">
           Copyright Â© 2025. Developed By{' '}
-          <span className="font-semibold text-[#4A7C59]">Village Basket</span>
+          <span className="font-semibold text-[#8B3D28]">Village Basket</span>
         </p>
       </footer>
     </div>

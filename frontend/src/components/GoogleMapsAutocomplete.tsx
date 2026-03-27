@@ -140,13 +140,13 @@ export default function GoogleMapsAutocomplete({
     }
 
     return () => {
-       if (autocompleteRef.current) {
+      if (autocompleteRef.current) {
         try {
           window.google?.maps?.event?.clearInstanceListeners?.(autocompleteRef.current);
         } catch {
-           // Ignore
+          // Ignore
         }
-       }
+      }
     }
   }, [isLoaded, initializeAutocomplete]);
 

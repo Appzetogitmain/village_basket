@@ -170,7 +170,7 @@ const SellerAccountSettings = () => {
     if (loading && !sellerData.sellerName) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-white/40">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B3D28]"></div>
             </div>
         );
     }
@@ -230,7 +230,7 @@ const SellerAccountSettings = () => {
                             onClick={() => setIsEditing(!isEditing)}
                             className={`px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 shadow-sm flex items-center gap-2 ${isEditing
                                 ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-                                : 'bg-[#4A7C59] text-white hover:bg-teal-700 hover:shadow-md'
+                                : 'bg-[#8B3D28] text-white hover:bg-[#723221] hover:shadow-md'
                                 }`}
                         >
                             {isEditing ? (
@@ -259,11 +259,11 @@ const SellerAccountSettings = () => {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-black uppercase tracking-wider rounded-lg transition-all duration-200 ${activeTab === tab.id
-                                        ? 'bg-[#4A7C59]/10 text-[#4A7C59] shadow-sm ring-1 ring-[#4A7C59]/20'
+                                        ? 'bg-[#8B3D28]/10 text-[#8B3D28] shadow-sm ring-1 ring-[#8B3D28]/20'
                                         : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
                                         }`}
                                 >
-                                    <span className={`${activeTab === tab.id ? 'text-[#4A7C59]' : 'text-neutral-400'}`}>
+                                    <span className={`${activeTab === tab.id ? 'text-[#8B3D28]' : 'text-neutral-400'}`}>
                                         {tab.icon}
                                     </span>
                                     {tab.label}
@@ -272,7 +272,7 @@ const SellerAccountSettings = () => {
                         </div>
 
                         {/* Status Card */}
-                        <div className="mt-6 bg-gradient-to-br from-[#4A7C59] to-[#3D664A] rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
+                        <div className="mt-6 bg-gradient-to-br from-[#8B3D28] to-[#723221] rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -translate-y-6 translate-x-6"></div>
                             <div className="flex items-center justify-between mb-3">
                                 <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded">
@@ -322,7 +322,7 @@ const SellerAccountSettings = () => {
                                             <div className="space-y-8">
                                                 <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-neutral-100">
                                                     <div className="relative group">
-                                                        <div className="absolute inset-0 bg-gradient-to-tr from-teal-500 to-emerald-500 rounded-full blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                                                        <div className="absolute inset-0 bg-gradient-to-tr from-[#8B3D28] to-[#8B3D28] rounded-full blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
                                                         <img
                                                             src={sellerData.profile || 'https://placehold.co/150'}
                                                             alt="Profile"
@@ -357,7 +357,7 @@ const SellerAccountSettings = () => {
                                                                 autoComplete="new-password"
                                                                 placeholder="••••••••"
                                                                 disabled={!isEditing}
-                                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all placeholder:text-gray-300"
+                                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#8B3D28]/20 focus:border-[#8B3D28] outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all placeholder:text-gray-300"
                                                             />
                                                         </div>
                                                         {isEditing && <p className="text-xs text-gray-400 ml-1">Leave blank to keep current password</p>}
@@ -370,7 +370,7 @@ const SellerAccountSettings = () => {
                                                         type="button"
                                                         onClick={handleTestNotification}
                                                         disabled={testNotifLoading}
-                                                        className="flex items-center gap-2 px-4 py-2 border border-teal-600 text-[#4A7C59] hover:bg-teal-50 font-medium rounded-lg transition-all disabled:opacity-50"
+                                                        className="flex items-center gap-2 px-4 py-2 border border-[#8B3D28] text-[#8B3D28] hover:bg-white/40 font-medium rounded-lg transition-all disabled:opacity-50"
                                                     >
                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -405,7 +405,7 @@ const SellerAccountSettings = () => {
                                                     <div>
                                                         <h3 className="text-lg font-black text-village-umber">{sellerData.storeName || 'Store Name'}</h3>
                                                         <div className="flex items-center gap-2 mt-1">
-                                                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#4A7C59]/10 text-[#4A7C59] uppercase tracking-widest">
+                                                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#8B3D28]/10 text-[#8B3D28] uppercase tracking-widest">
                                                                 {sellerData.category || 'Category'}
                                                             </span>
                                                         </div>
@@ -423,7 +423,7 @@ const SellerAccountSettings = () => {
                                                                 value={sellerData.category}
                                                                 onChange={handleInputChange}
                                                                 disabled={!isEditing}
-                                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all appearance-none bg-white/90 backdrop-blur-md border-white/20"
+                                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#8B3D28]/20 focus:border-[#8B3D28] outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all appearance-none bg-white/90 backdrop-blur-md border-white/20"
                                                             >
                                                                 <option value="">Select Category</option>
                                                                 {categories.map(cat => (
@@ -460,7 +460,7 @@ const SellerAccountSettings = () => {
                                                                 />
                                                                 <div className="mt-4 animate-fadeIn">
                                                                     <p className="text-sm font-medium text-neutral-700 mb-2">
-                                                                        Exact Location <span className="text-[#4A7C59] text-xs font-normal">(Move the map to place the pin on your store's entrance)</span>
+                                                                        Exact Location <span className="text-[#8B3D28] text-xs font-normal">(Move the map to place the pin on your store's entrance)</span>
                                                                     </p>
                                                                     <LocationPickerMap
                                                                         initialLat={parseFloat(sellerData.latitude) || 26.9124}
@@ -500,7 +500,7 @@ const SellerAccountSettings = () => {
                                                             value={sellerData.serviceRadiusKm}
                                                             onChange={handleInputChange}
                                                             disabled={!isEditing}
-                                                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all appearance-none bg-white/90 backdrop-blur-md border-white/20"
+                                                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#8B3D28]/20 focus:border-[#8B3D28] outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all appearance-none bg-white/90 backdrop-blur-md border-white/20"
                                                         >
                                                             <option value="1">1 km</option>
                                                             <option value="2">2 km</option>
@@ -524,7 +524,7 @@ const SellerAccountSettings = () => {
                                             <div className="space-y-8">
                                                 <div className="space-y-3">
                                                     <label className="text-xs font-black text-neutral-700 ml-1 uppercase tracking-wider">Store Banner</label>
-                                                    <div className="relative group rounded-xl overflow-hidden bg-neutral-100 border-2 border-dashed border-neutral-300 aspect-[21/9] transition-all hover:border-[#4A7C59]">
+                                                    <div className="relative group rounded-xl overflow-hidden bg-neutral-100 border-2 border-dashed border-neutral-300 aspect-[21/9] transition-all hover:border-[#8B3D28]">
                                                         <img
                                                             src={sellerData.storeBanner || 'https://placehold.co/1200x400?text=Store+Banner'}
                                                             alt="Store Banner"
@@ -553,7 +553,7 @@ const SellerAccountSettings = () => {
                                                         disabled={!isEditing}
                                                         rows={6}
                                                         placeholder="Tell customers about your store, specialty, and heritage..."
-                                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-teal-500 outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all resize-none leading-relaxed"
+                                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#8B3D28]/20 focus:border-[#8B3D28] outline-none disabled:bg-gray-50/50 disabled:text-gray-500 transition-all resize-none leading-relaxed"
                                                     />
                                                 </div>
                                             </div>
@@ -563,7 +563,7 @@ const SellerAccountSettings = () => {
                                             <div className="space-y-10">
                                                 <section>
                                                     <div className="flex items-center gap-3 mb-4">
-                                                        <div className="p-2 bg-[#4A7C59]/10 text-[#4A7C59] rounded-lg">
+                                                        <div className="p-2 bg-[#8B3D28]/10 text-[#8B3D28] rounded-lg">
                                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                                                         </div>
                                                         <h4 className="text-base font-black text-village-umber">Bank Details</h4>
@@ -578,7 +578,7 @@ const SellerAccountSettings = () => {
 
                                                 <section>
                                                     <div className="flex items-center gap-3 mb-4">
-                                                        <div className="p-2 bg-[#4A7C59]/10 text-[#4A7C59] rounded-lg">
+                                                        <div className="p-2 bg-[#8B3D28]/10 text-[#8B3D28] rounded-lg">
                                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                                         </div>
                                                         <h4 className="text-base font-black text-village-umber">Tax Information</h4>
@@ -608,7 +608,7 @@ const SellerAccountSettings = () => {
                                             <button
                                                 type="submit"
                                                 disabled={saveLoading}
-                                                className={`px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 ${saveLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                                className={`px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-[#8B3D28] to-[#723221] hover:from-[#8B3D28] hover:to-[#723221] shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 ${saveLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                             >
                                                 {saveLoading ? (
                                                     <span className="flex items-center gap-2">
@@ -641,7 +641,7 @@ const InputGroup = ({ label, name, value, onChange, disabled, type = "text", pla
             disabled={disabled}
             placeholder={placeholder}
             autoComplete={autoComplete}
-            className={`w-full px-4 py-2.5 rounded-lg border border-neutral-200 focus:ring-2 focus:ring-[#4A7C59]/20 focus:border-[#4A7C59] outline-none transition-all text-sm ${disabled ? 'bg-neutral-50/80 text-neutral-500 cursor-default' : 'bg-white'
+            className={`w-full px-4 py-2.5 rounded-lg border border-neutral-200 focus:ring-2 focus:ring-[#8B3D28]/20 focus:border-[#8B3D28] outline-none transition-all text-sm ${disabled ? 'bg-neutral-50/80 text-neutral-500 cursor-default' : 'bg-white'
 
             }`}
         />

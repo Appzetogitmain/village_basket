@@ -202,7 +202,7 @@ export default function SellerSidebar({ onClose }: SellerSidebarProps) {
   };
 
   return (
-    <aside className="w-64 bg-[#4A7C59] h-screen flex flex-col shadow-xl z-50">
+    <aside className="w-64 bg-[#8B3D28] h-screen flex flex-col shadow-xl z-50">
       {/* Close button - only show on mobile */}
       <div className="flex justify-end p-3 border-b border-white/10 lg:hidden">
         <button
@@ -242,9 +242,9 @@ export default function SellerSidebar({ onClose }: SellerSidebarProps) {
                       handleNavigation(item.path);
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 mb-0.5 rounded-lg text-left transition-colors ${active
-                    ? "bg-[#3a6346] text-white shadow-inner"
-                    : "text-white/70 hover:bg-[#3a6346]/50 hover:text-white"
+                  className={`w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 mb-0.5 rounded-lg text-left transition-all ${active
+                    ? "bg-[#FAF7F2] text-[#8B3D28] shadow-lg font-bold"
+                    : "text-white/70 hover:bg-white/10 hover:text-white"
                     }`}>
                   <div className="flex items-center gap-2">
                     {item.icon && (
@@ -262,7 +262,7 @@ export default function SellerSidebar({ onClose }: SellerSidebarProps) {
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                       className={`transition-transform ${expanded ? "rotate-180" : ""
-                        } ${active ? "text-white" : "text-white/50"}`}>
+                        } ${active ? "text-[#8B3D28]" : "text-white/50"}`}>
                       <path
                         d="M6 9L12 15L18 9"
                         stroke="currentColor"
@@ -284,8 +284,8 @@ export default function SellerSidebar({ onClose }: SellerSidebarProps) {
                           <button
                             onClick={() => handleNavigation(subItem.path)}
                             className={`w-full flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-left transition-colors ${subActive
-                              ? "bg-[#2a4a34] text-white"
-                              : "text-white/60 hover:bg-[#2a4a34]/50 hover:text-white"
+                              ? "bg-white/20 text-[#FAF7F2] font-bold"
+                              : "text-white/60 hover:bg-white/10 hover:text-white"
                               }`}>
                             <span className="flex-shrink-0 opacity-70 scale-90">
                               {subItem.icon}

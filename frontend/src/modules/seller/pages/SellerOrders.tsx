@@ -127,7 +127,7 @@ export default function SellerOrders() {
       case 'On the way':
         return 'bg-purple-100 text-purple-800';
       case 'Delivered':
-        return 'bg-green-100 text-green-800';
+        return 'bg-[#FAF7F2] text-[#8B3D28] border border-[#8B3D28]/20';
       case 'Cancelled':
         return 'bg-red-100 text-red-800';
       default:
@@ -158,8 +158,8 @@ export default function SellerOrders() {
       <div className="px-3 sm:px-4 md:px-6">
         {/* White Card Container */}
         <div className="bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-          {/* Green Banner */}
-          <div className="bg-[#4A7C59] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-t-lg">
+          {/* Brown Banner */}
+          <div className="bg-[#8B3D28] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-t-lg">
             <h2 className="text-base sm:text-lg font-semibold">View Order List</h2>
           </div>
 
@@ -220,7 +220,7 @@ export default function SellerOrders() {
                     setStatus(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#4A7C59] focus:border-[#4A7C59]"
+                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                 >
                   <option>All Status</option>
                   <option>Pending</option>
@@ -239,7 +239,7 @@ export default function SellerOrders() {
                     setEntriesPerPage(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#4A7C59] focus:border-[#4A7C59]"
+                  className="w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                 >
                   <option>10</option>
                   <option>25</option>
@@ -260,7 +260,7 @@ export default function SellerOrders() {
                     setSearchQuery(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="flex-1 w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#4A7C59] focus:border-[#4A7C59]"
+                  className="flex-1 w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   placeholder="Search by Order ID, Status, or Amount"
                 />
               </div>
@@ -269,7 +269,7 @@ export default function SellerOrders() {
               <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto">
                 <button
                   onClick={handleExport}
-                  className="flex items-center justify-center gap-2 bg-[#4A7C59] hover:bg-[#3a6346] text-white px-3 sm:px-4 py-2 rounded text-xs sm:text-sm font-medium transition-colors w-full sm:w-auto"
+                  className="flex items-center justify-center gap-2 bg-[#8B3D28] hover:bg-[#723221] text-white px-3 sm:px-4 py-2 rounded text-xs sm:text-sm font-medium transition-colors w-full sm:w-auto"
                 >
                   <svg
                     width="16"
@@ -339,7 +339,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'orderId' ? 'text-[#4A7C59]' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'orderId' ? 'text-[#8B3D28]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -368,7 +368,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'deliveryDate' ? 'text-[#4A7C59]' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'deliveryDate' ? 'text-[#8B3D28]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -397,7 +397,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'orderDate' ? 'text-[#4A7C59]' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'orderDate' ? 'text-[#8B3D28]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -426,7 +426,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'status' ? 'text-[#4A7C59]' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'status' ? 'text-[#8B3D28]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -455,7 +455,7 @@ export default function SellerOrders() {
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`cursor-pointer ${sortField === 'amount' ? 'text-[#4A7C59]' : 'text-neutral-400'
+                          className={`cursor-pointer ${sortField === 'amount' ? 'text-[#8B3D28]' : 'text-neutral-400'
                             }`}
                         >
                           <path
@@ -507,7 +507,7 @@ export default function SellerOrders() {
                         <td className="px-3 sm:px-4 md:px-6 py-3">
                           <button
                             onClick={() => navigate(`/seller/orders/${order.id}`)}
-                            className="text-[#4A7C59] hover:text-[#3a6346] text-xs sm:text-sm font-medium transition-colors"
+                            className="text-[#8B3D28] hover:text-[#723221] text-xs sm:text-sm font-medium transition-colors"
                           >
                             View
                           </button>

@@ -51,21 +51,51 @@ export default function LocationPermissionRequest({
 
   const handleManualLocationSelect = (address: string, lat: number, lng: number, _placeName: string) => {
     setManualAddress(address);
-    setManualLat(lat);
-    setManualLng(lng);
-    // placeName is available but not stored separately as we use address
+    // Ignore synthetic zeroes emitted by React when the DOM input value changes automatically
+    if (lat !== 0 || lng !== 0) {
+      setManualLat(lat);
+      setManualLng(lng);
+    } else if (!address) {
+      setManualLat(0);
+      setManualLng(0);
+    }
   };
 
   const handleSaveManualLocation = async () => {
-    if (!manualAddress || manualLat === 0 || manualLng === 0) {
+    if (!manualAddress || manualAddress.length < 3) {
       return;
+    }
+
+    let finalLat = manualLat;
+    let finalLng = manualLng;
+
+    // If Google's API failed to populate lat/lng but they typed an address, do a quick fallback lookup
+    if (finalLat === 0 || finalLng === 0) {
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(manualAddress)}&limit=1`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            finalLat = parseFloat(data[0].lat);
+            finalLng = parseFloat(data[0].lon);
+          }
+        }
+      } catch (e) {
+        console.error('Fallback geocoding failed', e);
+      }
+    }
+
+    // Absolute fallback to prevent UI block if all geocoding fails
+    if (finalLat === 0 || finalLng === 0) {
+      finalLat = 20.5937; // Center of India fallback
+      finalLng = 78.9629;
     }
 
     try {
       // Save manual location - this will set isLocationEnabled to true
       await updateLocation({
-        latitude: manualLat,
-        longitude: manualLng,
+        latitude: finalLat,
+        longitude: finalLng,
         address: manualAddress,
       });
       // Modal will automatically hide when isLocationEnabled becomes true
@@ -175,6 +205,7 @@ export default function LocationPermissionRequest({
           </>
         ) : (
           <div className="space-y-4">
+            <style>{`.pac-container { z-index: 100000 !important; }`}</style>
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
                 Search and select your location
@@ -196,7 +227,7 @@ export default function LocationPermissionRequest({
               </button>
               <button
                 onClick={handleSaveManualLocation}
-                disabled={!manualAddress || manualLat === 0}
+                disabled={!manualAddress || manualAddress.length < 3}
                 className="flex-1 py-2 bg-[#8B3D28] text-white rounded-lg font-semibold hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save Location

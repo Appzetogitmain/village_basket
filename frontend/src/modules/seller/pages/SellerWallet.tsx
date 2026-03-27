@@ -80,7 +80,7 @@ export default function SellerWallet() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#4A7C59]"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#8B3D28]"></div>
       </div>
     );
   }
@@ -98,14 +98,14 @@ export default function SellerWallet() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mx-4 mb-4 bg-gradient-to-br from-[#4A7C59] to-[#3D664A] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden"
+        className="mx-4 mb-4 bg-gradient-to-br from-[#8B3D28] to-[#723221] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8"></div>
         <p className="text-xs opacity-80 mb-1 uppercase font-bold tracking-widest">Wallet Balance</p>
         <h1 className="text-3xl font-black mb-4">₹{balance.toFixed(2)}</h1>
         <button
           onClick={() => setShowWithdrawModal(true)}
-          className="bg-white/95 text-[#4A7C59] px-5 py-2 rounded-lg text-sm font-black uppercase tracking-wide hover:bg-white transition-all shadow-md"
+          className="bg-white/95 text-[#8B3D28] px-5 py-2 rounded-lg text-sm font-black uppercase tracking-wide hover:bg-white transition-all shadow-md"
         >
           Request Withdrawal
         </button>
@@ -118,7 +118,7 @@ export default function SellerWallet() {
           <button
             onClick={() => setActiveTab('transactions')}
             className={`flex-1 py-3 text-xs font-black uppercase tracking-wider transition-colors ${activeTab === 'transactions'
-              ? 'text-[#4A7C59] border-b-2 border-[#4A7C59]'
+              ? 'text-[#8B3D28] border-b-2 border-[#8B3D28]'
               : 'text-neutral-500 hover:text-neutral-800'
               }`}
           >
@@ -127,7 +127,7 @@ export default function SellerWallet() {
           <button
             onClick={() => setActiveTab('withdrawals')}
             className={`flex-1 py-3 text-xs font-black uppercase tracking-wider transition-colors ${activeTab === 'withdrawals'
-              ? 'text-[#4A7C59] border-b-2 border-[#4A7C59]'
+              ? 'text-[#8B3D28] border-b-2 border-[#8B3D28]'
               : 'text-neutral-500 hover:text-neutral-800'
               }`}
           >
@@ -136,7 +136,7 @@ export default function SellerWallet() {
           <button
             onClick={() => setActiveTab('commissions')}
             className={`flex-1 py-3 text-xs font-black uppercase tracking-wider transition-colors ${activeTab === 'commissions'
-              ? 'text-[#4A7C59] border-b-2 border-[#4A7C59]'
+              ? 'text-[#8B3D28] border-b-2 border-[#8B3D28]'
               : 'text-neutral-500 hover:text-neutral-800'
               }`}
           >
@@ -195,7 +195,7 @@ export default function SellerWallet() {
                         })}
                       </p>
                     </div>
-                    <p className={`font-bold text-lg ${item.type === 'Credit' ? 'text-[#4A7C59]' : 'text-red-600'} ${item.status === 'Pending' ? 'opacity-60' : ''}`}>
+                    <p className={`font-bold text-lg ${item.type === 'Credit' ? 'text-[#8B3D28]' : 'text-red-600'} ${item.status === 'Pending' ? 'opacity-60' : ''}`}>
                       {item.type === 'Credit' ? '+' : '-'}₹{item.amount.toFixed(2)}
                     </p>
                   </div>
@@ -259,7 +259,7 @@ export default function SellerWallet() {
                         <p className="font-medium text-neutral-800 text-sm">Order Commission</p>
                         <p className="text-xs text-neutral-500">Rate: {comm.rate}%</p>
                       </div>
-                      <p className="font-bold text-[#4A7C59]">₹{comm.amount.toFixed(2)}</p>
+                      <p className="font-bold text-[#8B3D28]">₹{comm.amount.toFixed(2)}</p>
                     </div>
                     <div className="flex justify-between text-xs text-neutral-400">
                       <span>Order Amount: ₹{comm.orderAmount.toFixed(2)}</span>
@@ -291,7 +291,7 @@ export default function SellerWallet() {
                     type="number"
                     value={withdrawAmount}
                     onChange={(e) => setWithdrawAmount(e.target.value)}
-                    className="w-full border border-neutral-200 rounded-lg pl-8 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent"
+                    className="w-full border border-neutral-200 rounded-lg pl-8 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#8B3D28] focus:border-transparent"
                     placeholder="Enter amount"
                     min="0"
                     step="0.01"
@@ -304,7 +304,7 @@ export default function SellerWallet() {
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value as any)}
-                  className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#4A7C59] focus:border-transparent"
+                  className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#8B3D28] focus:border-transparent"
                 >
                   <option value="Bank Transfer">Bank Transfer</option>
                   <option value="UPI">UPI</option>
@@ -323,7 +323,7 @@ export default function SellerWallet() {
                 </button>
                 <button
                   onClick={handleWithdrawRequest}
-                  className="flex-1 bg-[#4A7C59] text-white rounded-lg py-2.5 text-sm font-black uppercase tracking-wide hover:bg-[#3a6346] transition disabled:opacity-50"
+                  className="flex-1 bg-[#8B3D28] text-white rounded-lg py-2.5 text-sm font-black uppercase tracking-wide hover:bg-[#723221] transition disabled:opacity-50"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Request'}

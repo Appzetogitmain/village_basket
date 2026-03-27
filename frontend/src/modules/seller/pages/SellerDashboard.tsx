@@ -256,14 +256,14 @@ export default function SellerDashboard() {
           <p className="text-sm text-gray-500">Overview of your store performance</p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start relative z-10">
-          <span className={`text-[13px] font-bold tracking-wide uppercase ${isShopOpen ? 'text-[#4A7C59]' : 'text-red-500'}`}>
+          <span className={`text-[13px] font-bold tracking-wide uppercase ${isShopOpen ? 'text-[#8B3D28]' : 'text-red-500'}`}>
             {isShopOpen ? 'Shop is Live' : 'Shop is Closed'}
           </span>
           <button
             onClick={handleToggleShop}
             disabled={statusLoading}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#4A7C59] focus:ring-offset-2 ${
-              isShopOpen ? 'bg-[#4A7C59]' : 'bg-gray-300'
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:ring-offset-2 ${
+              isShopOpen ? 'bg-[#8B3D28]' : 'bg-gray-300'
             } ${statusLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           >
             <span
@@ -318,7 +318,7 @@ export default function SellerDashboard() {
                 setEntriesPerPage(Math.max(1, Math.min(100, value)));
                 setCurrentPage(1);
               }}
-              className="w-16 px-2 py-1 border border-neutral-300 rounded text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#4A7C59] focus:border-teal-500"
+              className="w-16 px-2 py-1 border border-neutral-300 rounded text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
               min="1"
               max="100"
             />
@@ -434,7 +434,7 @@ export default function SellerDashboard() {
                   <td className="px-4 sm:px-6 py-3">
                     <button
                       onClick={() => navigate(`/seller/orders/${order.id}`)}
-                      className="bg-[#4A7C59] hover:bg-teal-700 text-white p-2 rounded transition-colors"
+                      className="bg-[#8B3D28] hover:bg-[#723221] text-white p-2 rounded transition-colors"
                       aria-label="View order details"
                     >
                       <svg
