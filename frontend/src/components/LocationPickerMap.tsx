@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAP_SCRIPT_ID } from '../config/googleMapsConfig';
 
 interface LocationPickerMapProps {
   initialLat: number;
@@ -18,8 +19,7 @@ const defaultCenter = {
   lng: 78.9629,
 };
 
-type Libraries = ("places" | "drawing" | "geometry" | "visualization")[];
-const libraries: Libraries = ['places'];
+
 
 export default function LocationPickerMap({
   initialLat,
@@ -29,9 +29,9 @@ export default function LocationPickerMap({
 }: LocationPickerMapProps) {
   // Use the same ID and libraries as GoogleMapsAutocomplete to share the script
   const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
+    id: GOOGLE_MAP_SCRIPT_ID,
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
-    libraries: libraries,
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);

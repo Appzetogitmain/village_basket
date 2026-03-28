@@ -1,17 +1,20 @@
-import { useState, useEffect, useRef } from 'react';
-import { useJsApiLoader } from '@react-google-maps/api';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useJsApiLoader, Autocomplete } from '@react-google-maps/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { OrderAddress } from '../../types/order';
 import { getAddresses, addAddress, updateAddress, Address } from '../../services/api/customerAddressService';
+import { getDeliveryConfig, AppDeliverySettings } from '../../services/api/customerService';
 import { appConfig } from '../../services/configService';
 import { calculateProductPrice } from '../../utils/priceUtils';
 import GoogleMapsLocationPicker from '../../components/GoogleMapsLocationPicker';
 
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAP_SCRIPT_ID } from '../../config/googleMapsConfig';
+
 export default function CheckoutAddress() {
-  const { cart } = useCart();
+  const { cart, refreshCart } = useCart();
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -40,11 +43,29 @@ export default function CheckoutAddress() {
   // Location picker state
   const [selectedLatitude, setSelectedLatitude] = useState<number>(0);
   const [selectedLongitude, setSelectedLongitude] = useState<number>(0);
+  const [deliverySettings, setDeliverySettings] = useState<AppDeliverySettings | null>(null);
+  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
   const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
+    id: GOOGLE_MAP_SCRIPT_ID,
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+    libraries: GOOGLE_MAPS_LIBRARIES
   });
+
+  // Fetch delivery configuration
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await getDeliveryConfig();
+        if (response.success) {
+          setDeliverySettings(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching delivery config:', error);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   // Get user's current location on mount
 
@@ -142,9 +163,134 @@ export default function CheckoutAddress() {
     }
   }, [editAddress]);
 
-  const platformFee = appConfig.platformFee;
-  const deliveryFee = cart.total >= appConfig.freeDeliveryThreshold ? 0 : appConfig.deliveryFee;
+  const platformFee = cart.platformFee ?? deliverySettings?.platformFee ?? appConfig.platformFee;
+  const deliveryFee = cart.estimatedDeliveryFee ?? (cart.total >= (deliverySettings?.freeDeliveryThreshold ?? appConfig.freeDeliveryThreshold) ? 0 : (deliverySettings?.deliveryCharges ?? appConfig.deliveryFee));
   const totalAmount = cart.total + platformFee + deliveryFee;
+
+  // Use current location
+  const handleUseCurrentLocation = useCallback(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setSelectedLatitude(lat);
+          setSelectedLongitude(lng);
+          
+          // Refresh cart for new GPS location
+          refreshCart(lat, lng);
+
+          // Reverse Geocode to populate fields
+          if (window.google?.maps?.Geocoder) {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+              if (status === 'OK' && results && results[0]) {
+                const components = results[0].address_components;
+                let street = '';
+                let city = '';
+                let state = '';
+                let pincode = '';
+                let landmark = '';
+
+                components.forEach(c => {
+                  const types = c.types;
+                  if (types.includes('street_number')) street = c.long_name + ' ' + street;
+                  if (types.includes('route')) street += c.long_name;
+                  if (types.includes('locality')) city = c.long_name;
+                  if (types.includes('administrative_area_level_1')) state = c.long_name;
+                  if (types.includes('postal_code')) pincode = c.long_name;
+                  if (types.includes('sublocality') || types.includes('neighborhood')) landmark = c.long_name;
+                });
+
+                setAddress(prev => ({
+                  ...prev,
+                  street: street.trim() || prev.street,
+                  city: city || prev.city,
+                  state: state || prev.state,
+                  pincode: pincode || prev.pincode,
+                  landmark: landmark || prev.landmark
+                }));
+              }
+            });
+          }
+        },
+        (error) => {
+          showToast('Failed to get current location', 'error');
+        }
+      );
+    } else {
+      showToast('Geolocation is not supported by your browser', 'error');
+    }
+  }, [showToast, refreshCart]);
+
+  const onAutocompleteLoad = (autocompleteInstance: google.maps.places.Autocomplete) => {
+    setAutocomplete(autocompleteInstance);
+  };
+
+  const onPlaceChanged = () => {
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+      if (place.geometry && place.geometry.location) {
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        setSelectedLatitude(lat);
+        setSelectedLongitude(lng);
+
+        // Refresh cart to get updated delivery fee for this locality
+        refreshCart(lat, lng);
+
+        // Populate fields from place components
+        const addrComponents = place.address_components;
+        if (addrComponents) {
+          let street = '';
+          let city = '';
+          let state = '';
+          let pincode = '';
+          let landmark = place.name !== place.formatted_address ? place.name : '';
+
+          addrComponents.forEach(component => {
+            const types = component.types;
+            if (types.includes('street_number')) street = component.long_name + ' ' + street;
+            if (types.includes('route')) street += component.long_name;
+            if (types.includes('locality')) city = component.long_name;
+            if (types.includes('administrative_area_level_1')) state = component.long_name;
+            if (types.includes('postal_code')) pincode = component.long_name;
+            if (!landmark && (types.includes('sublocality') || types.includes('neighborhood'))) {
+              landmark = component.long_name;
+            }
+          });
+
+          setAddress(prev => ({
+            ...prev,
+            street: street.trim() || prev.street,
+            city: city || prev.city,
+            state: state || prev.state,
+            pincode: pincode || prev.pincode,
+            landmark: landmark || prev.landmark
+          }));
+        }
+      }
+    }
+  };
+
+  const handleLocationSelect = useCallback((lat: number, lng: number, addressDetails?: any) => {
+    setSelectedLatitude(lat);
+    setSelectedLongitude(lng);
+    
+    // Refresh cart to get updated delivery fee for this specific location
+    refreshCart(lat, lng);
+
+    if (addressDetails) {
+      setAddress(prev => ({
+        ...prev,
+        street: addressDetails.street || prev.street,
+        city: addressDetails.city || prev.city,
+        state: addressDetails.state || prev.state,
+        pincode: addressDetails.pincode || prev.pincode,
+        landmark: addressDetails.landmark || prev.landmark
+      }));
+    }
+  }, [refreshCart]);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof OrderAddress, string>> = {};
@@ -301,10 +447,63 @@ export default function CheckoutAddress() {
         </div>
       </div>
 
-      <div className="px-4 py-3 border-b border-neutral-200">
-        <label className="block text-xs font-medium text-neutral-700 mb-2">
-           Delivery Address Details
+      {/* Map Section */}
+      <div className="relative">
+        {isLoaded && (
+          <div className="h-[250px] relative">
+            <GoogleMapsLocationPicker
+              initialLat={selectedLatitude || 20.5937}
+              initialLng={selectedLongitude || 78.9629}
+              onLocationSelect={handleLocationSelect}
+              height="250px"
+            />
+
+            {/* Floating Autocomplete Search inside Map area for premium feel */}
+            <div className="absolute top-4 left-4 right-4 z-[40]">
+              <Autocomplete
+                onLoad={onAutocompleteLoad}
+                onPlaceChanged={onPlaceChanged}
+              >
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
+                      <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Search your locality / area..."
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-neutral-200 rounded-xl shadow-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#8B3D28] font-poppins"
+                  />
+                </div>
+              </Autocomplete>
+            </div>
+
+            {/* Use Current Location Button */}
+            <button
+              onClick={handleUseCurrentLocation}
+              className="absolute bottom-16 right-4 z-[30] bg-white p-3 rounded-full shadow-lg border border-neutral-100 hover:bg-neutral-50 active:scale-90 transition-all"
+              title="Use Current Location"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" fill="#8B3D28" />
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="px-4 py-3 border-b border-neutral-200 bg-neutral-50/50 flex items-center justify-between">
+        <label className="text-xs font-black text-neutral-900 font-poppins uppercase tracking-widest">
+          Delivery Address Details
         </label>
+        <div className="flex items-center gap-1 text-[#8B3D28]">
+          <span className="text-[10px] font-bold font-poppins">Pin verified</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
       </div>
 
       {/* Who you are ordering for? */}
@@ -488,6 +687,19 @@ export default function CheckoutAddress() {
             maxLength={6}
           />
           {errors.pincode && <p className="text-[10px] text-red-500 mt-0.5">{errors.pincode}</p>}
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-neutral-700 mb-1">
+            Landmark (Optional)
+          </label>
+          <input
+            type="text"
+            value={address.landmark || ''}
+            onChange={(e) => handleInputChange('landmark', e.target.value)}
+            className="w-full px-3 py-2 bg-white border border-neutral-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] transition-colors"
+            placeholder="E.g. Near Apollo Hospital"
+          />
         </div>
       </div>
 

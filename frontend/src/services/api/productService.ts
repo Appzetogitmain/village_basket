@@ -17,8 +17,12 @@ export interface ProductVariation {
   name?: string; // Mapped from title if needed, or direct
   value?: string;
   title?: string; // Frontend uses title
-  price: number;
-  discPrice: number;
+  retailPrice: number;
+  retailDiscPrice: number;
+  wholesalePrice: number;
+  wholesaleDiscPrice: number;
+  price?: number; // Resolved price based on user role
+  discPrice?: number; // Resolved discount price base on user role
   stock: number;
   status: "Available" | "Sold out" | "In stock"; // Added In stock
   sku?: string;
@@ -57,6 +61,10 @@ export interface Product {
   createdAt?: string;
   updatedAt?: string;
   // Common root-level fields for displays
+  retailPrice?: number;
+  retailDiscPrice?: number;
+  wholesalePrice?: number;
+  wholesaleDiscPrice?: number;
   price?: number;
   mrp?: number;
   // Fallback for old fields if any legacy code uses them

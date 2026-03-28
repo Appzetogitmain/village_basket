@@ -398,9 +398,20 @@ export default function AdminCatalogManager() {
                 <div className={`font-bold text-sm truncate ${selectedProductId === prod._id ? "text-white" : "text-neutral-800"}`} title={prod.productName}>
                   {prod.productName}
                 </div>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className={`text-[10px] font-bold ${selectedProductId === prod._id ? "text-white/80" : "text-[#A54B31]"}`}>₹{prod.price}</span>
-                  {!prod.publish && <span className="text-[9px] font-bold px-1 rounded bg-orange-50 text-orange-600 border border-orange-100">DRAFT</span>}
+                <div className="flex flex-col gap-0.5 mt-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[8px] font-bold text-neutral-400 uppercase">Retail</span>
+                    <span className={`text-[10px] font-bold ${selectedProductId === prod._id ? "text-white/90" : "text-[#A54B31]"}`}>
+                      ₹{prod.retailPrice || prod.price}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[8px] font-bold text-neutral-400 uppercase">Wholesale</span>
+                    <span className={`text-[10px] font-bold ${selectedProductId === prod._id ? "text-white/90" : "text-blue-600"}`}>
+                      ₹{prod.wholesalePrice || 0}
+                    </span>
+                  </div>
+                  {!prod.publish && <span className="text-[9px] font-bold px-1 rounded bg-orange-50 text-orange-600 border border-orange-100 self-start mt-1">DRAFT</span>}
                 </div>
               </div>
               {selectedProductId === prod._id && (

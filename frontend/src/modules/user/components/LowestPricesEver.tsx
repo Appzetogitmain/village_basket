@@ -124,7 +124,19 @@ const ProductCard = memo(({
               </div>
             </div>
             <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-wider italic">
-              Pack: {product.pack || 'Standard'}
+              Pack: {(() => {
+                  let packValue = (product.pack || '').trim();
+                  
+                  // Format numeric-only pack values (e.g., 500 becomes 500g)
+                  if (packValue && /^\d+$/.test(packValue)) {
+                    const num = parseInt(packValue);
+                    if (num >= 500 && num < 1000) return `${num}g`;
+                    if (num >= 1000) return `${num/1000}kg`;
+                    return `${num}g`;
+                  }
+                  
+                  return packValue || 'Standard';
+                })()}
             </span>
           </div>
 

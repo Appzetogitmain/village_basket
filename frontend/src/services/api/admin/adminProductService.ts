@@ -115,6 +115,10 @@ export interface Product {
   seller: string | { sellerName: string; storeName: string };
   mainImage?: string;
   galleryImages: string[];
+  retailPrice?: number;
+  retailDiscPrice?: number;
+  wholesalePrice?: number;
+  wholesaleDiscPrice?: number;
   price: number;
   compareAtPrice?: number;
   stock: number | string;
@@ -124,6 +128,10 @@ export interface Product {
   variations?: Array<{
     name: string;
     value: string;
+    retailPrice?: number;
+    retailDiscPrice?: number;
+    wholesalePrice?: number;
+    wholesaleDiscPrice?: number;
     price?: number;
     stock?: number;
     sku?: string;
@@ -162,6 +170,10 @@ export interface CreateProductData {
   seller?: string;
   mainImage?: string;
   galleryImages?: string[];
+  retailPrice?: number;
+  retailDiscPrice?: number;
+  wholesalePrice?: number;
+  wholesaleDiscPrice?: number;
   price: number;
   compareAtPrice?: number;
   stock: number;
@@ -171,6 +183,10 @@ export interface CreateProductData {
   variations?: Array<{
     name: string;
     value: string;
+    retailPrice?: number;
+    retailDiscPrice?: number;
+    wholesalePrice?: number;
+    wholesaleDiscPrice?: number;
     price?: number;
     stock?: number;
     sku?: string;

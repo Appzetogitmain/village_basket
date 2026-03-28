@@ -11,7 +11,23 @@ export interface CustomerProfile {
   refCode: string;
   walletAmount: number;
   totalOrders: number;
-  totalSpent: number;
+  userType: 'retail' | 'wholesale';
+}
+
+export interface DeliveryConfig {
+  isDistanceBased: boolean;
+  baseCharge: number;
+  baseDistance: number;
+  kmRate: number;
+  deliveryBoyKmRate?: number;
+  googleMapsKey?: string;
+}
+
+export interface AppDeliverySettings {
+  deliveryConfig: DeliveryConfig;
+  platformFee: number;
+  deliveryCharges: number;
+  freeDeliveryThreshold: number;
 }
 
 export interface GetProfileResponse {
@@ -45,6 +61,14 @@ export const getProfile = async (): Promise<GetProfileResponse> => {
  */
 export const updateProfile = async (data: UpdateProfileData): Promise<UpdateProfileResponse> => {
   const response = await api.put<UpdateProfileResponse>('/customer/profile', data);
+  return response.data;
+};
+
+/**
+ * Get delivery configuration settings
+ */
+export const getDeliveryConfig = async (): Promise<{ success: boolean; data: AppDeliverySettings }> => {
+  const response = await api.get<{ success: boolean; data: AppDeliverySettings }>('/customer/delivery-config');
   return response.data;
 };
 

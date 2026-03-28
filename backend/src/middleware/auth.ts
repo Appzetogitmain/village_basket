@@ -100,3 +100,26 @@ export const requireUserType = (...userTypes: AuthUserType[]) => {
   };
 };
 
+/**
+ * Optional authentication middleware - populates req.user if a valid token is provided,
+ * but DOES NOT return an error if the token is missing or invalid.
+ */
+export const optionalAuthenticate = (req: Request, _res: Response, next: NextFunction): void => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        const decoded = verifyToken(token);
+        req.user = decoded;
+      } catch (error) {
+        // Silently skip if token is invalid - we treat this as a guest request
+        console.debug('Invalid token in optionalAuthenticate');
+      }
+    }
+    next();
+  } catch (error) {
+    next();
+  }
+};
