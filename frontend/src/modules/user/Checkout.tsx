@@ -458,9 +458,9 @@ export default function Checkout() {
 
   const handleGoToOrders = () => {
     if (placedOrderId) {
-      navigate(`/orders/${placedOrderId}`);
+      navigate(`/user/orders/${placedOrderId}`);
     } else {
-      navigate('/orders');
+      navigate('/user/orders');
     }
   };
 
@@ -846,7 +846,7 @@ export default function Checkout() {
         <div className="flex items-center justify-between">
           <span className="text-xs text-neutral-700">Ordering for someone else?</span>
           <button
-            onClick={() => navigate('/checkout/address', {
+            onClick={() => navigate('/user/checkout/address', {
               state: {
                 editAddress: savedAddress
               }
@@ -897,7 +897,7 @@ export default function Checkout() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate('/checkout/address', {
+                  navigate('/user/checkout/address', {
                     state: {
                       editAddress: savedAddress
                     }
@@ -1772,7 +1772,7 @@ export default function Checkout() {
           </button>
         ) : (
           <button
-            onClick={() => navigate('/checkout/address', {
+            onClick={() => navigate('/user/checkout/address', {
               state: {
                 editAddress: savedAddress
               }

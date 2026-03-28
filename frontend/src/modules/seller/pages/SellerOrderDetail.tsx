@@ -361,6 +361,8 @@ export default function SellerOrderDetail() {
     switch (status) {
       case 'Accepted':
         return 'bg-blue-100 text-blue-800 border border-blue-400';
+      case 'Processed':
+        return 'bg-indigo-100 text-indigo-800 border border-indigo-400';
       case 'On the way':
         return 'bg-purple-100 text-purple-800 border border-purple-400';
       case 'Delivered':
@@ -433,6 +435,7 @@ export default function SellerOrderDetail() {
                   disabled={orderStatus === 'Rejected' || orderStatus === 'Cancelled' || orderStatus === 'Delivered'}
                 >
                   <option value="Accepted">Accepted</option>
+                  <option value="Processed">Processed</option>
                   <option value="On the way">On the way</option>
                   <option value="Delivered">Delivered</option>
                   <option value="Cancelled">Cancelled</option>

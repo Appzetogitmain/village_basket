@@ -10,22 +10,27 @@ import { addRewardCoin } from './rewardService';
 export async function generateDeliveryOtp(orderId: string): Promise<{ success: boolean; message: string }> {
   try {
     const order = await Order.findById(orderId);
-
     if (!order) {
       throw new Error('Order not found');
     }
 
-    if (order.status === 'Delivered') {
-      throw new Error('Order is already delivered');
+    // Fetch customer to get permanent OTP
+    const customer = await Customer.findById(order.customer);
+    if (!customer) {
+      throw new Error('Customer not found');
     }
 
-    // No longer generate per-order OTP - customer has permanent deliveryOtp
-    // Just return success as the customer's permanent OTP will be used
-    console.log(`[Delivery OTP] Using customer's permanent delivery OTP for order ${orderId}`);
+    // Set order fields for visibility
+    order.deliveryOtp = customer.deliveryOtp;
+    order.deliveryOtpRequested = true;
+    order.deliveryOtpExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 mins expiry
+    await order.save();
+
+    console.log(`[Delivery OTP] Using customer's permanent delivery OTP (${customer.deliveryOtp}) for order ${orderId}`);
 
     return {
       success: true,
-      message: 'Customer has a permanent delivery OTP. Share it with the delivery partner.',
+      message: 'Delivery OTP has been shared with the customer.',
     };
   } catch (error: any) {
     console.error('Error in generateDeliveryOtp:', error);

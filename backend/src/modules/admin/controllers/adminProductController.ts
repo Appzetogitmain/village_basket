@@ -867,11 +867,12 @@ export const createProduct = asyncHandler(
       if (
         !productData.productName ||
         !productData.category ||
-        !productData.price
+        !productData.retailPrice ||
+        !productData.wholesalePrice
       ) {
         return res.status(400).json({
           success: false,
-          message: "Product name, category, and price are required",
+          message: "Product name, category, retail price, and wholesale price are required",
         });
       }
 
@@ -1044,6 +1045,24 @@ export const updateProduct = asyncHandler(
     const { id } = req.params;
     const updateData = req.body;
 
+    // Validate variations if provided
+    if (updateData.variations && updateData.variations.length > 0) {
+      updateData.variations = updateData.variations.map((v: any) => ({
+        ...v,
+        retailPrice: Number(v.retailPrice),
+        retailDiscPrice: Number(v.retailDiscPrice) || 0,
+        wholesalePrice: Number(v.wholesalePrice),
+        wholesaleDiscPrice: Number(v.wholesaleDiscPrice) || 0,
+      }));
+
+      // Sync top-level prices from first variation
+      const firstVar = updateData.variations[0];
+      updateData.retailPrice = firstVar.retailPrice;
+      updateData.retailDiscPrice = firstVar.retailDiscPrice || 0;
+      updateData.wholesalePrice = firstVar.wholesalePrice;
+      updateData.wholesaleDiscPrice = firstVar.wholesaleDiscPrice || 0;
+    }
+
     const product = await Product.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
@@ -1203,12 +1222,13 @@ export const bulkImportProducts = asyncHandler(
           !productData.productName ||
           !productData.category ||
           !productData.seller ||
-          !productData.price
+          !productData.retailPrice ||
+          !productData.wholesalePrice
         ) {
           results.failed++;
           results.errors.push({
             index: i,
-            error: "Missing required fields",
+            error: "Missing required fields (productName, category, seller, retailPrice, and wholesalePrice)",
           });
           continue;
         }

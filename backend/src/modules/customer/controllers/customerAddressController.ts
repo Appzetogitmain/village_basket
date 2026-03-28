@@ -38,6 +38,9 @@ export const addAddress = async (req: Request, res: Response) => {
             existingAddress.city = city;
             existingAddress.state = state;
             existingAddress.pincode = pincode;
+            existingAddress.landmark = landmark;
+            existingAddress.latitude = latitude;
+            existingAddress.longitude = longitude;
             existingAddress.isDefault = isDefault || false;
 
             await existingAddress.save();

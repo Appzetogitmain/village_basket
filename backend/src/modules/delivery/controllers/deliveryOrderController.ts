@@ -134,7 +134,7 @@ export const getPendingOrders = asyncHandler(async (req: Request, res: Response)
     // Pending statuses: Ready for pickup, Out for delivery, Picked Up, Assigned, In Transit
     const orders = await Order.find({
         deliveryBoy: deliveryId,
-        status: { $in: ["Ready for pickup", "Out for Delivery", "Picked Up", "Assigned", "In Transit"] }
+        status: { $in: ["Ready for pickup", "Picked up", "Assigned", "In Transit"] }
     })
         .populate("items")
         .sort({ createdAt: -1 });
@@ -222,7 +222,7 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
     // Status transition logic
     if (status) order.status = status;
 
-    if (status === 'Picked up' || status === 'Out for Delivery') {
+    if (status === 'Picked up') {
         order.deliveryBoyStatus = 'Picked Up';
     } else if (status === 'Delivered') {
         order.deliveryBoyStatus = 'Delivered';
@@ -386,7 +386,7 @@ export const sendDeliveryOtp = asyncHandler(async (req: Request, res: Response) 
         return res.status(400).json({ success: false, message: "Order is already delivered" });
     }
 
-    if (order.status !== 'Picked up' && order.status !== 'Out for Delivery') {
+    if (order.status !== 'Picked up') {
         return res.status(400).json({ success: false, message: "Order must be picked up before sending delivery OTP" });
     }
 
@@ -400,6 +400,13 @@ export const sendDeliveryOtp = asyncHandler(async (req: Request, res: Response) 
                 orderId: id,
                 orderNumber: order.orderNumber,
                 message: 'Delivery OTP sent to customer',
+            });
+
+            // Emit to customer (order room) to reveal OTP
+            io.to(`order-${id}`).emit('otp-sent', {
+                orderId: id,
+                deliveryOtp: order.deliveryOtp || (await Order.findById(id).select('deliveryOtp'))?.deliveryOtp,
+                message: 'Delivery OTP has been revealed'
             });
         }
 
@@ -457,6 +464,9 @@ export const verifyDeliveryOtpController = asyncHandler(async (req: Request, res
         // Update delivery boy balance and cash collected (if COD)
         if (updatedOrder && updatedOrder.status === 'Delivered') {
             if (updatedOrder.paymentMethod === 'COD') {
+                updatedOrder.paymentStatus = 'Paid';
+                await updatedOrder.save();
+                
                 await Delivery.findByIdAndUpdate(deliveryId, {
                     $inc: { cashCollected: updatedOrder.total }
                 });
@@ -646,9 +656,9 @@ export const confirmSellerPickup = asyncHandler(async (req: Request, res: Respon
 
     const allPickedUp = allSellerIds.every(sellerId => pickedUpSellerIds.includes(sellerId));
 
-    // If all sellers picked up, automatically change status to "Out for Delivery"
-    if (allPickedUp && order.status !== 'Out for Delivery' && order.status !== 'Delivered') {
-        order.status = 'Out for Delivery';
+    // If all sellers picked up, automatically change status to "Picked up"
+    if (allPickedUp && order.status !== 'Picked up' && order.status !== 'Delivered') {
+        order.status = 'Picked up';
         order.deliveryBoyStatus = 'In Transit';
     }
 
@@ -670,7 +680,7 @@ export const confirmSellerPickup = asyncHandler(async (req: Request, res: Respon
             io.to(`delivery-${deliveryId}`).emit('all-sellers-picked-up', {
                 orderId: id,
                 orderNumber: order.orderNumber,
-                message: 'All items picked up. Order is now Out for Delivery.'
+                message: 'All items picked up. Order is now ready to deliver.'
             });
         }
     }
@@ -678,7 +688,7 @@ export const confirmSellerPickup = asyncHandler(async (req: Request, res: Respon
     return res.status(200).json({
         success: true,
         message: allPickedUp
-            ? "All sellers picked up! Order status changed to Out for Delivery."
+            ? "All sellers picked up! Ready to deliver to customer."
             : `Pickup confirmed from ${seller.storeName}`,
         data: {
             order,

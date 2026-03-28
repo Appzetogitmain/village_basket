@@ -58,6 +58,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const pendingOperationsRef = useRef<Set<string>>(new Set());
 
   const { isAuthenticated, user } = useAuth();
+  const isWholesale = user?.customerType === 'wholesale';
   const { location } = useLocation();
   const { showToast } = useToast();
 
@@ -371,6 +372,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const itemVariantTitle = (item.product as any).variantTitle;
       return !itemVariantId && !itemVariantTitle;
     });
+
+    if (isWholesale && itemToUpdate) {
+        const minQty = itemToUpdate.product.minWholesaleQuantity || 1;
+        if (quantity < minQty) {
+            showToast(`Wholesale minimum order quantity is ${minQty}`, 'error');
+            return;
+        }
+    }
 
     const previousItems = [...items];
     setItems((prevItems) =>

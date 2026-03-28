@@ -437,7 +437,7 @@ export async function handleOrderAcceptance(
         }
 
         // Check if order already has a delivery boy assigned
-        if (order.deliveryBoy) {
+        if (order.deliveryBoy && order.deliveryBoy.toString() !== normalizedDeliveryBoyId) {
             return { success: false, message: 'Order already assigned to another delivery boy' };
         }
 
@@ -445,7 +445,7 @@ export async function handleOrderAcceptance(
         order.deliveryBoy = new mongoose.Types.ObjectId(normalizedDeliveryBoyId);
         order.deliveryBoyStatus = 'Assigned';
         order.assignedAt = new Date();
-        order.status = 'Processed'; // Mark as processed when assigned
+        order.status = 'Ready for pickup'; // Mark as ready for pickup when assigned
 
         await order.save();
 
@@ -503,6 +503,16 @@ export async function handleOrderRejection(
         const state = notificationStates.get(orderId);
 
         if (!state) {
+            console.log(`⚠️ Notification state missing for order ${orderId}. Checking database for manual unassignment...`);
+            // DB Fallback: For manual assignments, just clear the deliveryBoy
+            const order = await Order.findById(orderId);
+            if (order && order.deliveryBoy && order.deliveryBoy.toString() === String(deliveryBoyId).trim()) {
+                order.deliveryBoy = undefined;
+                order.deliveryBoyStatus = undefined;
+                order.status = 'Accepted'; // Put back to Accepted for re-assignment
+                await order.save();
+                return { success: true, message: 'Assignment rejected and cleared', allRejected: false };
+            }
             return { success: false, message: 'Order notification not found', allRejected: false };
         }
 

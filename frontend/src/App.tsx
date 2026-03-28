@@ -24,6 +24,12 @@ import RouteTransition from "./components/RouteTransition";
 import { useEffect } from "react";
 import { initializePushNotifications, setupForegroundNotificationHandler } from "./services/pushNotificationService";
 
+const GlobalRedirect = ({ type }: { type: 'product' | 'category' | 'order' }) => {
+  const { id } = useParams();
+  const target = type === 'product' ? `/user/product/${id}` : type === 'category' ? `/user/category/${id}` : `/user/orders/${id}`;
+  return <Navigate to={target} replace />;
+};
+
 // Landing page - load immediately
 import LandingPage from "./modules/landing/LandingPage";
 
@@ -157,16 +163,6 @@ const AdminRewardOrders = lazy(() => import("./modules/admin/pages/AdminRewardOr
 const UserRewards = lazy(() => import("./modules/user/Rewards"));
 const AdminDeliverySlots = lazy(() => import("./modules/admin/pages/AdminDeliverySlots"));
 
-const ProductRedirect = () => {
-  const { id } = useParams();
-  return <Navigate to={`/user/product/${id}`} replace />;
-};
-
-const CategoryRedirect = () => {
-  const { id } = useParams();
-  return <Navigate to={`/user/category/${id}`} replace />;
-};
-
 function App() {
   // Initialize push notifications on app load
   useEffect(() => {
@@ -205,13 +201,14 @@ function App() {
                           {/* Top-level redirects to nested /user routes */}
                           <Route path="/checkout" element={<Navigate to="/user/checkout" replace />} />
                           <Route path="/checkout/*" element={<Navigate to="/user/checkout" replace />} />
-                          <Route path="/product/:id" element={<ProductRedirect />} />
-                          <Route path="/category/:id" element={<CategoryRedirect />} />
+                          <Route path="/product/:id" element={<GlobalRedirect type="product" />} />
+                          <Route path="/category/:id" element={<GlobalRedirect type="category" />} />
                           <Route path="/login" element={<Navigate to="/user/login" replace />} />
                           <Route path="/home" element={<Navigate to="/user/home" replace />} />
                           <Route path="/search" element={<Navigate to="/user/search" replace />} />
                           <Route path="/wishlist" element={<Navigate to="/user/wishlist" replace />} />
                           <Route path="/orders" element={<Navigate to="/user/orders" replace />} />
+                          <Route path="/orders/:id" element={<GlobalRedirect type="order" />} />
                           <Route path="/account" element={<Navigate to="/user/account" replace />} />
                           <Route path="/addresses" element={<Navigate to="/user/addresses" replace />} />
                           <Route path="/rewards" element={<Navigate to="/user/rewards" replace />} />

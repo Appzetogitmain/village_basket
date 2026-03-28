@@ -239,7 +239,7 @@ export const updateOrderStatus = asyncHandler(
     const { status } = req.body;
 
     // Validate allowed status updates for seller
-    const allowedStatuses = ['Accepted', 'On the way', 'Delivered', 'Cancelled', 'Rejected'];
+    const allowedStatuses = ['Accepted', 'Processed', 'On the way', 'Delivered', 'Cancelled', 'Rejected'];
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
@@ -275,8 +275,38 @@ export const updateOrderStatus = asyncHandler(
     }
 
     const previousStatus = order.status;
-    order.status = status;
-    await order.save();
+    console.log(`[updateOrderStatus] Pre-save Check: orderId=${order._id}, newStatus=${status}, previousStatus=${previousStatus}`);
+    
+    try {
+      // Prepare update object
+      const updateData: any = { status };
+      
+      // Align delivery boy status if order reaches terminal state
+      if (status === 'Delivered') {
+        updateData.deliveryBoyStatus = 'Delivered';
+        updateData.deliveredAt = new Date();
+      } else if (['Cancelled', 'Rejected', 'Returned'].includes(status)) {
+        updateData.deliveryBoyStatus = 'Failed'; // Releases the delivery boy
+        updateData.cancelledAt = new Date();
+      }
+
+      const updatedOrder = await Order.findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
+      
+      if (!updatedOrder) {
+        throw new Error('Order not found during update');
+      }
+      
+      // Update our local reference to the updated one
+      order.status = updatedOrder.status;
+      console.log(`[updateOrderStatus] Order updated successfully`);
+    } catch (saveError) {
+      console.error(`[updateOrderStatus] Error updating order:`, saveError);
+      throw saveError;
+    }
 
     // If order is delivered, credit seller's balance
     if (status === 'Delivered' && previousStatus !== 'Delivered') {
@@ -297,12 +327,14 @@ export const updateOrderStatus = asyncHandler(
 
           // Log transaction
           await WalletTransaction.create({
-            sellerId,
+            userId: sellerId,
+            userType: 'SELLER',
             amount: netEarning,
             type: 'Credit',
             description: `Earnings from Order #${order.orderNumber} (Item Total: ₹${sellerSubtotal})`,
             reference: `ORD-${order.orderNumber}-${sellerId}-${Date.now()}`,
-            status: 'Completed'
+            status: 'Completed',
+            relatedOrder: order._id
           });
         }
       }
@@ -336,10 +368,18 @@ export const updateOrderStatus = asyncHandler(
 
 export const getDeliveryBoys = asyncHandler(
   async (_req: Request, res: Response) => {
-    // Only fetch delivery boys who are active and online
+    // Find all delivery boys who currently have an active order
+    // Active delivery statuses: Assigned, Picked Up, In Transit
+    const busyDeliveryBoys = await Order.distinct("deliveryBoy", {
+      deliveryBoyStatus: { $in: ["Assigned", "Picked Up", "In Transit"] },
+      status: { $nin: ["Delivered", "Cancelled", "Returned", "Rejected"] }
+    });
+
+    // Only fetch delivery boys who are active, online, and not busy with an ongoing order
     const deliveryBoys = await Delivery.find({
       status: "Active",
-      isOnline: true
+      isOnline: true,
+      _id: { $nin: busyDeliveryBoys }
     }).select("name mobile email isOnline location");
 
     return res.status(200).json({
@@ -379,9 +419,9 @@ export const assignDeliveryBoy = asyncHandler(
     order.deliveryBoyStatus = "Assigned";
     order.assignedAt = new Date();
 
-    // Typically assigned implies it is processed
-    if (order.status === 'Pending' || order.status === 'Received' || order.status === 'Accepted') {
-      order.status = 'Processed';
+    // Typically assigned implies it is ready for pickup
+    if (order.status === 'Pending' || order.status === 'Received' || order.status === 'Accepted' || order.status === 'Processed') {
+      order.status = 'Ready for pickup';
     }
 
     await order.save();
@@ -390,10 +430,27 @@ export const assignDeliveryBoy = asyncHandler(
     try {
       const io: SocketIOServer = (req.app.get("io") as SocketIOServer);
       if (io) {
+        // Format notifications payload
+        const notificationPayload = {
+          orderId: order._id.toString(),
+          orderNumber: order.orderNumber,
+          customerName: order.customerName,
+          deliveryAddress: {
+            address: order.deliveryAddress.address,
+            landmark: order.deliveryAddress.landmark,
+            city: order.deliveryAddress.city,
+            state: order.deliveryAddress.state,
+            pincode: order.deliveryAddress.pincode
+          },
+          total: order.total,
+          itemsCount: order.items?.length || 0
+        };
+
         // Instead of broadcasting to all, alert just this one
         io.to(`delivery-${deliveryBoyId}`).emit('order-assigned-manually', {
           orderId,
-          message: `You have been manually assigned to order #${order.orderNumber}`
+          message: `You have been manually assigned to order #${order.orderNumber}`,
+          orderData: notificationPayload
         });
       }
 

@@ -35,7 +35,7 @@ export async function notifySellersOfOrderUpdate(
 
             const notificationData = {
                 type,
-                orderId: order._id,
+                orderId: order._id.toString(),
                 orderNumber: order.orderNumber,
                 status: order.status,
                 paymentStatus: order.paymentStatus,

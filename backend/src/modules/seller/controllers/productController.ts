@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import Product from "../../../models/Product";
 import Shop from "../../../models/Shop";
+import Category from "../../../models/Category";
 import { asyncHandler } from "../../../utils/asyncHandler";
 
 /**
@@ -37,21 +39,22 @@ export const createProduct = asyncHandler(
         ...v,
         value: v.value || v.title, // Map title to value
         name: v.name || "Variation", // Default name
-        discPrice: v.discPrice || 0,
+        retailPrice: Number(v.retailPrice),
+        retailDiscPrice: Number(v.retailDiscPrice) || 0,
+        wholesalePrice: Number(v.wholesalePrice),
+        wholesaleDiscPrice: Number(v.wholesaleDiscPrice) || 0,
         status: v.status || "Available",
       }));
     }
 
     // 3. Set Price and Stock from Variations
-    // The Product model requires a top-level price and stock
     if (newProductData.variations && newProductData.variations.length > 0) {
-      // Use the price of the first variation as the base price
-      newProductData.price = newProductData.variations[0].price;
-      newProductData.discPrice = newProductData.variations[0].discPrice || 0;
+      const firstVar = newProductData.variations[0];
+      newProductData.retailPrice = firstVar.retailPrice;
+      newProductData.retailDiscPrice = firstVar.retailDiscPrice || 0;
+      newProductData.wholesalePrice = firstVar.wholesalePrice;
+      newProductData.wholesaleDiscPrice = firstVar.wholesaleDiscPrice || 0;
 
-      // Calculate total stock (sum of all variations)
-      // Note: If any variation has stock 0 (unlimited), how should we handle top level?
-      // For now, let's sum them up. If purely unlimited, logic might differ.
       newProductData.stock = newProductData.variations.reduce(
         (acc: number, curr: any) => acc + (parseInt(curr.stock) || 0),
         0
@@ -59,10 +62,10 @@ export const createProduct = asyncHandler(
     }
 
     // 4. Validate Price (Model requirement)
-    if (newProductData.price === undefined || newProductData.price === null) {
+    if (newProductData.retailPrice === undefined || newProductData.retailPrice === null) {
       return res.status(400).json({
         success: false,
-        message: "Product price is required (add at least one variation)",
+        message: "Product retail price is required (add at least one variation)",
       });
     }
 
@@ -82,10 +85,16 @@ export const createProduct = asyncHandler(
 
     // Validate variation prices
     for (const variation of productData.variations) {
-      if (Number(variation.discPrice) > Number(variation.price)) {
+      if (Number(variation.retailDiscPrice) > Number(variation.retailPrice)) {
         return res.status(400).json({
           success: false,
-          message: `Discounted price (${variation.discPrice}) cannot be greater than price (${variation.price}) for variation ${variation.title}`,
+          message: `Retail Discounted price (${variation.retailDiscPrice}) cannot be greater than retail price (${variation.retailPrice}) for variation ${variation.title}`,
+        });
+      }
+      if (Number(variation.wholesaleDiscPrice) > Number(variation.wholesalePrice)) {
+        return res.status(400).json({
+          success: false,
+          message: `Wholesale Discounted price (${variation.wholesaleDiscPrice}) cannot be greater than wholesale price (${variation.wholesalePrice}) for variation ${variation.title}`,
         });
       }
     }
@@ -157,8 +166,24 @@ export const getProducts = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Category filter
-  if (category) {
-    query.category = category;
+  if (category && category !== "All Category") {
+    if (mongoose.Types.ObjectId.isValid(category as string)) {
+      query.category = category;
+    } else {
+      // Find category by name
+      try {
+        const foundCategory = await Category.findOne({ name: { $regex: category as string, $options: "i" } });
+        if (foundCategory) {
+          query.category = foundCategory._id;
+        } else {
+          // If not found, return empty results as name doesn't exist
+          query.category = new mongoose.Types.ObjectId();
+        }
+      } catch (e) {
+         // Silently fail search if regex is invalid or other error
+         query.category = new mongoose.Types.ObjectId();
+      }
+    }
   }
 
   // Status filter (publish, popular, dealOfDay)
@@ -318,23 +343,35 @@ export const updateProduct = asyncHandler(
         ...v,
         value: v.value || v.title,
         name: v.name || "Variation",
-        discPrice: v.discPrice || 0,
+        retailPrice: Number(v.retailPrice),
+        retailDiscPrice: Number(v.retailDiscPrice) || 0,
+        wholesalePrice: Number(v.wholesalePrice),
+        wholesaleDiscPrice: Number(v.wholesaleDiscPrice) || 0,
         status: v.status || "Available",
       }));
 
       for (const variation of updateData.variations) {
-        if (Number(variation.discPrice) > Number(variation.price)) {
+        if (Number(variation.retailDiscPrice) > Number(variation.retailPrice)) {
           return res.status(400).json({
             success: false,
-            message: `Discounted price cannot be greater than price for variation ${variation.title || variation.value
-              }`,
+            message: `Retail Discounted price cannot be greater than retail price for variation ${variation.title || variation.value}`,
+          });
+        }
+        if (Number(variation.wholesaleDiscPrice) > Number(variation.wholesalePrice)) {
+          return res.status(400).json({
+            success: false,
+            message: `Wholesale Discounted price cannot be greater than wholesale price for variation ${variation.title || variation.value}`,
           });
         }
       }
 
       // Sync top-level price and stock from variations (same as createProduct)
-      updateData.price = updateData.variations[0].price;
-      updateData.discPrice = updateData.variations[0].discPrice || 0;
+      const firstVar = updateData.variations[0];
+      updateData.retailPrice = firstVar.retailPrice;
+      updateData.retailDiscPrice = firstVar.retailDiscPrice || 0;
+      updateData.wholesalePrice = firstVar.wholesalePrice;
+      updateData.wholesaleDiscPrice = firstVar.wholesaleDiscPrice || 0;
+      
       updateData.stock = updateData.variations.reduce(
         (acc: number, curr: any) => acc + (parseInt(curr.stock) || 0),
         0
