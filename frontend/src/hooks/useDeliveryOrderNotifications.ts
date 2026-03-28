@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { OrderNotificationData } from '../services/api/delivery/deliveryOrderNotificationService';
 import { acceptOrder, rejectOrder } from '../services/api/delivery/deliveryOrderNotificationService';
 import { getSocketBaseURL } from '../services/api/config';
@@ -17,6 +18,7 @@ const INITIAL_RECONNECT_DELAY = 2000;
 
 export const useDeliveryOrderNotifications = () => {
     const { isAuthenticated, user } = useAuth();
+    const { showToast } = useToast();
     const [state, setState] = useState<NotificationState>({
         currentNotification: null,
         notificationQueue: [],
@@ -105,6 +107,54 @@ export const useDeliveryOrderNotifications = () => {
                     currentNotification: orderData,
                 };
             });
+        });
+
+        socket.on('order-assigned-manually', (data: any) => {
+            console.log('📦 Manual order assignment received:', data);
+            
+            // Play notification sound
+            try {
+                const audio = new Audio('/assets/sound/delivery-alert.mp3');
+                audio.play().catch(e => console.error('Audio playback failed', e));
+                
+                // Also vibrate if supported
+                if ("vibrate" in navigator) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+            } catch (e) {
+                console.error('Audio init failed', e);
+            }
+
+            const message = data.message || 'You have been manually assigned to a new order!';
+
+            // Show visual modal alert if data is available
+            if (data.orderData) {
+                console.log('🖼️ showing assignment modal for manual order:', data.orderId);
+                const notificationData = data.orderData as OrderNotificationData;
+                
+                setState(prev => {
+                    // Force the manual notification to take priority if it's currently null
+                    if (!prev.currentNotification) {
+                        return { ...prev, currentNotification: notificationData };
+                    }
+                    // Otherwise append to queue
+                    return {
+                        ...prev,
+                        notificationQueue: [...prev.notificationQueue, notificationData],
+                    };
+                });
+            } else {
+                // FALLBACK: Show toast instead if data is missing
+                showToast(message, 'success');
+            }
+            
+            // If supported and permitted, trigger a native push notification
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("New Order Assigned", {
+                    body: message,
+                    icon: "/favicon.ico"
+                });
+            }
         });
 
         socket.on('order-accepted', (data: { orderId: string; acceptedBy: string }) => {

@@ -262,7 +262,7 @@ export default function DeliveryOrderDetail() {
     useEffect(() => {
         const checkCustomerProx = async () => {
             if (!id || !deliveryBoyLocation) return;
-            if (order?.status !== 'Out for Delivery') return;
+            if (order?.status !== 'Picked up') return;
 
             try {
                 const response = await checkCustomerProximity(id, deliveryBoyLocation.lat, deliveryBoyLocation.lng);
@@ -278,7 +278,7 @@ export default function DeliveryOrderDetail() {
             }
         };
 
-        if (deliveryBoyLocation && order?.status === 'Out for Delivery') {
+        if (deliveryBoyLocation && order?.status === 'Picked up') {
             checkCustomerProx();
             const interval = setInterval(checkCustomerProx, 4000); // Check every 4 seconds
             return () => clearInterval(interval);
@@ -506,7 +506,7 @@ export default function DeliveryOrderDetail() {
         );
     }
 
-    const statusFlow: DeliveryOrderStatus[] = ['Pending', 'Ready for pickup', 'Picked up', 'Out for Delivery', 'Delivered'];
+    const statusFlow: DeliveryOrderStatus[] = ['Pending', 'Ready for pickup', 'Picked up', 'Delivered'];
 
     let currentStatusIndex = statusFlow.indexOf(order.status as DeliveryOrderStatus);
     // Handle cases where status might not be in the flow (e.g. Cancelled)
@@ -543,7 +543,7 @@ export default function DeliveryOrderDetail() {
     const nextStatus = getNextStatus();
     const isMapVisible = order.status === 'Out for Delivery' || order.status === 'Picked up' || (sellerLocations.length > 0 && order.status !== 'Delivered');
     const showSellerLocations = sellerLocations.length > 0 && order.status !== 'Picked up' && order.status !== 'Out for Delivery' && order.status !== 'Delivered';
-    const showCustomerLocation = order.status === 'Picked up' || order.status === 'Out for Delivery';
+    const showCustomerLocation = order.status === 'Picked up';
 
     // Check if we have valid customer coordinates
     const customerLat = order.deliveryAddress?.latitude || order.address?.latitude;
@@ -596,7 +596,7 @@ export default function DeliveryOrderDetail() {
                 <div className="mx-4 mt-4 organic-radius overflow-hidden shadow-lg border-2 border-white relative z-10">
                     <GoogleMapsTracking
                         sellerLocations={
-                            (order.status === 'Out for Delivery' || order.status === 'Picked up')
+                            (order.status === 'Picked up')
                                 ? []  // Hide seller markers when delivering to customer
                                 : sellerLocations.map(s => ({
                                     lat: s.latitude,
@@ -611,13 +611,12 @@ export default function DeliveryOrderDetail() {
                         deliveryLocation={deliveryBoyLocation || undefined}
                         isTracking={!!deliveryBoyLocation}
                         showRoute={!!deliveryBoyLocation && (
-                            ((order.status === 'Picked up' || order.status === 'Out for Delivery') && hasValidCustomerLocation) ||
-                            (sellerLocations.length > 0 && order.status !== 'Delivered' && order.status !== 'Picked up' && order.status !== 'Out for Delivery')
+                            (order.status === 'Picked up' && hasValidCustomerLocation) ||
+                            (sellerLocations.length > 0 && order.status !== 'Delivered' && order.status !== 'Picked up')
                         )}
                         routeOrigin={deliveryBoyLocation || undefined}
                         routeDestination={
-                            order.status === 'Picked up' || order.status === 'Out for Delivery'
-                                ? (hasValidCustomerLocation ? {
+                            order.status === 'Picked up' ? (hasValidCustomerLocation ? {
                                     lat: customerLat!,
                                     lng: customerLng!
                                 } : undefined)
@@ -626,18 +625,13 @@ export default function DeliveryOrderDetail() {
                                     : undefined
                         }
                         routeWaypoints={
-                            order.status === 'Picked up' || order.status === 'Out for Delivery'
-                                ? []
+                            order.status === 'Picked up' ? []
                                 : sellerLocations.length > 1
                                     ? sellerLocations.slice(0, -1).map(s => ({ lat: s.latitude, lng: s.longitude }))
                                     : []
                         }
                         destinationName={
-                            order.status === 'Picked up' || order.status === 'Out for Delivery'
-                                ? order.address?.split(',')[0]
-                                : sellerLocations.length > 0
-                                    ? sellerLocations[0].storeName
-                                    : undefined
+                            order.status === 'Picked up' ? order.address?.split(',')[0] : sellerLocations.length > 0 ? sellerLocations[0].storeName : undefined
                         }
                         onRouteInfoUpdate={setRouteInfo}
                         lastUpdate={lastUpdate}
@@ -750,7 +744,7 @@ export default function DeliveryOrderDetail() {
                             <div className="flex justify-between text-[7px] font-black text-stone-400 uppercase tracking-tighter mt-1 px-1">
                                 {statusFlow.map((step, idx) => (
                                     <span key={idx} className={`text-center flex-1 transition-colors px-1 ${idx === currentStatusIndex ? 'text-[#8B3D28]' : ''}`}>
-                                        {step === 'Ready for pickup' ? 'Ready' : step}
+                                        {step === 'Ready for pickup' ? 'READY' : step === 'Picked up' ? 'PICKED' : step}
                                     </span>
                                 ))}
                             </div>
@@ -920,7 +914,7 @@ export default function DeliveryOrderDetail() {
             </div>
 
             {/* Customer Delivery OTP Section (only when order is Out for Delivery) */}
-            {order.status === 'Out for Delivery' && (
+            {order.status === 'Picked up' && (
                 <div className="fixed bottom-24 left-4 right-4 z-40">
                     <div className="village-card paper-texture organic-radius p-5 shadow-2xl border-none ring-1 ring-[#8B3D28]/10">
                         <div className="flex items-center justify-between mb-4">
@@ -991,7 +985,7 @@ export default function DeliveryOrderDetail() {
             )}
 
             {/* Floating Action Button Dock */}
-            {nextStatus && order.status !== 'Picked up' && order.status !== 'Out for Delivery' && !showOtpInput && (
+            {nextStatus && order.status !== 'Picked up' && !showOtpInput && (
                 <div className="fixed bottom-24 left-4 right-4 z-40">
                     <button
                         onClick={() => handleStatusChange(nextStatus)}

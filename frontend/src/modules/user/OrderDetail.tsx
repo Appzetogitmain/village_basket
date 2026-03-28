@@ -484,7 +484,8 @@ export default function OrderDetail() {
     eta,
     distance,
     status: trackingStatus,
-    orderStatus: socketOrderStatus, // Real-time order status from socket
+    orderStatus: socketOrderStatus,
+    deliveryOtp: socketDeliveryOtp,
     isConnected,
     lastUpdate,
     error: trackingError,
@@ -530,8 +531,7 @@ export default function OrderDetail() {
       const shouldFetch = order.status &&
         order.status !== 'Delivered' &&
         order.status !== 'Cancelled' &&
-        order.status !== 'Picked up' &&
-        order.status !== 'Out for Delivery';
+        order.status !== 'Picked up';
 
       if (shouldFetch) {
         try {
@@ -742,9 +742,14 @@ export default function OrderDetail() {
       subtitle: "",
       color: "bg-[#8B3D28]",
     },
+    "Picked up": {
+      title: "Order picked up",
+      subtitle: "Partner is on the way to you",
+      color: "bg-[#8B3D28]",
+    },
     "On the way": {
       title: "Order picked up",
-      subtitle: "",
+      subtitle: "Partner is on the way to you",
       color: "bg-[#8B3D28]",
     },
     Delivered: {
@@ -768,9 +773,9 @@ export default function OrderDetail() {
       subtitle: "On the way to you",
       color: "bg-blue-600",
     },
-    "Out for Delivery": {
-      title: "Out for delivery",
-      subtitle: "",
+    "Ready for pickup": {
+      title: "Ready for pickup",
+      subtitle: "Order is ready at the store",
       color: "bg-[#8B3D28]",
     },
     Cancelled: {
@@ -880,7 +885,7 @@ export default function OrderDetail() {
             lng: order?.deliveryAddress?.longitude || order?.address?.longitude || 0,
           }}
           routeWaypoints={
-            order?.status === 'Picked up' || order?.status === 'Out for Delivery'
+            order?.status === 'Picked up'
               ? []
               : sellerLocations.map(s => ({
                 lat: s.latitude,
@@ -888,7 +893,7 @@ export default function OrderDetail() {
               }))
           }
           destinationName={
-            order?.status === 'Picked up' || order?.status === 'Out for Delivery'
+            order?.status === 'Picked up'
               ? (order?.deliveryAddress?.address?.split(',')[0] || order?.address?.address?.split(',')[0] || "Delivery Address")
               : sellerLocations.length > 0
                 ? "Sellers & Delivery Address"
@@ -908,7 +913,7 @@ export default function OrderDetail() {
       )}
 
       {/* Delivery Partner Card */}
-      {(order?.deliveryPartner || order?.deliveryOtp) && (
+      {(order?.deliveryPartner || order?.deliveryOtp || socketDeliveryOtp) && (
         <DeliveryPartnerCard
           partner={{
             name: order?.deliveryPartner?.name || "Delivery Partner",
@@ -919,7 +924,7 @@ export default function OrderDetail() {
           eta={routeInfo ? Math.ceil(routeInfo.durationValue / 60) : eta}
           distance={routeInfo ? routeInfo.distanceValue : distance}
           isTracking={isConnected && !!deliveryLocation}
-          deliveryOtp={order?.deliveryOtp}
+          deliveryOtp={socketDeliveryOtp || order?.deliveryOtp}
           onCall={() => {
             const phone = order?.deliveryPartner?.phone || "1234567890";
             window.location.href = `tel:${phone}`;
