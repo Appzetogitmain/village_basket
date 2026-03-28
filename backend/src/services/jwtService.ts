@@ -4,6 +4,7 @@ import { UserType } from '../models/Otp';
 export interface TokenPayload {
   userId: string;
   userType: UserType;
+  customerType?: string; // added this
   role?: string;
 }
 
@@ -13,10 +14,11 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 /**
  * Generate JWT token for authenticated user
  */
-export function generateToken(userId: string, userType: UserType, role?: string): string {
+export function generateToken(userId: string, userType: UserType, role?: string, customerType?: string): string {
   const payload: TokenPayload = {
     userId,
     userType,
+    ...(customerType && { customerType }),
     ...(role && { role }),
   };
 

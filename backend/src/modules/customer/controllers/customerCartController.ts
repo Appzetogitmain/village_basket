@@ -10,10 +10,10 @@ import { getRoadDistances } from '../../../services/mapService';
 import Seller from '../../../models/Seller';
 
 // Helper to calculate item price matching frontend logic
-const calculateItemPrice = (product: any, variationSelector: any, userType: string = 'retail') => {
+const calculateItemPrice = (product: any, variationSelector: any, customerType: string = 'retail') => {
     let variation = null;
     let variationId = variationSelector;
-    const isWholesale = userType === 'wholesale';
+    const isWholesale = customerType === 'wholesale';
 
     const priceField = isWholesale ? 'wholesalePrice' : 'retailPrice';
     const discPriceField = isWholesale ? 'wholesaleDiscPrice' : 'retailDiscPrice';
@@ -47,7 +47,7 @@ const calculateItemPrice = (product: any, variationSelector: any, userType: stri
         finalPrice = product[discPriceField];
     }
 
-    console.log(`[DEBUG Price] User: ${userType}, VarId: ${variationId}, Final: ${finalPrice}`);
+    console.log(`[DEBUG Price] User: ${customerType}, VarId: ${variationId}, Final: ${finalPrice}`);
     return finalPrice;
 };
 
@@ -55,7 +55,7 @@ const calculateItemPrice = (product: any, variationSelector: any, userType: stri
 const calculateCartTotal = async (cartId: any, nearbySellerIds: mongoose.Types.ObjectId[] = [], userType: string = 'retail') => {
     const items = await CartItem.find({ cart: cartId }).populate({
         path: 'product',
-        select: 'retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice variations seller status publish productName'
+        select: 'productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mainImage stock pack mrp category seller status publish variations minWholesaleQuantity compareAtPrice'
     });
 
     let total = 0;
@@ -175,7 +175,7 @@ export const getCart = async (req: Request, res: Response) => {
             path: 'items',
             populate: {
                 path: 'product',
-                select: 'productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mainImage stock pack mrp category seller status publish variations'
+                select: 'productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mainImage stock pack mrp category seller status publish variations minWholesaleQuantity compareAtPrice'
             }
         });
 
@@ -194,7 +194,7 @@ export const getCart = async (req: Request, res: Response) => {
                 const isAvailable = nearbySellerIds.some(id => id.toString() === product.seller.toString());
                 if (isAvailable) {
                     filteredItems.push(item);
-                    const userType = req.user?.userType || 'retail';
+                    const userType = req.user?.customerType || 'retail';
                     const price = calculateItemPrice(product, item.variation, userType);
                     total += price * item.quantity;
                     console.log(`[DEBUG CartLoop] Item: ${product.productName}, Price: ${price}, Qty: ${item.quantity}, RunningTotal: ${total}`);
@@ -211,24 +211,23 @@ export const getCart = async (req: Request, res: Response) => {
         // Calculate fees
         const fees = await calculateDeliveryStuff(total, filteredItems, userLat, userLng);
 
-        const userType = req.user?.userType || 'retail';
+        const userType = req.user?.customerType || 'retail';
         const priceField = userType === 'wholesale' ? 'wholesalePrice' : 'retailPrice';
-        const discPriceField = userType === 'wholesale' ? 'wholesaleDiscPrice' : 'retailDiscPrice';
-
+        
         // Map items to include generic price and mrp fields
         const mappedItems = filteredItems.map((item: any) => {
             const prod = item.product;
             if (!prod) return item;
             
             const itemPrice = calculateItemPrice(prod, item.variation, userType);
-            const mrp = prod[priceField] || 0;
 
             return {
                 ...item.toObject(),
                 product: {
                     ...prod.toObject(),
                     price: itemPrice,
-                    mrp: mrp
+                    mrp: prod.mrp || prod.compareAtPrice || prod[priceField] || 0,
+                    minWholesaleQuantity: prod.minWholesaleQuantity
                 },
                 price: itemPrice // Field at item level for cart
             };
@@ -311,6 +310,40 @@ export const addToCart = async (req: Request, res: Response) => {
             product: productId,
             variation: variation || null
         });
+        
+        // Enforce Minimum Wholesale Quantity
+        const userType = req.user?.customerType || 'retail';
+        if (userType === 'wholesale') {
+            let minQty = product.minWholesaleQuantity || 1;
+            
+            // Check if variation has a specific MOQ
+            if (variation && product.variations?.length) {
+                let variationId = variation;
+                if (typeof variation === 'object' && (variation as any)._id) {
+                    variationId = (variation as any)._id;
+                }
+                
+                const varObj = product.variations.find((v: any) => 
+                    (v._id && v._id.toString() === variationId.toString()) || 
+                    v.title === variationId || 
+                    v.name === variationId
+                );
+                if (varObj && varObj.minWholesaleQuantity) {
+                    minQty = varObj.minWholesaleQuantity;
+                }
+            }
+
+            const currentQty = cartItem ? cartItem.quantity : 0;
+            const newTotalQty = currentQty + quantity;
+
+            if (newTotalQty < minQty) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Minimum order quantity for this product is ${minQty}`,
+                    minWholesaleQuantity: minQty
+                });
+            }
+        }
 
         if (cartItem) {
             // Update quantity
@@ -328,7 +361,7 @@ export const addToCart = async (req: Request, res: Response) => {
         }
 
         // Update total with location filtering
-        const userType = req.user?.userType || 'retail';
+        // Use already defined userType
         cart.total = await calculateCartTotal(cart._id, nearbySellerIds, userType);
         await cart.save();
 
@@ -337,7 +370,7 @@ export const addToCart = async (req: Request, res: Response) => {
             path: 'items',
             populate: {
                 path: 'product',
-                select: 'productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mainImage stock pack mrp category seller status publish variations'
+                select: 'productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mainImage stock pack mrp category seller status publish variations minWholesaleQuantity compareAtPrice'
             }
         });
 
@@ -350,8 +383,7 @@ export const addToCart = async (req: Request, res: Response) => {
         const fees = await calculateDeliveryStuff(cart.total, filteredItems, userLat, userLng);
 
         const priceField = userType === 'wholesale' ? 'wholesalePrice' : 'retailPrice';
-        const discPriceField = userType === 'wholesale' ? 'wholesaleDiscPrice' : 'retailDiscPrice';
-
+        
         const mappedItems = filteredItems.map((item: any) => {
             const prod = item.product;
             if (!prod) return item;
@@ -361,7 +393,7 @@ export const addToCart = async (req: Request, res: Response) => {
                 product: {
                     ...prod.toObject(),
                     price: itemPrice,
-                    mrp: prod[priceField] || 0
+                    mrp: prod.mrp || prod.compareAtPrice || prod[priceField] || 0
                 },
                 price: itemPrice
             };
@@ -432,10 +464,41 @@ export const updateCartItem = async (req: Request, res: Response) => {
             });
         }
 
+        // Enforce Minimum Wholesale Quantity
+        const userType = req.user?.customerType || 'retail';
+        if (userType === 'wholesale') {
+            let minQty = product.minWholesaleQuantity || 1;
+            
+            // Check if variation has a specific MOQ
+            if (cartItem.variation && product.variations?.length) {
+                let variationId = cartItem.variation;
+                if (typeof variationId === 'object' && (variationId as any)._id) {
+                    variationId = (variationId as any)._id;
+                }
+                
+                const varObj = product.variations.find((v: any) => 
+                    (v._id && v._id.toString() === variationId.toString()) || 
+                    v.title === variationId || 
+                    v.name === variationId
+                );
+                if (varObj && varObj.minWholesaleQuantity) {
+                    minQty = varObj.minWholesaleQuantity;
+                }
+            }
+
+            if (quantity < minQty) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Minimum order quantity for this product is ${minQty}`,
+                    minWholesaleQuantity: minQty
+                });
+            }
+        }
+
         cartItem.quantity = quantity;
         await cartItem.save();
 
-        const userType = req.user?.userType || 'retail';
+        // Use already defined userType
         cart.total = await calculateCartTotal(cart._id, nearbySellerIds, userType);
         await cart.save();
 
@@ -443,7 +506,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
             path: 'items',
             populate: {
                 path: 'product',
-                select: 'productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mainImage stock pack mrp category seller status publish variations'
+                select: 'productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mainImage stock pack mrp category seller status publish variations minWholesaleQuantity compareAtPrice'
             }
         });
 
@@ -465,7 +528,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
                 product: {
                     ...prod.toObject(),
                     price: itemPrice,
-                    mrp: prod[priceField] || 0
+                    mrp: prod.mrp || prod.compareAtPrice || prod[priceField] || 0
                 },
                 price: itemPrice
             };
@@ -517,7 +580,7 @@ export const removeFromCart = async (req: Request, res: Response) => {
             nearbySellerIds = await findSellersWithinRange(userLat, userLng);
         }
 
-        const userType = req.user?.userType || 'retail';
+        const userType = req.user?.customerType || 'retail';
         cart.total = await calculateCartTotal(cart._id, nearbySellerIds, userType);
         await cart.save();
 
@@ -525,7 +588,7 @@ export const removeFromCart = async (req: Request, res: Response) => {
             path: 'items',
             populate: {
                 path: 'product',
-                select: 'productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mainImage stock pack mrp category seller status publish variations'
+                select: 'productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mainImage stock pack mrp category seller status publish variations minWholesaleQuantity compareAtPrice'
             }
         });
 

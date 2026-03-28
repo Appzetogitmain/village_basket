@@ -95,7 +95,7 @@ export const verifySmsOtp = asyncHandler(
     }
 
     // Generate JWT token
-    const token = generateToken(customer._id.toString(), "Customer");
+    const token = generateToken(customer._id.toString(), "Customer", undefined, customer.userType || 'retail');
 
     return res.status(200).json({
       success: true,
@@ -112,7 +112,8 @@ export const verifySmsOtp = asyncHandler(
           walletAmount: customer.walletAmount,
           refCode: customer.refCode,
           status: customer.status,
-          userType: customer.userType || 'retail',
+          userType: 'Customer',
+          customerType: customer.userType || 'retail',
         },
         isNewUser,
       },

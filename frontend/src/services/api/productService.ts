@@ -26,6 +26,7 @@ export interface ProductVariation {
   stock: number;
   status: "Available" | "Sold out" | "In stock"; // Added In stock
   sku?: string;
+  minWholesaleQuantity?: number;
 }
 
 export interface Product {
@@ -58,6 +59,7 @@ export interface Product {
   galleryImageUrls: string[];
   variations: ProductVariation[];
   variationType?: string;
+  minWholesaleQuantity?: number;
   createdAt?: string;
   updatedAt?: string;
   // Common root-level fields for displays
@@ -105,6 +107,7 @@ export interface CreateProductData {
   galleryImageUrls?: string[];
   variations: ProductVariation[];
   variationType?: string;
+  minWholesaleQuantity?: number;
   isShopByStoreOnly?: boolean;
   shopId?: string;
 }

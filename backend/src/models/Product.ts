@@ -29,18 +29,20 @@ export interface IProduct extends Document {
   stock: number;
   sku?: string;
   barcode?: string;
+  minWholesaleQuantity: number;
 
 
 
   // Variations
   variationType?: string; // e.g., 'Size', 'Color', 'Weight'
-  variations?: Array<{
+    variations?: Array<{
     name: string;
     value: string;
     retailPrice?: number;
     retailDiscPrice?: number;
     wholesalePrice?: number;
     wholesaleDiscPrice?: number;
+    minWholesaleQuantity?: number;
     stock?: number;
     sku?: string;
     status?: string;
@@ -203,6 +205,11 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       trim: true,
     },
+    minWholesaleQuantity: {
+      type: Number,
+      default: 1,
+      min: [1, "Minimum wholesale quantity cannot be less than 1"],
+    },
 
 
 
@@ -220,6 +227,7 @@ const ProductSchema = new Schema<IProduct>(
           retailDiscPrice: { type: Number, default: 0 },
           wholesalePrice: Number,
           wholesaleDiscPrice: { type: Number, default: 0 },
+          minWholesaleQuantity: { type: Number, default: 1 },
           stock: Number,
           status: {
             type: String,

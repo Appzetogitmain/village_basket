@@ -22,6 +22,7 @@ import { SubscriptionPlanId } from '../../types/subscription';
 import DailyServiceSelector from './components/DailyServiceSelector';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLocation as useGlobalLocation } from 'react-router-dom';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -37,7 +38,8 @@ export default function ProductDetail() {
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const [isSubscriptionMode, setIsSubscriptionMode] = useState(false);
   const { showToast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user: authUser } = useAuth();
+  const isWholesale = authUser?.customerType === 'wholesale'; 
   const {
     dailyServiceCart,
     addToDailyServiceCart,
@@ -284,6 +286,29 @@ export default function ProductDetail() {
       alert("This variant is currently out of stock.");
       return;
     }
+
+    const minQty = (selectedVariant?.minWholesaleQuantity || product.minWholesaleQuantity || 1);
+    
+    if (isWholesale && inCartQty === 0 && minQty > 1) {
+       // First time adding to cart, add the minimum quantity
+       const productWithVariant = {
+        ...product,
+        price: variantPrice,
+        mrp: variantMrp,
+        pack: variantTitle,
+        selectedVariant: selectedVariant,
+        variantId: selectedVariant?._id,
+        variantTitle: variantTitle,
+      };
+      // We need to modify addToCart to accept quantity, but the current context might only add 1
+      // Let's check CartContext.tsx again.
+      for(let i=0; i < minQty; i++) {
+         addToCart(productWithVariant, i === 0 ? addButtonRef.current : null);
+      }
+      showToast(`Added minimum wholesale quantity (${minQty}) to cart`, 'success');
+      return;
+    }
+
     // Create product with selected variant info
     const productWithVariant = {
       ...product,
@@ -617,6 +642,20 @@ export default function ProductDetail() {
               </>
             )}
           </div>
+
+          {/* Wholesale MOQ indicator */}
+          {isWholesale && (selectedVariant?.minWholesaleQuantity > 1 || product.minWholesaleQuantity > 1) && (
+            <div className="mb-2 p-2 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-2">
+               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+               </svg>
+               <span className="text-xs font-bold text-blue-700">
+                 Min. Order Qty: {selectedVariant?.minWholesaleQuantity || product.minWholesaleQuantity || 1}
+               </span>
+            </div>
+          )}
 
           {/* Stock Status */}
           {variantStock !== 0 && variantStock !== undefined && variantStock !== null && (

@@ -16,6 +16,7 @@ export interface Product {
   smallDescription?: string;
   pack: string;
   price: number;
+  minWholesaleQuantity?: number;
   mrp?: number;
   discPrice?: number;
   variations?: Array<{
@@ -27,6 +28,7 @@ export interface Product {
     stock?: number;
     status?: string;
     _id?: { $oid: string } | string;
+    minWholesaleQuantity?: number;
   }>;
   imageUrl?: string;
   mainImage?: string;

@@ -16,6 +16,7 @@ import {
 interface User {
   id: string;
   userType?: "Admin" | "Seller" | "Customer" | "Delivery";
+  customerType?: "retail" | "wholesale";
   [key: string]: any;
 }
 

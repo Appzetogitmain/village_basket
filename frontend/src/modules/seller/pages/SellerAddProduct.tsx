@@ -58,6 +58,7 @@ export default function SellerAddProduct() {
     galleryImageUrls: [] as string[],
     isShopByStoreOnly: "No",
     shopId: "",
+    minWholesaleQuantity: "1",
   });
 
   const [variations, setVariations] = useState<ProductVariation[]>([]);
@@ -69,6 +70,7 @@ export default function SellerAddProduct() {
     wholesaleDiscPrice: "0",
     stock: "0",
     status: "Available" as "Available" | "Sold out",
+    minWholesaleQuantity: "1",
   });
 
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
@@ -186,6 +188,7 @@ export default function SellerAddProduct() {
               galleryImageUrls: product.galleryImageUrls || (product as any).galleryImages || [],
               isShopByStoreOnly: (product as any).isShopByStoreOnly ? "Yes" : "No",
               shopId: (product as any).shopId?._id || (product as any).shopId || "",
+              minWholesaleQuantity: product.minWholesaleQuantity?.toString() || "1",
             });
             setVariations(product.variations);
             if (product.mainImageUrl || product.mainImage) {
@@ -343,6 +346,7 @@ export default function SellerAddProduct() {
     const wholesalePrice = parseFloat(variationForm.wholesalePrice);
     const wholesaleDiscPrice = parseFloat(variationForm.wholesaleDiscPrice || "0");
     const stock = parseInt(variationForm.stock || "0");
+    const minWholesaleQuantity = parseInt(variationForm.minWholesaleQuantity || "1");
 
     if (retailDiscPrice > retailPrice) {
       setUploadError("Retail discounted price cannot be greater than retail price");
@@ -361,6 +365,7 @@ export default function SellerAddProduct() {
       wholesaleDiscPrice,
       stock,
       status: variationForm.status,
+      minWholesaleQuantity,
     };
 
     setVariations([...variations, newVariation]);
@@ -372,6 +377,7 @@ export default function SellerAddProduct() {
       wholesaleDiscPrice: "0",
       stock: "0",
       status: "Available",
+      minWholesaleQuantity: "1",
     });
     setUploadError("");
   };
@@ -484,6 +490,7 @@ export default function SellerAddProduct() {
         variationType: formData.variationType || undefined,
         isShopByStoreOnly: formData.isShopByStoreOnly === "Yes",
         shopId: formData.isShopByStoreOnly === "Yes" && formData.shopId ? formData.shopId : undefined,
+        minWholesaleQuantity: parseInt(formData.minWholesaleQuantity || "1"),
       };
 
       // Create or Update product via API
@@ -528,6 +535,7 @@ export default function SellerAddProduct() {
               galleryImageUrls: [],
               isShopByStoreOnly: "No",
               shopId: "",
+              minWholesaleQuantity: "1",
             });
             setVariations([]);
             setMainImageFile(null);
@@ -926,6 +934,24 @@ export default function SellerAddProduct() {
                       <option value="Sold out">Sold out</option>
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                       Min. Wholesale Qty
+                    </label>
+                    <input
+                      type="number"
+                      value={variationForm.minWholesaleQuantity}
+                      onChange={(e) =>
+                        setVariationForm({
+                          ...variationForm,
+                          minWholesaleQuantity: e.target.value,
+                        })
+                      }
+                      placeholder="1"
+                      min="1"
+                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-neutral-50/50 p-4 rounded-lg">
@@ -1029,6 +1055,9 @@ export default function SellerAddProduct() {
                             </div>
                             <div className="text-xs text-neutral-500">
                               Stock: <span className="font-semibold text-neutral-700">{variation.stock === 0 ? "Unlimited" : variation.stock}</span>
+                            </div>
+                            <div className="text-xs text-blue-700">
+                              Min. Wholesale Order: <span className="font-semibold">{variation.minWholesaleQuantity || 1}</span>
                             </div>
                           </div>
                         </div>
@@ -1154,6 +1183,23 @@ export default function SellerAddProduct() {
                   />
                   <p className="text-xs text-neutral-500 mt-1">
                     Keep blank if no such limit
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Min Wholesale Quantity
+                  </label>
+                  <input
+                    type="number"
+                    name="minWholesaleQuantity"
+                    value={formData.minWholesaleQuantity}
+                    onChange={handleChange}
+                    placeholder="1"
+                    min="1"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                  />
+                  <p className="text-xs text-neutral-500 mt-1">
+                    Minimum quantity a wholesaler must order
                   </p>
                 </div>
               </div>
