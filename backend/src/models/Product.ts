@@ -21,22 +21,28 @@ export interface IProduct extends Document {
   galleryImages: string[];
 
   // Pricing & Inventory
-  price: number;
-  discPrice?: number;
+  retailPrice: number;
+  retailDiscPrice?: number;
+  wholesalePrice: number;
+  wholesaleDiscPrice?: number;
   compareAtPrice?: number;
   stock: number;
   sku?: string;
   barcode?: string;
+  minWholesaleQuantity: number;
 
 
 
   // Variations
   variationType?: string; // e.g., 'Size', 'Color', 'Weight'
-  variations?: Array<{
+    variations?: Array<{
     name: string;
     value: string;
-    price?: number;
-    discPrice?: number;
+    retailPrice?: number;
+    retailDiscPrice?: number;
+    wholesalePrice?: number;
+    wholesaleDiscPrice?: number;
+    minWholesaleQuantity?: number;
     stock?: number;
     sku?: string;
     status?: string;
@@ -159,15 +165,25 @@ const ProductSchema = new Schema<IProduct>(
     },
 
     // Pricing & Inventory
-    price: {
+    retailPrice: {
       type: Number,
-      required: [true, "Price is required"],
-      min: [0, "Price cannot be negative"],
+      required: [true, "Retail price is required"],
+      min: [0, "Retail price cannot be negative"],
     },
-    discPrice: {
+    retailDiscPrice: {
       type: Number,
       default: 0,
-      min: [0, "Discounted price cannot be negative"],
+      min: [0, "Retail discounted price cannot be negative"],
+    },
+    wholesalePrice: {
+      type: Number,
+      required: [true, "Wholesale price is required"],
+      min: [0, "Wholesale price cannot be negative"],
+    },
+    wholesaleDiscPrice: {
+      type: Number,
+      default: 0,
+      min: [0, "Wholesale discounted price cannot be negative"],
     },
     compareAtPrice: {
       type: Number,
@@ -189,6 +205,11 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       trim: true,
     },
+    minWholesaleQuantity: {
+      type: Number,
+      default: 1,
+      min: [1, "Minimum wholesale quantity cannot be less than 1"],
+    },
 
 
 
@@ -202,8 +223,11 @@ const ProductSchema = new Schema<IProduct>(
         {
           name: String,
           value: String,
-          price: Number,
-          discPrice: { type: Number, default: 0 },
+          retailPrice: Number,
+          retailDiscPrice: { type: Number, default: 0 },
+          wholesalePrice: Number,
+          wholesaleDiscPrice: { type: Number, default: 0 },
+          minWholesaleQuantity: { type: Number, default: 1 },
           stock: Number,
           status: {
             type: String,
@@ -349,9 +373,19 @@ ProductSchema.virtual("mrp").get(function () {
 ProductSchema.pre("save", function (next) {
   // Sync price and stock from variations if they exist
   if (this.variations && this.variations.length > 0) {
-    // Set price to the price of the first variation if top-level price is not set or if we want to keep it in sync
-    if (this.variations[0].price !== undefined) {
-      this.price = this.variations[0].price;
+    const firstVariation = this.variations[0];
+    
+    if (firstVariation.retailPrice !== undefined) {
+      this.retailPrice = firstVariation.retailPrice;
+    }
+    if (firstVariation.retailDiscPrice !== undefined) {
+      this.retailDiscPrice = firstVariation.retailDiscPrice;
+    }
+    if (firstVariation.wholesalePrice !== undefined) {
+      this.wholesalePrice = firstVariation.wholesalePrice;
+    }
+    if (firstVariation.wholesaleDiscPrice !== undefined) {
+      this.wholesaleDiscPrice = firstVariation.wholesaleDiscPrice;
     }
 
     // Calculate total stock as sum of all variation stocks
@@ -361,10 +395,10 @@ ProductSchema.pre("save", function (next) {
     );
   }
 
-  // Calculate discount
-  if (this.compareAtPrice && this.compareAtPrice > this.price) {
+  // Calculate generic discount percentage based on retail price for display consistency
+  if (this.compareAtPrice && this.compareAtPrice > this.retailPrice) {
     this.discount = Math.round(
-      ((this.compareAtPrice - this.price) / this.compareAtPrice) * 100
+      ((this.compareAtPrice - this.retailPrice) / this.compareAtPrice) * 100
     );
   } else {
     this.discount = 0;

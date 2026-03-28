@@ -158,11 +158,16 @@ export default function SellerProductList() {
           "/assets/product-placeholder.jpg",
         brandName: (product.brand as any)?.name || "-",
         category: (product.category as any)?.name || "-",
+        categoryId: (product.category as any)?._id || (product as any).category || "",
         subCategory: (product.subcategory as any)?.name || "-",
-        price: (product as any).price || 0,
-        discPrice: (product as any).discPrice || 0,
+        price: (product as any).retailPrice || 0,
+        discPrice: (product as any).retailDiscPrice || 0,
+        wholesalePrice: (product as any).wholesalePrice || 0,
+        wholesaleDiscPrice: (product as any).wholesaleDiscPrice || 0,
         variation: "Default",
         isPopular: product.popular,
+        publish: product.publish,
+        stock: (product as any).stock || 0,
         productId: product._id,
       }];
     }
@@ -177,12 +182,17 @@ export default function SellerProductList() {
         "/assets/product-placeholder.jpg",
       brandName: (product.brand as any)?.name || "-",
       category: (product.category as any)?.name || "-",
+      categoryId: (product.category as any)?._id || (product as any).category || "",
       subCategory: (product.subcategory as any)?.name || "-",
-      price: variation.price,
-      discPrice: variation.discPrice,
+      price: variation.retailPrice,
+      discPrice: variation.retailDiscPrice,
+      wholesalePrice: variation.wholesalePrice,
+      wholesaleDiscPrice: variation.wholesaleDiscPrice,
       variation:
         variation.title || variation.value || variation.name || "Default",
       isPopular: product.popular,
+      publish: product.publish,
+      stock: variation.stock || 0,
       productId: product._id,
     }));
   });
@@ -195,9 +205,15 @@ export default function SellerProductList() {
       variation.brandName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory =
       categoryFilter === "All Category" ||
-      variation.category === categoryFilter;
-    const matchesStatus = statusFilter === "All Products";
-    const matchesStock = stockFilter === "All Products";
+      variation.categoryId === categoryFilter;
+    const matchesStatus =
+      statusFilter === "All Products" ||
+      (statusFilter === "Published" && variation.publish) ||
+      (statusFilter === "Unpublished" && !variation.publish);
+    const matchesStock =
+      stockFilter === "All Products" ||
+      (stockFilter === "In Stock" && variation.stock > 0) ||
+      (stockFilter === "Out of Stock" && variation.stock <= 0);
     return matchesSearch && matchesCategory && matchesStatus && matchesStock;
   });
 
@@ -266,8 +282,8 @@ export default function SellerProductList() {
     </span>
   );
 
-  // Get unique categories for filter
-  const categories = allCategories.map((cat) => cat.name);
+  // Display categories in filter
+  const filterCategories = allCategories.map((cat) => ({ id: cat._id, name: cat.name }));
 
   return (
     <div className="flex flex-col h-full">
@@ -301,9 +317,9 @@ export default function SellerProductList() {
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                 <option value="All Category">All Category</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
+                {allCategories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
                   </option>
                 ))}
               </select>
@@ -357,8 +373,10 @@ export default function SellerProductList() {
                   "Seller Name",
                   "Brand Name",
                   "Category",
-                  "Price",
-                  "Disc Price",
+                  "Retail Price",
+                  "Retail Disc Price",
+                  "Wholesale Price",
+                  "Wholesale Disc Price",
                   "Variation",
                 ];
                 const csvContent = [
@@ -373,6 +391,8 @@ export default function SellerProductList() {
                       `"${v.category}"`,
                       v.price,
                       v.discPrice,
+                      v.wholesalePrice,
+                      v.wholesaleDiscPrice,
                       `"${v.variation}"`,
                     ].join(",")
                   ),
@@ -488,6 +508,9 @@ export default function SellerProductList() {
                   </div>
                 </th>
                 <th className="p-4 border border-neutral-200">
+                  <div className="flex items-center justify-center">Action</div>
+                </th>
+                <th className="p-4 border border-neutral-200">
                   <div className="flex items-center justify-between">
                     product Image
                   </div>
@@ -517,14 +540,28 @@ export default function SellerProductList() {
                   className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
                   onClick={() => handleSort("price")}>
                   <div className="flex items-center justify-between">
-                    Price <SortIcon column="price" />
+                    Retail Price <SortIcon column="price" />
                   </div>
                 </th>
                 <th
                   className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
                   onClick={() => handleSort("discPrice")}>
                   <div className="flex items-center justify-between">
-                    Disc Price <SortIcon column="discPrice" />
+                    Retail Disc Price <SortIcon column="discPrice" />
+                  </div>
+                </th>
+                <th
+                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                  onClick={() => handleSort("wholesalePrice")}>
+                  <div className="flex items-center justify-between">
+                    Wholesale Price <SortIcon column="wholesalePrice" />
+                  </div>
+                </th>
+                <th
+                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                  onClick={() => handleSort("wholesaleDiscPrice")}>
+                  <div className="flex items-center justify-between">
+                    Wholesale Disc Price <SortIcon column="wholesaleDiscPrice" />
                   </div>
                 </th>
                 <th
@@ -534,9 +571,7 @@ export default function SellerProductList() {
                     Variation <SortIcon column="variation" />
                   </div>
                 </th>
-                <th className="p-4 border border-neutral-200">
-                  <div className="flex items-center justify-center">Action</div>
-                </th>
+
               </tr>
             </thead>
             <tbody>
@@ -593,6 +628,48 @@ export default function SellerProductList() {
                     <td className="p-4 align-middle border border-neutral-200">
                       {variation.sellerName}
                     </td>
+                    <td className="p-4 align-middle border border-neutral-200">
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          onClick={() => handleEdit(variation.productId)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg transition-all text-xs font-bold border border-blue-200 shadow-sm"
+                          title="Edit Product">
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(variation.productId)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-600 hover:text-white rounded-lg transition-all text-xs font-bold border border-red-200 shadow-sm"
+                          title="Delete Product">
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                          </svg>
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                    </td>
                     <td className="p-4 border border-neutral-200">
                       <div className="w-16 h-12 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
                         <img
@@ -615,64 +692,33 @@ export default function SellerProductList() {
                     <td className="p-4 align-middle border border-neutral-200">
                       {variation.subCategory}
                     </td>
-                    <td className="p-4 align-middle border border-neutral-200">
+                    <td className="p-4 align-middle border border-neutral-200 font-bold text-[#8B3D28]">
                       ₹{variation.price.toFixed(2)}
                     </td>
-                    <td className="p-4 align-middle border border-neutral-200">
+                    <td className="p-4 align-middle border border-neutral-200 text-[#8B3D28]">
                       {variation.discPrice > 0
                         ? `₹${variation.discPrice.toFixed(2)}`
+                        : "-"}
+                    </td>
+                    <td className="p-4 align-middle border border-neutral-200 font-bold text-blue-700">
+                      ₹{variation.wholesalePrice.toFixed(2)}
+                    </td>
+                    <td className="p-4 align-middle border border-neutral-200 text-blue-700">
+                      {variation.wholesaleDiscPrice > 0
+                        ? `₹${variation.wholesaleDiscPrice.toFixed(2)}`
                         : "-"}
                     </td>
                     <td className="p-4 align-middle border border-neutral-200">
                       {variation.variation}
                     </td>
-                    <td className="p-4 align-middle border border-neutral-200">
-                      <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => handleEdit(variation.productId)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                          title="Edit Product">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => handleDelete(variation.productId)}
-                          className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-                          title="Delete Product">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
+
                   </tr>
                 );
               })}
               {displayedVariations.length === 0 && (
                 <tr>
                   <td
-                    colSpan={12}
+                    colSpan={14}
                     className="p-8 text-center text-neutral-400 border border-neutral-200">
                     No products found.
                   </td>

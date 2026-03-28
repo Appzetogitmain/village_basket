@@ -7,7 +7,9 @@ export interface CalculatedPrice {
   hasDiscount: boolean;
 }
 
-export const calculateProductPrice = (product: any, variationSelector?: number | string): CalculatedPrice => {
+import { getUserData } from '../services/api/config';
+
+export const calculateProductPrice = (product: any, variationSelector?: number | string, accountType?: string): CalculatedPrice => {
   if (!product) {
     return {
       displayPrice: 0,
@@ -16,6 +18,10 @@ export const calculateProductPrice = (product: any, variationSelector?: number |
       hasDiscount: false
     };
   }
+
+  // Auto-detect account type if not provided
+  const effectiveAccountType = accountType || getUserData('customer')?.accountType || 'retailer';
+  const isWholesale = effectiveAccountType === 'wholesaler';
 
   let variation;
   if (typeof variationSelector === 'number') {
@@ -37,19 +43,33 @@ export const calculateProductPrice = (product: any, variationSelector?: number |
   }
 
   // Fallback to first variation if no specific one selected/found but variations exist
-  // Only if variationSelector was NOT provided (undefined). If it was provided but not found, we probably shouldn't default to 0?
-  // Current behavior was: if index undefined, use index 0.
   if (!variation && product.variations?.length > 0 && variationSelector === undefined) {
     variation = product.variations[0];
   }
 
-  const displayPrice = (variation?.discPrice && variation.discPrice > 0)
-    ? variation.discPrice
-    : (product.discPrice && product.discPrice > 0)
-      ? product.discPrice
-      : (variation?.price || product.price || 0);
+  // Pick correct fields based on account type
+  const targetPriceField = isWholesale ? 'wholesalePrice' : 'retailPrice';
+  const targetDiscPriceField = isWholesale ? 'wholesaleDiscPrice' : 'retailDiscPrice';
 
-  const mrp = variation?.price || product.mrp || product.compareAtPrice || product.price || 0;
+  // Base price (MRP equivalent)
+  const mrp = variation?.[targetPriceField] 
+    || product[targetPriceField] 
+    || variation?.price 
+    || product.mrp 
+    || product.compareAtPrice 
+    || product.price 
+    || 0;
+
+  // Discounted price
+  const displayPrice = (variation?.[targetDiscPriceField] && variation[targetDiscPriceField] > 0)
+    ? variation[targetDiscPriceField]
+    : (product[targetDiscPriceField] && product[targetDiscPriceField] > 0)
+      ? product[targetDiscPriceField]
+      : (variation?.discPrice && variation.discPrice > 0)
+        ? variation.discPrice
+        : (product.discPrice && product.discPrice > 0)
+          ? product.discPrice
+          : mrp;
 
   const hasDiscount = mrp > displayPrice;
   const discount = hasDiscount ? Math.round(((mrp - displayPrice) / mrp) * 100) : 0;

@@ -60,7 +60,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   const navigate = useNavigate();
   const { cart, addToCart, updateQuantity } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { location } = useLocation();
   const { showToast } = useToast(); // Get toast function
   const imageRef = useRef<HTMLImageElement>(null);
@@ -93,7 +93,7 @@ export default function ProductCard({
   const inCartQty = cartItem?.quantity || 0;
 
   // Get Price and MRP using utility
-  const { displayPrice, mrp, discount } = calculateProductPrice(product);
+  const { displayPrice, mrp, discount } = calculateProductPrice(product, undefined, user?.accountType);
 
   const handleCardClick = () => {
     navigate(`/user/product/${((product as any).id || product._id) as string}`);
@@ -347,10 +347,25 @@ export default function ProductCard({
           <span className="text-[8px] md:text-[10px] font-bold text-neutral-400 uppercase tracking-wider italic">
             Pack: {(() => {
                 const v = product.variations?.[0];
-                if (!v) return (product.pack || 'Standard').trim();
-                const vName = (v.name || '').trim();
-                const isPlaceholder = !vName || vName.toLowerCase() === 'variation' || vName.toLowerCase() === 'standard';
-                return (isPlaceholder ? (v.value || v.title || vName) : vName).trim() || (product.pack || 'Standard').trim();
+                let packValue = '';
+                
+                if (v) {
+                  const vName = (v.name || '').trim();
+                  const isPlaceholder = !vName || vName.toLowerCase() === 'variation' || vName.toLowerCase() === 'standard';
+                  packValue = (isPlaceholder ? (v.value || v.title || vName) : vName).trim();
+                } else {
+                  packValue = (product.pack || 'Standard').trim();
+                }
+
+                // Format numeric-only pack values (e.g., 500 becomes 500g)
+                if (packValue && /^\d+$/.test(packValue)) {
+                  const num = parseInt(packValue);
+                  if (num >= 500 && num < 1000) return `${num}g`;
+                  if (num >= 1000) return `${num/1000}kg`;
+                  return `${num}g`;
+                }
+                
+                return packValue || 'Standard';
               })()}
           </span>
         </div>

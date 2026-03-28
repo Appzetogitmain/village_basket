@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Customer from "../../../models/Customer";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import AppSettings from "../../../models/AppSettings";
 
 /**
  * Get customer profile
@@ -46,6 +47,7 @@ export const getProfile = asyncHandler(async (req: Request, res: Response) => {
       state: customer.state,
       pincode: customer.pincode,
       locationUpdatedAt: customer.locationUpdatedAt,
+      userType: customer.userType || 'retail',
     },
   });
 });
@@ -124,6 +126,7 @@ export const updateProfile = asyncHandler(
         notificationPreferences: customer.notificationPreferences,
         accountPrivacy: customer.accountPrivacy,
         donationStats: customer.donationStats,
+        userType: customer.userType || 'retail',
       },
 
     });
@@ -224,5 +227,17 @@ export const getLocation = asyncHandler(async (req: Request, res: Response) => {
       pincode: customer.pincode,
       locationUpdatedAt: customer.locationUpdatedAt,
     },
+  });
+});
+
+/**
+ * Get delivery configuration for customers
+ */
+export const getDeliveryConfig = asyncHandler(async (req: Request, res: Response) => {
+  const settings = await AppSettings.findOne().select("deliveryConfig platformFee deliveryCharges freeDeliveryThreshold");
+  
+  return res.status(200).json({
+    success: true,
+    data: settings,
   });
 });

@@ -10,6 +10,7 @@ import { notifySellersOfOrderUpdate } from "../../../services/sellerNotification
 import { generateDeliveryOtp } from "../../../services/deliveryOtpService";
 import AppSettings from "../../../models/AppSettings";
 import { getRoadDistances } from "../../../services/mapService";
+import Coupon from "../../../models/Coupon";
 import { Server as SocketIOServer } from "socket.io";
 
 // Create a new order
@@ -26,7 +27,7 @@ export const createOrder = async (req: Request, res: Response) => {
             session = null;
         }
 
-        const { items, address, paymentMethod, fees, deliverySlot } = req.body;
+        const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, giftPackaging } = req.body;
         const userId = req.user!.userId;
 
         // Log incoming request for debugging
@@ -290,11 +291,16 @@ export const createOrder = async (req: Request, res: Response) => {
                 selectedVariation = product.variations[0];
             }
 
-            const itemPrice = (selectedVariation?.discPrice && selectedVariation.discPrice > 0)
-                ? selectedVariation.discPrice
-                : (product.discPrice && product.discPrice > 0)
-                    ? product.discPrice
-                    : (selectedVariation?.price || product.price || 0);
+            const userType = customer.userType || 'retail';
+            const isWholesale = userType === 'wholesale';
+            const priceField = isWholesale ? 'wholesalePrice' : 'retailPrice';
+            const discPriceField = isWholesale ? 'wholesaleDiscPrice' : 'retailDiscPrice';
+
+            const itemPrice = (selectedVariation?.[discPriceField] && selectedVariation[discPriceField] > 0)
+                ? selectedVariation[discPriceField]
+                : (product[discPriceField] && Number(product[discPriceField]) > 0)
+                    ? product[discPriceField]
+                    : (selectedVariation?.[priceField] || product[priceField] || 0);
             const itemTotal = itemPrice * qty;
             calculatedSubtotal += itemTotal;
 
@@ -359,13 +365,13 @@ export const createOrder = async (req: Request, res: Response) => {
         }
 
         // Apply fees
-        let platformFee = Number(fees?.platformFee) || 0;
+        const settings = await AppSettings.getSettings();
+        let platformFee = Number(fees?.platformFee) || settings?.platformFee || 0;
         let deliveryFee = Number(fees?.deliveryFee) || 0;
         let deliveryDistanceKm = 0;
 
         // --- Distance-Based Delivery Charge Calculation ---
         try {
-            const settings = await AppSettings.getSettings();
             const freeDeliveryThreshold = settings?.freeDeliveryThreshold || 0;
 
             // Check for Free Delivery eligibility first
@@ -423,11 +429,45 @@ export const createOrder = async (req: Request, res: Response) => {
             // Fallback to provided fee or 0
         }
 
-        const finalTotal = calculatedSubtotal + platformFee + deliveryFee;
+        let discountAmount = 0;
+        if (couponCode) {
+            try {
+                const coupon = await Coupon.findOne({
+                    code: couponCode.toUpperCase(),
+                    isActive: true,
+                    startDate: { $lte: new Date() },
+                    endDate: { $gte: new Date() },
+                });
+
+                if (coupon) {
+                    if (!coupon.minimumPurchase || calculatedSubtotal >= coupon.minimumPurchase) {
+                        if (coupon.discountType === "Percentage") {
+                            discountAmount = (calculatedSubtotal * coupon.discountValue) / 100;
+                            if (coupon.maximumDiscount && discountAmount > coupon.maximumDiscount) {
+                                discountAmount = coupon.maximumDiscount;
+                            }
+                        } else {
+                            discountAmount = coupon.discountValue;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn("Coupon validation failed during order creation:", error);
+            }
+        }
+
+        const tip = Number(tipAmount) || 0;
+        const giftPackagingFee = giftPackaging ? 30 : 0;
+        const finalTotal = calculatedSubtotal + platformFee + deliveryFee + tip + giftPackagingFee - discountAmount;
 
         // Update Order with calculated values and items
         newOrder.subtotal = Number(calculatedSubtotal.toFixed(2));
-        newOrder.total = Number(finalTotal.toFixed(2));
+        newOrder.platformFee = platformFee;
+        newOrder.discount = discountAmount;
+        newOrder.couponCode = couponCode;
+        newOrder.customerNotes = tip > 0 ? `Tip: ₹${tip}` : '';
+        newOrder.gstin = gstin;
+        newOrder.total = Number(Math.max(0, finalTotal).toFixed(2));
         newOrder.items = orderItemIds;
         newOrder.shipping = deliveryFee; // Update with calculated fee
         newOrder.deliveryDistanceKm = deliveryDistanceKm; // Store distance for commission calc
@@ -538,7 +578,7 @@ export const getMyOrders = async (req: Request, res: Response) => {
         const orders = await Order.find(query)
             .populate({
                 path: 'items',
-                populate: { path: 'product', select: 'productName mainImage price' }
+                populate: { path: 'product', select: 'productName mainImage retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice' }
             })
             .sort({ createdAt: -1 })
             .skip(skip)
@@ -594,7 +634,7 @@ export const getOrderById = async (req: Request, res: Response) => {
             .populate({
                 path: 'items',
                 populate: [
-                    { path: 'product', select: 'productName mainImage pack manufacturer price' },
+                    { path: 'product', select: 'productName mainImage pack manufacturer retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mrp' },
                     { path: 'seller', select: 'storeName city phone fssaiLicNo' }
                 ]
             })

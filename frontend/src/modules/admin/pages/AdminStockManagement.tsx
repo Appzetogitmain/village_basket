@@ -543,8 +543,8 @@ export default function AdminStockManagement() {
                           )}
                         </div>
 
-                        {/* Hover Actions */}
-                        <div className="absolute inset-x-0 bottom-2 flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                        {/* Actions */}
+                        <div className="absolute inset-x-0 bottom-2 flex justify-center gap-2 transition-all duration-300">
                           <button
                             onClick={(e) => { e.stopPropagation(); navigate(`/admin/product/edit/${product._id}`); }}
                             className="p-2 bg-white text-neutral-700 rounded-full hover:bg-[#A54B31] hover:text-white shadow-md border border-neutral-100 transition-colors"

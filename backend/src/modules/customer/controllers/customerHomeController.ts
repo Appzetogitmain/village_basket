@@ -27,7 +27,7 @@ async function fetchSectionData(
         status: "Active",
         publish: true,
       })
-        .select("productName mainImage price compareAtPrice discount rating reviewsCount pack seller variations")
+        .select("productName mainImage price compareAtPrice retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice discount rating reviewsCount pack seller variations")
         .lean();
 
       // Sort according to the order in the products array
@@ -48,8 +48,12 @@ async function fetchSectionData(
           productName: p.productName,
           image: p.mainImage,
           mainImage: p.mainImage,
-          price: p.price,
-          compareAtPrice: p.compareAtPrice,
+          price: p.retailPrice || p.price,
+          compareAtPrice: p.compareAtPrice || p.retailPrice || p.price,
+          retailPrice: p.retailPrice || p.price,
+          retailDiscPrice: p.retailDiscPrice || p.discPrice || 0,
+          wholesalePrice: p.wholesalePrice,
+          wholesaleDiscPrice: p.wholesaleDiscPrice || 0,
           mrp: p.compareAtPrice || p.price,
           discount: p.discount || (p.compareAtPrice && p.price ? Math.round(((p.compareAtPrice - p.price) / p.compareAtPrice) * 100) : 0),
           rating: p.rating || 0,
@@ -108,7 +112,7 @@ async function fetchSectionData(
       const products = await Product.find(query)
         .sort({ createdAt: -1 })
         .limit(limit || 8)
-        .select("productName mainImage price compareAtPrice discount rating reviewsCount pack seller variations")
+        .select("productName mainImage price compareAtPrice retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice discount rating reviewsCount pack seller variations")
         .lean();
 
       return products.map((p: any) => {
@@ -300,7 +304,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
       popular: true,
     })
       .limit(12)
-      .select("productName mainImage price compareAtPrice discount rating reviewsCount pack seller category variations")
+      .select("productName mainImage price compareAtPrice retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice discount rating reviewsCount pack seller category variations")
       .lean();
 
     const formattedBestsellers = bestsellers.map((p: any) => ({
@@ -339,7 +343,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
       .sort({ order: 1 })
       .populate({
         path: "product",
-        select: "productName mainImage price compareAtPrice discount rating reviewsCount pack seller category variations",
+        select: "productName mainImage price compareAtPrice retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice discount rating reviewsCount pack seller category variations",
       })
       .limit(12)
       .lean();
@@ -376,7 +380,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
       })
         .sort({ discount: -1 })
         .limit(12)
-        .select("productName mainImage price compareAtPrice discount rating reviewsCount pack seller category variations")
+        .select("productName mainImage price compareAtPrice retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice discount rating reviewsCount pack seller category variations")
         .lean();
 
       formattedLowestPrices = lowestPrices.map((p: any) => ({
@@ -396,7 +400,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
       dealOfDay: true,
     })
       .limit(12)
-      .select("productName mainImage price compareAtPrice discount rating reviewsCount pack seller category variations")
+      .select("productName mainImage price compareAtPrice retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice discount rating reviewsCount pack seller category variations")
       .lean();
 
     const formattedTrending = trending.map((p: any) => ({
@@ -501,11 +505,11 @@ export const getHomeContent = async (req: Request, res: Response) => {
         endDate: { $gte: new Date() },
       })
         .populate("categoryCards.subCategoryId", "name image icon subcategoryName slug")
-        .populate("categoryCards.productId", "productName mainImage price mrp")
+        .populate("categoryCards.productId", "productName mainImage price mrp retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice")
         .populate("productCategoryId", "name icon image color slug")
         .populate({
           path: "featuredProducts",
-          select: "productName mainImage price mrp discount rating reviewsCount pack seller category variations",
+          select: "productName mainImage price mrp retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice discount rating reviewsCount pack seller category variations",
         })
         .sort({ order: 1 })
         .lean();
@@ -520,11 +524,11 @@ export const getHomeContent = async (req: Request, res: Response) => {
         endDate: { $gte: new Date() },
       })
         .populate("categoryCards.subCategoryId", "name image icon subcategoryName slug")
-        .populate("categoryCards.productId", "productName mainImage price mrp")
+        .populate("categoryCards.productId", "productName mainImage price mrp retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice")
         .populate("productCategoryId", "name icon image color slug")
         .populate({
           path: "featuredProducts",
-          select: "productName mainImage price mrp discount rating reviewsCount pack seller category variations",
+          select: "productName mainImage price mrp retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice discount rating reviewsCount pack seller category variations",
         })
         .sort({ order: 1 })
         .lean();
@@ -872,6 +876,7 @@ export const getStoreProducts = async (req: Request, res: Response) => {
       .populate("seller", "storeName")
       .sort({ createdAt: -1 })
       .limit(50)
+      .select("productName mainImage price mrp retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice compareAtPrice discount rating reviewsCount pack seller category variations")
       .lean({ virtuals: true });
 
     const total = await Product.countDocuments(query);

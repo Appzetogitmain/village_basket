@@ -30,6 +30,11 @@ export const getProducts = async (req: Request, res: Response) => {
       isShopByStoreOnly: { $ne: true },
     };
 
+    // Determine user type for pricing (retail by default)
+    const userType = (req as any).user?.userType === 'wholesale' ? 'wholesale' : 'retail';
+    const priceField = userType === 'wholesale' ? 'wholesalePrice' : 'retailPrice';
+    const discPriceField = userType === 'wholesale' ? 'wholesaleDiscPrice' : 'retailDiscPrice';
+
     // Location-based filtering: Only show products from sellers within user's range
     const userLat = latitude ? parseFloat(latitude as string) : null;
     const userLng = longitude ? parseFloat(longitude as string) : null;
@@ -141,9 +146,9 @@ export const getProducts = async (req: Request, res: Response) => {
     }
 
     if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
+      query[priceField] = {};
+      if (minPrice) query[priceField].$gte = Number(minPrice);
+      if (maxPrice) query[priceField].$lte = Number(maxPrice);
     }
 
     if (minDiscount) {
@@ -165,8 +170,8 @@ export const getProducts = async (req: Request, res: Response) => {
 
     // Build sort object
     let sortOptions: any = { createdAt: -1 }; // Default new to old
-    if (sort === "price_asc") sortOptions = { price: 1 };
-    if (sort === "price_desc") sortOptions = { price: -1 };
+    if (sort === "price_asc") sortOptions = { [discPriceField]: 1 };
+    if (sort === "price_desc") sortOptions = { [discPriceField]: -1 };
     if (sort === "discount") sortOptions = { discount: -1 };
     if (sort === "popular") sortOptions = { popular: -1, dealOfDay: -1 };
 
@@ -177,13 +182,31 @@ export const getProducts = async (req: Request, res: Response) => {
       .populate("seller", "storeName")
       .sort(sortOptions)
       .skip(skip)
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean();
+
+    // Map products to include generic price and mrp fields for the frontend
+    const mappedProducts = products.map((prod: any) => {
+      // For each variation, also sync prices
+      const variations = prod.variations?.map((v: any) => ({
+        ...v,
+        price: v[priceField] || 0,
+        discPrice: v[discPriceField] || 0,
+      }));
+
+      return {
+        ...prod,
+        price: prod[discPriceField] || prod[priceField] || 0,
+        mrp: prod[priceField] || 0,
+        variations
+      };
+    });
 
     const total = await Product.countDocuments(query);
 
     return res.status(200).json({
       success: true,
-      data: products,
+      data: mappedProducts,
       pagination: {
         page: Number(page),
         limit: Number(limit),
@@ -205,6 +228,9 @@ export const getProductById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { latitude, longitude } = req.query; // User location
+    const userType = (req as any).user?.userType === 'wholesale' ? 'wholesale' : 'retail';
+    const priceField = userType === 'wholesale' ? 'wholesalePrice' : 'retailPrice';
+    const discPriceField = userType === 'wholesale' ? 'wholesaleDiscPrice' : 'retailDiscPrice';
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
@@ -318,16 +344,38 @@ export const getProductById = async (req: Request, res: Response) => {
       }
     }
 
-    const similarProducts = await Product.find(similarProductsQuery)
+    const rawSimilarProducts = await Product.find(similarProductsQuery)
       .limit(6)
-      .select(
-        "productName price mrp variations mainImage pack discount _id rating reviewsCount"
-      );
+      .select(`productName retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mrp variations mainImage pack discount _id rating reviewsCount`)
+      .lean();
+
+    const similarProducts = rawSimilarProducts.map((prod: any) => ({
+      ...prod,
+      price: prod[discPriceField] || prod[priceField] || 0,
+      mrp: prod[priceField] || 0,
+      variations: prod.variations?.map((v: any) => ({
+        ...v,
+        price: v[priceField] || 0,
+        discPrice: v[discPriceField] || 0,
+      }))
+    }));
+
+    // Map main product
+    const mappedProduct: any = product.toObject();
+    mappedProduct.price = mappedProduct[discPriceField] || mappedProduct[priceField] || 0;
+    mappedProduct.mrp = mappedProduct[priceField] || 0;
+    if (mappedProduct.variations) {
+      mappedProduct.variations = mappedProduct.variations.map((v: any) => ({
+        ...v,
+        price: v[priceField] || 0,
+        discPrice: v[discPriceField] || 0,
+      }));
+    }
 
     return res.status(200).json({
       success: true,
       data: {
-        ...product.toObject(),
+        ...mappedProduct,
         similarProducts,
         isAvailableAtLocation, // Add availability flag to response
       },
