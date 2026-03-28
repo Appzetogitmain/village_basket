@@ -134,234 +134,177 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const showFooter = !isCheckoutPage && !isProductDetailPage;
 
   return (
-    <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
+    <div className="flex flex-col min-h-screen w-full overflow-x-hidden md:bg-transparent">
       {/* Desktop Container Wrapper */}
       <div className="md:w-full md:bg-transparent md:min-h-screen overflow-x-hidden">
-        <div className="md:w-full md:min-h-screen md:flex md:flex-col overflow-x-hidden">
-          {/* Top Navigation Bar - Desktop Only */}
-          {showFooter && (
-            <nav
-              className="hidden md:flex items-center justify-center gap-8 px-6 lg:px-8 py-4 shadow-lg bg-[#8B3D28] border-b border-white/10 transition-all duration-300 relative overflow-hidden"
-            >
-              {/* Subtle Decorative Warli Pattern (Top Edge) */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-30"></div>
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
-
-              {/* Home */}
-              <Link
-                to="/user"
-                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${(isActive('/user') || isActive('/user/'))
-                  ? 'bg-white/20 text-[#FFCC00] shadow-md font-bold scale-105'
-                  : 'hover:bg-white/10 text-white/90'
-                  }`}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {(isActive('/user') || isActive('/user/')) ? (
-                    <>
-                      <path d="M2 12L12 4L22 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="white" fillOpacity="0.2" />
-                      <rect x="4" y="12" width="16" height="8" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
-                    </>
-                  ) : (
-                    <>
-                      <path d="M2 12L12 4L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                      <rect x="4" y="12" width="16" height="8" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" fill="none" />
-                    </>
-                  )}
-                </svg>
-                <span className="font-medium text-sm">Home</span>
-              </Link>
-
-              {/* Order Again */}
-              <Link
-                to="/user/order-again"
-                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${isActive('/user/order-again')
-                  ? 'bg-white/20 text-[#FFCC00] shadow-md font-bold scale-105'
-                  : 'hover:bg-white/10 text-white/90'
-                  }`}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {isActive('/user/order-again') ? (
-                    <path d="M5 8V6C5 4.34315 6.34315 3 8 3H16C17.6569 3 19 4.34315 19 6V8H21C21.5523 8 22 8.44772 22 9V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V9C2 8.44772 2.44772 8 3 8H5Z" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
-                  ) : (
-                    <path d="M5 8V6C5 4.34315 6.34315 3 8 3H16C17.6569 3 19 4.34315 19 6V8H21C21.5523 8 22 8.44772 22 9V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V9C2 8.44772 2.44772 8 3 8H5Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" fill="none" />
-                  )}
-                </svg>
-                <span className="font-medium text-sm">Order Again</span>
-              </Link>
-
-              {/* Categories */}
-              <Link
-                to="/user/categories"
-                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${(isActive('/user/categories') || location.pathname.startsWith('/user/category/'))
-                  ? 'bg-white/20 text-[#FFCC00] shadow-md font-bold scale-105'
-                  : 'hover:bg-white/10 text-white/90'
-                  }`}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {(isActive('/user/categories') || location.pathname.startsWith('/user/category/')) ? (
-                    <>
-                      <circle cx="7" cy="7" r="2.5" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" />
-                      <circle cx="17" cy="7" r="2.5" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" />
-                      <circle cx="7" cy="17" r="2.5" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" />
-                      <circle cx="17" cy="17" r="2.5" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" />
-                    </>
-                  ) : (
-                    <>
-                      <circle cx="7" cy="7" r="2.5" stroke="currentColor" strokeWidth="2" fill="none" />
-                      <circle cx="17" cy="7" r="2.5" stroke="currentColor" strokeWidth="2" fill="none" />
-                      <circle cx="7" cy="17" r="2.5" stroke="currentColor" strokeWidth="2" fill="none" />
-                      <circle cx="17" cy="17" r="2.5" stroke="currentColor" strokeWidth="2" fill="none" />
-                    </>
-                  )}
-                </svg>
-                <span className="font-medium text-sm">Categories</span>
-              </Link>
-
-              {/* Profile */}
-              <Link
-                to="/user/account"
-                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${isActive('/user/account')
-                  ? 'bg-white/20 text-[#FFCC00] shadow-md font-bold scale-105'
-                  : 'hover:bg-white/10 text-white/90'
-                  }`}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {isActive('/user/account') ? (
-                    <>
-                      <circle cx="12" cy="8" r="4" fill="white" fillOpacity="0.2" stroke="currentColor" strokeWidth="2.5" />
-                      <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="white" fillOpacity="0.2" />
-                    </>
-                  ) : (
-                    <>
-                      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" fill="none" />
-                      <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
-                    </>
-                  )}
-                </svg>
-                <span className="font-medium text-sm">Profile</span>
-              </Link>
-            </nav>
-          )}
-
-          {/* Sticky Header - Global Desktop Header, Hidden on Mobile */}
+        <div className="md:w-full md:min-h-screen md:flex md:flex-col overflow-x-hidden md:bg-transparent">
+          {/* Sticky Desktop Header - Single Premium Row */}
           {showHeader && (
-            <header className={`sticky top-0 z-50 bg-[#8B3D28] shadow-lg md:top-[60px] border-b border-white/10 hidden md:block`}>
-              {/* Delivery info line */}
-              <div className="px-4 md:px-6 lg:px-8 py-1 bg-white/10 text-white text-[9px] uppercase font-black tracking-widest text-center">
-                VILLAGE FRESH GOODS
-              </div>
+            <header className="sticky top-0 z-50 bg-[#8B3D28] shadow-xl border-b border-white/5 hidden md:block px-4 md:px-8 py-4">
+              <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-6 lg:gap-12">
+                
+                {/* Logo & Location Side-by-Side */}
+                <div className="flex items-center gap-6 lg:gap-10">
+                  <Link to="/user" className="flex-shrink-0 transition-transform hover:scale-105 active:scale-95 duration-300">
+                    <img
+                      src={brandLogo}
+                      alt="Village Basket"
+                      className="h-10 lg:h-12 w-auto object-contain brightness-110 drop-shadow-md"
+                    />
+                  </Link>
+                  
+                  {/* Delivery Location - Styled like the image */}
+                  <button
+                    onClick={() => navigate('/user/location')}
+                    className="flex items-center gap-3 group transition-all"
+                  >
+                    <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10 group-hover:bg-[#FFCC00] group-hover:border-[#FFCC00] transition-all">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-[#FFCC00] group-hover:text-[#8B3D28] transition-colors">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+                      </svg>
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] font-black text-[#FFCC00] uppercase tracking-tighter leading-none mb-1">Deliver to</span>
+                      <span className="text-xs lg:text-sm font-bold text-white max-w-[140px] lg:max-w-[200px] truncate leading-tight group-hover:text-[#FFCC00]">
+                        {userLocation?.address || userLocation?.city || 'Set Location'}
+                      </span>
+                    </div>
+                  </button>
+                </div>
 
-              {/* Main Header Row */}
-              <div className="px-4 md:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
-                {/* Logo */}
-                <Link to="/user" className="flex-shrink-0">
-                  <img
-                    src={brandLogo}
-                    alt="Village Basket"
-                    className="h-10 md:h-12 w-auto object-contain filter brightness-125 drop-shadow-md"
-                  />
-                </Link>
-
-                {/* Desktop Search - Hidden on mobile in this row */}
-                <div className="hidden md:flex flex-1 max-w-xl">
-                  <div className="relative w-full">
+                {/* Central Premium Search Bar */}
+                <div className="flex-1 max-w-3xl">
+                  <div 
+                    onClick={() => navigate('/user/search')}
+                    className="relative w-full group cursor-pointer"
+                  >
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B3D28]/60 transition-colors group-hover:text-[#8B3D28]">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                        <circle cx="11" cy="11" r="7" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      </svg>
+                    </div>
                     <input
                       type="text"
-                      value={searchQuery}
-                      onChange={(e) => handleSearchChange(e.target.value)}
-                      placeholder="Search for Desi Products..."
-                      className="w-full px-4 py-2 pl-10 bg-white/20 backdrop-blur-md border border-white/20 rounded-xl text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFCC00] transition-all"
+                      readOnly
+                      placeholder='Search for "farm fresh vegetables"'
+                      className="w-full bg-white text-village-umber rounded-2xl py-3 px-12 text-sm lg:text-base font-medium placeholder:text-village-umber/40 border border-transparent shadow-md focus:outline-none focus:ring-2 focus:ring-[#FFCC00]/50 transition-all cursor-pointer group-hover:shadow-lg"
                     />
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60">🔍</span>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B3D28]/40">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
 
-                {/* Right Actions */}
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => navigate('/user/search')}
-                    className="md:hidden text-white p-1 hover:bg-white/10 rounded-full transition-colors"
+                {/* Desktop Menu - Styled like the image */}
+                <div className="flex items-center gap-1 lg:gap-4 ml-4">
+                  {/* Home */}
+                  <Link
+                    to="/user"
+                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user') || isActive('/user/') || isActive('/user/home') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="11" cy="11" r="7" />
-                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      <polyline points="9 22 9 12 15 12 15 22" />
                     </svg>
-                  </button>
-                  <button
-                    onClick={() => navigate('/user/checkout')}
-                    className="text-white p-1 hover:bg-white/10 rounded-full transition-colors relative"
+                    <span className="text-sm font-bold">Home</span>
+                  </Link>
+
+                  {/* Orders */}
+                  <Link
+                    to="/user/order-again"
+                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/order-again') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-                      <line x1="3" y1="6" x2="21" y2="6" />
-                      <path d="M16 10a4 4 0 01-8 0" />
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                     </svg>
-                  </button>
-                  <button
-                    onClick={() => navigate('/user/account')}
-                    className="hidden md:flex text-white p-1 hover:bg-white/10 rounded-full transition-colors"
+                    <span className="text-sm font-bold">Orders</span>
+                  </Link>
+
+                  {/* Categories */}
+                  <Link
+                    to="/user/categories"
+                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/categories') || location.pathname.startsWith('/user/category/') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7" />
+                      <rect x="14" y="3" width="7" height="7" />
+                      <rect x="14" y="14" width="7" height="7" />
+                      <rect x="3" y="14" width="7" height="7" />
+                    </svg>
+                    <span className="text-sm font-bold">Categories</span>
+                  </Link>
+
+                  {/* Profile */}
+                  <Link
+                    to="/user/account"
+                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/account') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                       <circle cx="12" cy="7" r="4" />
                     </svg>
-                  </button>
+                    <span className="text-sm font-bold">Profile</span>
+                  </Link>
+
+                  {/* Cart Indicator */}
+                  {(cart?.itemCount || 0) > 0 && (
+                    <button
+                      onClick={() => navigate('/user/checkout')}
+                      className="ml-2 w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center relative hover:bg-white/30 transition-all font-bold text-white shadow-inner"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <path d="M16 10a4 4 0 01-8 0" />
+                      </svg>
+                      <span className="absolute -top-1.5 -right-1.5 bg-[#4b7d5a] text-white text-[10px] font-black rounded-lg min-w-[20px] h-[20px] flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
+                        {cart?.itemCount}
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
-
-              {/* Location line - only show if user has provided location */}
-              {userLocation && (userLocation.address || userLocation.city) && (
-                <div className="px-4 md:px-6 lg:px-8 py-2 flex items-center justify-between text-[11px] bg-black/10 border-t border-white/5">
-                  <div className="flex items-center gap-1.5 text-white/90">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
-                    </svg>
-                    <span className="line-clamp-1 italic font-medium">
-                      Delivering to: {userLocation?.address || userLocation?.city || 'Your Location'}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setShowLocationChangeModal(true)}
-                    className="text-[#FFCC00] font-black uppercase tracking-tighter hover:text-white transition-colors flex-shrink-0 ml-2 font-poppins text-[10px]"
-                  >
-                    Change
-                  </button>
-                </div>
-              )}
             </header>
           )}
 
           {/* Scrollable Main Content */}
-          <main ref={mainRef} className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide pb-24 md:pb-8">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{
-                  duration: 0.2,
-                  ease: "easeInOut"
-                }}
-                className="w-full max-w-full"
-                style={{ minHeight: '100%' }}
-                onAnimationComplete={() => {
-                  const isHomePage = location.pathname === '/user' || location.pathname === '/user/' || location.pathname === '/user/home';
+          <main ref={mainRef} className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide pb-24 md:pb-8 md:bg-transparent">
+            <div className="w-full max-w-[1550px] mx-auto">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    duration: 0.2,
+                    ease: "easeInOut"
+                  }}
+                  className="w-full max-w-full"
+                  style={{ minHeight: '100%' }}
+                  onAnimationComplete={() => {
+                    const isHomePage = location.pathname === '/user' || location.pathname === '/user/' || location.pathname === '/user/home';
 
-                  // Home page handles its own scroll (either restoration or starting from top)
-                  if (isHomePage) {
-                    return;
-                  }
+                    // Home page handles its own scroll (either restoration or starting from top)
+                    if (isHomePage) {
+                      return;
+                    }
 
-                  if (mainRef.current) {
-                    mainRef.current.scrollTop = 0;
-                  }
-                  window.scrollTo(0, 0);
-                }}
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
+                    if (mainRef.current) {
+                      mainRef.current.scrollTop = 0;
+                    }
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  {children}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </main>
 
           {/* Floating Cart Pill */}

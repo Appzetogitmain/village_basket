@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useMemo, useEffect, useRef } from 'react';
+﻿import { createContext, useContext, useState, ReactNode, useMemo, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
 import { useLocation } from '../hooks/useLocation';
@@ -66,9 +66,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return apiItems
       .filter((item: any) => item.product) // Safety filter
       .map((item: any) => ({
-        id: String(item._id || ''), // Store CartItem ID as string
+        id: item._id, // Store CartItem ID
         product: {
-          id: String(item.product._id || item.product.id || ''),
+          id: item.product._id, // Map _id to id
           name: item.product.productName || item.product.name,
           price: item.product.price,
           mrp: item.product.mrp,
@@ -76,7 +76,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           variations: item.product.variations,
           imageUrl: item.product.mainImage || item.product.imageUrl,
           pack: item.product.pack || '1 unit',
-          categoryId: String(item.product.category || ''),
+          categoryId: item.product.category || '',
           description: item.product.description,
           variantId: item.variation // Preserving variation ID/value
         },
@@ -168,7 +168,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = async (product: Product, sourceElement?: HTMLElement | null) => {
     // Get consistent product ID - MongoDB returns _id, frontend expects id
     const productId = product._id || product.id;
-    if (!productId) return;
 
     // Prevent concurrent operations on the same product
     if (pendingOperationsRef.current.has(productId)) {
@@ -278,8 +277,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const removeFromCart = async (productId: string, variant?: string) => {
-    if (!productId) return;
-
     // Unique key for pending operations
     const operationKey = variant ? `${productId}-${variant}` : productId;
 
@@ -337,8 +334,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const updateQuantity = async (productId: string, quantity: number, variantId?: string, variantTitle?: string) => {
-    if (!productId) return;
-
     if (quantity <= 0) {
       removeFromCart(productId, variantId || variantTitle);
       return;

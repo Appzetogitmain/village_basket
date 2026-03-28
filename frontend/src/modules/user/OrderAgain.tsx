@@ -8,6 +8,7 @@ import { getProducts } from '../../services/api/customerProductService';
 import WishlistButton from '../../components/WishlistButton';
 import { calculateProductPrice } from '../../utils/priceUtils';
 import { getVariationColor } from '../../utils/variationUtils';
+import ProductCard from './components/ProductCard';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -101,9 +102,14 @@ export default function OrderAgain() {
 
       {/* Orders Section */}
       {hasOrders && (
-        <div className="px-4 mt-4 mb-6">
-          <h2 className="text-[10px] font-black text-village-umber uppercase tracking-[0.2em] mb-3 opacity-70">Recent Orders</h2>
-          <div className="space-y-3">
+        <div className="px-4 md:px-8 mt-4 md:mt-10 mb-6 md:mb-10">
+          <div className="mb-4 md:mb-8">
+            <h2 className="text-[10px] md:text-xs font-black text-[#8B3D28] uppercase tracking-[0.2em] mb-1 opacity-70">Your Journey</h2>
+            <h2 className="text-xl md:text-4xl font-black text-village-umber tracking-tighter font-poppins capitalize">
+              Recent Orders
+            </h2>
+          </div>
+          <div className="space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-6">
             {orders.map((order) => {
               const previewItems = (order.items || []).slice(0, 3);
 
@@ -111,61 +117,63 @@ export default function OrderAgain() {
                 <div
                   key={order.id}
                   onClick={() => navigate(`/user/orders/${order.id}`)}
-                  className="village-card paper-texture organic-radius p-3 active:scale-[0.98] transition-all cursor-pointer bg-white relative shadow-sm border border-neutral-100/50"
+                  className="village-card paper-texture organic-radius p-4 md:p-6 active:scale-[0.98] transition-all cursor-pointer bg-white relative shadow-sm border border-neutral-100/50 hover:shadow-xl md:hover:-translate-y-1 duration-300"
                 >
-                  <div className="flex justify-between items-start mb-1">
+                  <div className="flex justify-between items-start mb-2 md:mb-4">
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[9px] font-black text-village-umber/40 uppercase tracking-tighter">Order</span>
-                      <h4 className="text-[10px] font-black text-village-umber uppercase truncate max-w-[140px]">#{order.id}</h4>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${getStatusColor(order.status)}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[9px] md:text-[11px] font-black text-village-umber/40 uppercase tracking-tighter">Order ID</span>
+                        <div className={`px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-black uppercase tracking-tighter ${getStatusColor(order.status)} shadow-sm`}>
                           {order.status}
-                        </span>
-                        <span className="text-xs font-black text-village-umber">₹{order.totalAmount.toFixed(0)}</span>
+                        </div>
                       </div>
-                      <span className="text-[9px] font-bold text-neutral-400 italic">
-                        {order.totalItems} {order.totalItems === 1 ? 'item' : 'items'}
+                      <h4 className="text-[10px] md:text-sm font-black text-village-umber uppercase truncate max-w-[140px] md:max-w-xs tracking-tight">#{order.id}</h4>
+                      <span className="text-[10px] md:text-xs font-bold text-neutral-400 mt-1">
+                        {formatDate(order.createdAt)}
                       </span>
                     </div>
-                  </div>
 
-                  <div className="flex justify-between items-center mt-1 text-[9px] font-bold text-neutral-500">
-                    {formatDate(order.createdAt)}
-                  </div>
-
-                  <div className="flex justify-between items-end mt-3 pt-2 border-t border-village-umber/5">
-                    <div className="flex items-center gap-1">
-                      <div className="w-6 h-6 rounded bg-neutral-100 flex items-center justify-center text-[9px] font-black text-neutral-400 border border-neutral-200 uppercase">
-                        {order.status.charAt(0)}
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs md:text-xl font-black text-village-umber">₹{order.totalAmount.toFixed(0)}</span>
                       </div>
-                      <div className="flex items-center -space-x-2 ml-1">
+                      <div className="bg-[#4b7d5a]/10 px-2 py-0.5 rounded text-[8px] md:text-[10px] font-black text-[#4b7d5a] uppercase tracking-tighter">
+                        {order.totalItems} {order.totalItems === 1 ? 'item' : 'items'} Ordered
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center mt-3 md:mt-6 pt-3 md:pt-4 border-t border-village-umber/5">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center -space-x-2 md:-space-x-3">
                         {previewItems.map((item: any, idx: number) => (
                           item?.product && (
                             <div
                               key={item.product?.id || idx}
-                              className="w-6 h-6 bg-white rounded-full border border-neutral-100 flex items-center justify-center overflow-hidden shadow-sm"
+                              className="w-8 h-8 md:w-12 md:h-12 bg-white rounded-full border-2 border-white flex items-center justify-center overflow-hidden shadow-md ring-1 ring-neutral-100"
                             >
-                              <img src={item.product?.imageUrl || item.product?.mainImage} alt="" className="w-full h-full object-contain" />
+                              <img src={item.product?.imageUrl || item.product?.mainImage} alt="" className="w-full h-full object-contain p-1" />
                             </div>
                           )
                         ))}
                         {order.items.length > 3 && (
-                          <div className="w-6 h-6 bg-neutral-100 rounded-full flex items-center justify-center text-[7px] font-black text-neutral-500 border border-neutral-100">
+                          <div className="w-8 h-8 md:w-12 md:h-12 bg-[#8B3D28]/5 rounded-full flex items-center justify-center text-[10px] md:text-xs font-black text-village-umber border-2 border-white shadow-md ring-1 ring-neutral-100">
                             +{order.items.length - 3}
                           </div>
                         )}
                       </div>
+                      <span className="hidden md:inline-block ml-2 text-[11px] font-black text-village-umber/40 uppercase tracking-widest px-2">
+                        Items List
+                      </span>
                     </div>
 
                     <button
                       onClick={(e) => handleOrderAgain(order, e)}
                       disabled={addedOrders.has(order.id)}
-                      className={`h-7 px-4 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md ${
+                      className={`h-8 md:h-11 px-4 md:px-8 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-md ${
                         addedOrders.has(order.id)
                         ? 'bg-amber-100 text-amber-700 shadow-none'
-                        : 'bg-[#4A7C59] text-white hover:bg-[#3D664A] shadow-[#4A7C59]/20'
+                        : 'bg-[#4b7d5a] text-white hover:bg-[#3D664A] shadow-[#4b7d5a]/20 translate-y-0'
                       }`}
                     >
                       {addedOrders.has(order.id) ? 'Added!' : 'Order Again'}
@@ -179,51 +187,25 @@ export default function OrderAgain() {
       )}
 
       {/* Bestsellers Section */}
-      <div className="px-4 py-4">
-        <h2 className="text-[10px] font-black text-village-umber uppercase tracking-[0.2em] mb-4 opacity-70">Bestsellers</h2>
-        <div className="flex overflow-x-auto gap-3.5 pb-2 scrollbar-hide -mx-4 px-4 snap-x">
-          {bestsellerProducts.map((product) => {
-            const { displayPrice, mrp, discount, hasDiscount } = calculateProductPrice(product);
-            const cartItem = cart.items.find(item => item?.product && (item.product.id === product.id || item.product._id === product.id));
-            const inCartQty = cartItem?.quantity || 0;
+      <div className="mt-8 mb-12">
+        <div className="px-4 md:px-8 mb-4 md:mb-10">
+          <h2 className="text-[10px] md:text-sm font-black text-[#4b7d5a] uppercase tracking-[0.2em] mb-1 opacity-70">Special Picks</h2>
+          <h2 className="text-xl md:text-4xl font-black text-village-umber tracking-tighter font-poppins capitalize">
+            Bestsellers
+          </h2>
+        </div>
 
-            return (
-              <div key={product.id} className="village-card paper-texture organic-radius overflow-hidden flex flex-col bg-white min-w-[155px] max-w-[155px] snap-start">
-                <div onClick={() => navigate(`/user/product/${product.id}`)} className="relative aspect-square w-full bg-neutral-50 flex items-center justify-center p-3 cursor-pointer">
-                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain drop-shadow-md" />
-                  {discount > 0 && (
-                    <div className="absolute top-2 left-0 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-r-sm shadow-sm">
-                      {discount}% OFF
-                    </div>
-                  )}
-                  <WishlistButton productId={product.id} size="sm" className="top-2 right-2 shadow-sm" />
-                </div>
-                <div className="p-2.5 flex flex-col flex-1">
-                  <h3 className="text-[10px] font-black text-village-umber uppercase tracking-tight line-clamp-2 leading-tight mb-1 h-[24px]">{product.name}</h3>
-                  <div className="flex items-baseline gap-1 mb-2">
-                    <span className="text-xs font-black text-village-umber">₹{displayPrice}</span>
-                    {hasDiscount && <span className="text-[9px] text-neutral-400 line-through font-bold">₹{mrp}</span>}
-                  </div>
-                  <div className="mt-auto">
-                    {inCartQty === 0 ? (
-                      <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(product); }}
-                        className="w-full h-7 bg-[#4A7C59] text-white text-[9px] font-black uppercase tracking-widest rounded-lg shadow-md active:scale-95 transition-all"
-                      >
-                        Add
-                      </button>
-                    ) : (
-                      <div className="flex items-center justify-between bg-neutral-100 rounded-lg h-7 px-1">
-                        <button onClick={(e) => { e.stopPropagation(); updateQuantity(product.id, inCartQty - 1); }} className="w-5 h-5 flex items-center justify-center text-[#4A7C59] font-black">-</button>
-                        <span className="text-[10px] font-black text-village-umber">{inCartQty}</span>
-                        <button onClick={(e) => { e.stopPropagation(); updateQuantity(product.id, inCartQty + 1); }} className="w-5 h-5 flex items-center justify-center text-[#4A7C59] font-black">+</button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="px-4 md:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-6">
+            {bestsellerProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                showBadge={true}
+                categoryStyle={false}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

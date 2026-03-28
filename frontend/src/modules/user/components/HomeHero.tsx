@@ -343,7 +343,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
               <path d="M16 10a4 4 0 01-8 0" />
             </svg>
             {(cart?.itemCount || 0) > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-[#4A7C59] text-white text-[9px] font-black rounded-lg min-w-[18px] h-[18px] px-1 flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
+              <span className="absolute -top-1.5 -right-1.5 bg-[#4b7d5a] text-white text-[9px] font-black rounded-lg min-w-[18px] h-[18px] px-1 flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
                 {cart?.itemCount || 0}
               </span>
             )}
@@ -387,7 +387,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
           onClick={() => navigate('/user/location')}
           className="flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2.5 py-1.5 border border-white/5 active:scale-[0.98] transition-all cursor-pointer relative z-20"
         >
-          <div className="w-4 h-4 rounded-full bg-[#4A7C59] flex items-center justify-center shadow-sm">
+          <div className="w-4 h-4 rounded-full bg-[#4b7d5a] flex items-center justify-center shadow-sm">
             <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
             </svg>
@@ -401,31 +401,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
         </div>
       </div>
 
-      {/* Legacy/Desktop Header - Hidden on Mobile */}
-      <div className="hidden md:block">
-        <div ref={topSectionRef} className="px-4 md:px-6 lg:px-8 pt-2 md:pt-3 pb-0">
-          <div className="flex items-start justify-between mb-2 md:mb-2">
-            {/* Left: Text content */}
-            <div className="flex-1 pr-2">
-              {/* Service name & Logo */}
-              <div className="mb-0.5 flex flex-col items-start gap-1">
-                <img src={brandLogo} alt="Village Basket" className="h-[38px] md:h-[46px] object-contain" />
-              </div>
-              {/* Delivery time - large, bold, dark grey/black */}
-              
-              {/* Location with dropdown indicator - only show if location is provided */}
-              {locationDisplayText && (
-                <div className="text-neutral-700 text-[10px] md:text-xs flex items-center gap-0.5 leading-tight">
-                  <span className="line-clamp-1" title={locationDisplayText}>{locationDisplayText}</span>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Desktop Header removed - Now handled by AppLayout global header */}
 
       {/* Sticky section: Search Bar and Category Tabs - Always sticky */}
       <div
@@ -440,25 +416,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
           transition: 'background 0.3s ease-out, backdrop-filter 0.3s ease-out, box-shadow 0.3s ease-out',
         }}
       >
-        <div className="px-4 md:px-6 lg:px-8 pt-2 md:pt-2 pb-2 md:pb-2 hidden md:block">
-          {/* Desktop Search Bar Only - Animated Search moved into Top Row for Mobile */}
-          <div
-            onClick={handleSearchClick}
-            className={`w-full md:w-auto md:max-w-xl md:mx-auto rounded-2xl shadow-lg px-3 py-2 md:px-3 md:py-1.5 flex items-center gap-2 cursor-pointer hover:shadow-xl transition-all duration-300 mb-2 md:mb-1.5 ${scrollProgress > 0.5 ? 'bg-white shadow-inner' : 'bg-white'}`}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" className="text-neutral-400">
-              <circle cx="11" cy="11" r="7" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <span className="flex-1 text-neutral-400 font-medium text-sm">Search for products...</span>
-            <div className="text-neutral-300 ml-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
-              </svg>
-            </div>
-          </div>
-        </div>
+        {/* Sticky Search Bar - Removed for mobile to reduce clutter */}
 
         {/* Category Tabs Section */}
         <div className="w-full relative" style={{ paddingTop: '12px', paddingBottom: '24px' }}>
@@ -469,7 +427,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
           </div>
           <div
             ref={tabsContainerRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide px-4 md:px-6 lg:px-8 md:justify-center scroll-smooth py-4"
+            className="flex gap-4 md:gap-12 overflow-x-auto scrollbar-hide px-4 md:px-12 lg:px-24 md:justify-center scroll-smooth py-6 md:py-10"
           >
 
             {tabs.map((tab) => {

@@ -32,6 +32,7 @@ export default function Home() {
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollHandledRef = useRef(false);
   const SCROLL_POSITION_KEY = 'home-scroll-position';
+  const bestsellersScrollRef = useRef<HTMLDivElement>(null);
 
   // State for dynamic data
   const [loading, setLoading] = useState(true);
@@ -209,6 +210,17 @@ export default function Home() {
   }, []);
 
   // Removed duplicate saveScrollPosition
+  // Scroll helper for Bestsellers section
+  const scrollBestsellers = (direction: 'left' | 'right') => {
+    if (bestsellersScrollRef.current) {
+      const scrollAmount = 400;
+      bestsellersScrollRef.current.scrollBy({
+        left: direction === 'right' ? scrollAmount : -scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const getFilteredProducts = (tabId: string) => {
     if (tabId === "all") {
       return products;
@@ -263,7 +275,7 @@ export default function Home() {
       </div>
 
       {/* LOWEST PRICES EVER Section */}
-      <div className="bg-gradient-to-b from-white to-transparent pt-2 relative z-10">
+      <div className="bg-transparent pt-2 relative z-10">
         <LowestPricesEver activeTab={activeTab} products={homeData.lowestPrices} />
       </div>
 
@@ -272,7 +284,7 @@ export default function Home() {
 
       {/* Main content */}
       <div
-        className="pt-1 space-y-6 md:space-y-10 md:pt-4 relative z-10"
+        className="pt-1 space-y-6 md:space-y-10 md:pt-4 md:px-6 lg:px-12 xl:px-24 relative z-10"
       >
 
 
@@ -287,20 +299,20 @@ export default function Home() {
 
               if (section.displayType === "products" && section.data && section.data.length > 0) {
                 const gridClass = {
-                  2: "grid-cols-2",
-                  3: "grid-cols-3",
-                  4: "grid-cols-4",
-                  6: "grid-cols-6",
-                  8: "grid-cols-8"
-                }[columnCount] || "grid-cols-4";
+                  2: "grid-cols-2 md:grid-cols-4 lg:grid-cols-6",
+                  3: "grid-cols-3 md:grid-cols-6 lg:grid-cols-9",
+                  4: "grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10",
+                  6: "grid-cols-6 md:grid-cols-8 lg:grid-cols-12",
+                  8: "grid-cols-8 md:grid-cols-10 lg:grid-cols-14"
+                }[columnCount] || "grid-cols-4 md:grid-cols-8 lg:grid-cols-12";
 
                 const isCompact = columnCount >= 4;
-                const gapClass = columnCount >= 4 ? "gap-2" : "gap-3 md:gap-4";
+                const gapClass = columnCount >= 4 ? "gap-2" : "gap-3 md:gap-6 lg:gap-8";
 
                 return (
                   <div key={section.id} className="mt-6 mb-6 md:mt-8 md:mb-8">
                     {section.title && (
-                      <h2 className="text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins capitalize">
+                      <h2 className="text-xl md:text-4xl font-black text-village-umber mb-4 md:mb-10 px-4 md:px-6 lg:px-8 tracking-tighter font-poppins capitalize">
                         {section.title}
                       </h2>
                     )}
@@ -342,9 +354,21 @@ export default function Home() {
             <h2 className="text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins">
               Bestsellers
             </h2>
-            <div className="px-4 md:px-6 lg:px-8">
+            <div className="px-4 md:px-6 lg:px-8 relative group">
+              {/* Left Arrow - Web View Only */}
+              <button
+                onClick={() => scrollBestsellers('left')}
+                className="hidden md:flex absolute left-0 md:left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 backdrop-blur-sm border border-neutral-100 shadow-xl items-center justify-center text-village-umber hover:bg-[#8B3D28] hover:text-white transition-all z-30 opacity-0 group-hover:opacity-100 active:scale-95"
+                title="Previous"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+
               <div
-                className="flex items-stretch gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2"
+                ref={bestsellersScrollRef}
+                className="flex items-stretch gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2 no-scrollbar"
                 style={{ scrollSnapType: 'x mandatory' }}
               >
                 {homeData.bestsellers.map((product: any) => (
@@ -361,6 +385,17 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+
+              {/* Right Arrow - Web View Only */}
+              <button
+                onClick={() => scrollBestsellers('right')}
+                className="hidden md:flex absolute right-0 md:right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 backdrop-blur-sm border border-neutral-100 shadow-xl items-center justify-center text-village-umber hover:bg-[#8B3D28] hover:text-white transition-all z-30 opacity-0 group-hover:opacity-100 active:scale-95"
+                title="Next"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
             </div>
           </div>
         )}

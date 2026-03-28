@@ -77,8 +77,8 @@ export default function ProductCard({
   // Get quantity in cart - properly matching the default variation for this card
   const cartItem = cart.items.find((item) => {
     if (!item?.product) return false;
-    const itemProductId = item.product.id || item.product._id;
-    const productId = (product as any).id || product._id;
+    const itemProductId = String(item.product.id || item.product._id || '');
+    const productId = String((product as any).id || (product as any)._id || '');
     if (itemProductId !== productId) return false;
 
     // If product has variations, the card defaults to the first one
@@ -222,11 +222,11 @@ export default function ProductCard({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.3 }}
+      whileHover={{ y: -8, scale: 1.02 }}
+      transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 20 }}
       className={`village-card white-paper-texture organic-radius overflow-hidden flex flex-col relative h-full bg-white shadow-[0_8px_16px_rgba(0,0,0,0.06)] border border-neutral-100/50 transition-all hover:shadow-xl active:scale-[0.98] ${className}`}
     >
-      <div 
+      <div
         onClick={handleCardClick}
         className="cursor-pointer relative"
       >
@@ -247,7 +247,7 @@ export default function ProductCard({
 
           {/* Discount Badge */}
           {discount > 0 && (
-            <div className={`absolute top-2 left-0 z-10 ${categoryStyle ? 'bg-red-600' : 'bg-[#4A7C59]'} text-white text-[8px] md:text-[9px] font-black px-2 py-0.5 rounded-r-sm shadow-sm`}>
+            <div className={`absolute top-2 left-0 z-10 ${categoryStyle ? 'bg-[#1b4332]' : 'bg-[#4b7d5a]'} text-white text-[10px] md:text-[12px] font-black px-3 py-1 md:px-4 md:py-1.5 rounded-r-full shadow-md uppercase tracking-tighter`}>
               {discount}% OFF
             </div>
           )}
@@ -256,22 +256,22 @@ export default function ProductCard({
 
           {/* Wishlist Button */}
           <div className="absolute top-2 right-2 z-20">
-             <button
-                onClick={toggleWishlist}
-                className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center border border-neutral-100/50 active:scale-90 transition-transform"
+            <button
+              onClick={toggleWishlist}
+              className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center border border-neutral-100/50 active:scale-90 transition-transform"
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill={isWishlisted ? "#ef4444" : "none"}
+                className={isWishlisted ? "text-red-500" : "text-neutral-400"}
+                stroke="currentColor"
+                strokeWidth="2.5"
               >
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill={isWishlisted ? "#ef4444" : "none"}
-                  className={isWishlisted ? "text-red-500" : "text-neutral-400"}
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
-             </button>
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </button>
           </div>
 
           {/* ADD Button Overlay for Category Style */}
@@ -287,7 +287,7 @@ export default function ProductCard({
                     ref={addButtonRef}
                     disabled={product.isAvailable === false}
                     onClick={handleCustomAdd}
-                    className="bg-white/95 backdrop-blur-sm text-[#8B3D28] border-2 border-[#8B3D28] text-[10px] font-black px-3 py-1 rounded shadow-md hover:bg-white transition-colors uppercase tracking-wider"
+                    className="bg-white/95 backdrop-blur-sm text-[#4b7d5a] border-2 border-[#4b7d5a] text-[10px] font-black px-3 py-1 rounded shadow-md hover:bg-white transition-colors uppercase tracking-wider"
                   >
                     Add
                   </motion.button>
@@ -297,13 +297,13 @@ export default function ProductCard({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
-                    className="flex items-center gap-1 bg-[#8B3D28] rounded px-1.5 py-1 shadow-md"
+                    className="flex items-center gap-1 bg-[#4b7d5a] rounded px-1.5 py-1 shadow-md"
                   >
                     <button
                       onClick={handleCustomDecrease}
                       className="w-4 h-4 flex items-center justify-center text-white font-bold text-lg active:scale-90 transition-transform leading-none"
                     >−</button>
-                     <QuantityInput
+                    <QuantityInput
                       value={currentQty}
                       min={0}
                       onChange={(val) => {
@@ -327,7 +327,7 @@ export default function ProductCard({
       </div>
 
       {/* Product Content */}
-      <div 
+      <div
         onClick={handleCardClick}
         className="p-3 flex flex-col flex-1 cursor-pointer"
       >
@@ -338,20 +338,20 @@ export default function ProductCard({
             </h3>
             {/* Rating Display */}
             <div className="flex items-center gap-0.5 bg-amber-50 px-1 rounded flex-shrink-0">
-               <span className="text-[9px] font-black text-amber-700">{(product.rating || 4.5).toFixed(1)}</span>
-               <svg width="8" height="8" viewBox="0 0 24 24" fill="#F59E0B">
-                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z" />
-               </svg>
+              <span className="text-[9px] font-black text-amber-700">{(product.rating || 4.5).toFixed(1)}</span>
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="#F59E0B">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+              </svg>
             </div>
           </div>
           <span className="text-[8px] md:text-[10px] font-bold text-neutral-400 uppercase tracking-wider italic">
             Pack: {(() => {
-                const v = product.variations?.[0];
-                if (!v) return (product.pack || 'Standard').trim();
-                const vName = (v.name || '').trim();
-                const isPlaceholder = !vName || vName.toLowerCase() === 'variation' || vName.toLowerCase() === 'standard';
-                return (isPlaceholder ? (v.value || v.title || vName) : vName).trim() || (product.pack || 'Standard').trim();
-              })()}
+              const v = product.variations?.[0];
+              if (!v) return (product.pack || 'Standard').trim();
+              const vName = (v.name || '').trim();
+              const isPlaceholder = !vName || vName.toLowerCase() === 'variation' || vName.toLowerCase() === 'standard';
+              return (isPlaceholder ? (v.value || v.title || vName) : vName).trim() || (product.pack || 'Standard').trim();
+            })()}
           </span>
         </div>
 
@@ -362,7 +362,7 @@ export default function ProductCard({
               <span className="text-[9px] md:text-[10px] text-neutral-400 line-through font-bold">₹{mrp}</span>
             )}
           </div>
-          
+
           {!categoryStyle && (
             <div className="mt-3">
               {inCartQty === 0 ? (
@@ -370,21 +370,20 @@ export default function ProductCard({
                   ref={addButtonRef}
                   disabled={product.isAvailable === false}
                   onClick={handleCustomAdd}
-                  className={`w-full h-8 md:h-10 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 ${
-                    product.isAvailable === false
-                    ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed uppercase'
-                    : 'bg-[#4A7C59] text-white hover:bg-[#3D664A] shadow-[#4A7C59]/20 translate-z-0'
-                  }`}
+                  className={`w-full h-8 md:h-10 rounded-xl text-[10px] md:text-sm font-black uppercase tracking-widest transition-all active:scale-95 ${product.isAvailable === false
+                    ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed uppercase border-none'
+                    : 'bg-[#4b7d5a] text-white md:bg-white md:border-[1.5px] md:border-[#4b7d5a] md:text-[#4b7d5a] md:shadow-none md:hover:bg-[#4b7d5a] md:hover:text-white translate-z-0'
+                    }`}
                 >
                   {product.isAvailable === false ? 'Out' : 'Add'}
                 </button>
               ) : (
-                <div className="flex items-center justify-between bg-[#8B3D28]/5 rounded-xl border border-[#8B3D28]/10 h-8 md:h-10 px-1 shadow-inner">
+                <div className="flex items-center justify-between bg-[#4b7d5a]/5 rounded-xl border border-[#4b7d5a]/10 h-8 md:h-10 px-1 shadow-inner">
                   <button
                     onClick={handleCustomDecrease}
-                    className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-white text-[#8B3D28] shadow-sm flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
+                    className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-white text-[#4b7d5a] shadow-sm flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
                   >−</button>
-                   <QuantityInput
+                  <QuantityInput
                     value={currentQty}
                     min={0}
                     onChange={(val) => {
@@ -393,11 +392,11 @@ export default function ProductCard({
                       const variantTitle = product.variations && product.variations.length > 0 ? String(product.variations[0].name || product.variations[0].title || product.variations[0].value) : (product.pack || undefined);
                       updateQuantity(productId, val, variant, variantTitle);
                     }}
-                    className="text-[11px] md:text-sm font-black text-[#8B3D28] w-8 text-center bg-transparent border-none focus:outline-none"
+                    className="text-[11px] md:text-sm font-black text-[#4b7d5a] w-8 text-center bg-transparent border-none focus:outline-none"
                   />
                   <button
                     onClick={handleIncrease}
-                    className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-[#8B3D28] text-white shadow-md flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
+                    className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-[#4b7d5a] text-white shadow-md flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
                   >+</button>
                 </div>
               )}

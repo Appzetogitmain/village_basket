@@ -566,7 +566,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
 
   return (
     <div
-      className="relative overflow-hidden bg-[#893826]"
+      className="relative overflow-hidden bg-[#893826] md:rounded-[2.5rem] md:mx-4 md:mt-4 md:shadow-[0_20px_50px_rgba(139,61,40,0.3)]"
       style={{
         paddingTop: "12px",
         paddingBottom: "16px",
@@ -577,21 +577,21 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
       <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
       
       {/* Ultra-Slim Header Ribbon */}
-      <div className="px-4 mb-3 flex items-center justify-between relative z-10">
-        <div className="flex items-center gap-2">
+      <div className="px-4 md:px-8 mb-3 md:mb-6 flex items-center justify-between relative z-10">
+        <div className="flex items-center gap-2 md:gap-3">
           <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
-          <h1 className="text-white font-black text-xs tracking-wider uppercase font-poppins">
+          <h1 className="text-white font-black md:font-bold text-xs md:text-3xl tracking-wider uppercase font-poppins">
             {headingText}
           </h1>
           <div className="h-3 w-[1px] bg-white/20"></div>
-          <span className="text-[10px] font-bold text-white/50 uppercase">
+          <span className="text-[10px] md:text-sm font-bold md:font-semibold text-white/50 uppercase">
             {saleTextValue}
           </span>
         </div>
         
         {dateRange && (
-          <div className="px-2 py-0.5 rounded-full bg-white/10 border border-white/10">
-            <span className="text-white/60 text-[8px] font-black uppercase tracking-widest">{dateRange.split('-')[1] || dateRange}</span>
+          <div className="px-2 py-0.5 md:px-4 md:py-1 rounded-full bg-white/10 border border-white/10">
+            <span className="text-white/60 text-[8px] md:text-xs font-black md:font-bold uppercase tracking-widest">{dateRange.split('-')[1] || dateRange}</span>
           </div>
         )}
       </div>
@@ -600,42 +600,41 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
       <div className="relative z-10">
         <div 
           ref={containerRef}
-          className="flex gap-2.5 overflow-x-auto px-4 pb-1 scrollbar-hide no-scrollbar"
+          className="flex md:justify-center gap-2.5 md:gap-6 overflow-x-auto md:overflow-visible px-4 md:px-8 pb-1 md:pb-6 scrollbar-hide no-scrollbar"
         >
           {/* Featured "Deal of Day" Card */}
-          <div className="flex-shrink-0 w-[140px] promo-card">
+          <div className="flex-shrink-0 w-[140px] md:w-[200px] promo-card">
             <div
               onClick={handleProductClick}
-              className="h-[140px] bg-white rounded-[1.5rem] p-3 flex flex-col justify-between relative overflow-hidden shadow-lg active:scale-[0.98] transition-all cursor-pointer border border-white/5"
+              className="h-[140px] md:h-[260px] bg-white rounded-[1.5rem] md:rounded-[2rem] p-3 md:p-6 flex flex-col justify-between relative overflow-hidden shadow-lg hover:shadow-xl md:hover:-translate-y-1 transition-all duration-500 cursor-pointer border border-white/5 group"
             >
               <div className="flex flex-col">
-                <div className="bg-[#4A7C59] text-white text-[7px] font-black px-1.5 py-0.5 rounded-full inline-block uppercase tracking-tighter mb-1.5 self-start ring-2 ring-[#4A7C59]/10">
+                <div className="bg-[#4b7d5a] text-white text-[7px] md:text-xs font-black md:font-bold px-1.5 py-0.5 md:px-3 md:py-1 rounded-full inline-block uppercase tracking-tighter md:tracking-normal mb-1.5 md:mb-3 self-start ring-2 ring-[#4b7d5a]/10">
                    {crazyDealsTitle}
                 </div>
-                <div className="text-village-umber font-black text-[10px] leading-tight line-clamp-2 uppercase tracking-tighter">
+                <div className="text-village-umber font-black md:font-bold text-[10px] md:text-base leading-tight line-clamp-2 uppercase tracking-tighter md:tracking-normal group-hover:text-[#8B3D28] transition-colors">
                   {displayProduct.productName || displayProduct.name}
                 </div>
               </div>
 
               <div
                 ref={productImageRef}
-                className="flex items-center justify-center -my-1 mx-auto"
-                style={{ height: "55px", width: "100%" }}>
-                  <div className="absolute w-12 h-12 bg-[#8B3D28]/5 rounded-full blur-xl"></div>
+                className="flex items-center justify-center mx-auto mb-2 md:mt-5 md:mb-6 h-[55px] md:h-[80px] w-full relative">
+                  <div className="absolute w-12 h-12 md:w-24 md:h-24 bg-[#8B3D28]/5 rounded-full blur-xl md:blur-3xl group-hover:scale-110 transition-transform"></div>
                   {displayProduct.imageUrl ? (
                     <img
                       src={displayProduct.imageUrl}
                       alt=""
-                      className="max-w-full max-h-full object-contain drop-shadow-lg relative z-10"
+                      className="max-w-full max-h-[55px] md:max-h-[85px] object-contain drop-shadow-lg relative z-10 group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
-                    <span className="text-2xl relative z-10">📦</span>
+                    <span className="text-2xl md:text-4xl relative z-10">📦</span>
                   )}
               </div>
 
-              <div className="w-full bg-[#8B3D28] rounded-xl py-1 px-2 flex items-center justify-center gap-1.5 shadow-md">
-                <span className="text-white/40 text-[7px] font-black line-through">₹{safeOriginalPrice}</span>
-                <span className="text-white text-[10px] font-black">₹{safeDiscountedPrice}</span>
+              <div className="w-full bg-[#4b7d5a] rounded-xl md:rounded-2xl py-1 md:py-1.5 px-2 md:px-4 flex items-center justify-center gap-1.5 md:gap-2 shadow-md mb-2 md:mb-5 transition-all group-hover:brightness-110">
+                <span className="text-white/40 text-[7px] md:text-xs font-black md:font-bold line-through">₹{safeOriginalPrice}</span>
+                <span className="text-white text-[10px] md:text-base font-black md:font-bold">₹{safeDiscountedPrice}</span>
               </div>
             </div>
           </div>
@@ -647,28 +646,28 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
             const categoryIcons = getCategoryIcons(card.categoryId || "");
 
             return (
-              <div key={`${card.id || 'promo'}-${index}`} className="flex-shrink-0 w-[125px] promo-card">
+              <div key={`${card.id || 'promo'}-${index}`} className="flex-shrink-0 w-[125px] md:w-[180px] promo-card">
                 <Link
                   to={card.type === 'product' ? `/user/product/${card.productId}` : (card.slug || card.categoryId ? `/user/category/${card.slug || card.categoryId}` : "#")}
-                  className="h-[140px] bg-white rounded-[1.5rem] p-3 flex flex-col overflow-hidden relative shadow-md no-underline group active:scale-[0.98] transition-all"
+                  className="h-[140px] md:h-[260px] bg-white rounded-[1.5rem] md:rounded-[1.8rem] p-3 md:p-5 flex flex-col overflow-hidden relative shadow-md hover:shadow-xl md:hover:-translate-y-1 no-underline group active:scale-[0.98] transition-all duration-500"
                 >
-                  <div className="bg-[#4A7C59] text-white text-[7px] font-black px-1.5 py-0.5 rounded-full inline-block uppercase tracking-tighter mb-2 self-start ring-2 ring-[#4A7C59]/10">
+                  <div className="bg-[#4b7d5a] text-white text-[7px] md:text-xs font-black md:font-bold px-1.5 py-0.5 md:px-3 md:py-1 rounded-full inline-block uppercase tracking-tighter md:tracking-normal mb-2 md:mb-4 self-start ring-2 ring-[#4b7d5a]/10 group-hover:scale-105 transition-transform">
                     {card.badge}
                   </div>
 
-                  <div className="text-village-umber font-black text-[9px] leading-tight line-clamp-2 uppercase italic tracking-tighter mb-1">
+                  <div className="text-village-umber font-black md:font-bold text-[9px] md:text-base leading-tight line-clamp-2 uppercase italic tracking-tighter md:tracking-normal mb-1 md:mb-4 group-hover:text-[#8B3D28] transition-colors">
                     {card.title}
                   </div>
 
-                  <div className="mt-auto flex items-center justify-center w-full relative h-[55px]">
-                    <div className="absolute inset-x-0 bottom-0 h-[35px] bg-[#8B3D28]/5 rounded-xl"></div>
-                    <div className="flex -space-x-2 relative z-10">
+                  <div className="mt-auto flex items-center justify-center w-full relative h-[55px] md:h-[90px]">
+                    <div className="absolute inset-x-0 bottom-0 h-[35px] md:h-[60px] bg-[#8B3D28]/5 rounded-xl md:rounded-[1.8rem] group-hover:bg-[#8B3D28]/10 transition-colors"></div>
+                    <div className="flex -space-x-2 md:-space-x-6 relative z-10">
                       {hasSubcategoryImages
                         ? subcategoryImages.slice(0, 3).map((imageUrl, idx) => (
                           <div
                             key={idx}
-                            className="w-8 h-8 bg-white rounded-full overflow-hidden border-2 border-white shadow-sm"
-                            style={{ zIndex: 3 - idx }}>
+                            className="w-8 h-8 md:w-14 md:h-14 bg-white rounded-full overflow-hidden border-2 md:border-4 border-white shadow-lg group-hover:scale-110 transition-transform"
+                            style={{ zIndex: 3 - idx, transitionDelay: `${idx * 50}ms` }}>
                              <img
                               src={imageUrl}
                               alt=""
@@ -678,14 +677,15 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                                 target.style.display = "none";
                                 const parent = target.parentElement;
                                 if (parent) {
-                                  parent.innerHTML =`<div class="w-full h-full flex items-center justify-center text-[10px] font-bold bg-neutral-50">${categoryIcons[idx] || "📦"}</div>`;
+                                  parent.innerHTML =`<div class="w-full h-full flex items-center justify-center text-[10px] font-semibold bg-neutral-50">${categoryIcons[idx] || "📦"}</div>`;
                                 }
                               }}
                             />
                           </div>
                         ))
                         : categoryIcons.slice(0, 2).map((icon, idx) => (
-                          <div key={idx} className="w-8 h-8 bg-neutral-50 rounded-full border-2 border-white flex items-center justify-center text-[10px]">
+                          <div key={idx} className="w-8 h-8 md:w-14 md:h-14 bg-neutral-50 rounded-full border-2 md:border-4 border-white flex items-center justify-center text-[10px] md:text-xl shadow-lg"
+                               style={{ zIndex: 3 - idx }}>
                             {icon}
                           </div>
                         ))}
