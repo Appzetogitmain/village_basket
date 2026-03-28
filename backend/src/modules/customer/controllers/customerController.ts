@@ -233,7 +233,7 @@ export const getLocation = asyncHandler(async (req: Request, res: Response) => {
 /**
  * Get delivery configuration for customers
  */
-export const getDeliveryConfig = asyncHandler(async (req: Request, res: Response) => {
+export const getDeliveryConfig = asyncHandler(async (_req: Request, res: Response) => {
   const settings = await AppSettings.findOne().select("deliveryConfig platformFee deliveryCharges freeDeliveryThreshold");
   
   return res.status(200).json({
