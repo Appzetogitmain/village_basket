@@ -307,8 +307,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </div>
           </main>
 
-          {/* Floating Cart Pill */}
-          <FloatingCartPill />
+          {/* Floating Cart Pill - Desktop (hidden on mobile to prevent duplicate keys/animations) */}
+          <div className="hidden md:block">
+            <FloatingCartPill />
+          </div>
 
           {/* Location Permission Request Modal - Mandatory for all users */}
           {showLocationRequest && (

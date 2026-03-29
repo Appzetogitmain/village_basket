@@ -50,13 +50,20 @@ export default function VariationSelectionModal({
     const isGeneric = !vName || ['variation', 'standard'].includes(vName.toLowerCase());
     const title = (isGeneric ? (variant.value || variant.title || vName) : vName).trim() || 'Standard';
 
+    const getIdStr = (id: any): string => {
+      if (!id) return "";
+      if (typeof id === "string") return id;
+      if (id.$oid) return id.$oid;
+      return String(id);
+    };
+
     const cartProduct = {
       ...product,
       price: displayPrice,
       mrp: mrp,
       pack: title,
       selectedVariant: variant,
-      variantId: variant?._id,
+      variantId: getIdStr(variant?._id),
       variantTitle: title,
     };
 

@@ -72,21 +72,36 @@ export default function ProductCard({
   // Single ref to track any cart operation in progress for this product
   const isOperationPendingRef = useRef(false);
 
+  // Helper to extract string ID from MongoDB format if needed
+  const getIdStr = (id: any): string => {
+    if (!id) return "";
+    if (typeof id === "string") return id;
+    if (id.$oid) return id.$oid;
+    return String(id);
+  };
+
+  // Pre-calculate default variation info if available
+  const defaultVariation = product.variations && product.variations.length > 0 ? product.variations[0] : null;
+  const defaultVarId = defaultVariation ? getIdStr(defaultVariation._id || (defaultVariation as any).id) : null;
+  const defaultVarTitle = defaultVariation ? (defaultVariation.value || defaultVariation.name || defaultVariation.title) : (product.pack || null);
 
 
   // Get quantity in cart - properly matching the default variation for this card
   const cartItem = cart.items.find((item) => {
     if (!item?.product) return false;
-    const itemProductId = String(item.product.id || item.product._id || '');
-    const productId = String((product as any).id || (product as any)._id || '');
+    const itemProductId = getIdStr(item.product.id || item.product._id);
+    const productId = getIdStr((product as any).id || product._id);
     if (itemProductId !== productId) return false;
 
     // If product has variations, the card defaults to the first one
     if (product.variations && product.variations.length > 0) {
-      const defaultVariant = product.variations[0];
-      const defaultVariantId = defaultVariant?._id || (defaultVariant as any).id || (defaultVariant as any).name || "Standard";
-      const itemVariant = (item.product as any).variantId || (item.product as any).selectedVariant?._id || (item.product as any).variantTitle || (item.product as any).pack;
-      return itemVariant === defaultVariantId;
+      const itemVariantId = getIdStr((item.product as any).variantId || (item.product as any).selectedVariant?._id);
+      const itemVariantValue = String((item.product as any).variantTitle || (item.product as any).pack || item.variant || "");
+      
+      // Match by ID OR by value/title (name) to be extra robust
+      return (defaultVarId && itemVariantId === defaultVarId) || 
+             (defaultVarTitle && itemVariantValue === defaultVarTitle) ||
+             (defaultVarId && itemVariantValue === defaultVarId); // Case where ID was stored in 'variation' field as string
     }
     return true;
   });
@@ -120,7 +135,18 @@ export default function ProductCard({
         setIsVariationModalOpen(true);
         return;
       }
-      await addToCart(product, addButtonRef.current);
+      
+      // Pass variation info for consistency if available, even for single variation products
+      if (defaultVarId || defaultVarTitle) {
+        const productWithVariation = {
+          ...product,
+          variantId: defaultVarId,
+          variantTitle: defaultVarTitle
+        };
+        await addToCart(productWithVariation, addButtonRef.current);
+      } else {
+        await addToCart(product, addButtonRef.current);
+      }
     } finally {
       // Reset the flag after the operation truly completes
       isOperationPendingRef.current = false;
@@ -139,9 +165,9 @@ export default function ProductCard({
     isOperationPendingRef.current = true;
 
     try {
-      const productId = ((product as any).id || product._id) as string;
-      const variant = product.variations && product.variations.length > 0 ? String(product.variations[0]._id || product.variations[0].name || product.variations[0].title) : undefined;
-      const variantTitle = product.variations && product.variations.length > 0 ? String(product.variations[0].name || product.variations[0].title || product.variations[0].value) : (product.pack || undefined);
+      const productId = getIdStr((product as any).id || product._id);
+      const variant = defaultVarId || defaultVarTitle || undefined;
+      const variantTitle = defaultVarTitle || undefined;
       await updateQuantity(productId, inCartQty - 1, variant, variantTitle);
     } finally {
       // Reset the flag after the operation truly completes
@@ -176,12 +202,13 @@ export default function ProductCard({
         return;
       }
       if (inCartQty > 0) {
-        const productId = ((product as any).id || product._id) as string;
-        const variant = product.variations && product.variations.length > 0 ? String(product.variations[0]._id || product.variations[0].name || product.variations[0].title) : undefined;
-        const variantTitle = product.variations && product.variations.length > 0 ? String(product.variations[0].name || product.variations[0].title || product.variations[0].value) : (product.pack || undefined);
+        const productId = getIdStr((product as any).id || product._id);
+        const variant = defaultVarId || defaultVarTitle || undefined;
+        const variantTitle = defaultVarTitle || undefined;
         await updateQuantity(productId, inCartQty + 1, variant, variantTitle);
       } else {
-        await addToCart(product, addButtonRef.current);
+        // Fallback to handleAdd logic for first time add
+        await handleAdd(e);
       }
     } finally {
       // Reset the flag after the operation truly completes
@@ -307,9 +334,9 @@ export default function ProductCard({
                       value={currentQty}
                       min={0}
                       onChange={(val) => {
-                        const productId = ((product as any).id || product._id) as string;
-                        const variant = product.variations && product.variations.length > 0 ? String(product.variations[0]._id || product.variations[0].name || product.variations[0].title) : undefined;
-                        const variantTitle = product.variations && product.variations.length > 0 ? String(product.variations[0].name || product.variations[0].title || product.variations[0].value) : (product.pack || undefined);
+                        const productId = getIdStr((product as any).id || product._id);
+                        const variant = defaultVarId || defaultVarTitle || undefined;
+                        const variantTitle = defaultVarTitle || undefined;
                         updateQuantity(productId, val, variant, variantTitle);
                       }}
                       className="text-white font-bold w-6 text-center bg-transparent border-none focus:outline-none text-xs"
@@ -402,9 +429,9 @@ export default function ProductCard({
                     value={currentQty}
                     min={0}
                     onChange={(val) => {
-                      const productId = ((product as any).id || product._id) as string;
-                      const variant = product.variations && product.variations.length > 0 ? String(product.variations[0]._id || product.variations[0].name || product.variations[0].title) : undefined;
-                      const variantTitle = product.variations && product.variations.length > 0 ? String(product.variations[0].name || product.variations[0].title || product.variations[0].value) : (product.pack || undefined);
+                      const productId = getIdStr((product as any).id || product._id);
+                      const variant = defaultVarId || defaultVarTitle || undefined;
+                      const variantTitle = defaultVarTitle || undefined;
                       updateQuantity(productId, val, variant, variantTitle);
                     }}
                     className="text-[11px] md:text-sm font-black text-[#4b7d5a] w-8 text-center bg-transparent border-none focus:outline-none"

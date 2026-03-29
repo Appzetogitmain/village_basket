@@ -334,9 +334,9 @@ export default function AddToCartAnimation({
             >
               {/* Left: Product thumbnails */}
               <div className="flex items-center -space-x-4">
-                {thumbnailItems.map((item, idx) => (
+                {thumbnailItems.map((item: any, idx) => (
                   <motion.div
-                    key={item.product._id || item.product.id || `item-${idx}`}
+                    key={item.id || `${item.product._id || item.product.id || 'item'}-${idx}`}
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{
