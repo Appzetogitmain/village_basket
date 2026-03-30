@@ -22,7 +22,7 @@ interface AddToCartEvent {
 
 interface CartContextType {
   cart: Cart;
-  addToCart: (product: Product, sourceElement?: HTMLElement | null) => Promise<void>;
+  addToCart: (product: Product, sourceElement?: HTMLElement | null, quantity?: number) => Promise<void>;
   removeFromCart: (productId: string, variant?: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number, variantId?: string, variantTitle?: string) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -79,6 +79,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           pack: item.product.pack || '1 unit',
           categoryId: String(item.product.category || ''),
           description: item.product.description,
+          minWholesaleQuantity: item.product.minWholesaleQuantity,
           variantId: item.variation // Preserving variation ID/value
         },
         quantity: item.quantity,
@@ -166,7 +167,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     };
   }, [items, estimatedFee, platformFee, freeDeliveryThreshold]);
 
-  const addToCart = async (product: Product, sourceElement?: HTMLElement | null) => {
+  const addToCart = async (product: Product, sourceElement?: HTMLElement | null, quantity?: number) => {
     // Get consistent product ID - MongoDB returns _id, frontend expects id
     const productId = product._id || product.id;
     if (!productId) return;
@@ -185,6 +186,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
       imageUrl: product.imageUrl || product.mainImage,
     };
 
+    // Determine the variant info for matching
+    const variantId = (product as any).variantId || (product as any).selectedVariant?._id;
+    const variantTitle = (product as any).variantTitle || (product as any).pack;
+
+    // Check if the item already exists in the cart
+    const existingItem = items.find((item) => {
+      if (!item?.product) return false;
+      const itemProductId = item.product.id || item.product._id;
+      const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
+      const itemVariantTitle = (item.product as any).variantTitle || (item.product as any).pack;
+
+      if (variantId || variantTitle) {
+        return itemProductId === productId && (itemVariantId === variantId || itemVariantTitle === variantTitle);
+      }
+      return itemProductId === productId && !itemVariantId && !itemVariantTitle;
+    });
+
+    // Calculate quantity to add
+    let qtyToAdd = quantity || 1;
+    
+    // For wholesale users, if the item is NOT in the cart, add the minimum wholesale quantity
+    if (isWholesale && !existingItem && !quantity) {
+      qtyToAdd = product.minWholesaleQuantity || 1;
+    }
+
     // Optimistic Update
     // Get source position if element is provided
     let sourcePosition: { x: number; y: number } | undefined;
@@ -201,55 +227,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Optimistically update state
     const previousItems = [...items];
     setItems((prevItems) => {
-      // Filter out null products and find existing item
       const validItems = prevItems.filter(item => item?.product);
-
-      // Check for variant ID or variant title if product has variants
-      const variantId = (product as any).variantId || (product as any).selectedVariant?._id;
-      const variantTitle = (product as any).variantTitle || (product as any).pack;
-
-      // Find existing item - match by product ID and variant (if variant exists)
-      const existingItem = validItems.find((item) => {
-        const itemProductId = item.product.id || item.product._id;
-        const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
-        const itemVariantTitle = (item.product as any).variantTitle || (item.product as any).pack;
-
-        // If both have variants, match by variant ID or title
-        if (variantId || variantTitle) {
-          return itemProductId === productId &&
-            (itemVariantId === variantId || itemVariantTitle === variantTitle);
-        }
-        // If no variant, match by product ID only
-        return itemProductId === productId && !itemVariantId && !itemVariantTitle;
-      });
-
+      
       if (existingItem) {
         return validItems.map((item) => {
           const itemProductId = item.product.id || item.product._id;
           const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
           const itemVariantTitle = (item.product as any).variantTitle || (item.product as any).pack;
 
-          // Match by product ID and variant
           const isMatch = variantId || variantTitle
             ? itemProductId === productId && (itemVariantId === variantId || itemVariantTitle === variantTitle)
             : itemProductId === productId && !itemVariantId && !itemVariantTitle;
 
           return isMatch
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + qtyToAdd }
             : item;
         });
       }
-      return [...validItems, { product: normalizedProduct, quantity: 1 }];
+      return [...validItems, { product: normalizedProduct, quantity: qtyToAdd }];
     });
 
     // Only sync to API if user is authenticated
     if (isAuthenticated && user?.userType === 'Customer') {
       try {
         // Pass variation info to API if available
-        const variation = (product as any).variantId || (product as any).selectedVariant?._id || (product as any).variantTitle || (product as any).pack;
+        const variation = variantId || variantTitle;
         const response = await apiAddToCart(
           productId,
-          1,
+          qtyToAdd,
           variation,
           location?.latitude,
           location?.longitude
@@ -273,7 +278,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     } else {
       // For unregistered users, the optimistic update is already saved to localStorage
-      // Remove from pending operations immediately
       pendingOperationsRef.current.delete(productId);
     }
   };
@@ -340,11 +344,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const updateQuantity = async (productId: string, quantity: number, variantId?: string, variantTitle?: string) => {
     if (!productId) return;
 
-    if (quantity <= 0) {
-      removeFromCart(productId, variantId || variantTitle);
-      return;
-    }
-
     // Create a unique operation key for this product/variant combination
     const operationKey = variantId ? `${productId}-${variantId}` : (variantTitle ? `${productId}-${variantTitle}` : productId);
 
@@ -373,12 +372,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return !itemVariantId && !itemVariantTitle;
     });
 
-    if (isWholesale && itemToUpdate) {
-        const minQty = itemToUpdate.product.minWholesaleQuantity || 1;
-        if (quantity < minQty) {
-            showToast(`Wholesale minimum order quantity is ${minQty}`, 'error');
-            return;
+    // Wholesale MOQ check: If decreasing below MOQ, force removal (jump to 0) 
+    // This allows wholesalers to remove items they no longer want without getting stuck at the MOQ.
+    let finalQuantity = quantity;
+    if (isWholesale && itemToUpdate && quantity > 0) {
+      // Find variation-specific MOQ if applicable
+      const variantKey = (itemToUpdate.product as any).variantId;
+      let minQty = itemToUpdate.product.minWholesaleQuantity || 1;
+
+      if (variantKey && itemToUpdate.product.variations?.length) {
+        const variation = itemToUpdate.product.variations.find((v: any) => 
+          (v._id && v._id.toString() === variantKey.toString()) || 
+          v._id === variantKey || 
+          v.id === variantKey || 
+          v.name === variantKey || 
+          v.value === variantKey || 
+          v.title === variantKey
+        );
+        if (variation && (variation as any).minWholesaleQuantity) {
+          minQty = (variation as any).minWholesaleQuantity;
         }
+      }
+
+      if (quantity < minQty) {
+        finalQuantity = 0; // Force total removal
+      }
+    }
+
+    if (finalQuantity <= 0) {
+      // Release lock before calling another locked function
+      pendingOperationsRef.current.delete(operationKey);
+      await removeFromCart(productId, variantId || variantTitle);
+      return;
     }
 
     const previousItems = [...items];

@@ -31,7 +31,7 @@ export const getProducts = async (req: Request, res: Response) => {
     };
 
     // Determine user type for pricing (retail by default)
-    const userType = (req as any).user?.userType === 'wholesale' ? 'wholesale' : 'retail';
+    const userType = (req as any).user?.customerType === 'wholesale' ? 'wholesale' : 'retail';
     const priceField = userType === 'wholesale' ? 'wholesalePrice' : 'retailPrice';
     const discPriceField = userType === 'wholesale' ? 'wholesaleDiscPrice' : 'retailDiscPrice';
 
@@ -228,7 +228,7 @@ export const getProductById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { latitude, longitude } = req.query; // User location
-    const userType = (req as any).user?.userType === 'wholesale' ? 'wholesale' : 'retail';
+    const userType = (req as any).user?.customerType === 'wholesale' ? 'wholesale' : 'retail';
     const priceField = userType === 'wholesale' ? 'wholesalePrice' : 'retailPrice';
     const discPriceField = userType === 'wholesale' ? 'wholesaleDiscPrice' : 'retailDiscPrice';
 

@@ -282,11 +282,8 @@ export default function ProductDetail() {
         variantId: selectedVariant?._id,
         variantTitle: variantTitle,
       };
-      // We need to modify addToCart to accept quantity, but the current context might only add 1
-      // Let's check CartContext.tsx again.
-      for (let i = 0; i < minQty; i++) {
-        addToCart(productWithVariant, i === 0 ? addButtonRef.current : null);
-      }
+
+      addToCart(productWithVariant, addButtonRef.current, minQty);
       showToast(`Added minimum wholesale quantity (${minQty}) to cart`, 'success');
       return;
     }

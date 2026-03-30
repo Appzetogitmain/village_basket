@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { sendOTP, verifyOTP } from '../../services/api/auth/customerAuthService';
 import { useAuth } from '../../context/AuthContext';
 import OTPInput from '../../components/OTPInput';
@@ -8,7 +8,9 @@ import loginAnimation from '../../../assets/login/login_screen3.json';
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+  const intendedCustomerType = (location.state?.accountType || location.state?.customerType || 'retail') as 'retail' | 'wholesale';
   const [mobileNumber, setMobileNumber] = useState('');
   const [showOTP, setShowOTP] = useState(false);
   const [sessionId, setSessionId] = useState('');
@@ -39,17 +41,15 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await verifyOTP(mobileNumber, otp, sessionId);
+      const response = await verifyOTP(mobileNumber, otp, sessionId, intendedCustomerType);
       if (response.success && response.data) {
         // Update auth context with user data
         login(response.data.token, {
-          id: response.data.user.id,
-          name: response.data.user.name,
-          phone: response.data.user.phone,
-          email: response.data.user.email,
-          walletAmount: response.data.user.walletAmount,
-          refCode: response.data.user.refCode,
-          status: response.data.user.status,
+          ...response.data.user,
+          // Ensure all identifying fields are stored for price calculations
+          customerType: response.data.user.customerType,
+          accountType: response.data.user.customerType,
+          userType: 'Customer'
         });
         navigate('/user');
       }

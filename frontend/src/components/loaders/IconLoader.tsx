@@ -29,7 +29,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   useEffect(() => {
     // List of rotating Indian Village animations provided by the user
     const ROTATING_ANIMATIONS = [
-      'indian_woman_vegetables.json',
+      'Basket.json',
       'india_man_mango_plucking.json',
       'indian_man_choose_fruits.json',
       'indian_man_spices.json'
@@ -76,7 +76,6 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
 
   const currentAnimation = currentAnimationName;
   const isExtraLarge = currentAnimation === 'indian_man_spices.json' ||
-    currentAnimation === 'indian_woman_vegetables.json' ||
     currentAnimation === 'bullock_cart.json';
 
   const renderAnimation = () => {
@@ -85,7 +84,9 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
     // Tailored sizes for different animation types
     let sizeClasses = "w-[600px] h-[600px]"; // Primary animations scale (Bullock Cart, Spices, Vegetables)
 
-    if (isRotatingVariant && !isExtraLarge) {
+    if (currentAnimation === 'Basket.json') {
+      sizeClasses = "w-[180px] h-[180px]"; // Basket is specifically much smaller
+    } else if (isRotatingVariant && !isExtraLarge) {
       sizeClasses = "w-[300px] h-[300px]"; // Further reduced scale for mango and fruit scenes for more compactness
     }
 
@@ -190,7 +191,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
               <div className={`text-center ${(() => {
                 const marginMap: Record<string, string> = {
                   'bullock_cart.json': '-mt-24',
-                  'indian_woman_vegetables.json': '-mt-24',
+                  'Basket.json': 'mt-0',
                   'indian_man_spices.json': '-mt-72',
                   'india_man_mango_plucking.json': 'mt-0', // Default for small ones
                   'indian_man_choose_fruits.json': 'mt-0', // Default for small ones

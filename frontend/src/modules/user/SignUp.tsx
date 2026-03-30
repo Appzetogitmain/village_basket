@@ -16,11 +16,12 @@ export default function SignUp() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Frontend only: Simulate success and navigate back to login
-    setTimeout(() => {
-      setLoading(false);
-      navigate('/user/login');
-    }, 1500);
+
+    // Convert 'retailer'/'wholesaler' UI terms to 'retail'/'wholesale' for the system
+    const systemAccountType = formData.accountType === 'wholesaler' ? 'wholesale' : 'retail';
+
+    // Real flow: Navigate to login (OTP) and pass the intended account type
+    navigate('/user/login', { state: { accountType: systemAccountType } });
   };
 
   return (
@@ -55,7 +56,7 @@ export default function SignUp() {
             <p className="text-neutral-500 text-xs font-bold uppercase tracking-widest mt-1 opacity-60">Join the Village Network</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="w-full space-y-5">
+          <form onSubmit={handleSubmit} className="w-full space-y-6">
             {/* Name */}
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Full Name</label>
@@ -112,6 +113,7 @@ export default function SignUp() {
                     : 'border-neutral-100 text-neutral-400 bg-white hover:bg-neutral-50'}`}
                 >
                   Retailer
+
                 </button>
                 <button
                   type="button"
@@ -121,6 +123,7 @@ export default function SignUp() {
                     : 'border-neutral-100 text-neutral-400 bg-white hover:bg-neutral-50'}`}
                 >
                   Wholesaler
+
                 </button>
               </div>
             </div>
@@ -130,7 +133,13 @@ export default function SignUp() {
               disabled={loading}
               className="w-full h-12 bg-[#8B3D28] text-white rounded-xl font-black uppercase tracking-[0.2em] text-xs shadow-lg shadow-[#8B3D28]/20 transition-all active:scale-95 duration-300 mt-6 flex items-center justify-center"
             >
-              {loading ? 'Creating Account...' : 'Sign Up'}
+              <div className="absolute inset-0 w-full h-full bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Creating Account...</span>
+                </div>
+              ) : 'Sign Up Now'}
             </button>
           </form>
 

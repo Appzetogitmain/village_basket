@@ -136,6 +136,9 @@ export default function ProductCard({
         return;
       }
       
+      const isWholesale = user?.customerType === 'wholesale';
+      const minQty = defaultVariation?.minWholesaleQuantity || product.minWholesaleQuantity || 1;
+
       // Pass variation info for consistency if available, even for single variation products
       if (defaultVarId || defaultVarTitle) {
         const productWithVariation = {
@@ -146,6 +149,10 @@ export default function ProductCard({
         await addToCart(productWithVariation, addButtonRef.current);
       } else {
         await addToCart(product, addButtonRef.current);
+      }
+
+      if (isWholesale && minQty > 1) {
+        showToast(`Added minimum wholesale quantity (${minQty})`, 'success');
       }
     } finally {
       // Reset the flag after the operation truly completes
