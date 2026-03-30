@@ -285,8 +285,35 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
   };
 
   const handleTabClick = (tabId: string) => {
-    onTabChange?.(tabId);
-    // Don't scroll - keep page at current position
+    // If it's the home/all view, just filter the landing page as traditional tabs
+    if (tabId === 'all') {
+      onTabChange?.('all');
+      return;
+    }
+
+    // Find the clicked tab object to access the label for custom routing
+    const clickedTab = tabs.find(t => t.id === tabId);
+    const label = clickedTab?.label?.toLowerCase() || '';
+
+    // Hardcoded navigation for specific categories as requested
+    if (label.includes('biscuits') || label.includes('snacka')) {
+      navigate('/user/category/snacks-and-biscuits');
+    } else if (label.includes('oil') || label.includes('ghee')) {
+      navigate('/user/category/oil-and-ghee');
+    } else if (label.includes('rice')) {
+      navigate('/user/category/rice');
+    } else if (label.includes('vegetables')) {
+      navigate('/user/category/vegetables');
+    } else if (label.includes('dryfruits') || label.includes('nuts')) {
+      navigate('/user/category/dryfruits');
+    } else if (label.includes('fruits')) {
+      navigate('/user/category/fruits');
+    } else if (label.includes('grocery')) {
+      navigate('/user/categories');
+    } else {
+      // Fallback: stay on home page and filter products if no specific route is matched
+      onTabChange?.(tabId);
+    }
   };
 
   const { currentTheme } = useThemeContext();
@@ -375,15 +402,15 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
             {/* Mic Icon for Voice Search Cue */}
             <div className="text-neutral-400 pl-1 border-l border-neutral-100">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" />
               </svg>
             </div>
           </div>
         </div>
 
         {/* Delivery Address Pill */}
-        <div 
+        <div
           onClick={() => navigate('/user/location')}
           className="flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2.5 py-1.5 border border-white/5 active:scale-[0.98] transition-all cursor-pointer relative z-20"
         >
@@ -408,8 +435,8 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
         ref={stickyRef}
         className="sticky top-0 z-50"
         style={{
-          background: scrollProgress >= 0.1 
-            ? `rgba(139, 61, 40, ${Math.min(1, scrollProgress * 1.2)})` 
+          background: scrollProgress >= 0.1
+            ? `rgba(139, 61, 40, ${Math.min(1, scrollProgress * 1.2)})`
             : 'transparent',
           backdropFilter: scrollProgress >= 0.1 ? `blur(${scrollProgress * 8}px)` : 'none',
           boxShadow: scrollProgress >= 0.1 ? `0 4px 15px rgba(0, 0, 0, 0.15)` : 'none',
@@ -432,7 +459,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
 
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
-              
+
               return (
                 <button
                   key={tab.id}
