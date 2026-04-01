@@ -855,11 +855,11 @@ export default function LandingPage() {
             <div>
               <h4 className="font-black text-xs uppercase tracking-widest text-[#E5A93D] mb-4">Support</h4>
               <div className="flex flex-col gap-2">
-                <a href="#about" className="text-white/60 hover:text-white font-medium text-sm transition-colors">About Us</a>
-                <a href="#contact" className="text-white/60 hover:text-white font-medium text-sm transition-colors">Contact Us</a>
-                <a href="#faq" className="text-white/60 hover:text-white font-medium text-sm transition-colors">FAQ</a>
-                <a href="#privacy" className="text-white/60 hover:text-white font-medium text-sm transition-colors">Privacy Policy</a>
-                <a href="#terms" className="text-white/60 hover:text-white font-medium text-sm transition-colors">Terms of Service</a>
+                <Link to="/user/about-us" className="text-white/60 hover:text-white font-medium text-sm transition-colors">About Us</Link>
+                <a href="/#contact" className="text-white/60 hover:text-white font-medium text-sm transition-colors">Contact Us</a>
+                <Link to="/user/faq" className="text-white/60 hover:text-white font-medium text-sm transition-colors">FAQ</Link>
+                <Link to="/user/privacy-policy" className="text-white/60 hover:text-white font-medium text-sm transition-colors">Privacy Policy</Link>
+                <Link to="/user/terms-of-service" className="text-white/60 hover:text-white font-medium text-sm transition-colors">Terms of Service</Link>
               </div>
             </div>
           </div>

@@ -4,6 +4,9 @@ import Lottie from 'lottie-react';
 import { useLoading } from '../../context/LoadingContext';
 import './iconLoader.css';
 
+// Module-level cache: animation JSON is fetched once and reused across all navigations
+const animationDataCache = new Map<string, any>();
+
 interface IconLoaderProps {
   forceShow?: boolean;
 }
@@ -49,10 +52,18 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
     }
 
     setCurrentAnimationName(animationName);
-    fetch(`/animations/${animationName}`)
-      .then(res => res.json())
-      .then(data => setAnimationData(data))
-      .catch(err => console.error('Failed to load animation:', err));
+    // Use cached data if available — avoids re-fetching on repeat visits to same route type
+    if (animationDataCache.has(animationName)) {
+      setAnimationData(animationDataCache.get(animationName));
+    } else {
+      fetch(`/animations/${animationName}`)
+        .then(res => res.json())
+        .then(data => {
+          animationDataCache.set(animationName, data);
+          setAnimationData(data);
+        })
+        .catch(err => console.error('Failed to load animation:', err));
+    }
   }, [currentPath]);
 
   // Detect excluded paths (No loaders for Delivery, Admin, or Seller portals)

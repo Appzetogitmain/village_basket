@@ -132,6 +132,14 @@ export default function DeliveryAbout() {
                     <p className="text-village-umber text-[11px] font-black uppercase tracking-tight">{item.value}</p>
                 </div>
             ))}
+            <button onClick={() => navigate('/user/privacy-policy')} className="w-full p-4 flex justify-between items-center group active:bg-stone-50 transition-colors border-t border-stone-100">
+                <p className="text-stone-300 text-[9px] font-black uppercase tracking-widest">Privacy Policy</p>
+                <p className="text-village-umber text-[11px] font-black uppercase tracking-tight">VIEW</p>
+            </button>
+            <button onClick={() => navigate('/user/terms-of-service')} className="w-full p-4 flex justify-between items-center group active:bg-stone-50 transition-colors border-t border-stone-100">
+                <p className="text-stone-300 text-[9px] font-black uppercase tracking-widest">Terms of Service</p>
+                <p className="text-village-umber text-[11px] font-black uppercase tracking-tight">VIEW</p>
+            </button>
         </div>
 
         {/* Copy Ledger */}

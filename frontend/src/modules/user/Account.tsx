@@ -195,7 +195,7 @@ export default function Account() {
                 <div className="text-[10px] font-black text-village-umber uppercase tracking-widest">Orders</div>
               </button>
               <button
-                onClick={() => navigate('/faq')}
+                onClick={() => navigate('/user/faq')}
                 className="bg-white rounded-2xl border border-stone-100 p-4 hover:shadow-md transition-all text-center group"
               >
                 <div className="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center mx-auto mb-2 group-hover:bg-village-umber/5 transition-colors">
@@ -244,10 +244,24 @@ export default function Account() {
             <div>
               <h2 className="text-[10px] font-black text-stone-400 mb-3 uppercase tracking-[0.2em] px-1">App & Support</h2>
               <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden divide-y divide-stone-50 shadow-sm">
-                <button onClick={() => window.location.href = 'https://about.villagebasket.com'} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
+                <button onClick={() => navigate('/user/about-us')} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
                   <div className="flex items-center gap-4">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-stone-400"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" /><line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" strokeWidth="2" /><line x1="12" y1="8" x2="12.01" y2="8" stroke="currentColor" strokeWidth="2" /></svg>
-                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">About Village</span>
+                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">About Us</span>
+                  </div>
+                  <span className="text-stone-300">›</span>
+                </button>
+                <button onClick={() => navigate('/user/privacy-policy')} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-stone-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">Privacy Policy</span>
+                  </div>
+                  <span className="text-stone-300">›</span>
+                </button>
+                <button onClick={() => navigate('/user/terms-of-service')} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-stone-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">Terms of Service</span>
                   </div>
                   <span className="text-stone-300">›</span>
                 </button>
