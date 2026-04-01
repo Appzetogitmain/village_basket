@@ -6,7 +6,7 @@ import PromoStrip from "./components/PromoStrip";
 import LowestPricesEver from "./components/LowestPricesEver";
 import CategoryTileSection from "./components/CategoryTileSection";
 import FeaturedThisWeek from "./components/FeaturedThisWeek";
-// Bestseller section removed for cleaner layout
+import BestsellerCards from "./components/BestsellerCards";
 import ProductCard from "./components/ProductCard";
 import { getHomeContent } from "../../services/api/customerHomeService";
 import { getHeaderCategoriesPublic } from "../../services/api/headerCategoryService";
@@ -290,6 +290,11 @@ export default function Home() {
 
         {/* Featured This Week Section */}
         {/* <FeaturedThisWeek /> */}
+
+        {/* Bestseller Category Cards (2x2 Grid) */}
+        {homeData.bestsellerCards && homeData.bestsellerCards.length > 0 && (
+          <BestsellerCards cards={homeData.bestsellerCards} />
+        )}
 
         {/* Dynamic Home Sections - Render sections created by admin (For ALL tabs) */}
         {homeData.homeSections && homeData.homeSections.length > 0 && (

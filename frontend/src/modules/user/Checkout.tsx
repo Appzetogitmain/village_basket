@@ -559,7 +559,7 @@ export default function Checkout() {
   return (
     <div
       className="bg-transparent min-h-screen flex flex-col opacity-100"
-      style={{ opacity: 1, height: '1250px' }}
+      style={{ opacity: 1 }}
     >
 
 

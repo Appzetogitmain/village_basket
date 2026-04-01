@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import brandLogo from '@assets/village_basket-removebg-preview.png';
+import Footer from '../../components/Footer';
+import { useAuth } from '../../context/AuthContext';
 import dryfruitsImg from '@assets/landing_page/dryfruits.jpg';
 import veggiesImg from '@assets/landing_page/fresh_veggies.jpg';
 import fruitsImg from '@assets/landing_page/fruits.jpg';
@@ -194,6 +196,7 @@ function AppMockupSlider({
 /* ─── Main Landing Page ──────────────────────────────────── */
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -260,8 +263,10 @@ export default function LandingPage() {
             ))}
           </nav>
           <div className="hidden lg:flex items-center gap-3">
-            <Link to="/user/login" className={`text-sm font-bold px-4 py-2 rounded-xl transition-all ${scrolled ? 'text-white hover:bg-white/10' : 'text-[#8B3D28] hover:bg-[#8B3D28]/10'}`}>Login</Link>
-            <Link to="/user" className="text-sm font-black px-5 py-2.5 bg-[#4A7C59] text-white rounded-xl shadow-md hover:bg-[#3d6b4a] active:scale-95 transition-all">Shop Now</Link>
+            {!isAuthenticated && (
+              <Link to="/user/login" className={`text-sm font-bold px-4 py-2 rounded-xl transition-all ${scrolled ? 'text-white hover:bg-white/10' : 'text-[#8B3D28] hover:bg-[#8B3D28]/10'}`}>Login</Link>
+            )}
+            <Link to={isAuthenticated ? "/user" : "/user/login"} className="text-sm font-black px-5 py-2.5 bg-[#4A7C59] text-white rounded-xl shadow-md hover:bg-[#3d6b4a] active:scale-95 transition-all">Shop Now</Link>
           </div>
           <button onClick={() => setMobileMenuOpen(v => !v)} className={`lg:hidden p-2 rounded-xl ${scrolled ? 'text-white' : 'text-[#8B3D28]'}`}>
             {mobileMenuOpen
@@ -276,8 +281,10 @@ export default function LandingPage() {
               <a key={link.label} href={link.href} onClick={() => setMobileMenuOpen(false)} className="text-white/90 font-semibold text-sm">{link.label}</a>
             ))}
             <div className="flex flex-col gap-3 pt-3 border-t border-white/10">
-              <Link to="/user/login" onClick={() => setMobileMenuOpen(false)} className="text-white/80 font-bold text-sm text-center py-2">Login</Link>
-              <Link to="/user" onClick={() => setMobileMenuOpen(false)} className="bg-[#4A7C59] text-white font-black text-sm text-center py-3 rounded-xl">Shop Now</Link>
+              {!isAuthenticated && (
+                <Link to="/user/login" onClick={() => setMobileMenuOpen(false)} className="text-white/80 font-bold text-sm text-center py-2">Login</Link>
+              )}
+              <Link to={isAuthenticated ? "/user" : "/user/login"} onClick={() => setMobileMenuOpen(false)} className="bg-[#4A7C59] text-white font-black text-sm text-center py-3 rounded-xl">Shop Now</Link>
             </div>
           </div>
         )}
@@ -325,7 +332,7 @@ export default function LandingPage() {
             </div>
 
             <div className="flex flex-wrap gap-4 mb-10 lg:mb-0">
-              <Link to="/user" className="px-8 py-4 bg-[#8B3D28] text-white font-black rounded-2xl shadow-xl hover:bg-[#7a3323] active:scale-95 transition-all text-sm uppercase tracking-wider">
+              <Link to={isAuthenticated ? "/user" : "/user/login"} className="px-8 py-4 bg-[#8B3D28] text-white font-black rounded-2xl shadow-xl hover:bg-[#7a3323] active:scale-95 transition-all text-sm uppercase tracking-wider">
                 Start Shopping →
               </Link>
               <a href="#our-story" className="px-8 py-4 bg-white border-2 border-[#8B3D28] text-[#8B3D28] font-black rounded-2xl hover:bg-[#8B3D28]/5 active:scale-95 transition-all text-sm uppercase tracking-wider">
@@ -822,58 +829,7 @@ export default function LandingPage() {
 
 
       {/* ── 11. Footer ──────────────────────────────────── */}
-      <footer className="bg-[#3E2723] text-white py-12 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {/* Brand */}
-            <div className="lg:col-span-2">
-              <div className="bg-white py-1.5 px-3 rounded-xl inline-block mb-4">
-                <img src={brandLogo} alt="Village Basket" className="h-8 md:h-10 w-auto object-contain" />
-              </div>
-              <p className="text-white/60 text-sm leading-relaxed max-w-sm">
-                Fresh from the village. Delivered to your doorstep with care and authenticity. Join our mission to empower rural farmers.
-              </p>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h4 className="font-black text-xs uppercase tracking-widest text-[#E5A93D] mb-4">Quick Links</h4>
-              <div className="flex flex-col gap-2">
-                {[
-                  { label: 'Shop Now', to: '/user' },
-                  { label: 'My Account', to: '/user/account' },
-                  { label: 'My Orders', to: '/user/orders' },
-                  { label: 'Seller Portal', to: '/seller/login' },
-                  { label: 'Delivery Portal', to: '/delivery/login' },
-                ].map(l => (
-                  <Link key={l.label} to={l.to} className="text-white/60 hover:text-white font-medium text-sm transition-colors">{l.label}</Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h4 className="font-black text-xs uppercase tracking-widest text-[#E5A93D] mb-4">Support</h4>
-              <div className="flex flex-col gap-2">
-                <Link to="/user/about-us" className="text-white/60 hover:text-white font-medium text-sm transition-colors">About Us</Link>
-                <a href="/#contact" className="text-white/60 hover:text-white font-medium text-sm transition-colors">Contact Us</a>
-                <Link to="/user/faq" className="text-white/60 hover:text-white font-medium text-sm transition-colors">FAQ</Link>
-                <Link to="/user/privacy-policy" className="text-white/60 hover:text-white font-medium text-sm transition-colors">Privacy Policy</Link>
-                <Link to="/user/terms-of-service" className="text-white/60 hover:text-white font-medium text-sm transition-colors">Terms of Service</Link>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-white/40 font-bold text-xs uppercase tracking-widest">© {new Date().getFullYear()} VillageBasket. All rights reserved.</p>
-            <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/user')} className="text-xs font-black text-[#3E2723] bg-white hover:bg-[#FAF7F2] px-6 py-2.5 rounded-xl transition-colors uppercase tracking-widest shadow-md">
-                Start Shopping
-              </button>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer showOnMobile={true} />
     </div>
   );
 }

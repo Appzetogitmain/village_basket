@@ -7,6 +7,7 @@ import LocationPermissionRequest from './LocationPermissionRequest';
 import { useThemeContext } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
 import brandLogo from '@assets/village_basket-removebg-preview.png';
+import Footer from './Footer';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -264,6 +265,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     <span className="text-sm font-bold">Profile</span>
                   </Link>
 
+                  {/* Explore More */}
+                  <Link
+                    to="/"
+                    className="ml-2 flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#4b7d5a] text-white shadow-[0_4px_15px_rgba(75,125,90,0.3)] hover:shadow-[0_6px_20px_rgba(75,125,90,0.4)] hover:bg-[#3d664a] transition-all active:scale-95 group"
+                  >
+                    <span className="text-[10px] font-black uppercase tracking-widest">Explore More</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 transition-transform">
+                      <path d="M5 12h14m-7-7l7 7-7 7" />
+                    </svg>
+                  </Link>
+
                   {/* Cart Indicator */}
                   {(cart?.itemCount || 0) > 0 && (
                     <button
@@ -286,7 +298,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           )}
 
           {/* Scrollable Main Content */}
-          <main ref={mainRef} className="flex-1 md:pt-24 overflow-x-hidden md:bg-transparent pb-24 md:pb-8">
+          <main ref={mainRef} className={`flex-1 ${showHeader ? 'md:pt-24' : 'md:pt-0'} overflow-x-hidden md:bg-transparent pb-24 md:pb-8`}>
             <div className="w-full max-w-[1550px] mx-auto">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
@@ -319,6 +331,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </AnimatePresence>
             </div>
           </main>
+          {showFooter && <Footer showOnMobile={false} />}
 
           {/* Floating Cart Pill - Desktop (hidden on mobile to prevent duplicate keys/animations) */}
           <div className="hidden md:block">
