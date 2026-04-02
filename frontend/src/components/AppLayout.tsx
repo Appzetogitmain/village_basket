@@ -7,6 +7,7 @@ import LocationPermissionRequest from './LocationPermissionRequest';
 import { useThemeContext } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
 import brandLogo from '@assets/village_basket-removebg-preview.png';
+import Footer from './Footer';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -125,11 +126,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
     }
   }, [isCategoriesActive, prevCategoriesActive]);
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const isProductDetailPage = location.pathname.startsWith('/user/product/');
   const isSearchPage = location.pathname === '/user/search';
   const isCheckoutPage = location.pathname === '/user/checkout' || location.pathname.startsWith('/user/checkout/') || location.pathname === '/user/daily-service/checkout' || location.pathname.startsWith('/user/daily-service/checkout');
-  const isHomePage = location.pathname === '/user' || location.pathname === '/user/' || location.pathname === '/user/home';
-  const showHeader = !isCheckoutPage;
+  const isOrderDetailPage = location.pathname.startsWith('/user/orders/');
+  const showHeader = !isCheckoutPage && !isOrderDetailPage;
   const showSearchBar = isSearchPage;
   const showFooter = !isCheckoutPage && !isProductDetailPage;
 
@@ -138,19 +150,21 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Desktop Container Wrapper */}
       <div className="md:w-full md:bg-transparent md:min-h-screen overflow-x-hidden">
         <div className="md:w-full md:min-h-screen md:flex md:flex-col overflow-x-hidden md:bg-transparent">
-          {/* Sticky Desktop Header - Single Premium Row */}
+          {/* Sticky Desktop Header - Dynamic Transition */}
           {showHeader && (
-            <header className="sticky top-0 z-50 bg-[#8B3D28] shadow-xl border-b border-white/5 hidden md:block px-4 md:px-8 py-4">
+            <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 hidden md:block px-4 md:px-8 ${isScrolled ? 'bg-[#8B3D28]/95 backdrop-blur-md shadow-xl py-3 border-b border-white/5' : 'bg-transparent py-5'}`}>
               <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-6 lg:gap-12">
                 
                 {/* Logo & Location Side-by-Side */}
                 <div className="flex items-center gap-6 lg:gap-10">
-                  <Link to="/user" className="flex-shrink-0 transition-transform hover:scale-105 active:scale-95 duration-300">
-                    <img
-                      src={brandLogo}
-                      alt="Village Basket"
-                      className="h-10 lg:h-12 w-auto object-contain brightness-110 drop-shadow-md"
-                    />
+                  <Link to="/user" className="flex-shrink-0 transition-all hover:scale-105 active:scale-95 duration-300">
+                    <div className={`${isScrolled ? 'bg-white' : 'bg-white shadow-xl'} rounded-2xl px-5 py-2 transition-all duration-500 border-2 border-white/10 flex items-center justify-center`}>
+                      <img
+                        src={brandLogo}
+                        alt="Village Basket"
+                        className={`${isScrolled ? 'h-8 lg:h-9' : 'h-9 lg:h-11'} w-auto object-contain transition-all duration-500`}
+                      />
+                    </div>
                   </Link>
                   
                   {/* Delivery Location - Styled like the image */}
@@ -158,14 +172,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     onClick={() => navigate('/user/location')}
                     className="flex items-center gap-3 group transition-all"
                   >
-                    <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10 group-hover:bg-[#FFCC00] group-hover:border-[#FFCC00] transition-all">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-[#FFCC00] group-hover:text-[#8B3D28] transition-colors">
+                    <div className={`w-10 h-10 rounded-2xl ${isScrolled ? 'bg-white/10' : 'bg-black/20 backdrop-blur-md'} flex items-center justify-center border border-white/10 group-hover:bg-[#4b7d5a] group-hover:border-[#4b7d5a] transition-all`}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-[#4b7d5a] group-hover:text-white transition-colors">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
                       </svg>
                     </div>
                     <div className="flex flex-col text-left">
-                      <span className="text-[10px] font-black text-[#FFCC00] uppercase tracking-tighter leading-none mb-1">Deliver to</span>
-                      <span className="text-xs lg:text-sm font-bold text-white max-w-[140px] lg:max-w-[200px] truncate leading-tight group-hover:text-[#FFCC00]">
+                      <span className="text-[10px] font-black text-[#4b7d5a] uppercase tracking-tighter leading-none mb-1">Deliver to</span>
+                      <span className={`text-xs lg:text-sm font-bold max-w-[140px] lg:max-w-[200px] truncate leading-tight group-hover:text-[#4b7d5a] transition-colors ${isScrolled ? 'text-white' : 'text-village-umber'}`}>
                         {userLocation?.address || userLocation?.city || 'Set Location'}
                       </span>
                     </div>
@@ -188,7 +202,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       type="text"
                       readOnly
                       placeholder='Search for "farm fresh vegetables"'
-                      className="w-full bg-white text-village-umber rounded-2xl py-3 px-12 text-sm lg:text-base font-medium placeholder:text-village-umber/40 border border-transparent shadow-md focus:outline-none focus:ring-2 focus:ring-[#FFCC00]/50 transition-all cursor-pointer group-hover:shadow-lg"
+                      className={`w-full bg-white text-village-umber rounded-2xl py-3 px-12 text-sm lg:text-base font-medium placeholder:text-village-umber/40 border border-transparent transition-all cursor-pointer group-hover:shadow-lg ${isScrolled ? 'shadow-md ring-1 ring-white/10' : 'shadow-xl'}`}
                     />
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B3D28]/40">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -204,7 +218,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   {/* Home */}
                   <Link
                     to="/user"
-                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user') || isActive('/user/') || isActive('/user/home') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user') || isActive('/user/') || isActive('/user/home') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -216,7 +230,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   {/* Orders */}
                   <Link
                     to="/user/order-again"
-                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/order-again') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/order-again') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
@@ -228,7 +242,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   {/* Categories */}
                   <Link
                     to="/user/categories"
-                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/categories') || location.pathname.startsWith('/user/category/') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/categories') || location.pathname.startsWith('/user/category/') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="7" height="7" />
@@ -242,7 +256,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   {/* Profile */}
                   <Link
                     to="/user/account"
-                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/account') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/account') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -251,18 +265,29 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     <span className="text-sm font-bold">Profile</span>
                   </Link>
 
+                  {/* Explore More */}
+                  <Link
+                    to="/"
+                    className="ml-2 flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#4b7d5a] text-white shadow-[0_4px_15px_rgba(75,125,90,0.3)] hover:shadow-[0_6px_20px_rgba(75,125,90,0.4)] hover:bg-[#3d664a] transition-all active:scale-95 group"
+                  >
+                    <span className="text-[10px] font-black uppercase tracking-widest">Explore More</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 transition-transform">
+                      <path d="M5 12h14m-7-7l7 7-7 7" />
+                    </svg>
+                  </Link>
+
                   {/* Cart Indicator */}
                   {(cart?.itemCount || 0) > 0 && (
                     <button
                       onClick={() => navigate('/user/checkout')}
-                      className="ml-2 w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center relative hover:bg-white/30 transition-all font-bold text-white shadow-inner"
+                      className={`ml-2 w-10 h-10 rounded-2xl flex items-center justify-center relative hover:bg-white/30 transition-all font-bold shadow-inner ${isScrolled ? 'bg-white/20 text-white' : 'bg-black/10 text-village-umber'}`}
                     >
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
                         <line x1="3" y1="6" x2="21" y2="6" />
                         <path d="M16 10a4 4 0 01-8 0" />
                       </svg>
-                      <span className="absolute -top-1.5 -right-1.5 bg-[#4b7d5a] text-white text-[10px] font-black rounded-lg min-w-[20px] h-[20px] flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
+                      <span className={`absolute -top-1.5 -right-1.5 bg-[#4b7d5a] text-white text-[10px] font-black rounded-lg min-w-[20px] h-[20px] flex items-center justify-center shadow-lg border-2 ${isScrolled ? 'border-[#8B3D28]' : 'border-white'}`}>
                         {cart?.itemCount}
                       </span>
                     </button>
@@ -273,7 +298,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           )}
 
           {/* Scrollable Main Content */}
-          <main ref={mainRef} className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide pb-24 md:pb-8 md:bg-transparent">
+          <main ref={mainRef} className={`flex-1 ${showHeader ? 'md:pt-24' : 'md:pt-0'} overflow-x-hidden md:bg-transparent pb-24 md:pb-8`}>
             <div className="w-full max-w-[1550px] mx-auto">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
@@ -306,10 +331,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </AnimatePresence>
             </div>
           </main>
+          {showFooter && <Footer showOnMobile={false} />}
 
           {/* Floating Cart Pill - Desktop (hidden on mobile to prevent duplicate keys/animations) */}
           <div className="hidden md:block">
-            <FloatingCartPill />
+            {!isOrderDetailPage && <FloatingCartPill />}
           </div>
 
           {/* Location Permission Request Modal - Mandatory for all users */}

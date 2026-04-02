@@ -11,7 +11,24 @@ export interface CustomerProfile {
   refCode: string;
   walletAmount: number;
   totalOrders: number;
-  userType: 'retail' | 'wholesale';
+  userType: 'Customer';
+  customerType: 'retail' | 'wholesale';
+}
+
+export interface WalletTransaction {
+  _id: string;
+  amount: number;
+  type: 'Credit' | 'Debit';
+  description: string;
+  status: string;
+  reference: string;
+  createdAt: string;
+  relatedOrder?: string;
+}
+
+export interface GetWalletTransactionsResponse {
+  success: boolean;
+  data: WalletTransaction[];
 }
 
 export interface DeliveryConfig {
@@ -61,6 +78,14 @@ export const getProfile = async (): Promise<GetProfileResponse> => {
  */
 export const updateProfile = async (data: UpdateProfileData): Promise<UpdateProfileResponse> => {
   const response = await api.put<UpdateProfileResponse>('/customer/profile', data);
+  return response.data;
+};
+
+/**
+ * Get wallet transactions
+ */
+export const getWalletTransactions = async (): Promise<GetWalletTransactionsResponse> => {
+  const response = await api.get<GetWalletTransactionsResponse>('/customer/wallet/transactions');
   return response.data;
 };
 

@@ -53,6 +53,7 @@ export interface Order {
   /** @deprecated Use deliverySlot */
   deliveryShift?: DeliveryShift;
   deliverySlot?: DeliverySlotSelection;
+  walletAmountUsed?: number;
 }
 
 

@@ -39,6 +39,8 @@ export interface ICustomer extends Document {
   fcmTokenMobile?: string[];   // Mobile push notification tokens
   // Reward System
   rewardCoins: number;
+  // Wallet System
+  walletAmount: number;
   userType: 'retail' | 'wholesale';
 }
 
@@ -164,6 +166,12 @@ const CustomerSchema = new Schema<ICustomer>(
       default: 0,
       min: [0, 'Reward coins cannot be negative']
     },
+    // Wallet System
+    walletAmount: {
+      type: Number,
+      default: 0,
+      min: [0, 'Wallet balance cannot be negative']
+    },
     userType: {
       type: String,
       enum: ['retail', 'wholesale'],
@@ -195,6 +203,11 @@ CustomerSchema.pre('save', async function (next) {
 });
 
 const Customer = mongoose.models.Customer || mongoose.model<ICustomer>('Customer', CustomerSchema);
+
+// Register Alias for refPath 'CUSTOMER'
+if (!mongoose.models.CUSTOMER) {
+    mongoose.model('CUSTOMER', CustomerSchema, 'customers');
+}
 
 export default Customer;
 

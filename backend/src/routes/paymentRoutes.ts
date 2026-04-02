@@ -31,7 +31,7 @@ router.post('/create-order', authenticate, requireUserType('Customer'), async (r
                 message: 'Order not found',
             });
         }
-        totalToPay = order.total;
+        totalToPay = order.payableAmount;
         customerId = order.customer.toString();
 
         // Verify order belongs to customer

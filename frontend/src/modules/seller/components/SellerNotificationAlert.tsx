@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SellerNotification } from '../hooks/useSellerSocket';
-import { updateOrderStatus } from '../../../services/api/orderService';
+import { updateOrderStatus, acknowledgeOrder } from '../../../services/api/orderService';
 import { useNavigate } from 'react-router-dom';
 
 interface SellerNotificationAlertProps {
@@ -183,10 +183,23 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
              </div>
           ) : (
             <button
-              onClick={onClose}
-              className="w-full py-4 rounded-xl font-bold text-white shadow-lg transition-transform active:scale-95 bg-[#8B3D28] hover:bg-[#723221]"
+              onClick={async () => {
+                if (notification.type === 'ORDER_CANCELLED') {
+                  setLoading(true);
+                  try {
+                    await acknowledgeOrder(notification.orderId);
+                  } catch (err) {
+                    console.error("Acknowledge refund error:", err);
+                  } finally {
+                    setLoading(false);
+                  }
+                }
+                onClose();
+              }}
+              disabled={loading}
+              className="w-full py-4 rounded-xl font-bold text-white shadow-lg transition-transform active:scale-95 bg-[#8B3D28] hover:bg-[#723221] disabled:opacity-50"
             >
-              Acknowledge & Dismiss
+              {loading ? 'Processing...' : 'Acknowledge & Dismiss'}
             </button>
           )}
         </div>

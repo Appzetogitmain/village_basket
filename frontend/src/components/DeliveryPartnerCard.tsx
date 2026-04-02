@@ -60,7 +60,7 @@ export default function DeliveryPartnerCard({
 
     return (
         <motion.div
-            className="mx-4 mt-4 bg-white rounded-xl shadow-sm overflow-hidden"
+            className="village-card paper-texture organic-radius bg-white shadow-sm overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}

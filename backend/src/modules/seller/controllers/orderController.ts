@@ -218,6 +218,7 @@ export const getOrderById = asyncHandler(
       grandTotal: order.total || 0,
       paymentMethod: order.paymentMethod || 'N/A',
       paymentStatus: order.paymentStatus || 'Pending',
+      isRefunded: order.isRefunded || false,
       deliveryAddress: order.deliveryAddress || {},
     };
 
@@ -258,11 +259,18 @@ export const updateOrderStatus = asyncHandler(
     }
 
     const order = await Order.findById(id);
-
     if (!order) {
       return res.status(404).json({
         success: false,
         message: "Order not found",
+      });
+    }
+
+    // Prevent updates if order is in a final state
+    if (['Delivered', 'Cancelled', 'Returned', 'Rejected'].includes(order.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Order cannot be updated as it is already ${order.status}`,
       });
     }
 
@@ -414,6 +422,14 @@ export const assignDeliveryBoy = asyncHandler(
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
+    // Prevent assignment if order is in a final state
+    if (['Delivered', 'Cancelled', 'Returned', 'Rejected'].includes(order.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot assign delivery partner as the order is already ${order.status}`,
+      });
+    }
+
     // Actually assign
     order.deliveryBoy = deliveryBoyId;
     order.deliveryBoyStatus = "Assigned";
@@ -476,6 +492,124 @@ export const assignDeliveryBoy = asyncHandler(
         id: order._id,
         status: order.status,
         deliveryBoy: deliveryBoyId,
+      },
+    });
+  }
+);
+/**
+ * Acknowledge a cancellation and approve the refund
+ */
+export const acknowledgeOrder = asyncHandler(
+  async (req: Request, res: Response) => {
+    const sellerId = (req as any).user.userId;
+    const { id } = req.params;
+
+    const order = await Order.findById(id).populate('customer');
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Authorization check
+    const sellerItem = await OrderItem.findOne({ order: order._id, seller: sellerId });
+    if (!sellerItem) {
+       return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    // Only process if it's already cancelled and not yet refunded
+    if (order.status !== 'Cancelled' && order.status !== 'Rejected') {
+      return res.status(400).json({
+        success: false,
+        message: `Order must be Cancelled or Rejected to approve refund (Current: ${order.status})`,
+      });
+    }
+
+    if (order.isRefunded) {
+      return res.status(400).json({
+        success: false,
+        message: "Refund already processed for this order",
+      });
+    }
+
+    // Refund logic (copied from customOrderController but optimized for seller-side)
+    const walletUsed = order.walletAmountUsed || 0;
+    let refundAmount = 0;
+    
+    if (order.paymentStatus === 'Paid') {
+        refundAmount = order.total;
+    } else if (walletUsed > 0) {
+        refundAmount = walletUsed;
+    }
+
+    if (refundAmount > 0) {
+        const Customer = (await import("../../../models/Customer")).default;
+        const Refund = (await import("../../../models/Refund")).default;
+        const Payment = (await import("../../../models/Payment")).default;
+
+        const updatedCustomer = await Customer.findOneAndUpdate(
+            { _id: order.customer },
+            { $inc: { walletAmount: refundAmount } },
+            { new: true }
+        );
+
+        if (updatedCustomer) {
+            order.isRefunded = true;
+            if (order.paymentStatus === 'Paid' || refundAmount === order.total) {
+                order.paymentStatus = 'Refunded';
+            }
+
+            // Create Wallet Transaction Record (Credit)
+            await WalletTransaction.create({
+                userId: order.customer,
+                userType: 'CUSTOMER',
+                amount: refundAmount,
+                type: 'Credit',
+                description: `Refund for cancelled order #${order.orderNumber} (Approved by Seller)`,
+                status: 'Completed',
+                reference: `REFUND_APP_${order._id}_${Date.now()}`,
+                relatedOrder: order._id
+            });
+
+            // Mark Payment as Refunded if exists
+            const payment = await Payment.findOne({ 
+                order: order._id, 
+                status: { $in: ['Completed', 'Succeeded', 'Authorized'] } 
+            });
+
+            if (payment) {
+                payment.status = 'Refunded';
+                payment.refundAmount = refundAmount;
+                payment.refundedAt = new Date();
+                payment.refundReason = order.cancellationReason || "Seller Approved Cancellation";
+                await payment.save();
+
+                // Create audit record
+                await Refund.create({
+                    order: order._id,
+                    payment: payment._id,
+                    customer: order.customer,
+                    amount: refundAmount,
+                    reason: order.cancellationReason || "Seller Approved",
+                    status: 'Completed'
+                });
+            }
+        }
+    } else {
+        // If it was a COD order with no wallet use, just mark as acknowledged/refunded if applicable
+        order.isRefunded = true;
+    }
+
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Cancellation acknowledged and refund approved successfully",
+      data: {
+        id: order._id,
+        isRefunded: order.isRefunded,
+        paymentStatus: order.paymentStatus
       },
     });
   }

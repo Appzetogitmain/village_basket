@@ -11,6 +11,9 @@ import { generateDeliveryOtp } from "../../../services/deliveryOtpService";
 import AppSettings from "../../../models/AppSettings";
 import { getRoadDistances } from "../../../services/mapService";
 import Coupon from "../../../models/Coupon";
+import Payment from "../../../models/Payment";
+import Refund from "../../../models/Refund";
+import WalletTransaction from "../../../models/WalletTransaction";
 import { Server as SocketIOServer } from "socket.io";
 
 // Create a new order
@@ -27,7 +30,7 @@ export const createOrder = async (req: Request, res: Response) => {
             session = null;
         }
 
-        const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, giftPackaging } = req.body;
+        const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, giftPackaging, walletAmountUsed } = req.body;
         const userId = req.user!.userId;
 
         // Log incoming request for debugging
@@ -456,6 +459,7 @@ export const createOrder = async (req: Request, res: Response) => {
             }
         }
 
+        // Recalculate Final Total
         const tip = Number(tipAmount) || 0;
         const giftPackagingFee = giftPackaging ? 30 : 0;
         const finalTotal = calculatedSubtotal + platformFee + deliveryFee + tip + giftPackagingFee - discountAmount;
@@ -469,8 +473,121 @@ export const createOrder = async (req: Request, res: Response) => {
         newOrder.gstin = gstin;
         newOrder.total = Number(Math.max(0, finalTotal).toFixed(2));
         newOrder.items = orderItemIds;
-        newOrder.shipping = deliveryFee; // Update with calculated fee
-        newOrder.deliveryDistanceKm = deliveryDistanceKm; // Store distance for commission calc
+        newOrder.shipping = deliveryFee;
+        newOrder.deliveryDistanceKm = deliveryDistanceKm;
+        newOrder.payableAmount = newOrder.total; // Start with full total
+
+        // --- Financial Debug Logging ---
+        console.log(`[FINANCE DEBUG] Order Calculation for ORD-${newOrder._id}:`, {
+            subtotal: newOrder.subtotal,
+            platformFee,
+            deliveryFee,
+            discount: discountAmount,
+            tip,
+            giftPackagingFee,
+            finalTotalInDB: newOrder.total,
+            walletBalance: customer.walletAmount,
+            requestedWalletUse: walletAmountUsed
+        });
+
+        // --- Partial Wallet Usage Logic ---
+        const walletToDebit = Number(walletAmountUsed) || 0;
+        let totalDebitedFromWallet = 0;
+
+        if (walletToDebit > 0) {
+            const amountToUse = Math.min(walletToDebit, newOrder.total);
+
+            // Check balance first
+            if ((customer.walletAmount || 0) < amountToUse) {
+                if (session) await session.abortTransaction();
+                return res.status(400).json({
+                    success: false,
+                    message: `Insufficient wallet balance. Balance: ₹${customer.walletAmount || 0}, Requested: ₹${amountToUse}`
+                });
+            }
+
+            // Atomic debit
+            const updatedCustomer = await Customer.findOneAndUpdate(
+                { _id: userId, walletAmount: { $gte: amountToUse } },
+                { $inc: { walletAmount: -amountToUse } },
+                { session, new: true }
+            );
+
+            if (!updatedCustomer) {
+                if (session) await session.abortTransaction();
+                return res.status(400).json({
+                    success: false,
+                    message: "Failed to debit wallet. Concurrent update or insufficient balance."
+                });
+            }
+
+            totalDebitedFromWallet = amountToUse;
+            newOrder.walletAmountUsed = amountToUse;
+            newOrder.payableAmount = Number((newOrder.total - amountToUse).toFixed(2));
+
+            console.log(`[FINANCE DEBUG] Wallet Applied: -₹${amountToUse}, New Payable: ₹${newOrder.payableAmount}`);
+
+            // Create Wallet Transaction record
+            const walletTx = new WalletTransaction({
+                userId: customer._id,
+                userType: 'CUSTOMER',
+                amount: amountToUse,
+                type: 'Debit',
+                description: `Payment for order #${newOrder.orderNumber} ${newOrder.payableAmount === 0 ? '(Full)' : '(Partial)'}`,
+                status: 'Completed',
+                reference: `PAY_${newOrder._id}_${Date.now()}`,
+                relatedOrder: newOrder._id
+            });
+            await walletTx.save({ session });
+        }
+
+        // --- Full Wallet Payment Logic (Override/Fallback) ---
+        if (paymentMethod === 'Wallet') {
+            const remaining = newOrder.total - totalDebitedFromWallet;
+
+            if (remaining > 0) {
+                if ((customer.walletAmount || 0) < remaining) {
+                    if (session) await session.abortTransaction();
+                    return res.status(400).json({
+                        success: false,
+                        message: `Insufficient wallet balance. Total: ₹${newOrder.total}, Used: ₹${totalDebitedFromWallet}, Remaining: ₹${remaining}`
+                    });
+                }
+
+                const updatedCustomer = await Customer.findOneAndUpdate(
+                    { _id: userId, walletAmount: { $gte: remaining } },
+                    { $inc: { walletAmount: -remaining } },
+                    { session, new: true }
+                );
+
+                if (!updatedCustomer) {
+                    if (session) await session.abortTransaction();
+                    return res.status(400).json({
+                        success: false,
+                        message: "Failed to debit wallet. Insufficient balance or concurrent update."
+                    });
+                }
+
+                newOrder.walletAmountUsed = (newOrder.walletAmountUsed || 0) + remaining;
+                newOrder.payableAmount = 0; // Everything paid via wallet
+
+                // Create Wallet Transaction record (Full/Remaining)
+                const walletTx = new WalletTransaction({
+                    userId: customer._id,
+                    userType: 'CUSTOMER',
+                    amount: remaining,
+                    type: 'Debit',
+                    description: `Payment for order #${newOrder.orderNumber} (Remaining)`,
+                    status: 'Completed',
+                    reference: `PAY_R_${newOrder._id}_${Date.now()}`,
+                    relatedOrder: newOrder._id
+                });
+                await walletTx.save({ session });
+            }
+
+            // Mark order as paid if totally paid by wallet
+            newOrder.paymentStatus = 'Paid';
+        }
 
 
         if (session) {
@@ -735,11 +852,13 @@ export const cancelOrder = async (req: Request, res: Response) => {
         const { reason } = req.body;
         const userId = req.user!.userId;
 
+        console.log(`DEBUG: Cancellation request for order ${id} by user ${userId} with reason: ${reason}`);
+
         if (!reason) {
             return res.status(400).json({ success: false, message: "Cancellation reason is required" });
         }
 
-        // Only start session if we are on a replica set (required for transactions)
+        // Start session for atomic cancellation if possible
         try {
             session = await mongoose.startSession();
             session.startTransaction();
@@ -748,16 +867,28 @@ export const cancelOrder = async (req: Request, res: Response) => {
             session = null;
         }
 
+        // Fetch order with items populated to avoid multiple queries
         const order = session
-            ? await Order.findOne({ _id: id, customer: userId }).session(session)
-            : await Order.findOne({ _id: id, customer: userId });
+            ? await Order.findOne({ _id: id, customer: userId })
+                .populate({
+                    path: 'items',
+                    populate: { path: 'product' }
+                })
+                .session(session)
+            : await Order.findOne({ _id: id, customer: userId })
+                .populate({
+                    path: 'items',
+                    populate: { path: 'product' }
+                });
 
         if (!order) {
             if (session) await session.abortTransaction();
             return res.status(404).json({ success: false, message: "Order not found" });
         }
 
-        if (['Delivered', 'Cancelled', 'Returned', 'Rejected', 'Out for Delivery', 'Shipped'].includes(order.status)) {
+        // Status check
+        const nonCancellableStatuses = ['Delivered', 'Cancelled', 'Returned', 'Rejected', 'Out for Delivery', 'Shipped'];
+        if (nonCancellableStatuses.includes(order.status)) {
             if (session) await session.abortTransaction();
             return res.status(400).json({
                 success: false,
@@ -765,38 +896,59 @@ export const cancelOrder = async (req: Request, res: Response) => {
             });
         }
 
-        // Restore stock
-        for (const item of order.items) {
-            const orderItem = session
-                ? await OrderItem.findById(item).session(session)
-                : await OrderItem.findById(item);
+        // Track seller IDs for notifications
+        const sellerIds = new Set<string>();
 
-            if (orderItem) {
-                const product = session
-                    ? await Product.findById(orderItem.product).session(session)
-                    : await Product.findById(orderItem.product);
+        // 1. Restore stock and update OrderItems
+        if (order.items && Array.isArray(order.items)) {
+            for (const item of order.items) {
+                // Since we populated, it's either an IOrderItem or null
+                const orderItem = item as any;
+                if (!orderItem) continue;
 
-                if (product) {
-                    // Check if it was a variation
-                    if (orderItem.variation) {
-                        // Try to find matching variation
-                        const variationIndex = product.variations?.findIndex((v: any) =>
+                if (orderItem.seller) {
+                    sellerIds.add(orderItem.seller.toString());
+                }
+
+                if (orderItem.product) {
+                    const product = orderItem.product; // Already populated!
+
+                    // Restore variation stock if applicable
+                    if (orderItem.variation && product.variations && product.variations.length > 0) {
+                        const variationIndex = product.variations.findIndex((v: any) =>
+                            (v._id && v._id.toString() === orderItem.variation) ||
                             v.name === orderItem.variation ||
                             v.value === orderItem.variation ||
                             v.title === orderItem.variation ||
                             v.pack === orderItem.variation
                         );
 
-                        if (variationIndex !== undefined && variationIndex !== -1 && product.variations) {
-                            product.variations[variationIndex].stock += orderItem.quantity;
-                        } else if (product.variations && product.variations.length > 0) {
-                            // Fallback to first variation if specific one not found (should be rare)
-                            product.variations[0].stock += orderItem.quantity;
+                        if (variationIndex !== -1) {
+                            product.variations[variationIndex].stock = (product.variations[variationIndex].stock || 0) + (orderItem.quantity || 0);
+                        } else {
+                            // If variation not found by string, try to restore to the first one as fallback
+                            // or just the main stock if no variations match
+                            product.variations[0].stock = (product.variations[0].stock || 0) + (orderItem.quantity || 0);
                         }
                     }
 
-                    // Helper: also increment main stock if variations are just attributes or if simple product
-                    product.stock += orderItem.quantity;
+                    // Always restore main product stock
+                    product.stock = (product.stock || 0) + (orderItem.quantity || 0);
+
+                    // Ensure required fields like retailPrice are present to avoid validation fail on save
+                    // If they are missing in DB (dirty data), we provide a fallback from OrderItem
+                    if (product.retailPrice == null) {
+                        product.retailPrice = orderItem.unitPrice || 0;
+                    }
+                    if (product.wholesalePrice == null) {
+                        product.wholesalePrice = product.retailPrice || 0;
+                    }
+
+                    // Mark variations as modified so Mongoose saves them
+                    if (product.variations) {
+                        product.markModified('variations');
+                    }
+
                     if (session) {
                         await product.save({ session });
                     } else {
@@ -804,6 +956,7 @@ export const cancelOrder = async (req: Request, res: Response) => {
                     }
                 }
 
+                // Update item status
                 orderItem.status = 'Cancelled';
                 if (session) {
                     await orderItem.save({ session });
@@ -813,10 +966,111 @@ export const cancelOrder = async (req: Request, res: Response) => {
             }
         }
 
+        // Capture delivery boy ID before clearing if assigned
+        const assignedDeliveryBoyId = order.deliveryBoy ? order.deliveryBoy.toString() : null;
+        console.log(`DEBUG: Cancellation request for order ${id}. Captured driver ID: ${assignedDeliveryBoyId}`);
+
+        // Clear delivery assignment and OTP if order is cancelled
+        order.deliveryBoy = undefined;
+        order.deliveryBoyStatus = undefined;
+        order.deliveryOtp = undefined;
+        order.deliveryOtpExpiresAt = undefined;
+
+        const previousStatus = order.status;
+
+        // Mark as cancelled
         order.status = 'Cancelled';
         order.cancellationReason = reason;
         order.cancelledAt = new Date();
-        order.cancelledBy = new mongoose.Types.ObjectId(userId); // Use Customer ID as canceller
+
+        // Handle cancelledBy safely
+        try {
+            order.cancelledBy = new mongoose.Types.ObjectId(userId) as any;
+        } catch (idErr) {
+            console.warn("Could not cast userId to ObjectId for cancelledBy, using as is:", userId);
+            (order as any).cancelledBy = userId;
+        }
+
+        // Refund Logic:
+        // 1. If the order was just 'Pending' (Payment not finished / abandoned), do an INSTANT refund.
+        // 2. Otherwise (Received, Accepted, Processed, etc.), we postpone until seller acknowledges.
+        const walletUsed = order.walletAmountUsed || 0;
+        const totalAmount = order.total;
+        let refundAmount = 0;
+
+        let isInstantRefund = ['Pending'].includes(previousStatus);
+
+        if (isInstantRefund) {
+            if (order.paymentStatus === 'Paid') {
+                refundAmount = totalAmount;
+            } else if (walletUsed > 0) {
+                refundAmount = walletUsed;
+            }
+        }
+
+        if (isInstantRefund && refundAmount > 0) {
+            console.log(`DEBUG: Instant refund for order ${id} (Status was: ${previousStatus}). Refund: ₹${refundAmount}.`);
+        } else {
+            console.log(`DEBUG: Cancellation request for order ${id}. Status: ${previousStatus}. Refund postponed for seller approval.`);
+            order.isRefunded = false;
+        }
+
+        if (refundAmount > 0 && !order.isRefunded && order.paymentMethod !== 'COD') {
+            try {
+                const updatedCustomer = await Customer.findOneAndUpdate(
+                    { _id: order.customer },
+                    { $inc: { walletAmount: refundAmount } },
+                    { session, new: true }
+                );
+
+                if (updatedCustomer) {
+                    order.isRefunded = true;
+                    if (order.paymentStatus === 'Paid' || refundAmount === totalAmount) {
+                        order.paymentStatus = 'Refunded';
+                    }
+
+                    // Create Wallet Transaction Record (Credit)
+                    const walletTx = new WalletTransaction({
+                        userId: order.customer,
+                        userType: 'CUSTOMER',
+                        amount: refundAmount,
+                        type: 'Credit',
+                        description: `Refund for cancelled order #${order.orderNumber}`,
+                        status: 'Completed',
+                        reference: `REFUND_${order._id}_${Date.now()}`,
+                        relatedOrder: order._id
+                    });
+                    await walletTx.save({ session });
+
+                    // 3. Mark Payment Record as Refunded if it exists for bank references
+                    const payment = await Payment.findOne({
+                        order: order._id,
+                        status: { $in: ['Completed', 'Succeeded', 'Authorized'] }
+                    }).session(session);
+
+                    if (payment) {
+                        payment.status = 'Refunded';
+                        payment.refundAmount = refundAmount;
+                        payment.refundedAt = new Date();
+                        payment.refundReason = reason;
+                        await payment.save({ session });
+
+                        // 4. Create separate Refund record for audit
+                        const refund = new Refund({
+                            order: order._id,
+                            payment: payment._id,
+                            customer: order.customer,
+                            amount: refundAmount,
+                            reason: reason,
+                            status: 'Completed'
+                        });
+                        await refund.save({ session });
+                    }
+                }
+            } catch (payErr) {
+                console.error("DEBUG: Wallet refund update error (Suppressed):", payErr);
+            }
+        }
 
         if (session) {
             await order.save({ session });
@@ -825,58 +1079,67 @@ export const cancelOrder = async (req: Request, res: Response) => {
             await order.save();
         }
 
-        // Notify
+        // 3. Notify involved parties (in background)
         try {
             const io = (req.app as any).get("io");
             if (io) {
+                // Notify sellers via Socket
                 await notifySellersOfOrderUpdate(io, order, 'ORDER_CANCELLED');
 
-                // Notify delivery boy if assigned
-                if (order.deliveryBoy) {
-                    // Update delivery status to Failed since order is cancelled
-                    // We do this in background to not block response
-                    Order.findByIdAndUpdate(order._id, { deliveryBoyStatus: 'Failed' }).exec();
-
-                    // Notify the specific delivery boy
-                    const deliveryBoyId = order.deliveryBoy.toString();
-                    io.to(`delivery-${deliveryBoyId}`).emit('order-cancelled', {
-                        orderId: order._id,
-                        orderNumber: order.orderNumber,
-                        message: "Order has been cancelled by the customer"
-                    });
-
-                    console.log(`Notification sent to delivery boy ${deliveryBoyId} for cancelled order ${order.orderNumber}`);
-                }
-
-                // Emit to order room for real-time updates on tracking screen
+                // Notify order room
                 io.to(`order-${order._id}`).emit('order-cancelled', {
                     orderId: order._id,
                     status: 'Cancelled',
                     message: "Order has been cancelled"
                 });
 
-                // Push Notification to sellers
-                try {
-                    const { sendNotification } = await import('../../../services/notificationService');
-                    const orderAny = order as any;
-                    const sellerIdsInOrder = [...new Set(orderAny.items.map((i: any) => i.seller?.toString()).filter((id: any) => id))];
-                    for (const sellerId of sellerIdsInOrder) {
-                        await sendNotification("Seller", sellerId as string, "Order Cancelled", `${orderAny.customerName} cancelled order #${orderAny.orderNumber}.`, {
+                // Notify delivery boy if assigned
+                if (assignedDeliveryBoyId) {
+                    const deliveryBoyIdStr = assignedDeliveryBoyId.toString();
+                    io.to(`delivery-${deliveryBoyIdStr}`).emit('order-cancelled', {
+                        orderId: order._id,
+                        orderNumber: order.orderNumber,
+                        message: "Order has been cancelled by the customer"
+                    });
+                }
+
+                // Push Notifications
+                const { sendNotification, sendOrderStatusNotification } = await import('../../../services/notificationService');
+
+                // Push to sellers
+                for (const sellerId of Array.from(sellerIds)) {
+                    await sendNotification("Seller", sellerId, "Order Cancelled", `Customer cancelled order #${order.orderNumber}.`, {
+                        type: "Order",
+                        idempotencyKey: `cancel_${order._id}_${sellerId}`
+                    });
+                }
+
+                // Push to Customer (Confirmation)
+                await sendOrderStatusNotification(order.orderNumber, order._id.toString(), order.customer.toString(), 'Cancelled', order.total);
+
+                // Push to Delivery Partner (if assigned)
+                if (assignedDeliveryBoyId) {
+                    console.log(`DEBUG: Sending push notification to delivery partner ${assignedDeliveryBoyId} for order ${order.orderNumber}`);
+                    await sendNotification(
+                        "Delivery",
+                        assignedDeliveryBoyId, // Already stringified
+                        "Order Cancelled",
+                        `The order #${order.orderNumber} you were assigned to has been cancelled by the customer.`,
+                        {
                             type: "Order",
-                            idempotencyKey: `cancel_${orderAny._id}_${sellerId}`
-                        });
-                    }
-
-                    // Push to Customer (Confirmation)
-                    const { sendOrderStatusNotification } = await import('../../../services/notificationService');
-                    await sendOrderStatusNotification(orderAny.orderNumber, orderAny._id.toString(), orderAny.customer.toString(), 'Cancelled', orderAny.total);
-
-                } catch (pushErr) {
-                    console.error("Error sending cancellation push:", pushErr);
+                            priority: "High",
+                            data: {
+                                type: "ORDER_CANCELLED",
+                                id: order._id.toString(),
+                                orderNumber: order.orderNumber
+                            },
+                            idempotencyKey: `cancel_delivery_${order._id}_${assignedDeliveryBoyId}_${Date.now()}` // Unique per attempt
+                        }
+                    );
                 }
             }
-        } catch (err) {
-            console.error("Notification error:", err);
+        } catch (notifErr) {
+            console.error("DEBUG: Cancellation Notification Error (Supressed):", notifErr);
         }
 
         return res.status(200).json({
@@ -885,6 +1148,7 @@ export const cancelOrder = async (req: Request, res: Response) => {
             data: {
                 id: order._id,
                 status: order.status,
+                paymentStatus: order.paymentStatus,
                 cancelledAt: order.cancelledAt
             }
         });
@@ -895,11 +1159,12 @@ export const cancelOrder = async (req: Request, res: Response) => {
                 await session.abortTransaction();
             } catch (e) { }
         }
-        console.error('Error cancelling order:', error);
+        console.error('ERROR: Fatal error in cancelOrder:', error);
         return res.status(500).json({
             success: false,
             message: "Failed to cancel order",
-            error: error.message
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     } finally {
         if (session) session.endSession();

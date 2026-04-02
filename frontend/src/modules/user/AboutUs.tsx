@@ -170,8 +170,12 @@ export default function AboutUs() {
                     </div>
                 </div>
 
-                {/* Version Info */}
                 <div className="mt-8 text-center">
+                    <div className="flex justify-center gap-4 text-[10px] text-teal-600 font-bold uppercase tracking-widest mb-2">
+                        <button onClick={() => navigate('/user/privacy-policy')}>Privacy Policy</button>
+                        <span className="text-neutral-300">|</span>
+                        <button onClick={() => navigate('/user/terms-of-service')}>Terms of Service</button>
+                    </div>
                     <p className="text-xs text-neutral-500">Version 1.0.0</p>
                     <p className="text-xs text-neutral-500 mt-1">© 2024 Village Basket. All rights reserved.</p>
                 </div>

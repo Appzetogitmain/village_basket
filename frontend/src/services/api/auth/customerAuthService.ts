@@ -19,6 +19,8 @@ export interface VerifyOTPResponse {
       walletAmount: number;
       refCode: string;
       status: string;
+      customerType: 'retail' | 'wholesale';
+      userType: 'Customer' | 'Admin' | 'Seller' | 'Delivery';
     };
     isNewUser?: boolean;
   };
@@ -36,14 +38,23 @@ export const sendOTP = async (mobile: string): Promise<SendOTPResponse> => {
  * Verify SMS OTP and login customer
  * Auto-creates customer if not exists
  */
-export const verifyOTP = async (mobile: string, otp: string, sessionId?: string): Promise<VerifyOTPResponse> => {
-  const response = await api.post<VerifyOTPResponse>('/auth/customer/verify-sms-otp', { mobile, otp, sessionId });
+export const verifyOTP = async (mobile: string, otp: string, sessionId?: string, customerType?: string): Promise<VerifyOTPResponse> => {
+  const response = await api.post<VerifyOTPResponse>('/auth/customer/verify-sms-otp', { 
+    mobile, 
+    otp, 
+    sessionId,
+    customerType
+  });
 
   if (response.data.success && response.data.data.token) {
     setAuthToken(response.data.data.token, 'customer');
-    // Add userType to user data for proper identification
+    
+    // Ensure all identifying fields are stored for price calculations
     const userData = {
       ...response.data.data.user,
+      // Fallbacks to ensure consistency with priceUtils.ts checks
+      customerType: response.data.data.user.customerType || 'retail',
+      accountType: response.data.data.user.customerType || 'retail',
       userType: 'Customer'
     };
     setUserData(userData, 'customer');

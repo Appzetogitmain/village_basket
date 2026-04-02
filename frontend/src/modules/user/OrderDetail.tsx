@@ -667,12 +667,13 @@ export default function OrderDetail() {
       await cancelOrder(id, cancellationReason);
       setOrderStatus("Cancelled" as any);
       setShowCancelModal(false);
-      alert("Order cancelled successfully");
+      alert("Order cancelled successfully. Your amount will be refunded to your Village Wallet.");
       // Refresh order to get updated status
       handleRefresh();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error cancelling order:", error);
-      alert("Failed to cancel order");
+      const errorMessage = error.response?.data?.message || "Failed to cancel order";
+      alert(errorMessage);
     }
   };
 
@@ -730,7 +731,7 @@ export default function OrderDetail() {
 
   const statusConfig: Record<
     string,
-    { title: string; subtitle: string; color: string }
+    { title: string; subtitle: string; color: string; icon?: string }
   > = {
     Received: {
       title: "Order received",
@@ -779,9 +780,10 @@ export default function OrderDetail() {
       color: "bg-[#8B3D28]",
     },
     Cancelled: {
-      title: "Order cancelled",
-      subtitle: "This order has been cancelled",
+      title: "Order Cancelled",
+      subtitle: "Refunded to your Village Wallet",
       color: "bg-red-600",
+      icon: "🚫",
     },
     Returned: {
       title: "Order returned",
@@ -801,29 +803,49 @@ export default function OrderDetail() {
         animate={{ opacity: 1 }}>
         <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
         
-        {/* Navigation bar - Compact & Consolidated */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 relative z-10">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-1.5 flex items-center justify-center hover:bg-white/10 rounded-full transition-all active:scale-95"
-          >
-            <ArrowLeftIcon className="w-5 h-5 text-white" />
-          </button>
-          
-          <div className="flex flex-col items-center min-w-0">
-             <h1 className="text-[11px] font-black uppercase tracking-[0.2em] font-poppins text-white/90 leading-none">Order Details</h1>
-             <span className="text-[8px] font-bold text-white/50 truncate mt-0.5">#{id}</span>
+        {/* Navigation bar - Desktop Optimized */}
+        <div className="max-w-6xl mx-auto px-4 py-3 md:py-2.5 flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 flex items-center justify-center hover:bg-white/15 rounded-xl transition-all active:scale-95 bg-white/10"
+            >
+              <ArrowLeftIcon className="w-5 h-5 text-white" />
+            </button>
+            <div className="hidden md:flex flex-col">
+               <h1 className="text-[12px] font-black uppercase tracking-[0.2em] text-white/90 leading-none">Order Details</h1>
+               <span className="text-[10px] font-bold text-white/50 mt-1">#{id}</span>
+            </div>
           </div>
 
-          <div className="flex gap-1">
+          {/* Desktop status center piece */}
+          <div className="flex-1 text-center hidden md:block">
+            <motion.div
+              key={currentStatus.title}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-2 border border-white/10 shadow-lg">
+                <span className="text-2xl">{currentStatus.icon}</span>
+                <div className="text-left">
+                  <h2 className="text-sm font-black uppercase tracking-widest text-white leading-none mb-1">{currentStatus.title}</h2>
+                  <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest leading-none">{currentStatus.subtitle}</p>
+                </div>
+            </motion.div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="md:hidden flex flex-col items-center mr-2">
+               <h1 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90 leading-none">Order Details</h1>
+               <span className="text-[8px] font-bold text-white/50 mt-1">#{id}</span>
+            </div>
             <motion.button
-              className="p-1.5 flex items-center justify-center hover:bg-white/10 rounded-full"
+              className="p-2 flex items-center justify-center hover:bg-white/15 rounded-xl bg-white/10"
               whileTap={{ scale: 0.9 }}
               onClick={handleShare}>
               <Share2Icon className="w-4 h-4 text-white" />
             </motion.button>
             <motion.button
-              className="p-1.5 flex items-center justify-center hover:bg-white/10 rounded-full"
+              className="p-2 flex items-center justify-center hover:bg-white/15 rounded-xl bg-white/10"
               whileTap={{ scale: 0.9 }}
               onClick={handleRefresh}>
               <RefreshCwIcon className={`w-4 h-4 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -831,78 +853,80 @@ export default function OrderDetail() {
           </div>
         </div>
 
-        {/* Status section - Compact */}
-        <div className="px-4 py-4 text-center relative z-10">
-          <motion.h1
-            className="text-base font-black uppercase tracking-widest mb-1.5 leading-none"
-            key={currentStatus.title}
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}>
-            {currentStatus.title}
-          </motion.h1>
-
-          {/* Status pill - Compact */}
+        {/* Mobile-only status section */}
+        <div className="md:hidden px-4 pb-6 text-center relative z-10">
           <motion.div
-            className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-md rounded-full px-3 py-1 border border-white/10"
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2 }}>
-            <span className="text-[10px] font-bold text-white/90">{currentStatus.subtitle}</span>
-            {(orderStatus === "Accepted" || orderStatus === "On the way") && (
-              <>
-                <span className="w-1 h-1 rounded-full bg-green-300 animate-pulse" />
-                <span className="text-[10px] font-bold text-green-200">On time</span>
-              </>
-            )}
+            key={currentStatus.title}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center gap-2">
+            
+            <h1 className="text-xl font-black uppercase tracking-widest flex items-center gap-3 leading-none">
+              {currentStatus.icon && <span className="text-2xl">{currentStatus.icon}</span>}
+              {currentStatus.title}
+            </h1>
+
+            {/* Status pill - Compact */}
+            <motion.div
+              className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-md rounded-full px-4 py-1.5 border border-white/10 mt-2"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}>
+              <span className="text-[10px] font-bold text-white/95 uppercase tracking-wide">
+                {currentStatus.subtitle}
+              </span>
+            </motion.div>
           </motion.div>
         </div>
       </motion.div>
 
-      {/* Map Section */}
-      {!showConfirmation && !['Delivered', 'Cancelled', 'Returned'].includes(order?.status) && (
-        <GoogleMapsTracking
-          sellerLocations={sellerLocations.map(s => ({
-            lat: s.latitude,
-            lng: s.longitude,
-            name: s.storeName
-          }))}
-          customerLocation={{
-            lat: order?.deliveryAddress?.latitude || order?.address?.latitude || 0,
-            lng: order?.deliveryAddress?.longitude || order?.address?.longitude || 0,
-          }}
-          deliveryLocation={deliveryLocation || undefined}
-          isTracking={isConnected && !!deliveryLocation}
-          showRoute={
-            isConnected &&
-            !!deliveryLocation &&
-            order?.status !== 'Delivered' &&
-            order?.status !== 'Cancelled' &&
-            order?.status !== 'Returned'
-          }
-          routeOrigin={deliveryLocation || undefined}
-          routeDestination={{
-            lat: order?.deliveryAddress?.latitude || order?.address?.latitude || 0,
-            lng: order?.deliveryAddress?.longitude || order?.address?.longitude || 0,
-          }}
-          routeWaypoints={
-            order?.status === 'Picked up'
-              ? []
-              : sellerLocations.map(s => ({
-                lat: s.latitude,
-                lng: s.longitude,
-              }))
-          }
-          destinationName={
-            order?.status === 'Picked up'
-              ? (order?.deliveryAddress?.address?.split(',')[0] || order?.address?.address?.split(',')[0] || "Delivery Address")
-              : sellerLocations.length > 0
-                ? "Sellers & Delivery Address"
-                : "Delivery Address"
-          }
-          onRouteInfoUpdate={setRouteInfo}
-          lastUpdate={lastUpdate}
-        />
-      )}
+      <div className="max-w-6xl mx-auto">
+        {!showConfirmation && 
+         !['Delivered', 'Cancelled', 'Returned', 'Rejected'].includes(orderStatus) && (
+          <GoogleMapsTracking
+            sellerLocations={sellerLocations.map(s => ({
+              lat: s.latitude,
+              lng: s.longitude,
+              name: s.storeName
+            }))}
+            customerLocation={{
+              lat: order?.deliveryAddress?.latitude || order?.address?.latitude || 0,
+              lng: order?.deliveryAddress?.longitude || order?.address?.longitude || 0,
+            }}
+            deliveryLocation={deliveryLocation || undefined}
+            isTracking={isConnected && !!deliveryLocation}
+            showRoute={
+              isConnected &&
+              !!deliveryLocation &&
+              order?.status !== 'Delivered' &&
+              order?.status !== 'Cancelled' &&
+              order?.status !== 'Returned'
+            }
+            routeOrigin={deliveryLocation || undefined}
+            routeDestination={{
+              lat: order?.deliveryAddress?.latitude || order?.address?.latitude || 0,
+              lng: order?.deliveryAddress?.longitude || order?.address?.longitude || 0,
+            }}
+            routeWaypoints={
+              order?.status === 'Picked up'
+                ? []
+                : sellerLocations.map(s => ({
+                  lat: s.latitude,
+                  lng: s.longitude,
+                }))
+            }
+            destinationName={
+              order?.status === 'Picked up'
+                ? (order?.deliveryAddress?.address?.split(',')[0] || order?.address?.address?.split(',')[0] || "Delivery Address")
+                : sellerLocations.length > 0
+                  ? "Sellers & Delivery Address"
+                  : "Delivery Address"
+            }
+            onRouteInfoUpdate={setRouteInfo}
+            lastUpdate={lastUpdate}
+          />
+        )}
+      </div>
 
       {/* Tracking Error Display */}
       {trackingError && (
@@ -912,31 +936,55 @@ export default function OrderDetail() {
         </div>
       )}
 
-      {/* Delivery Partner Card */}
-      {(order?.deliveryPartner || order?.deliveryOtp || socketDeliveryOtp) && (
-        <DeliveryPartnerCard
-          partner={{
-            name: order?.deliveryPartner?.name || "Delivery Partner",
-            phone: order?.deliveryPartner?.phone,
-            profileImage: order?.deliveryPartner?.profileImage,
-            vehicleNumber: order?.deliveryPartner?.vehicleNumber,
-          }}
-          eta={routeInfo ? Math.ceil(routeInfo.durationValue / 60) : eta}
-          distance={routeInfo ? routeInfo.distanceValue : distance}
-          isTracking={isConnected && !!deliveryLocation}
-          deliveryOtp={socketDeliveryOtp || order?.deliveryOtp}
-          onCall={() => {
-            const phone = order?.deliveryPartner?.phone || "1234567890";
-            window.location.href = `tel:${phone}`;
-          }}
-        />
-      )}
 
       {/* Scrollable Content - High Density */}
-      <div className="px-3 py-3 space-y-3 pb-24">
-        {/* Payment Card - Only show if not Paid and order is not Delivered/Cancelled */}
-        {order.paymentStatus !== "Paid" && 
-         !['Delivered', 'Cancelled', 'Returned'].includes(orderStatus) && (
+      <div className="px-3 py-3 space-y-3 pb-24 max-w-5xl mx-auto">
+        {/* Delivery Partner Card */}
+        {(order?.deliveryPartner || order?.deliveryOtp || socketDeliveryOtp) && 
+         !['Delivered', 'Cancelled', 'Returned', 'Rejected'].includes(orderStatus) && (
+          <DeliveryPartnerCard
+            partner={{
+              name: order?.deliveryPartner?.name || "Delivery Partner",
+              phone: order?.deliveryPartner?.phone,
+              profileImage: order?.deliveryPartner?.profileImage,
+              vehicleNumber: order?.deliveryPartner?.vehicleNumber,
+            }}
+            eta={routeInfo ? Math.ceil(routeInfo.durationValue / 60) : eta}
+            distance={routeInfo ? routeInfo.distanceValue : distance}
+            isTracking={isConnected && !!deliveryLocation}
+            deliveryOtp={socketDeliveryOtp || order?.deliveryOtp}
+            onCall={() => {
+              const phone = order?.deliveryPartner?.phone || "1234567890";
+              window.location.href = `tel:${phone}`;
+            }}
+          />
+        )}
+        {/* Cancellation Details */}
+        {orderStatus === 'Cancelled' && (
+          <motion.div
+            className="village-card paper-texture organic-radius p-5 bg-[#8B3D28]/5 border border-[#8B3D28]/10"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}>
+            <div className="flex items-center gap-3 mb-3">
+               <div className="w-8 h-8 rounded-full bg-[#8B3D28] flex items-center justify-center text-white text-xs font-black">!</div>
+               <h3 className="text-village-umber text-sm font-black uppercase tracking-widest">Cancellation Details</h3>
+            </div>
+            <div className="space-y-2">
+              <p className="text-[10px] font-bold text-village-umber/60 uppercase tracking-widest leading-none">Reason Provided:</p>
+              <p className="text-village-umber text-xs font-bold bg-white/50 p-3 rounded-xl border border-dashed border-[#8B3D28]/20 italic">
+                "{order?.cancellationReason || "No specific reason provided"}"
+              </p>
+              {order?.cancelledAt && (
+                <p className="text-[8px] font-black text-neutral-400 uppercase tracking-[0.2em] mt-3">
+                  Cancelled on {new Date(order.cancelledAt).toLocaleString()}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+        {/* Payment Card - Show only if not Paid. For Online orders, hide once it moves past Pending to prevent stale status flashes */}
+        {((order.paymentStatus !== "Paid" && order.paymentMethod === 'COD') || (order.paymentStatus !== "Paid" && orderStatus === 'Pending')) &&
+         !['Delivered', 'Cancelled', 'Returned', 'Rejected', 'Accepted', 'On the way'].includes(orderStatus) && (
           <motion.div
             className="village-card paper-texture organic-radius p-3 bg-white shadow-sm border-none"
             initial={{ opacity: 0, y: 15 }}
@@ -966,10 +1014,10 @@ export default function OrderDetail() {
         )}
 
         {/* Promo Carousel */}
-        <PromoCarousel />
+        {/* <PromoCarousel /> */}
 
-        {/* Assignment Status */}
-        {!order?.deliveryPartner && (
+        {/* Assignment Status - Hide if cancelled */}
+        {!order?.deliveryPartner && !['Delivered', 'Cancelled', 'Returned', 'Rejected'].includes(orderStatus) && (
           <motion.div
             className="village-card paper-texture organic-radius p-3 bg-white shadow-sm border-none"
             initial={{ opacity: 0, y: 15 }}
@@ -988,10 +1036,12 @@ export default function OrderDetail() {
           </motion.div>
         )}
 
-        {/* Tip Section */}
-        <div className="village-card paper-texture organic-radius bg-white shadow-sm overflow-hidden">
-          <TipSection />
-        </div>
+        {/* Tip Section - Commented out as requested */}
+        {/* {!['Cancelled', 'Returned', 'Rejected'].includes(orderStatus) && (
+          <div className="village-card paper-texture organic-radius bg-white shadow-sm overflow-hidden">
+            <TipSection />
+          </div>
+        )} */}
 
         {/* Safety Banner */}
         <motion.button
@@ -1083,6 +1133,34 @@ export default function OrderDetail() {
                 <p className="text-[9px] font-bold text-neutral-400 italic">#{order.id.split("-").slice(-1)[0]} • {order.items?.length} Items</p>
               </div>
               <ChevronRightIcon className="w-4 h-4 text-neutral-300" />
+            </div>
+          </div>
+          <div className="p-3 space-y-2 border-b border-dashed border-village-umber/5">
+            <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+              <span>Subtotal</span>
+              <span>₹{order.subtotal || 0}</span>
+            </div>
+            {order.shipping > 0 && (
+              <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                <span>Shipping</span>
+                <span>₹{order.shipping}</span>
+              </div>
+            )}
+            {order.discount > 0 && (
+              <div className="flex justify-between items-center text-[10px] font-black text-green-600 uppercase tracking-widest">
+                <span>Discount</span>
+                <span>-₹{order.discount}</span>
+              </div>
+            )}
+            {order.walletAmountUsed > 0 && (
+              <div className="flex justify-between items-center text-[10px] font-black text-[#8B3D28] uppercase tracking-widest">
+                <span>Wallet Used</span>
+                <span>-₹{order.walletAmountUsed}</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center pt-1 border-t border-dashed border-village-umber/5">
+              <span className="text-[10px] font-black text-village-umber uppercase tracking-widest">Payable Amount</span>
+              <span className="text-sm font-black text-village-umber tracking-tight">₹{order.payableAmount !== undefined ? order.payableAmount : order.total}</span>
             </div>
           </div>
           <SectionItem

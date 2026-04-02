@@ -375,16 +375,16 @@ ProductSchema.pre("save", function (next) {
   if (this.variations && this.variations.length > 0) {
     const firstVariation = this.variations[0];
     
-    if (firstVariation.retailPrice !== undefined) {
+    if (typeof firstVariation.retailPrice === 'number' && !isNaN(firstVariation.retailPrice)) {
       this.retailPrice = firstVariation.retailPrice;
     }
-    if (firstVariation.retailDiscPrice !== undefined) {
+    if (typeof firstVariation.retailDiscPrice === 'number' && !isNaN(firstVariation.retailDiscPrice)) {
       this.retailDiscPrice = firstVariation.retailDiscPrice;
     }
-    if (firstVariation.wholesalePrice !== undefined) {
+    if (typeof firstVariation.wholesalePrice === 'number' && !isNaN(firstVariation.wholesalePrice)) {
       this.wholesalePrice = firstVariation.wholesalePrice;
     }
-    if (firstVariation.wholesaleDiscPrice !== undefined) {
+    if (typeof firstVariation.wholesaleDiscPrice === 'number' && !isNaN(firstVariation.wholesaleDiscPrice)) {
       this.wholesaleDiscPrice = firstVariation.wholesaleDiscPrice;
     }
 

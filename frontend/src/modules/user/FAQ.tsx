@@ -87,7 +87,7 @@ export default function FAQ() {
   return (
     <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
       {/* Header */}
-      <div className="bg-gradient-to-b from-green-200 via-green-100 to-white pb-6 md:pb-8 pt-12 md:pt-16">
+      <div className="bg-gradient-to-b from-green-200 via-green-100 to-white pb-4 md:pb-6 pt-6 md:pt-10">
         <div className="px-4 md:px-6 lg:px-8">
           <button
             onClick={() => navigate(-1)}
@@ -104,14 +104,14 @@ export default function FAQ() {
               />
             </svg>
           </button>
-          <div className="flex flex-col items-center mb-4 md:mb-6">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white flex items-center justify-center mb-3 md:mb-4 border-2 border-white shadow-sm">
+          <div className="flex flex-col items-center mb-2 md:mb-4">
+            <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white flex items-center justify-center mb-2 md:mb-3 border-2 border-white shadow-sm">
               <svg
-                width="40"
-                height="40"
+                width="28"
+                height="28"
                 viewBox="0 0 24 24"
                 fill="none"
-                className="text-green-600 md:w-12 md:h-12"
+                className="text-green-600 md:w-8 md:h-8"
               >
                 <path
                   d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
@@ -122,7 +122,7 @@ export default function FAQ() {
                 />
               </svg>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2">
+            <h1 className="text-lg md:text-xl font-bold text-neutral-900 mb-1">
               Frequently Asked Questions
             </h1>
             <p className="text-sm md:text-base text-neutral-600 text-center px-4">

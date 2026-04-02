@@ -39,7 +39,7 @@ export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
  */
 export const verifySmsOtp = asyncHandler(
   async (req: Request, res: Response) => {
-    const { mobile, otp, sessionId } = req.body;
+    const { mobile, otp, sessionId, customerType } = req.body;
 
     if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
       return res.status(400).json({
@@ -90,6 +90,7 @@ export const verifySmsOtp = asyncHandler(
         walletAmount: 0,
         totalOrders: 0,
         totalSpent: 0,
+        userType: customerType || 'retail',
       });
       isNewUser = true;
     }

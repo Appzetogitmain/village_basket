@@ -1,6 +1,6 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getOrderById, updateOrderStatus, OrderDetail, getAvailableDeliveryBoys, assignDeliveryBoy } from '../../../services/api/orderService';
+import { getOrderById, updateOrderStatus, OrderDetail, getAvailableDeliveryBoys, assignDeliveryBoy, acknowledgeOrder } from '../../../services/api/orderService';
 import jsPDF from 'jspdf';
 
 export default function SellerOrderDetail() {
@@ -428,19 +428,47 @@ export default function SellerOrderDetail() {
                   </button>
                 </div>
               ) : (
-                <select
-                  value={orderStatus}
-                  onChange={(e) => handleStatusUpdate(e.target.value)}
-                  className="w-full sm:w-64 px-4 py-2 border border-neutral-300 rounded-lg text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
-                  disabled={orderStatus === 'Rejected' || orderStatus === 'Cancelled' || orderStatus === 'Delivered'}
-                >
-                  <option value="Accepted">Accepted</option>
-                  <option value="Processed">Processed</option>
-                  <option value="On the way">On the way</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Cancelled">Cancelled</option>
-                  {orderStatus === 'Rejected' && <option value="Rejected">Rejected</option>}
-                </select>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <select
+                    value={orderStatus}
+                    onChange={(e) => handleStatusUpdate(e.target.value)}
+                    className="w-full sm:w-64 px-4 py-2 border border-neutral-300 rounded-lg text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                    disabled={orderStatus === 'Rejected' || orderStatus === 'Cancelled' || orderStatus === 'Delivered'}
+                  >
+                    <option value="Accepted">Accepted</option>
+                    <option value="Processed">Processed</option>
+                    <option value="On the way">On the way</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                    {orderStatus === 'Rejected' && <option value="Rejected">Rejected</option>}
+                  </select>
+
+                  {(orderStatus === 'Cancelled' || orderStatus === 'Rejected') && !orderDetail.isRefunded && (
+                    <button
+                      onClick={async () => {
+                        if (window.confirm('Are you sure you want to approve the refund for this order?')) {
+                          try {
+                            const res = await acknowledgeOrder(orderDetail.id);
+                            if (res.success) {
+                              alert("Refund approved successfully!");
+                              setOrderDetail({ ...orderDetail, isRefunded: true });
+                            }
+                          } catch (err: any) {
+                             alert(err.response?.data?.message || 'Failed to approve refund');
+                          }
+                        }
+                      }}
+                      className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors font-bold shadow-md"
+                    >
+                      Acknowledge & Approve Refund
+                    </button>
+                  )}
+                  {(orderStatus === 'Cancelled' || orderStatus === 'Rejected') && orderDetail.isRefunded && (
+                    <span className="text-green-600 font-bold bg-green-50 px-3 py-1.5 rounded-lg border border-green-200 text-sm">
+                      ✅ Refund Processed
+                    </span>
+                  )}
+                </div>
               )}
             </div>
             <button

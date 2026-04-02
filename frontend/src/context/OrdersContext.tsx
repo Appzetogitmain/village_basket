@@ -114,13 +114,19 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
             id: item.product.id || (item.product as { _id?: string })._id || '',
           },
           quantity: item.quantity,
-          variant: item.variant, // Pass variant if available
+          variant: item.variant,
         })),
         fees: {
           deliveryFee: order.fees?.deliveryFee || 0,
           platformFee: order.fees?.platformFee || 0,
         },
         deliveryShift: order.deliveryShift,
+        // Pass everything required by the backend controller
+        walletAmountUsed: order.walletAmountUsed || 0,
+        tipAmount: order.tipAmount || 0,
+        gstin: order.gstin,
+        couponCode: order.couponCode,
+        giftPackaging: order.giftPackaging || false,
         // Pass the new delivery slot if selected
         ...(order.deliverySlot && {
           deliverySlot: {
