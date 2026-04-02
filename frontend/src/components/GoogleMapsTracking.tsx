@@ -32,10 +32,13 @@ interface GoogleMapsTrackingProps {
     lastUpdate?: Date | null // Last location update timestamp
 }
 
-const mapContainerStyle = {
-    width: '100%',
-    height: '22rem'
-}
+const getMapContainerStyle = () => {
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+    return {
+        width: '100%',
+        height: isDesktop ? '18rem' : '22rem'
+    };
+};
 
 export default function GoogleMapsTracking({
     storeLocation,
@@ -557,7 +560,7 @@ export default function GoogleMapsTracking({
             )}
 
             <GoogleMap
-                mapContainerStyle={isFullScreen ? { width: '100%', height: '100%' } : mapContainerStyle}
+                mapContainerStyle={isFullScreen ? { width: '100%', height: '100%' } : getMapContainerStyle()}
                 center={initialCenter}
                 zoom={13}
                 onLoad={onLoad}

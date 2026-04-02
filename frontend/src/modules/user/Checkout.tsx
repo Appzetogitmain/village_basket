@@ -21,7 +21,7 @@ import type { DeliverySlotSelection } from '../../types/order';
 import GoogleMapsLocationPicker from '../../components/GoogleMapsLocationPicker';
 import { getProducts } from '../../services/api/customerProductService';
 import { useWishlist } from '../../context/WishlistContext';
-import { updateProfile } from '../../services/api/customerService';
+import { getProfile, updateProfile } from '../../services/api/customerService';
 import { calculateProductPrice } from '../../utils/priceUtils';
 import QuantityInput from '../../components/ui/QuantityInput';
 import RazorpayCheckout from '../../components/RazorpayCheckout';
@@ -67,6 +67,8 @@ export default function Checkout() {
   const [gstin, setGstin] = useState<string>('');
   const [showCancellationPolicy, setShowCancellationPolicy] = useState(false);
   const [giftPackaging, setGiftPackaging] = useState<boolean>(false);
+  const [useWalletBalance, setUseWalletBalance] = useState<boolean>(false);
+  const [hasAutoAppliedWallet, setHasAutoAppliedWallet] = useState<boolean>(false);
 
   // Profile completion modal state
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -83,7 +85,7 @@ export default function Checkout() {
   // Razorpay Payment State
   const [showRazorpayCheckout, setShowRazorpayCheckout] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'UPI'>('UPI');
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'UPI' | 'Wallet'>('UPI');
 
   // Delivery Slot State
   const [availableSlots, setAvailableSlots] = useState<Array<{ _id: string; name: string; label: string; startTime: string; endTime: string }>>([]);
@@ -105,10 +107,22 @@ export default function Checkout() {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [addressResponse, couponResponse] = await Promise.all([
+        const [addressResponse, couponResponse, profileResponse] = await Promise.all([
           getAddresses(),
-          getCoupons()
+          getCoupons(),
+          getProfile()
         ]);
+
+        // Update user profile globally to refresh wallet amount
+        if (profileResponse.success) {
+          updateUser(profileResponse.data);
+
+          // Auto-apply wallet by default if they have balance and it hasn't been set yet
+          if (profileResponse.data.walletAmount > 0 && !hasAutoAppliedWallet) {
+            setUseWalletBalance(true);
+            setHasAutoAppliedWallet(true);
+          }
+        }
 
         if (addressResponse.success && Array.isArray(addressResponse.data) && addressResponse.data.length > 0) {
           const defaultAddr = addressResponse.data.find((a: any) => a.isDefault) || addressResponse.data[0];
@@ -308,10 +322,11 @@ export default function Checkout() {
     }
   }
 
-  // Calculate tip amount (use custom tip if custom tip input is shown, otherwise use selected tip)
   const finalTipAmount = showCustomTipInput ? customTipAmount : (tipAmount || 0);
   const giftPackagingFee = giftPackaging ? 30 : 0;
-  const grandTotal = Math.max(0, discountedTotal + handlingCharge + deliveryCharge + finalTipAmount + giftPackagingFee - currentCouponDiscount);
+  const billTotal = Math.max(0, discountedTotal + handlingCharge + deliveryCharge + finalTipAmount + giftPackagingFee - currentCouponDiscount);
+  const walletAmountToUse = useWalletBalance ? Math.min(user?.walletAmount || 0, billTotal) : 0;
+  const grandTotal = billTotal - walletAmountToUse;
 
   const handleApplyCoupon = async (coupon: ApiCoupon) => {
     setIsValidatingCoupon(true);
@@ -428,20 +443,28 @@ export default function Checkout() {
       couponCode: selectedCoupon?.code || undefined,
       giftPackaging: giftPackaging,
       deliverySlot: selectedSlot || undefined,
+      walletAmountUsed: walletAmountToUse,
     };
 
     try {
       // Create the order
       const placedId = await addOrder(order);
       if (placedId) {
-        if (paymentMethod === 'COD') {
-          // For COD, success is immediate
+        // If order is fully covered by wallet or is COD/Wallet payment
+        if (paymentMethod === 'COD' || paymentMethod === 'Wallet' || grandTotal <= 0) {
+          // Success is immediate
           setPlacedOrderId(placedId);
           setShowOrderSuccess(true);
           clearCart();
-          showGlobalToast('Order placed successfully!', 'success');
+          showGlobalToast(grandTotal <= 0 ? 'Order paid via Wallet!' : 'Order placed successfully!', 'success');
+
+          // Refresh user profile to reflect balance deduction
+          const updatedProfile = await getProfile();
+          if (updatedProfile.success) {
+            updateUser(updatedProfile.data);
+          }
         } else {
-          // For UPI, trigger Razorpay
+          // For UPI with remaining balance, trigger Razorpay
           setPendingOrderId(placedId);
           setShowRazorpayCheckout(true);
         }
@@ -796,11 +819,10 @@ export default function Checkout() {
                 <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] bg-neutral-50 px-3 py-1 rounded-full border border-neutral-100">
                   ID: {placedOrderId}
                 </span>
-                <div className={`px-4 py-1.5 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-sm border-b-4 ${
-                  paymentMethod === 'COD' 
-                    ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                <div className={`px-4 py-1.5 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-sm border-b-4 ${paymentMethod === 'COD'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
                     : 'bg-green-50 text-green-700 border-green-200'
-                }`}>
+                  }`}>
                   Payment: {paymentMethod === 'COD' ? 'Cash on Delivery' : 'Paid Online'}
                 </div>
               </div>
@@ -972,15 +994,15 @@ export default function Checkout() {
                   <p className="text-[10px] text-neutral-600 mb-0.5">
                     {item.quantity} × {item.variant || (item.product as any).variantTitle || (item.product as any).pack || item.product?.pack}
                   </p>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleMoveToWishlist(item.product);
-                      }}
-                      className="text-[10px] text-[#8B3D28] font-bold mb-1.5 hover:text-[#722F1E] transition-colors font-poppins"
-                    >
-                      Move to wishlist
-                    </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMoveToWishlist(item.product);
+                    }}
+                    className="text-[10px] text-[#8B3D28] font-bold mb-1.5 hover:text-[#722F1E] transition-colors font-poppins"
+                  >
+                    Move to wishlist
+                  </button>
 
                   {/* Quantity Selector */}
                   <div className="flex items-center justify-between mt-1.5">
@@ -1033,8 +1055,8 @@ export default function Checkout() {
       <div className="px-4 md:px-6 lg:px-8 py-4 bg-white border-b border-neutral-200">
         <h2 className="text-sm font-bold text-neutral-900 mb-3 flex items-center gap-2">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-            <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+            <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
           Choose Delivery Time Slot
           {availableSlots.length > 0 && <span className="text-red-500 font-bold">*</span>}
@@ -1070,11 +1092,10 @@ export default function Checkout() {
                     label: slot.label,
                     timeRange: slot.label,
                   })}
-                  className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${
-                    isSelected
+                  className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${isSelected
                       ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
                       : 'border-neutral-100 bg-neutral-50 text-neutral-600 hover:border-neutral-200'
-                  }`}
+                    }`}
                 >
                   <span className="text-xl">{getIcon(slot.name)}</span>
                   <span className="text-xs font-bold font-poppins text-center leading-tight">{slot.name || 'Delivery Slot'}</span>
@@ -1208,11 +1229,10 @@ export default function Checkout() {
           {/* UPI Option */}
           <button
             onClick={() => setPaymentMethod('UPI')}
-            className={`p-3.5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all relative overflow-hidden ${
-              paymentMethod === 'UPI'
+            className={`p-3.5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all relative overflow-hidden ${paymentMethod === 'UPI'
                 ? 'border-[#8B3D28] bg-white text-[#8B3D28] shadow-sm'
                 : 'border-neutral-100 bg-white text-neutral-500 opacity-80'
-            }`}
+              }`}
           >
             <div className={`p-2 rounded-full ${paymentMethod === 'UPI' ? 'bg-[#8B3D28]/10 text-[#8B3D28]' : 'bg-neutral-50 text-neutral-400'}`}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -1235,11 +1255,10 @@ export default function Checkout() {
           {/* COD Option */}
           <button
             onClick={() => setPaymentMethod('COD')}
-            className={`p-3.5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all relative overflow-hidden ${
-              paymentMethod === 'COD'
+            className={`p-3.5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all relative overflow-hidden ${paymentMethod === 'COD'
                 ? 'border-[#8B3D28] bg-white text-[#8B3D28] shadow-sm'
                 : 'border-neutral-100 bg-white text-neutral-500 opacity-80'
-            }`}
+              }`}
           >
             <div className={`p-2 rounded-full ${paymentMethod === 'COD' ? 'bg-[#8B3D28]/10 text-[#8B3D28]' : 'bg-neutral-50 text-neutral-400'}`}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -1260,7 +1279,42 @@ export default function Checkout() {
               </div>
             )}
           </button>
+
         </div>
+        {/* Use Wallet Balance Toggle */}
+        {(user?.walletAmount ?? 0) > 0 && paymentMethod !== 'Wallet' && (
+          <div className="mt-4 pt-4 border-t border-neutral-100">
+            <button
+              onClick={() => setUseWalletBalance(!useWalletBalance)}
+              className={`w-full flex items-center justify-between rounded-xl p-3.5 transition-all ${useWalletBalance
+                  ? 'bg-[#8B3D28]/5 border-2 border-[#8B3D28] shadow-sm'
+                  : 'bg-white border-2 border-neutral-100 hover:border-neutral-200'
+                }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors ${useWalletBalance ? 'bg-[#8B3D28] text-white' : 'bg-neutral-100 text-neutral-400'
+                  }`}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    {useWalletBalance ? <path d="M20 6L9 17l-5-5" /> : <rect x="3" y="3" width="18" height="18" rx="2" />}
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <p className={`text-xs font-black font-poppins uppercase tracking-wide ${useWalletBalance ? 'text-[#8B3D28]' : 'text-neutral-900'}`}>
+                    Use Village Wallet Balance
+                  </p>
+                  <p className="text-[10px] font-medium text-neutral-500">
+                    {useWalletBalance
+                      ? `Remaining: ₹${(user?.walletAmount ?? 0) - walletAmountToUse}`
+                      : `Available: ₹${user?.walletAmount || 0}`}
+                  </p>
+                </div>
+              </div>
+              {useWalletBalance && (
+                <span className="text-xs font-black text-[#8B3D28] font-poppins">-₹{walletAmountToUse}</span>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Bill details */}
@@ -1364,14 +1418,27 @@ export default function Checkout() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
-                  <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+                  <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 <span className="text-xs text-neutral-700">Delivery Slot</span>
               </div>
               <span className="text-xs font-bold text-[#8B3D28] font-poppins uppercase">
                 {selectedSlot.name}
               </span>
+            </div>
+          )}
+
+          {/* Wallet Discount (if partial) */}
+          {useWalletBalance && walletAmountToUse > 0 && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B3D28" strokeWidth="2.5">
+                  <path d="M19 5H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2z" />
+                </svg>
+                <span className="text-xs text-[#8B3D28] font-bold">Wallet Applied</span>
+              </div>
+              <span className="text-xs font-black text-[#8B3D28] font-poppins">-₹{walletAmountToUse}</span>
             </div>
           )}
 
@@ -1888,6 +1955,13 @@ export default function Checkout() {
             clearCart();
             setShowOrderSuccess(true);
             showGlobalToast('Payment successful!', 'success');
+
+            // Refresh user profile for updated wallet balance
+            getProfile().then(res => {
+              if (res.success) {
+                updateUser(res.data);
+              }
+            });
           }}
           onFailure={(error) => {
             setShowRazorpayCheckout(false);

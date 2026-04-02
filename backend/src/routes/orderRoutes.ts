@@ -5,6 +5,7 @@ import {
   updateOrderStatus,
   getDeliveryBoys,
   assignDeliveryBoy,
+  acknowledgeOrder,
 } from "../modules/seller/controllers/orderController";
 import { authenticate, requireUserType } from "../middleware/auth";
 
@@ -25,6 +26,9 @@ router.get("/:id", getOrderById);
 
 // Update order status
 router.patch("/:id/status", updateOrderStatus);
+
+// Acknowledge cancellation and approve refund
+router.post("/:id/acknowledge", acknowledgeOrder);
 
 // Assign manual delivery boy
 router.post("/:id/assign-delivery", assignDeliveryBoy);

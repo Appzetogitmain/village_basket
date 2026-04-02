@@ -41,6 +41,8 @@ export interface IOrder extends Document {
   discount: number;
   couponCode?: string;
   total: number;
+  walletAmountUsed?: number;
+  payableAmount: number;
 
   // Payment
   paymentMethod: string;
@@ -102,6 +104,7 @@ export interface IOrder extends Document {
   cancellationReason?: string;
   cancelledAt?: Date;
   cancelledBy?: mongoose.Types.ObjectId;
+  isRefunded?: boolean;
 
   createdAt: Date;
   updatedAt: Date;
@@ -229,6 +232,16 @@ const OrderSchema = new Schema<IOrder>(
       type: Number,
       required: [true, "Total is required"],
       min: [0, "Total cannot be negative"],
+    },
+    walletAmountUsed: {
+      type: Number,
+      default: 0,
+      min: [0, "Wallet amount used cannot be negative"],
+    },
+    payableAmount: {
+      type: Number,
+      default: 0,
+      min: [0, "Payable amount cannot be negative"],
     },
 
     // Payment
@@ -364,7 +377,10 @@ const OrderSchema = new Schema<IOrder>(
     },
     cancelledBy: {
       type: Schema.Types.ObjectId,
-      ref: "Admin",
+    },
+    isRefunded: {
+      type: Boolean,
+      default: false,
     },
   },
   {

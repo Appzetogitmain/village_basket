@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Customer from "../../../models/Customer";
+import WalletTransaction from "../../../models/WalletTransaction";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import AppSettings from "../../../models/AppSettings";
 
@@ -37,7 +38,7 @@ export const getProfile = asyncHandler(async (req: Request, res: Response) => {
       registrationDate: customer.registrationDate,
       status: customer.status,
       refCode: customer.refCode,
-      walletAmount: customer.walletAmount,
+      walletAmount: customer.walletAmount || 0,
       totalOrders: customer.totalOrders,
       totalSpent: customer.totalSpent,
       latitude: customer.latitude,
@@ -114,7 +115,7 @@ export const updateProfile = asyncHandler(
         registrationDate: customer.registrationDate,
         status: customer.status,
         refCode: customer.refCode,
-        walletAmount: customer.walletAmount,
+        walletAmount: customer.walletAmount || 0,
         totalOrders: customer.totalOrders,
         totalSpent: customer.totalSpent,
         latitude: customer.latitude,
@@ -132,6 +133,30 @@ export const updateProfile = asyncHandler(
     });
   }
 );
+
+/**
+ * Get wallet transactions
+ */
+export const getWalletTransactions = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+
+    if (!userId || (req as any).user?.userType !== "Customer") {
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized or not a customer",
+        });
+    }
+
+    const transactions = await WalletTransaction.find({ 
+        userId, 
+        userType: 'CUSTOMER' 
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+        success: true,
+        data: transactions,
+    });
+});
 
 /**
  * Update customer location

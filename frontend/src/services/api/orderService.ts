@@ -59,6 +59,7 @@ export interface OrderDetail {
   grandTotal: number;
   paymentMethod: string;
   paymentStatus: string;
+  isRefunded?: boolean;
   deliveryAddress: DeliveryAddress;
 }
 
@@ -124,6 +125,14 @@ export const getAvailableDeliveryBoys = async (): Promise<ApiResponse<{ _id: str
  */
 export const assignDeliveryBoy = async (orderId: string, deliveryBoyId: string): Promise<ApiResponse<{ id: string; status: string; deliveryBoy: string }>> => {
   const response = await api.post<ApiResponse<{ id: string; status: string; deliveryBoy: string }>>(`/orders/${orderId}/assign-delivery`, { deliveryBoyId });
+  return response.data;
+};
+
+/**
+ * Acknowledge a cancellation and approve the refund
+ */
+export const acknowledgeOrder = async (id: string): Promise<ApiResponse<{ id: string; isRefunded: boolean }>> => {
+  const response = await api.post<ApiResponse<{ id: string; isRefunded: boolean }>>(`/orders/${id}/acknowledge`);
   return response.data;
 };
 

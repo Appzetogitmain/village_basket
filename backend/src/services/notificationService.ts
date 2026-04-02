@@ -3,6 +3,7 @@ import Admin from "../models/Admin";
 import Seller from "../models/Seller";
 import Customer from "../models/Customer";
 import Delivery from "../models/Delivery";
+import { getIO } from "../socket/socketService";
 
 /**
  * Send notification to specific user
@@ -94,6 +95,33 @@ export const sendNotification = async (
     if (pushResponse) {
       notification.sentAt = new Date();
       await notification.save();
+    }
+
+    // 4. Send Real-time Socket Event
+    try {
+      const io = getIO();
+      let room = "";
+      const rId = recipientId.toString();
+
+      if (recipientType === "Customer") room = `customer-${rId}`;
+      else if (recipientType === "Seller") room = `seller-${rId}`;
+      else if (recipientType === "Delivery") room = `delivery-${rId}`;
+      else if (recipientType === "Admin") room = `admin-notifications`;
+
+      if (room) {
+        io.to(room).emit("notification", {
+          id: notification._id,
+          title,
+          message,
+          type: notification.type,
+          data: notification.data,
+          link: notification.link,
+          createdAt: notification.createdAt
+        });
+      }
+    } catch (socketError) {
+      // Fallback if socket fails - record still exists
+      console.warn("Socket notification failed:", socketError);
     }
 
     return notification;

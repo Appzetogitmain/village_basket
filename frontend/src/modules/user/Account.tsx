@@ -6,6 +6,7 @@ import { sendTestNotification } from '../../services/pushNotificationService';
 import { useToast } from '../../context/ToastContext';
 import { useLocation } from 'react-router-dom';
 import DailyServiceList from './components/DailyServiceList';
+import VillageWallet from './components/VillageWallet';
 
 export default function Account() {
   const navigate = useNavigate();
@@ -204,6 +205,9 @@ export default function Account() {
                 <div className="text-[10px] font-black text-village-umber uppercase tracking-widest">Help</div>
               </button>
             </div>
+
+            {/* Village Wallet Section */}
+            <VillageWallet balance={profile?.walletAmount || 0} />
 
             {/* Information Grid */}
             <div>

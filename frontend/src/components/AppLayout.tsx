@@ -140,8 +140,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const isProductDetailPage = location.pathname.startsWith('/user/product/');
   const isSearchPage = location.pathname === '/user/search';
   const isCheckoutPage = location.pathname === '/user/checkout' || location.pathname.startsWith('/user/checkout/') || location.pathname === '/user/daily-service/checkout' || location.pathname.startsWith('/user/daily-service/checkout');
-  const isHomePage = location.pathname === '/user' || location.pathname === '/user/' || location.pathname === '/user/home';
-  const showHeader = !isCheckoutPage;
+  const isOrderDetailPage = location.pathname.startsWith('/user/orders/');
+  const showHeader = !isCheckoutPage && !isOrderDetailPage;
   const showSearchBar = isSearchPage;
   const showFooter = !isCheckoutPage && !isProductDetailPage;
 
@@ -335,7 +335,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
           {/* Floating Cart Pill - Desktop (hidden on mobile to prevent duplicate keys/animations) */}
           <div className="hidden md:block">
-            <FloatingCartPill />
+            {!isOrderDetailPage && <FloatingCartPill />}
           </div>
 
           {/* Location Permission Request Modal - Mandatory for all users */}

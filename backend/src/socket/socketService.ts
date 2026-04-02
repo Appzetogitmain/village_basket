@@ -36,8 +36,10 @@ const calculateETA = (distanceInMeters: number): number => {
     return Math.ceil(distanceInMeters / averageSpeedMs);
 };
 
+let io: SocketIOServer;
+
 export const initializeSocket = (httpServer: HttpServer) => {
-    const io = new SocketIOServer(httpServer, {
+    io = new SocketIOServer(httpServer, {
         cors: {
             origin: (origin, callback) => {
                 // Allow requests with no origin (like mobile apps or server-to-server)
@@ -193,6 +195,19 @@ export const initializeSocket = (httpServer: HttpServer) => {
                 success: true,
                 message: 'Successfully joined seller notifications room',
                 sellerId: normalizedSellerId
+            });
+        });
+ 
+        // Customer joins their own room for notifications
+        socket.on('join-customer-room', (customerId: string) => {
+            const normalizedId = String(customerId).trim();
+            console.log(`👤 Customer ${normalizedId} joined notifications room`);
+            socket.join(`customer-${normalizedId}`);
+            
+            socket.emit('joined-customer-room', {
+                success: true,
+                message: 'Successfully joined customer notifications room',
+                customerId: normalizedId
             });
         });
 
@@ -377,4 +392,11 @@ export const emitLocationUpdate = (
         ...data,
         timestamp: new Date(),
     });
+};
+
+export const getIO = () => {
+    if (!io) {
+        throw new Error('Socket.io not initialized');
+    }
+    return io;
 };

@@ -7,6 +7,9 @@ const router = Router();
 // Get customer profile (protected route)
 router.get("/profile", authenticate, customerController.getProfile);
 
+// Get wallet transactions (protected route)
+router.get("/wallet/transactions", authenticate, customerController.getWalletTransactions);
+
 // Update customer profile (protected route)
 router.put("/profile", authenticate, customerController.updateProfile);
 
