@@ -40,9 +40,7 @@ export default function Checkout() {
   const { user, updateUser } = useAuth();
   const { addToWishlist: contextAddToWishlist } = useWishlist();
   const navigate = useNavigate();
-  const [tipAmount, setTipAmount] = useState<number | null>(null);
-  const [customTipAmount, setCustomTipAmount] = useState<number>(0);
-  const [showCustomTipInput, setShowCustomTipInput] = useState(false);
+
   const [savedAddress, setSavedAddress] = useState<OrderAddress | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<OrderAddress | null>(null);
   const [showCouponSheet, setShowCouponSheet] = useState(false);
@@ -322,9 +320,8 @@ export default function Checkout() {
     }
   }
 
-  const finalTipAmount = showCustomTipInput ? customTipAmount : (tipAmount || 0);
   const giftPackagingFee = giftPackaging ? 30 : 0;
-  const billTotal = Math.max(0, discountedTotal + handlingCharge + deliveryCharge + finalTipAmount + giftPackagingFee - currentCouponDiscount);
+  const billTotal = Math.max(0, discountedTotal + handlingCharge + deliveryCharge + giftPackagingFee - currentCouponDiscount);
   const walletAmountToUse = useWalletBalance ? Math.min(user?.walletAmount || 0, billTotal) : 0;
   const grandTotal = billTotal - walletAmountToUse;
 
@@ -438,7 +435,6 @@ export default function Checkout() {
       status: paymentMethod === 'COD' ? 'Received' : 'Pending', // COD is received immediately, UPI is pending until payment
       paymentMethod: paymentMethod, // Pass selected payment method
       createdAt: new Date().toISOString(),
-      tipAmount: finalTipAmount,
       gstin: gstin || undefined,
       couponCode: selectedCoupon?.code || undefined,
       giftPackaging: giftPackaging,
@@ -820,8 +816,8 @@ export default function Checkout() {
                   ID: {placedOrderId}
                 </span>
                 <div className={`px-4 py-1.5 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-sm border-b-4 ${paymentMethod === 'COD'
-                    ? 'bg-amber-50 text-amber-700 border-amber-200'
-                    : 'bg-green-50 text-green-700 border-green-200'
+                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                  : 'bg-green-50 text-green-700 border-green-200'
                   }`}>
                   Payment: {paymentMethod === 'COD' ? 'Cash on Delivery' : 'Paid Online'}
                 </div>
@@ -1093,8 +1089,8 @@ export default function Checkout() {
                     timeRange: slot.label,
                   })}
                   className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${isSelected
-                      ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
-                      : 'border-neutral-100 bg-neutral-50 text-neutral-600 hover:border-neutral-200'
+                    ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
+                    : 'border-neutral-100 bg-neutral-50 text-neutral-600 hover:border-neutral-200'
                     }`}
                 >
                   <span className="text-xl">{getIcon(slot.name)}</span>
@@ -1230,8 +1226,8 @@ export default function Checkout() {
           <button
             onClick={() => setPaymentMethod('UPI')}
             className={`p-3.5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all relative overflow-hidden ${paymentMethod === 'UPI'
-                ? 'border-[#8B3D28] bg-white text-[#8B3D28] shadow-sm'
-                : 'border-neutral-100 bg-white text-neutral-500 opacity-80'
+              ? 'border-[#8B3D28] bg-white text-[#8B3D28] shadow-sm'
+              : 'border-neutral-100 bg-white text-neutral-500 opacity-80'
               }`}
           >
             <div className={`p-2 rounded-full ${paymentMethod === 'UPI' ? 'bg-[#8B3D28]/10 text-[#8B3D28]' : 'bg-neutral-50 text-neutral-400'}`}>
@@ -1256,8 +1252,8 @@ export default function Checkout() {
           <button
             onClick={() => setPaymentMethod('COD')}
             className={`p-3.5 rounded-xl border-2 flex flex-col items-center gap-2 transition-all relative overflow-hidden ${paymentMethod === 'COD'
-                ? 'border-[#8B3D28] bg-white text-[#8B3D28] shadow-sm'
-                : 'border-neutral-100 bg-white text-neutral-500 opacity-80'
+              ? 'border-[#8B3D28] bg-white text-[#8B3D28] shadow-sm'
+              : 'border-neutral-100 bg-white text-neutral-500 opacity-80'
               }`}
           >
             <div className={`p-2 rounded-full ${paymentMethod === 'COD' ? 'bg-[#8B3D28]/10 text-[#8B3D28]' : 'bg-neutral-50 text-neutral-400'}`}>
@@ -1287,8 +1283,8 @@ export default function Checkout() {
             <button
               onClick={() => setUseWalletBalance(!useWalletBalance)}
               className={`w-full flex items-center justify-between rounded-xl p-3.5 transition-all ${useWalletBalance
-                  ? 'bg-[#8B3D28]/5 border-2 border-[#8B3D28] shadow-sm'
-                  : 'bg-white border-2 border-neutral-100 hover:border-neutral-200'
+                ? 'bg-[#8B3D28]/5 border-2 border-[#8B3D28] shadow-sm'
+                : 'bg-white border-2 border-neutral-100 hover:border-neutral-200'
                 }`}
             >
               <div className="flex items-center gap-3">
@@ -1387,18 +1383,7 @@ export default function Checkout() {
             </div>
           )}
 
-          {/* Tip amount */}
-          {finalTipAmount > 0 && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <span className="text-xs text-neutral-700">Tip to delivery partner</span>
-              </div>
-              <span className="text-xs font-medium text-neutral-900">₹{finalTipAmount}</span>
-            </div>
-          )}
+
 
           {/* Gift Packaging */}
           {giftPackaging && (
@@ -1474,98 +1459,7 @@ export default function Checkout() {
       </div>
 
 
-      {/* Tip your delivery partner */}
-      <div className="px-4 py-2 border-b border-neutral-200">
-        <h3 className="text-sm font-bold text-neutral-900 mb-0.5">Tip your delivery partner</h3>
-        <p className="text-xs text-neutral-600 mb-2">Your kindness means a lot! 100% of your tip will go directly to your delivery partner.</p>
 
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1.5">
-          <button
-            onClick={() => {
-              setTipAmount(20);
-              setShowCustomTipInput(false);
-            }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-bold text-xs font-poppins ${tipAmount === 20 && !showCustomTipInput
-              ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
-              : 'border-neutral-300 bg-white text-neutral-700'
-              }`}
-          >
-            😊 ₹20
-          </button>
-          <button
-            onClick={() => {
-              setTipAmount(30);
-              setShowCustomTipInput(false);
-            }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-bold text-xs font-poppins ${tipAmount === 30 && !showCustomTipInput
-              ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
-              : 'border-neutral-300 bg-white text-neutral-700'
-              }`}
-          >
-            🤩 ₹30
-          </button>
-          <button
-            onClick={() => {
-              setTipAmount(50);
-              setShowCustomTipInput(false);
-            }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-bold text-xs font-poppins ${tipAmount === 50 && !showCustomTipInput
-              ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
-              : 'border-neutral-300 bg-white text-neutral-700'
-              }`}
-          >
-            😍 ₹50
-          </button>
-          <button
-            onClick={() => {
-              setShowCustomTipInput(true);
-              setTipAmount(null);
-            }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-bold text-xs font-poppins ${showCustomTipInput
-              ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
-              : 'border-neutral-300 bg-white text-neutral-700'
-              }`}
-          >
-            🎁 Custom
-          </button>
-        </div>
-
-        {/* Custom Tip Input */}
-        {showCustomTipInput && (
-          <div className="mt-2 flex items-center gap-2">
-            <input
-              type="number"
-              value={customTipAmount || ''}
-              onChange={(e) => {
-                const val = Number(e.target.value);
-                if (val >= 0) {
-                  setCustomTipAmount(val);
-                }
-              }}
-              onBlur={(e) => {
-                const val = Number(e.target.value);
-                if (val < 0) {
-                  setCustomTipAmount(0);
-                }
-              }}
-              placeholder="Enter custom tip amount"
-              className="flex-1 px-3 py-1.5 bg-white border-2 border-[#8B3D28] rounded-lg text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
-              min="0"
-              step="1"
-            />
-            <button
-              onClick={() => {
-                setShowCustomTipInput(false);
-                setCustomTipAmount(0);
-                setTipAmount(null);
-              }}
-              className="px-3 py-1.5 text-xs font-medium text-neutral-700 hover:text-neutral-900"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
 
       {/* Gift Packaging */}
       <div className="px-4 py-2 border-b border-neutral-200">

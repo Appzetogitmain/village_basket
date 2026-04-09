@@ -611,7 +611,7 @@ export default function SellerAddProduct() {
                     value={formData.productName}
                     onChange={handleChange}
                     placeholder="Enter Product Name"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   />
                 </div>
                 <div>
@@ -623,7 +623,7 @@ export default function SellerAddProduct() {
                     name="headerCategory"
                     value={formData.headerCategory}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                     <option value="">Select Header Category</option>
                     {headerCategories.map((headerCat) => (
                       <option key={headerCat._id} value={headerCat._id}>
@@ -646,9 +646,9 @@ export default function SellerAddProduct() {
                     value={formData.category}
                     onChange={handleChange}
                     disabled={!formData.headerCategory}
-                    className={`w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] ${!formData.headerCategory
+                    className={`w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] ${!formData.headerCategory
                       ? "bg-neutral-100 cursor-not-allowed text-neutral-500"
-                      : "bg-white/90 backdrop-blur-md border-white/20"
+                      : "bg-white"
                       }`}>
                     <option value="">
                       {formData.headerCategory
@@ -690,9 +690,9 @@ export default function SellerAddProduct() {
                     value={formData.subcategory}
                     onChange={handleChange}
                     disabled={!formData.category}
-                    className={`w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] ${!formData.category
+                    className={`w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] ${!formData.category
                       ? "bg-neutral-100 cursor-not-allowed text-neutral-500"
-                      : "bg-white/90 backdrop-blur-md border-white/20"
+                      : "bg-white"
                       }`}>
                     <option value="">
                       {formData.category
@@ -714,7 +714,7 @@ export default function SellerAddProduct() {
                     name="publish"
                     value={formData.publish}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -727,7 +727,7 @@ export default function SellerAddProduct() {
                     name="popular"
                     value={formData.popular}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -740,7 +740,7 @@ export default function SellerAddProduct() {
                     name="dealOfDay"
                     value={formData.dealOfDay}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -753,7 +753,7 @@ export default function SellerAddProduct() {
                     name="brand"
                     value={formData.brand}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                     <option value="">Select Brand</option>
                     {brands.map((brand) => (
                       <option key={brand._id} value={brand._id}>
@@ -772,7 +772,7 @@ export default function SellerAddProduct() {
                     value={formData.tags}
                     onChange={handleChange}
                     placeholder="Select or create tags"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   />
                   <p className="text-xs text-red-500 mt-1">
                     This will help for search
@@ -790,7 +790,7 @@ export default function SellerAddProduct() {
                   onChange={handleChange}
                   placeholder="Enter Product Small Description"
                   rows={4}
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] resize-none"
+                  className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] resize-none"
                 />
               </div>
             </div>
@@ -812,7 +812,7 @@ export default function SellerAddProduct() {
                   value={formData.seoTitle}
                   onChange={handleChange}
                   placeholder="Enter SEO Title"
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                  className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                 />
               </div>
               <div>
@@ -825,7 +825,7 @@ export default function SellerAddProduct() {
                   value={formData.seoKeywords}
                   onChange={handleChange}
                   placeholder="Enter SEO Keywords"
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                  className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                 />
               </div>
               <div>
@@ -838,7 +838,7 @@ export default function SellerAddProduct() {
                   value={formData.seoImageAlt}
                   onChange={handleChange}
                   placeholder="Enter SEO Image Alt Text"
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                  className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                 />
               </div>
               <div>
@@ -851,7 +851,7 @@ export default function SellerAddProduct() {
                   onChange={handleChange}
                   placeholder="Enter SEO Description"
                   rows={4}
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] resize-none"
+                  className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] resize-none"
                 />
               </div>
             </div>
@@ -865,13 +865,13 @@ export default function SellerAddProduct() {
             <div className="p-4 sm:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Select Product Variation Type
+                  Select Product Variation Type <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="variationType"
                   value={formData.variationType}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                  className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                   <option value="">Select Product Type</option>
                   <option value="Size">Size</option>
                   <option value="Weight">Weight</option>
@@ -885,7 +885,7 @@ export default function SellerAddProduct() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Title (e.g., 100g)
+                      Title (e.g., 100g) <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -897,12 +897,12 @@ export default function SellerAddProduct() {
                         })
                       }
                       placeholder="100g"
-                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
+                      className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Stock (0 = Unlimited)
+                      Stock <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -914,12 +914,12 @@ export default function SellerAddProduct() {
                         })
                       }
                       placeholder="0"
-                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
+                      className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Status
+                      Status <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={variationForm.status}
@@ -929,14 +929,14 @@ export default function SellerAddProduct() {
                           status: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] bg-white">
+                      className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] bg-white">
                       <option value="Available">Available</option>
                       <option value="Sold out">Sold out</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
-                       Min. Wholesale Qty
+                      Min. Wholesale Qty <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -949,7 +949,7 @@ export default function SellerAddProduct() {
                       }
                       placeholder="1"
                       min="1"
-                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
+                      className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
                     />
                   </div>
                 </div>
@@ -960,23 +960,23 @@ export default function SellerAddProduct() {
                     <h4 className="font-semibold text-[#8B3D28] text-sm uppercase tracking-wider">Retail Pricing</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-neutral-600 mb-1">Price *</label>
+                        <label className="block text-xs font-medium text-neutral-600 mb-1">Price <span className="text-red-500">*</span></label>
                         <input
                           type="number"
                           value={variationForm.retailPrice}
                           onChange={(e) => setVariationForm({ ...variationForm, retailPrice: e.target.value })}
                           placeholder="100"
-                          className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-1 focus:ring-[#8B3D28]"
+                          className="w-full px-3 py-2 text-sm border border-neutral-400 rounded-lg focus:ring-1 focus:ring-[#8B3D28]"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-neutral-600 mb-1">Disc. Price</label>
+                        <label className="block text-xs font-medium text-neutral-600 mb-1">Disc. Price <span className="text-red-500">*</span></label>
                         <input
                           type="number"
                           value={variationForm.retailDiscPrice}
                           onChange={(e) => setVariationForm({ ...variationForm, retailDiscPrice: e.target.value })}
                           placeholder="80"
-                          className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-1 focus:ring-[#8B3D28]"
+                          className="w-full px-3 py-2 text-sm border border-neutral-400 rounded-lg focus:ring-1 focus:ring-[#8B3D28]"
                         />
                       </div>
                     </div>
@@ -987,23 +987,23 @@ export default function SellerAddProduct() {
                     <h4 className="font-semibold text-blue-800 text-sm uppercase tracking-wider">Wholesale Pricing</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-neutral-600 mb-1">Price *</label>
+                        <label className="block text-xs font-medium text-neutral-600 mb-1">Price <span className="text-red-500">*</span></label>
                         <input
                           type="number"
                           value={variationForm.wholesalePrice}
                           onChange={(e) => setVariationForm({ ...variationForm, wholesalePrice: e.target.value })}
                           placeholder="90"
-                          className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-1 focus:ring-blue-600"
+                          className="w-full px-3 py-2 text-sm border border-neutral-400 rounded-lg focus:ring-1 focus:ring-blue-600"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-neutral-600 mb-1">Disc. Price</label>
+                        <label className="block text-xs font-medium text-neutral-600 mb-1">Disc. Price <span className="text-red-500">*</span></label>
                         <input
                           type="number"
                           value={variationForm.wholesaleDiscPrice}
                           onChange={(e) => setVariationForm({ ...variationForm, wholesaleDiscPrice: e.target.value })}
                           placeholder="70"
-                          className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-1 focus:ring-blue-600"
+                          className="w-full px-3 py-2 text-sm border border-neutral-400 rounded-lg focus:ring-1 focus:ring-blue-600"
                         />
                       </div>
                     </div>
@@ -1097,7 +1097,7 @@ export default function SellerAddProduct() {
                     value={formData.manufacturer}
                     onChange={handleChange}
                     placeholder="Enter Manufacturer"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   />
                 </div>
                 <div>
@@ -1110,7 +1110,7 @@ export default function SellerAddProduct() {
                     value={formData.madeIn}
                     onChange={handleChange}
                     placeholder="Enter Made In"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   />
                 </div>
                 <div>
@@ -1121,7 +1121,7 @@ export default function SellerAddProduct() {
                     name="tax"
                     value={formData.tax}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                     <option value="">Select Tax</option>
                     {taxes.map((tax) => (
                       <option key={tax._id} value={tax._id}>
@@ -1138,7 +1138,7 @@ export default function SellerAddProduct() {
                     name="isReturnable"
                     value={formData.isReturnable}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -1153,7 +1153,7 @@ export default function SellerAddProduct() {
                     value={formData.maxReturnDays}
                     onChange={handleChange}
                     placeholder="Enter Max Return Days"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   />
                 </div>
                 <div>
@@ -1166,7 +1166,7 @@ export default function SellerAddProduct() {
                     value={formData.fssaiLicNo}
                     onChange={handleChange}
                     placeholder="Enter FSSAI Lic. No."
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   />
                 </div>
                 <div>
@@ -1179,7 +1179,7 @@ export default function SellerAddProduct() {
                     value={formData.totalAllowedQuantity}
                     onChange={handleChange}
                     placeholder="Enter Total allowed quantit"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   />
                   <p className="text-xs text-neutral-500 mt-1">
                     Keep blank if no such limit
@@ -1196,7 +1196,7 @@ export default function SellerAddProduct() {
                     onChange={handleChange}
                     placeholder="1"
                     min="1"
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   />
                   <p className="text-xs text-neutral-500 mt-1">
                     Minimum quantity a wholesaler must order
@@ -1226,7 +1226,7 @@ export default function SellerAddProduct() {
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   Product Main Image <span className="text-red-500">*</span>
                 </label>
-                <label className="block border-2 border-dashed border-neutral-300 rounded-lg p-8 text-center hover:border-[#8B3D28] transition-colors cursor-pointer">
+                <label className="block border-2 border-dashed border-neutral-400 rounded-lg p-8 text-center hover:border-[#8B3D28] transition-colors cursor-pointer">
                   {mainImagePreview ? (
                     <div className="space-y-2">
                       <img
@@ -1285,7 +1285,7 @@ export default function SellerAddProduct() {
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   Product Gallery Images (Optional)
                 </label>
-                <label className="block border-2 border-dashed border-neutral-300 rounded-lg p-8 text-center hover:border-[#8B3D28] transition-colors cursor-pointer">
+                <label className="block border-2 border-dashed border-neutral-400 rounded-lg p-8 text-center hover:border-[#8B3D28] transition-colors cursor-pointer">
                   {galleryImagePreviews.length > 0 ? (
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1378,7 +1378,7 @@ export default function SellerAddProduct() {
                     name="isShopByStoreOnly"
                     value={formData.isShopByStoreOnly}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                    className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
@@ -1393,7 +1393,7 @@ export default function SellerAddProduct() {
                       value={formData.shopId}
                       onChange={handleChange}
                       required={formData.isShopByStoreOnly === "Yes"}
-                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white/90 backdrop-blur-md border-white/20">
+                      className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28] bg-white">
                       <option value="">Select Store</option>
                       {shops.map((shop) => (
                         <option key={shop._id} value={shop._id}>

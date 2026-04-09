@@ -8,7 +8,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { getHeaderCategoriesPublic, HeaderCategory } from '../../../services/api/headerCategoryService';
 import LocationPickerMap from '../../../components/LocationPickerMap';
 import { useEffect } from 'react';
-import villageBasketLogo from '@assets/village_basket-removebg-preview.png';
+
 
 export default function SellerSignUp() {
   const navigate = useNavigate();
@@ -213,7 +213,7 @@ export default function SellerSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-green-50 flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-neutral-50 flex flex-col items-center justify-center px-4 py-8">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
@@ -228,16 +228,9 @@ export default function SellerSignUp() {
       {/* Sign Up Card */}
       <div className="w-full max-w-md bg-white/90 backdrop-blur-md border-white/20 rounded-2xl shadow-xl overflow-hidden">
         {/* Header Section */}
-        <div className="px-6 py-4 text-center border-b border-green-700" style={{ backgroundColor: 'rgb(21 178 74 / var(--tw-bg-opacity, 1))' }}>
-          <div className="mb-0 -mt-4">
-            <img
-              src={villageBasketLogo}
-              alt="Village Basket"
-              className="h-44 w-full max-w-xs mx-auto object-fill object-bottom"
-            />
-          </div>
-          <h1 className="text-2xl font-bold text-white mb-1 -mt-12">Seller Sign Up</h1>
-          <p className="text-green-50 text-sm -mt-2">Create your seller account</p>
+        <div className="px-6 py-6 text-center border-b border-[#723221] bg-[#8B3D28]">
+          <h1 className="text-2xl font-bold text-white mb-1">Seller Sign Up</h1>
+          <p className="text-orange-50 text-sm">Create your seller account</p>
         </div>
 
         {/* Sign Up Form */}
@@ -251,7 +244,7 @@ export default function SellerSignUp() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Required Fields Section */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-neutral-700 border-b pb-2">Required Information</h3>
+
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -264,7 +257,7 @@ export default function SellerSignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter your name"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                     disabled={loading}
                   />
                 </div>
@@ -273,7 +266,7 @@ export default function SellerSignUp() {
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Mobile Number <span className="text-red-500">*</span>
                   </label>
-                  <div className="flex items-center bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded-lg overflow-hidden focus-within:border-[#8B3D28] focus-within:ring-2 focus-within:ring-teal-200">
+                  <div className="flex items-center border border-neutral-300 rounded-lg overflow-hidden focus-within:border-[#8B3D28] focus-within:ring-2 focus-within:ring-orange-100 bg-white">
                     <div className="px-3 py-2.5 text-sm font-medium text-neutral-600 border-r border-neutral-300 bg-white/40">
                       +91
                     </div>
@@ -302,7 +295,7 @@ export default function SellerSignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter email address"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                     disabled={loading}
                   />
                 </div>
@@ -318,7 +311,7 @@ export default function SellerSignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter store name"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                     disabled={loading}
                   />
                 </div>
@@ -407,7 +400,7 @@ export default function SellerSignUp() {
                           setError('Geolocation is not supported by your browser');
                         }
                       }}
-                      className="p-2.5 bg-teal-50 text-[#8B3D28] rounded-lg border border-[#8B3D28] hover:bg-[#723221] transition-colors"
+                      className="p-2.5 bg-neutral-50 text-[#8B3D28] rounded-lg border border-[#8B3D28] hover:bg-neutral-100 transition-colors"
                       title="Use Current Location"
                     >
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -465,7 +458,7 @@ export default function SellerSignUp() {
                     min="0.1"
                     max="100"
                     step="0.1"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                     disabled={loading}
                   />
                   <p className="mt-1 text-xs text-neutral-500">
@@ -484,7 +477,7 @@ export default function SellerSignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter city"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                     disabled={loading}
                   />
                 </div>
@@ -498,58 +491,58 @@ export default function SellerSignUp() {
               </div>
 
               {/* Optional Fields Section */}
-              <div className="space-y-4 pt-4 border-t">
-                <h3 className="text-sm font-semibold text-neutral-700 border-b pb-2">Optional Information</h3>
+              <div className="space-y-4">
+
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">PAN Card</label>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">PAN Card <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="panCard"
                       value={formData.panCard}
                       onChange={handleInputChange}
                       placeholder="PAN Card Number"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                       disabled={loading}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">Tax Name</label>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Tax Name <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="taxName"
                       value={formData.taxName}
                       onChange={handleInputChange}
                       placeholder="Tax Name"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                       disabled={loading}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">Tax Number</label>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">Tax Number <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="taxNumber"
                       value={formData.taxNumber}
                       onChange={handleInputChange}
                       placeholder="Tax Number"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                       disabled={loading}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">IFSC Code</label>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">IFSC Code <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       name="ifsc"
                       value={formData.ifsc}
                       onChange={handleInputChange}
                       placeholder="IFSC Code"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                       disabled={loading}
                     />
                   </div>

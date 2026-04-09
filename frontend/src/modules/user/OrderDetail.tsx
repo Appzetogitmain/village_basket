@@ -468,12 +468,11 @@ export default function OrderDetail() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showInstructionsModal, setShowInstructionsModal] = useState(false);
   const [showItemsModal, setShowItemsModal] = useState(false);
-  const [showSpecialRequestsModal, setShowSpecialRequestsModal] =
-    useState(false);
+
 
   // Form states
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
-  const [specialRequests, setSpecialRequests] = useState("");
+
   const [cancellationReason, setCancellationReason] = useState("");
   const [selectedTip, setSelectedTip] = useState<number | "other" | null>(null);
   const [customTip, setCustomTip] = useState("");
@@ -690,18 +689,7 @@ export default function OrderDetail() {
     }
   };
 
-  const handleSaveSpecialRequests = async () => {
-    try {
-      if (!id) return;
-      await updateOrderNotes(id, { specialRequests });
-      setShowSpecialRequestsModal(false);
-      // alert("Special requests saved!");
-      handleRefresh();
-    } catch (error) {
-      console.error("Failed to save special requests:", error);
-      alert("Failed to save special requests");
-    }
-  };
+
 
   if (loading && !order) {
     return (
@@ -1163,12 +1151,7 @@ export default function OrderDetail() {
               <span className="text-sm font-black text-village-umber tracking-tight">₹{order.payableAmount !== undefined ? order.payableAmount : order.total}</span>
             </div>
           </div>
-          <SectionItem
-            icon={ChefHatIcon}
-            title="Special Requests"
-            subtitle={specialRequests || "Add cooking instructions"}
-            onClick={() => setShowSpecialRequestsModal(true)}
-          />
+
         </motion.div>
 
         {/* Help & Cancel Card */}
@@ -1369,55 +1352,7 @@ export default function OrderDetail() {
         )}
       </AnimatePresence>
 
-      {/* Special Requests Modal */}
-      <AnimatePresence>
-        {showSpecialRequestsModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
-            onClick={() => setShowSpecialRequestsModal(false)}>
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl p-6 max-w-md w-full">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Add Special Requests
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Let the store know if you have any special preferences
-              </p>
-              <textarea
-                className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
-                rows={4}
-                maxLength={200}
-                placeholder="e.g., No onions, Extra napkins, etc."
-                value={specialRequests}
-                onChange={(e) => setSpecialRequests(e.target.value)}
-              />
-              <p className="text-xs text-gray-500 mb-4">
-                {specialRequests.length}/200
-              </p>
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setShowSpecialRequestsModal(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                  onClick={handleSaveSpecialRequests}>
-                  Save
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
 
       <RazorpayCheckoutWrapper
         show={showRazorpay}
