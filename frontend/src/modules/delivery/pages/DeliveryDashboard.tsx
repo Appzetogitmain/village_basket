@@ -275,6 +275,8 @@ export default function DeliveryDashboard() {
       <div className="px-4 py-5 space-y-5 relative z-10">
         {/* Daily Collection & Cash Balance Bar */}
         <SummaryBar
+          leftIcon={dailyCollectionIcon}
+          leftLabel="Daily Collection"
           leftValue={`\u20B9 ${stats?.dailyCollection?.toLocaleString("en-IN") || "0"}`}
           rightIcon={cashBalanceIcon}
           rightLabel="Cash Balance"
@@ -391,6 +393,8 @@ export default function DeliveryDashboard() {
 
         {/* Today's Earning Summary Bar */}
         <SummaryBar
+          leftIcon={earningIcon}
+          leftLabel="Today's Earning"
           leftValue={`\u20B9 ${stats?.todayEarning || 0}`}
           rightIcon={cashBalanceIcon}
           rightLabel="Total Earnings"

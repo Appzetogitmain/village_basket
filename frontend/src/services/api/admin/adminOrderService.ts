@@ -44,6 +44,7 @@ export interface Order {
   discount: number;
   couponCode?: string;
   total: number;
+  donationAmount?: number;
   paymentMethod: string;
   paymentStatus: "Pending" | "Paid" | "Failed" | "Refunded";
   paymentId?: string;

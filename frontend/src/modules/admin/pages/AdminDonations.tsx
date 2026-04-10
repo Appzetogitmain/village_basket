@@ -64,8 +64,8 @@ export default function AdminDonations() {
     }
 
     filtered.sort((a, b) => {
-      let aValue = a[sortField] || 0;
-      let bValue = b[sortField] || 0;
+      let aValue = (a as any)[sortField] || 0;
+      let bValue = (b as any)[sortField] || 0;
 
       if (typeof aValue === "string") {
         aValue = aValue.toLowerCase();
