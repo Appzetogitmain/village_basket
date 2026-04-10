@@ -113,7 +113,7 @@ export default function DeliveryOrders() {
 
                 <div className="flex items-center justify-between pt-4 border-t border-dashed border-stone-100">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-[10px] font-black text-stone-300">₹</span>
+                    <span className="text-[10px] font-black text-stone-300">{"\u20B9"}</span>
                     <p className="text-village-umber text-sm font-black tracking-tighter">{order.totalAmount}</p>
                   </div>
 

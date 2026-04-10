@@ -460,7 +460,7 @@ export default function AdminLowestPrices() {
                                                                 {product.productName}
                                                             </div>
                                                             <div className="text-xs text-neutral-500">
-                                                                {product.price ? `₹${product.price}` : "No price"} • {product.stock} in stock
+                                                                {product.price ? `\u20B9${product.price}` : "No price"} • {product.stock} in stock
                                                             </div>
                                                         </div>
                                                     </div>
@@ -630,7 +630,7 @@ export default function AdminLowestPrices() {
                                                     </td>
                                                     <td className="px-3 py-2 font-semibold text-teal-700">
                                                         {product?.price
-                                                            ? `₹${product.price.toLocaleString("en-IN")}`
+                                                            ? `\u20B9${product.price.toLocaleString("en-IN")}`
                                                             : "N/A"}
                                                     </td>
                                                     <td className="px-3 py-2 text-center">

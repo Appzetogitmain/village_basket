@@ -462,7 +462,7 @@ export default function AdminManageCustomer() {
                         {customer.totalOrders}
                       </td>
                       <td className="px-3 py-2 border border-neutral-200">
-                        ₹{(customer.totalSpent || 0).toFixed(2)}
+                        {"\u20B9"}{(customer.totalSpent || 0).toFixed(2)}
                       </td>
                       <td className="px-3 py-2 border border-neutral-200">
                         <div className="flex items-center gap-2">

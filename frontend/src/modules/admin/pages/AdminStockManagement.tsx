@@ -571,7 +571,7 @@ export default function AdminStockManagement() {
                         <div className="mt-auto flex items-end justify-between">
                           <div className="flex flex-col">
                             {/* <span className="text-[10px] text-neutral-400 capitalize">{product.brand ? (typeof product.brand === 'string' ? 'Brand' : product.brand.name) : 'No Brand'}</span> */}
-                            <span className="text-[#8B3D28]ase font-bold text-neutral-900">₹{product.price}</span>
+                            <span className="text-[#8B3D28]ase font-bold text-neutral-900">{"\u20B9"}{product.price}</span>
                           </div>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${product.publish ? "bg-green-50 text-[#A54B31] border-green-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
                             {product.publish ? "LIVE" : "DRAFT"}

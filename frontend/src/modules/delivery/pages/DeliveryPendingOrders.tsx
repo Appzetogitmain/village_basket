@@ -127,7 +127,7 @@ export default function DeliveryPendingOrders() {
                   </div>
                   <div className="text-right">
                       <p className="text-stone-300 text-[7px] font-black uppercase tracking-widest mb-0.5">EST. VALUATION</p>
-                      <p className="text-village-umber text-sm font-black tracking-tighter italic">₹ {order.totalAmount}</p>
+                      <p className="text-village-umber text-sm font-black tracking-tighter italic">{"\u20B9"} {order.totalAmount}</p>
                   </div>
                 </div>
               </div>

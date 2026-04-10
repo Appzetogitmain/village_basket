@@ -57,9 +57,9 @@ export default function SimilarProducts({ products, currentProductId }: SimilarP
                     {product.name}
                   </h4>
                   <div className="flex items-center gap-1">
-                    <span className="text-sm font-bold text-neutral-900">₹{displayPrice.toLocaleString('en-IN')}</span>
+                    <span className="text-sm font-bold text-neutral-900">{"\u20B9"}{displayPrice.toLocaleString('en-IN')}</span>
                     {hasDiscount && (
-                      <span className="text-xs text-neutral-500 line-through">₹{mrp.toLocaleString('en-IN')}</span>
+                      <span className="text-xs text-neutral-500 line-through">{"\u20B9"}{mrp.toLocaleString('en-IN')}</span>
                     )}
                   </div>
                 </div>

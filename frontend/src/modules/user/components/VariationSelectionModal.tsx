@@ -169,9 +169,9 @@ export default function VariationSelectionModal({
                             {title}
                           </p>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-sm font-bold text-neutral-900">₹{displayPrice}</span>
+                            <span className="text-sm font-bold text-neutral-900">{"\u20B9"}{displayPrice}</span>
                             {hasDiscount && (
-                              <span className="text-[10px] text-neutral-400 line-through font-normal">₹{mrp}</span>
+                              <span className="text-[10px] text-neutral-400 line-through font-normal">{"\u20B9"}{mrp}</span>
                             )}
                           </div>
                         </div>
@@ -193,7 +193,7 @@ export default function VariationSelectionModal({
               <div className="flex items-center justify-between gap-4">
                 <div className="flex-1">
                   <p className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider">Total</p>
-                  <p className="text-lg font-bold text-neutral-900">₹{calculateProductPrice(product, selectedIndex).displayPrice}</p>
+                  <p className="text-lg font-bold text-neutral-900">{"\u20B9"}{calculateProductPrice(product, selectedIndex).displayPrice}</p>
                 </div>
                 <Button
                   ref={addButtonRef}

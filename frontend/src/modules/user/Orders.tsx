@@ -84,7 +84,7 @@ export default function Orders() {
                     <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${getStatusColor(order.status)}`}>
                       {order.status}
                     </span>
-                    <span className="text-xs font-black text-village-umber">₹{order.totalAmount.toFixed(0)}</span>
+                    <span className="text-xs font-black text-village-umber">{"\u20B9"}{order.totalAmount.toFixed(0)}</span>
                   </div>
                   <span className="text-[9px] font-bold text-neutral-400 italic">
                     {order.totalItems} {order.totalItems === 1 ? 'item' : 'items'}

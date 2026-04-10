@@ -81,7 +81,7 @@ export default function DeliveryEarnings() {
         return;
       }
 
-      if (!window.confirm(`Confirm withdrawal request for ₹${amount}?`)) {
+      if (!window.confirm(`Confirm withdrawal request for \u20B9${amount}?`)) {
         return;
       }
 
@@ -135,7 +135,7 @@ export default function DeliveryEarnings() {
           </div>
           
           <div className="flex items-baseline gap-1">
-             <span className="text-lg font-black text-white/60">₹</span>
+             <span className="text-lg font-black text-white/60">{"\u20B9"}</span>
              <h3 className="text-4xl font-black tracking-tighter leading-none">
                {stats?.walletBalance?.toFixed(2) || "0.00"}
              </h3>
@@ -154,7 +154,7 @@ export default function DeliveryEarnings() {
         <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm flex flex-col items-center text-center">
                  <p className="text-stone-400 text-[8px] font-black uppercase tracking-widest mb-1.5 font-black">Month Total</p>
-                 <p className="text-village-umber text-sm font-black">₹{stats?.totalEarning?.toFixed(0) || "0"}</p>
+                 <p className="text-village-umber text-sm font-black">{"\u20B9"}{stats?.totalEarning?.toFixed(0) || "0"}</p>
             </div>
             <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm flex flex-col items-center text-center">
                  <p className="text-stone-400 text-[8px] font-black uppercase tracking-widest mb-1.5 font-black">Success Rate</p>
@@ -168,7 +168,7 @@ export default function DeliveryEarnings() {
             Instant Withdrawal
           </h3>
           <div className="relative mb-5">
-            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[16px] font-black text-stone-300">₹</span>
+            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[16px] font-black text-stone-300">{"\u20B9"}</span>
             <input
               type="number"
               value={withdrawAmount}
@@ -214,7 +214,7 @@ export default function DeliveryEarnings() {
                   </div>
                   <div className="text-right">
                     <p className="text-village-umber text-[12px] font-black tracking-tighter">
-                        ₹{day.amount}
+                        {"\u20B9"}{day.amount}
                     </p>
                   </div>
                 </div>

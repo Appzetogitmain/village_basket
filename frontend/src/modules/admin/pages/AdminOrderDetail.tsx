@@ -205,10 +205,10 @@ export default function AdminOrderDetail() {
                             )}
                           </div>
                         </td>
-                        <td className="text-right py-3 px-2">₹{item.unitPrice?.toFixed(2) || '0.00'}</td>
+                        <td className="text-right py-3 px-2">{"\u20B9"}{item.unitPrice?.toFixed(2) || '0.00'}</td>
                         <td className="text-right py-3 px-2">{item.quantity || 0}</td>
                         <td className="text-right py-3 px-2 font-medium">
-                          ₹{item.total?.toFixed(2) || '0.00'}
+                          {"\u20B9"}{item.total?.toFixed(2) || '0.00'}
                         </td>
                       </tr>
                     );
@@ -262,25 +262,25 @@ export default function AdminOrderDetail() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-neutral-600">Subtotal:</span>
-                <span className="font-medium">₹{order.subtotal?.toFixed(2) || '0.00'}</span>
+                <span className="font-medium">{"\u20B9"}{order.subtotal?.toFixed(2) || '0.00'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-neutral-600">Tax:</span>
-                <span className="font-medium">₹{order.tax?.toFixed(2) || '0.00'}</span>
+                <span className="font-medium">{"\u20B9"}{order.tax?.toFixed(2) || '0.00'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-neutral-600">Shipping:</span>
-                <span className="font-medium">₹{order.shipping?.toFixed(2) || '0.00'}</span>
+                <span className="font-medium">{"\u20B9"}{order.shipping?.toFixed(2) || '0.00'}</span>
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-red-600">
                   <span>Discount:</span>
-                  <span className="font-medium">-₹{(order.discount || 0).toFixed(2)}</span>
+                  <span className="font-medium">-{"\u20B9"}{(order.discount || 0).toFixed(2)}</span>
                 </div>
               )}
               <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
                 <span>Total:</span>
-                <span>₹{order.total?.toFixed(2) || '0.00'}</span>
+                <span>{"\u20B9"}{order.total?.toFixed(2) || '0.00'}</span>
               </div>
             </div>
           </div>

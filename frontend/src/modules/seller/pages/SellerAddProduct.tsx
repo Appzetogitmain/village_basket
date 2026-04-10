@@ -1041,16 +1041,16 @@ export default function SellerAddProduct() {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1 mt-1">
                             <div className="text-sm">
                               <span className="text-neutral-500 font-medium">Retail:</span>
-                              <span className="ml-2 font-bold text-neutral-700">₹{variation.retailPrice}</span>
+                              <span className="ml-2 font-bold text-neutral-700">{"\u20B9"}{variation.retailPrice}</span>
                               {variation.retailDiscPrice > 0 && (
-                                <span className="ml-2 text-[#8B3D28] font-bold">₹{variation.retailDiscPrice}</span>
+                                <span className="ml-2 text-[#8B3D28] font-bold">{"\u20B9"}{variation.retailDiscPrice}</span>
                               )}
                             </div>
                             <div className="text-sm">
                               <span className="text-neutral-500 font-medium">Wholesale:</span>
-                              <span className="ml-2 font-bold text-neutral-700">₹{variation.wholesalePrice}</span>
+                              <span className="ml-2 font-bold text-neutral-700">{"\u20B9"}{variation.wholesalePrice}</span>
                               {variation.wholesaleDiscPrice > 0 && (
-                                <span className="ml-2 text-blue-700 font-bold">₹{variation.wholesaleDiscPrice}</span>
+                                <span className="ml-2 text-blue-700 font-bold">{"\u20B9"}{variation.wholesaleDiscPrice}</span>
                               )}
                             </div>
                             <div className="text-xs text-neutral-500">

@@ -633,8 +633,8 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
               </div>
 
               <div className="w-full bg-[#4b7d5a] rounded-xl md:rounded-2xl py-1 md:py-1.5 px-2 md:px-4 flex items-center justify-center gap-1.5 md:gap-2 shadow-md mb-2 md:mb-5 transition-all group-hover:brightness-110">
-                <span className="text-white/40 text-[7px] md:text-xs font-black md:font-bold line-through">₹{safeOriginalPrice}</span>
-                <span className="text-white text-[10px] md:text-base font-black md:font-bold">₹{safeDiscountedPrice}</span>
+                <span className="text-white/40 text-[7px] md:text-xs font-black md:font-bold line-through">{"\u20B9"}{safeOriginalPrice}</span>
+                <span className="text-white text-[10px] md:text-base font-black md:font-bold">{"\u20B9"}{safeDiscountedPrice}</span>
               </div>
             </div>
           </div>

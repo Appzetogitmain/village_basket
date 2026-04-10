@@ -720,7 +720,7 @@ export default function CheckoutAddress() {
                     </div>
                   </div>
                   <div className="font-semibold text-neutral-900 ml-2 flex-shrink-0">
-                    ₹{(displayPrice * item.quantity).toFixed(0)}
+                    {"\u20B9"}{(displayPrice * item.quantity).toFixed(0)}
                   </div>
                 </div>
               );
@@ -730,22 +730,22 @@ export default function CheckoutAddress() {
           <div className="border-t border-neutral-200 pt-2.5 space-y-1.5">
             <div className="flex justify-between text-xs text-neutral-700">
               <span>Subtotal</span>
-              <span className="font-medium">₹{cart.total.toFixed(0)}</span>
+              <span className="font-medium">{"\u20B9"}{cart.total.toFixed(0)}</span>
             </div>
             <div className="flex justify-between text-xs text-neutral-700">
               <span>Platform Fee</span>
-              <span className="font-medium">₹{platformFee}</span>
+              <span className="font-medium">{"\u20B9"}{platformFee}</span>
             </div>
             <div className="flex justify-between text-xs text-neutral-700">
               <span>Delivery Charges</span>
               <span className={`font-black ${deliveryFee === 0 ? 'text-[#8B3D28]' : ''}`}>
-                {deliveryFee === 0 ? 'Free' : `₹${deliveryFee}`}
+                {deliveryFee === 0 ? 'Free' : `\u20B9${deliveryFee}`}
               </span>
             </div>
             <div className="border-t border-neutral-200 pt-2 mt-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-black text-neutral-900 font-poppins uppercase tracking-tight">Total</span>
-                <span className="text-base font-black text-[#8B3D28] font-poppins">₹{totalAmount.toFixed(0)}</span>
+                <span className="text-base font-black text-[#8B3D28] font-poppins">{"\u20B9"}{totalAmount.toFixed(0)}</span>
               </div>
             </div>
           </div>

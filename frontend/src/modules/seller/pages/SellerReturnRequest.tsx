@@ -361,16 +361,16 @@ export default function SellerReturnRequest() {
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.orderItemId}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.product}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.variant}</td>
-                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">?{request.price.toFixed(2)}</td>
-                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">?{request.discPrice.toFixed(2)}</td>
+                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{"\u20B9"}{request.price.toFixed(2)}</td>
+                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{"\u20B9"}{request.discPrice.toFixed(2)}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.quantity}</td>
-                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">?{request.total.toFixed(2)}</td>
+                                                <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{"\u20B9"}{request.total.toFixed(2)}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.status}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">{request.date}</td>
                                                 <td className="p-4 border border-neutral-200 text-sm text-neutral-900">
                                                     <button
                                                         onClick={() => {
-                                                            alert(`Return Request Details:\n\nOrder Item ID: ${request.orderItemId}\nProduct: ${request.product}\nVariant: ${request.variant}\nPrice: ?${request.price.toFixed(2)}\nDiscounted Price: ?${request.discPrice.toFixed(2)}\nQuantity: ${request.quantity}\nTotal: ?${request.total.toFixed(2)}\nStatus: ${request.status}\nDate: ${request.date}`);
+                                                            alert(`Return Request Details:\n\nOrder Item ID: ${request.orderItemId}\nProduct: ${request.product}\nVariant: ${request.variant}\nPrice: \u20B9${request.price.toFixed(2)}\nDiscounted Price: \u20B9${request.discPrice.toFixed(2)}\nQuantity: ${request.quantity}\nTotal: \u20B9${request.total.toFixed(2)}\nStatus: ${request.status}\nDate: ${request.date}`);
                                                         }}
                                                         className="text-[#8B3D28] hover:text-[#723221] text-xs font-medium transition-colors"
                                                     >

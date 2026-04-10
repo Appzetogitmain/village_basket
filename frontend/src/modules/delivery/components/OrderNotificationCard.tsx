@@ -275,7 +275,7 @@ export default function OrderNotificationCard({
                         </div>
                         <div className="text-right">
                             <p className="text-[8px] font-black text-stone-300 uppercase tracking-widest mb-1 opacity-80">VALUATION</p>
-                            <p className="text-sm font-black text-[#4A7C59] tracking-tighter italic">₹{notification.total.toFixed(2)}</p>
+                            <p className="text-sm font-black text-[#4A7C59] tracking-tighter italic">{"\u20B9"}{notification.total.toFixed(2)}</p>
                         </div>
                     </div>
 

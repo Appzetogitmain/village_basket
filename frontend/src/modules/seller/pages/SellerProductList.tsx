@@ -693,19 +693,19 @@ export default function SellerProductList() {
                       {variation.subCategory}
                     </td>
                     <td className="p-4 align-middle border border-neutral-200 font-bold text-[#8B3D28]">
-                      ₹{variation.price.toFixed(2)}
+                      {"\u20B9"}{variation.price.toFixed(2)}
                     </td>
                     <td className="p-4 align-middle border border-neutral-200 text-[#8B3D28]">
                       {variation.discPrice > 0
-                        ? `₹${variation.discPrice.toFixed(2)}`
+                        ? `\u20B9${variation.discPrice.toFixed(2)}`
                         : "-"}
                     </td>
                     <td className="p-4 align-middle border border-neutral-200 font-bold text-blue-700">
-                      ₹{variation.wholesalePrice.toFixed(2)}
+                      {"\u20B9"}{variation.wholesalePrice.toFixed(2)}
                     </td>
                     <td className="p-4 align-middle border border-neutral-200 text-blue-700">
                       {variation.wholesaleDiscPrice > 0
-                        ? `₹${variation.wholesaleDiscPrice.toFixed(2)}`
+                        ? `\u20B9${variation.wholesaleDiscPrice.toFixed(2)}`
                         : "-"}
                     </td>
                     <td className="p-4 align-middle border border-neutral-200">

@@ -806,7 +806,7 @@ export default function DeliveryOrderDetail() {
                         <div className="flex justify-between items-center relative z-10">
                             <div className="flex flex-col">
                                 <p className="text-white/60 text-[8px] font-black uppercase tracking-[0.2em] mb-1">Your payout</p>
-                                <h3 className="text-2xl font-black tracking-tighter">₹ {order.deliveryEarning?.toFixed(2) || '0.00'}</h3>
+                                <h3 className="text-2xl font-black tracking-tighter">{"\u20B9"} {order.deliveryEarning?.toFixed(2) || '0.00'}</h3>
                             </div>
                             <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm border border-white/10">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -849,7 +849,7 @@ export default function DeliveryOrderDetail() {
                         </div>
 
                         <div className="text-right">
-                            <p className="text-village-umber text-sm font-black">₹{order.totalAmount?.toFixed(2) || '0.00'}</p>
+                            <p className="text-village-umber text-sm font-black">{"\u20B9"}{order.totalAmount?.toFixed(2) || '0.00'}</p>
                             <p className="text-[7px] font-bold text-stone-400 uppercase tracking-widest">Total Bill</p>
                         </div>
                     </div>
@@ -885,13 +885,13 @@ export default function DeliveryOrderDetail() {
                                     </div>
                                     <span className="text-[11px] font-black text-village-umber uppercase tracking-tight">{item.name}</span>
                                 </div>
-                                <span className="text-[11px] font-black text-village-umber">₹{item.price * item.quantity}</span>
+                                <span className="text-[11px] font-black text-village-umber">{"\u20B9"}{item.price * item.quantity}</span>
                             </div>
                         ))}
                     </div>
                     <div className="mt-4 pt-4 border-t border-dashed border-stone-200 flex justify-between items-center">
                         <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Grand Total</span>
-                        <span className="text-[16px] font-black text-village-umber tracking-tighter">₹{order.totalAmount}</span>
+                        <span className="text-[16px] font-black text-village-umber tracking-tighter">{"\u20B9"}{order.totalAmount}</span>
                     </div>
                 </div>
 

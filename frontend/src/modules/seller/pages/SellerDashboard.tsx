@@ -430,7 +430,7 @@ export default function SellerDashboard() {
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">₹ {order.amount}</td>
+                  <td className="px-4 sm:px-6 py-3 text-sm text-neutral-900">{"\u20B9"} {order.amount}</td>
                   <td className="px-4 sm:px-6 py-3">
                     <button
                       onClick={() => navigate(`/seller/orders/${order.id}`)}

@@ -275,12 +275,10 @@ export default function DeliveryDashboard() {
       <div className="px-4 py-5 space-y-5 relative z-10">
         {/* Daily Collection & Cash Balance Bar */}
         <SummaryBar
-          leftIcon={dailyCollectionIcon}
-          leftLabel="Daily Collection"
-          leftValue={`₹ ${stats?.dailyCollection?.toLocaleString("en-IN") || "0"}`}
+          leftValue={`\u20B9 ${stats?.dailyCollection?.toLocaleString("en-IN") || "0"}`}
           rightIcon={cashBalanceIcon}
           rightLabel="Cash Balance"
-          rightValue={`₹ ${stats?.cashBalance?.toFixed(2) || "0.00"}`}
+          rightValue={`\u20B9 ${stats?.cashBalance?.toFixed(2) || "0.00"}`}
           accentColor="#8B3D28"
         />
 
@@ -302,7 +300,7 @@ export default function DeliveryDashboard() {
           </div>
           <div className="flex items-end justify-between relative z-10">
             <p className="text-2xl font-black tracking-tight">
-              ₹ {stats?.walletBalance?.toFixed(2) || "0.00"}
+              {"\u20B9"} {stats?.walletBalance?.toFixed(2) || "0.00"}
             </p>
             <div className="px-2 py-1 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-all group-hover:bg-white/20">
               View History
@@ -393,12 +391,10 @@ export default function DeliveryDashboard() {
 
         {/* Today's Earning Summary Bar */}
         <SummaryBar
-          leftIcon={earningIcon}
-          leftLabel="Today's Earning"
-          leftValue={`₹ ${stats?.todayEarning || 0}`}
+          leftValue={`\u20B9 ${stats?.todayEarning || 0}`}
           rightIcon={cashBalanceIcon}
           rightLabel="Total Earnings"
-          rightValue={`₹ ${stats?.totalEarning?.toFixed(2) || "0.00"}`}
+          rightValue={`\u20B9 ${stats?.totalEarning?.toFixed(2) || "0.00"}`}
           accentColor="#4A7C59"
         />
 
@@ -449,7 +445,7 @@ export default function DeliveryDashboard() {
 
                   <div className="flex items-center justify-between">
                     <p className="text-village-umber font-black text-sm tracking-tight pt-1">
-                      ₹ {order.totalAmount}
+                      {"\u20B9"} {order.totalAmount}
                     </p>
                     {order.estimatedDeliveryTime && (
                       <div className="flex items-center gap-1.5 bg-stone-50 px-2 py-1 rounded-lg">

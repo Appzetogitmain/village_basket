@@ -141,17 +141,17 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
                   <div className="flex-1">
                     <p className="font-medium text-neutral-800">{item.productName}</p>
                     <p className="text-sm text-neutral-500">
-                      Qty: {item.quantity} × ₹{item.price.toFixed(2)}
+                      Qty: {item.quantity} × \u20B9{item.price.toFixed(2)}
                       {item.variation && <span className="ml-2 px-1.5 py-0.5 bg-neutral-100 rounded text-[10px]">{item.variation}</span>}
                     </p>
                   </div>
-                  <p className="font-bold text-neutral-800">₹{item.total.toFixed(2)}</p>
+                  <p className="font-bold text-neutral-800">\u20B9{item.total.toFixed(2)}</p>
                 </div>
               ))}
 
               <div className="flex justify-between items-center pt-4 mt-2 border-t-2 border-neutral-100">
                 <span className="text-lg font-bold text-neutral-800">Total (Your Items)</span>
-                <span className="text-2xl font-black text-[#8B3D28]">₹{notification.totalAmount.toFixed(2)}</span>
+                <span className="text-2xl font-black text-[#8B3D28]">\u20B9{notification.totalAmount.toFixed(2)}</span>
               </div>
             </div>
           </section>

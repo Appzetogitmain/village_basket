@@ -103,7 +103,7 @@ const DailyServiceCheckout: React.FC = () => {
                   <p className="text-[9px] text-stone-400 font-bold uppercase tracking-tighter">
                     {item.variantName}
                   </p>
-                  <p className="text-[9px] text-village-green font-black mt-0.5">₹{item.pricePerDay.toLocaleString('en-IN')}/day</p>
+                  <p className="text-[9px] text-village-green font-black mt-0.5">{"\u20B9"}{item.pricePerDay.toLocaleString('en-IN')}/day</p>
                 </div>
 
                 <div className="flex items-center gap-2 bg-white rounded-xl border border-stone-100 p-1 shadow-sm">
@@ -135,7 +135,7 @@ const DailyServiceCheckout: React.FC = () => {
           
           <div className="mt-4 pt-3 border-t border-stone-100 flex justify-between items-center">
             <span className="text-[9px] font-black text-stone-400 uppercase">Daily Combined</span>
-            <span className="text-xs font-black text-village-umber tracking-tight">₹{dailyTotal.toLocaleString('en-IN')}/day</span>
+            <span className="text-xs font-black text-village-umber tracking-tight">{"\u20B9"}{dailyTotal.toLocaleString('en-IN')}/day</span>
           </div>
         </div>
 
@@ -168,10 +168,10 @@ const DailyServiceCheckout: React.FC = () => {
                     )}
                   </div>
                   <div className="text-xs font-black text-village-umber">
-                    ₹{Math.round(planDiscounted).toLocaleString('en-IN')}
+                    {"\u20B9"}{Math.round(planDiscounted).toLocaleString('en-IN')}
                   </div>
                   <div className="text-[8px] text-stone-500 font-bold mt-0.5 truncate">
-                    SAVE ₹{Math.round(planSavings).toLocaleString('en-IN')} OVER {plan.days}D
+                    SAVE \u20B9{Math.round(planSavings).toLocaleString('en-IN')} OVER {plan.days}D
                   </div>
                 </button>
               );
@@ -209,8 +209,8 @@ const DailyServiceCheckout: React.FC = () => {
           <div className="relative z-10">
             <h3 className="text-[10px] font-black text-village-green uppercase tracking-widest mb-4">Total Service Value</h3>
             <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-2xl font-black">₹{Math.round(discountedPrice).toLocaleString('en-IN')}</span>
-              <span className="text-xs text-white/40 line-through">₹{Math.round(totalPrice).toLocaleString('en-IN')}</span>
+              <span className="text-2xl font-black">{"\u20B9"}{Math.round(discountedPrice).toLocaleString('en-IN')}</span>
+              <span className="text-xs text-white/40 line-through">{"\u20B9"}{Math.round(totalPrice).toLocaleString('en-IN')}</span>
             </div>
             <p className="text-[10px] text-white/60 font-medium uppercase tracking-widest">
               Secured fresh for {days} days
@@ -219,7 +219,7 @@ const DailyServiceCheckout: React.FC = () => {
             <div className="mt-6 flex items-center justify-between bg-white/10 rounded-2xl p-3 border border-white/10">
               <div>
                 <p className="text-[8px] font-black text-white/40 uppercase tracking-widest">You Save Today</p>
-                <p className="text-sm font-black text-village-green">₹{Math.round(savings).toLocaleString('en-IN')}</p>
+                <p className="text-sm font-black text-village-green">{"\u20B9"}{Math.round(savings).toLocaleString('en-IN')}</p>
               </div>
               <div className="text-right">
                 <p className="text-[8px] font-black text-white/40 uppercase tracking-widest">Slot Confirmed</p>

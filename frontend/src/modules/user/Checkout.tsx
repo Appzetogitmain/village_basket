@@ -67,6 +67,9 @@ export default function Checkout() {
   const [giftPackaging, setGiftPackaging] = useState<boolean>(false);
   const [useWalletBalance, setUseWalletBalance] = useState<boolean>(false);
   const [hasAutoAppliedWallet, setHasAutoAppliedWallet] = useState<boolean>(false);
+  const [donationAmount, setDonationAmount] = useState<number>(0);
+  const [isCustomDonation, setIsCustomDonation] = useState<boolean>(false);
+  const [customDonationValue, setCustomDonationValue] = useState<string>('');
 
   // Profile completion modal state
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -321,7 +324,7 @@ export default function Checkout() {
   }
 
   const giftPackagingFee = giftPackaging ? 30 : 0;
-  const billTotal = Math.max(0, discountedTotal + handlingCharge + deliveryCharge + giftPackagingFee - currentCouponDiscount);
+  const billTotal = Math.max(0, discountedTotal + handlingCharge + deliveryCharge + giftPackagingFee + donationAmount - currentCouponDiscount);
   const walletAmountToUse = useWalletBalance ? Math.min(user?.walletAmount || 0, billTotal) : 0;
   const grandTotal = billTotal - walletAmountToUse;
 
@@ -440,6 +443,7 @@ export default function Checkout() {
       giftPackaging: giftPackaging,
       deliverySlot: selectedSlot || undefined,
       walletAmountUsed: walletAmountToUse,
+      donationAmount: donationAmount,
     };
 
     try {
@@ -1030,11 +1034,11 @@ export default function Checkout() {
                         <div className="flex items-center gap-1.5">
                           {hasDiscount && (
                             <span className="text-[10px] text-neutral-500 line-through">
-                              ₹{mrp}
+                              {"\u20B9"}{mrp}
                             </span>
                           )}
                           <span className="text-sm font-bold text-neutral-900">
-                            ₹{displayPrice}
+                            {"\u20B9"}{displayPrice}
                           </span>
                         </div>
                       );
@@ -1162,7 +1166,7 @@ export default function Checkout() {
                   <path d="M9 18l6-6-6-6" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <p className="text-[10px] text-blue-600 mt-0.5">Add products worth ₹{amountNeededForFreeDelivery} more</p>
+              <p className="text-[10px] text-blue-600 mt-0.5">Add products worth \u20B9{amountNeededForFreeDelivery} more</p>
             </div>
           </div>
           {/* Progress bar */}
@@ -1300,13 +1304,13 @@ export default function Checkout() {
                   </p>
                   <p className="text-[10px] font-medium text-neutral-500">
                     {useWalletBalance
-                      ? `Remaining: ₹${(user?.walletAmount ?? 0) - walletAmountToUse}`
-                      : `Available: ₹${user?.walletAmount || 0}`}
+                      ? `Remaining: \u20B9${(user?.walletAmount ?? 0) - walletAmountToUse}`
+                      : `Available: \u20B9${user?.walletAmount || 0}`}
                   </p>
                 </div>
               </div>
               {useWalletBalance && (
-                <span className="text-xs font-black text-[#8B3D28] font-poppins">-₹{walletAmountToUse}</span>
+                <span className="text-xs font-black text-[#8B3D28] font-poppins">-{"\u20B9"}{walletAmountToUse}</span>
               )}
             </button>
           </div>
@@ -1324,15 +1328,15 @@ export default function Checkout() {
               <span className="text-xs text-neutral-700">Items total</span>
               {savedAmount > 0 && (
                 <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">
-                  Saved ₹{savedAmount}
+                  Saved {"\u20B9"}{savedAmount}
                 </span>
               )}
             </div>
             <div className="flex items-center gap-1.5">
               {itemsTotal > discountedTotal && (
-                <span className="text-xs text-neutral-500 line-through">₹{itemsTotal}</span>
+                <span className="text-xs text-neutral-500 line-through">{"\u20B9"}{itemsTotal}</span>
               )}
-              <span className="text-xs font-medium text-neutral-900">₹{discountedTotal}</span>
+              <span className="text-xs font-medium text-neutral-900">{"\u20B9"}{discountedTotal}</span>
             </div>
           </div>
 
@@ -1344,7 +1348,7 @@ export default function Checkout() {
               </svg>
               <span className="text-xs text-neutral-700">Handling charge</span>
             </div>
-            <span className="text-xs font-medium text-neutral-900">₹{handlingCharge}</span>
+            <span className="text-xs font-medium text-neutral-900">{"\u20B9"}{handlingCharge}</span>
           </div>
 
           {/* Delivery charge */}
@@ -1359,7 +1363,7 @@ export default function Checkout() {
             </div>
             <div className="flex flex-col items-end">
               <span className={`text-xs font-black font-poppins ${deliveryCharge === 0 ? 'text-[#8B3D28]' : 'text-neutral-900'}`}>
-                {deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}
+                {deliveryCharge === 0 ? 'FREE' : `\u20B9${deliveryCharge}`}
               </span>
               {deliveryCharge > 0 && (
                 null
@@ -1379,7 +1383,7 @@ export default function Checkout() {
                   {selectedCoupon.code}
                 </span>
               </div>
-              <span className="text-xs font-black text-[#8B3D28] font-poppins">-₹{currentCouponDiscount.toLocaleString('en-IN')}</span>
+              <span className="text-xs font-black text-[#8B3D28] font-poppins">-{"\u20B9"}{currentCouponDiscount.toLocaleString('en-IN')}</span>
             </div>
           )}
 
@@ -1394,7 +1398,7 @@ export default function Checkout() {
                 </svg>
                 <span className="text-xs text-neutral-700">Gift Packaging</span>
               </div>
-              <span className="text-xs font-medium text-neutral-900">₹{giftPackagingFee}</span>
+              <span className="text-xs font-medium text-neutral-900">{"\u20B9"}{giftPackagingFee}</span>
             </div>
           )}
 
@@ -1423,15 +1427,22 @@ export default function Checkout() {
                 </svg>
                 <span className="text-xs text-[#8B3D28] font-bold">Wallet Applied</span>
               </div>
-              <span className="text-xs font-black text-[#8B3D28] font-poppins">-₹{walletAmountToUse}</span>
+              <span className="text-xs font-black text-[#8B3D28] font-poppins">-{"\u20B9"}{walletAmountToUse}</span>
             </div>
           )}
 
           {/* Grand total */}
           <div className="pt-2 border-t border-neutral-200 flex items-center justify-between">
             <span className="text-sm font-bold text-neutral-900">Grand total</span>
-            <span className="text-sm font-bold text-neutral-900">₹{Math.max(0, grandTotal)}</span>
+            <span className="text-sm font-bold text-neutral-900">{"\u20B9"}{Math.max(0, grandTotal)}</span>
           </div>
+
+          {/* Donation detail in bill */}
+          {donationAmount > 0 && (
+            <div className="pt-1 flex items-center justify-between">
+              <span className="text-[10px] text-neutral-500 font-medium italic">Includes {"\u20B9"}{donationAmount} donation for Village Trust</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1461,6 +1472,82 @@ export default function Checkout() {
 
 
 
+      {/* Donation Section */}
+      <div className="px-4 py-3 border-b border-neutral-200 bg-white">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-8 h-8 rounded-full bg-[#8B3D28]/10 flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B3D28" strokeWidth="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xs font-black text-neutral-900 font-poppins uppercase tracking-wide">Donation for Village Trust</h3>
+            <p className="text-[10px] text-neutral-500">Support our community with a small contribution</p>
+          </div>
+          {donationAmount > 0 && (
+            <button 
+              onClick={() => {
+                setDonationAmount(0);
+                setIsCustomDonation(false);
+                setCustomDonationValue('');
+              }}
+              className="text-[10px] text-[#8B3D28] font-bold font-poppins"
+            >
+              Remove
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-2">
+          {[10, 20].map((amt) => (
+            <button
+              key={amt}
+              onClick={() => {
+                setDonationAmount(amt);
+                setIsCustomDonation(false);
+              }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold font-poppins transition-all border-2 ${
+                donationAmount === amt && !isCustomDonation
+                  ? 'bg-[#8B3D28] text-white border-[#8B3D28]'
+                  : 'bg-white text-neutral-600 border-neutral-200 hover:border-[#8B3D28]/30'
+              }`}
+            >
+              {"\u20B9"}{amt}
+            </button>
+          ))}
+          <button
+            onClick={() => setIsCustomDonation(true)}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold font-poppins transition-all border-2 ${
+              isCustomDonation
+                ? 'bg-[#8B3D28] text-white border-[#8B3D28]'
+                : 'bg-white text-neutral-600 border-neutral-200 hover:border-[#8B3D28]/30'
+            }`}
+          >
+            Custom
+          </button>
+        </div>
+
+        {isCustomDonation && (
+          <div className="mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-neutral-400">{"\u20B9"}</span>
+              <input
+                type="number"
+                value={customDonationValue}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setCustomDonationValue(val);
+                  setDonationAmount(Number(val) || 0);
+                }}
+                placeholder="Enter amount"
+                className="w-full pl-7 pr-3 py-2 bg-neutral-50 border-2 border-neutral-200 rounded-lg text-sm font-bold focus:outline-none focus:border-[#8B3D28] transition-colors"
+                onWheel={(e) => (e.target as HTMLInputElement).blur()}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Gift Packaging */}
       <div className="px-4 py-2 border-b border-neutral-200">
         <button
@@ -1488,13 +1575,13 @@ export default function Checkout() {
               <p className={`text-xs font-black font-poppins ${giftPackaging ? 'text-[#8B3D28]' : 'text-neutral-900'}`}>
                 Gift Packaging
               </p>
-              <p className="text-[10px] text-neutral-600">
-                {giftPackaging ? 'Add ₹30 for gift packaging' : 'Add ₹30 for elegant gift packaging'}
-              </p>
+                <p className="text-[10px] text-neutral-600">
+                  {giftPackaging ? 'Add \u20B930 for gift packaging' : 'Add \u20B930 for elegant gift packaging'}
+                </p>
             </div>
           </div>
           {giftPackaging && (
-            <span className="text-xs font-black text-[#8B3D28] font-poppins">₹30</span>
+            <span className="text-xs font-black text-[#8B3D28] font-poppins">{"\u20B9"}30</span>
           )}
         </button>
       </div>
@@ -1685,7 +1772,7 @@ export default function Checkout() {
                           <p className="text-[10px] text-neutral-600 mb-1">{coupon.description}</p>
                           {coupon.minOrderValue && (
                             <p className="text-[10px] text-neutral-500">
-                              Min. order: ₹{coupon.minOrderValue}
+                              Min. order: {"\u20B9"}{coupon.minOrderValue}
                             </p>
                           )}
                         </div>

@@ -164,6 +164,7 @@ const AdminRewards = lazy(() => import("./modules/admin/pages/AdminRewards"));
 const AdminRewardOrders = lazy(() => import("./modules/admin/pages/AdminRewardOrders"));
 const UserRewards = lazy(() => import("./modules/user/Rewards"));
 const AdminDeliverySlots = lazy(() => import("./modules/admin/pages/AdminDeliverySlots"));
+const AdminDonations = lazy(() => import("./modules/admin/pages/AdminDonations"));
 
 function App() {
   // Initialize push notifications on app load
@@ -406,6 +407,7 @@ function App() {
                                         <Route path="orders/delivered" element={<AdminDeliveredOrders />} />
                                         <Route path="orders/cancelled" element={<AdminCancelledOrders />} />
                                         <Route path="orders/:id" element={<AdminOrderDetail />} />
+                                        <Route path="donations" element={<AdminDonations />} />
 
                                         <Route path="withdrawals" element={<AdminWithdrawals />} />
                                         <Route path="payments" element={<AdminPayments />} />

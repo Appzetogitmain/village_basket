@@ -82,7 +82,7 @@ export default function VillageWallet({ balance }: VillageWalletProps) {
             <div className="space-y-1">
               <p className="text-[9px] font-black text-white/50 uppercase tracking-[0.2em] ml-1">Available Balance</p>
               <div className="flex items-baseline gap-1">
-                <span className="text-xl font-medium text-white/60">₹</span>
+                <span className="text-xl font-medium text-white/60">{"\u20B9"}</span>
                 <h2 className="text-4xl font-black tracking-tighter leading-none bg-clip-text text-white drop-shadow-2xl">
                   {balance.toLocaleString('en-IN')}
                 </h2>
@@ -169,7 +169,7 @@ export default function VillageWallet({ balance }: VillageWalletProps) {
                         <p className={`text-sm font-black ${
                           tx.type === 'Credit' ? 'text-green-600' : 'text-red-500'
                         }`}>
-                          {tx.type === 'Credit' ? '+' : '-'}₹{tx.amount}
+                          {tx.type === 'Credit' ? '+' : '-'}{"\u20B9"}{tx.amount}
                         </p>
                         <p className="text-[9px] text-stone-300 font-black uppercase tracking-widest">{tx.status}</p>
                       </div>

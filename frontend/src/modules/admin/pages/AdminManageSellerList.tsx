@@ -546,7 +546,7 @@ export default function AdminManageSellerList() {
                                                     }}
                                                 />
                                             </td>
-                                            <td className="px-3 py-2 align-middle">{(seller.balance || 0).toFixed(2)}</td>
+                                            <td className="px-3 py-2 align-middle">{"\u20B9"}{(seller.balance || 0).toFixed(2)}</td>
                                             <td className="px-3 py-2 align-middle">{(seller.commission || 0).toFixed(2)}%</td>
                                             <td className="px-3 py-2 align-middle">
                                                 <button
@@ -1017,7 +1017,7 @@ export default function AdminManageSellerList() {
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Balance</label>
-                                            <p className="text-sm font-medium text-neutral-900">{(editingSeller.balance || 0).toFixed(2)}</p>
+                                            <p className="text-sm font-medium text-neutral-900">{"\u20B9"}{(editingSeller.balance || 0).toFixed(2)}</p>
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Categories Count</label>

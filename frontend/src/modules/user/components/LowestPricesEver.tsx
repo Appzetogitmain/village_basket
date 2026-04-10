@@ -142,9 +142,9 @@ const ProductCard = memo(({
 
           <div className="mt-auto flex flex-col pt-1">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-sm font-black text-village-umber">₹{displayPrice}</span>
+              <span className="text-sm font-black text-village-umber">{"\u20B9"}{displayPrice}</span>
               {hasDiscount && (
-                <span className="text-[8px] text-neutral-400 line-through font-bold">₹{mrp}</span>
+                <span className="text-[8px] text-neutral-400 line-through font-bold">{"\u20B9"}{mrp}</span>
               )}
             </div>
 

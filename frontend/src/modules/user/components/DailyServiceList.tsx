@@ -72,7 +72,7 @@ const DailyServiceList: React.FC = () => {
                         {item.variantName} • {item.quantity} Units
                       </p>
                     </div>
-                    <p className="text-[10px] font-black text-village-green">₹{item.pricePerDay}</p>
+                    <p className="text-[10px] font-black text-village-green">{"\u20B9"}{item.pricePerDay}</p>
                   </div>
                 ))}
               </div>
@@ -100,7 +100,7 @@ const DailyServiceList: React.FC = () => {
             <div className="bg-stone-50/50 px-5 py-3.5 flex items-center justify-between border-t border-stone-100/50">
                <div>
                   <p className="text-[8px] font-black text-stone-400 uppercase tracking-widest leading-none">Total Cycle Cost</p>
-                  <p className="text-sm font-black text-village-umber mt-1.5">₹{Math.round(sub.totalCyclePrice).toLocaleString('en-IN')}</p>
+                  <p className="text-sm font-black text-village-umber mt-1.5">{"\u20B9"}{Math.round(sub.totalCyclePrice).toLocaleString('en-IN')}</p>
                </div>
                <div className="flex gap-4">
                  {sub.status === 'active' ? (

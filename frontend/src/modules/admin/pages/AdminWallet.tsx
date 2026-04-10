@@ -156,35 +156,35 @@ export default function AdminWallet() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gapx-3 py-2">
                 <StatsCard
                     title="Total Platform Earning"
-                    value={`₹${stats?.totalGMV?.toLocaleString('en-IN') || '0'}`}
+                    value={`\u20B9${stats?.totalGMV?.toLocaleString('en-IN') || '0'}`}
                     icon={TrendingUpIcon}
                     color="text-[#8B3D28]"
                     bg="bg-blue-50"
                 />
                 <StatsCard
                     title="Current Platform Balance"
-                    value={`₹${stats?.currentAccountBalance?.toLocaleString('en-IN') || '0'}`}
+                    value={`\u20B9${stats?.currentAccountBalance?.toLocaleString('en-IN') || '0'}`}
                     icon={WalletIcon}
                     color="text-[#8B3D28]"
                     bg="bg-green-50"
                 />
                 <StatsCard
                     title="Total Admin Earning"
-                    value={`₹${stats?.totalAdminEarnings?.toLocaleString('en-IN') || '0'}`}
+                    value={`\u20B9${stats?.totalAdminEarnings?.toLocaleString('en-IN') || '0'}`}
                     icon={DollarSignIcon}
                     color="text-purple-600"
                     bg="bg-purple-50"
                 />
                 <StatsCard
                     title="Seller Pending Payouts"
-                    value={`₹${stats?.sellerPendingPayouts?.toLocaleString('en-IN') || '0'}`}
+                    value={`\u20B9${stats?.sellerPendingPayouts?.toLocaleString('en-IN') || '0'}`}
                     icon={ClockIcon}
                     color="text-orange-600"
                     bg="bg-orange-50"
                 />
                 <StatsCard
                     title="Delivery Boy Pending Payouts"
-                    value={`₹${stats?.deliveryPendingPayouts?.toLocaleString('en-IN') || '0'}`}
+                    value={`\u20B9${stats?.deliveryPendingPayouts?.toLocaleString('en-IN') || '0'}`}
                     icon={ClockIcon}
                     color="text-red-600"
                     bg="bg-red-50"
@@ -278,7 +278,7 @@ export default function AdminWallet() {
                                                     </td>
                                                     <td className={`py-3 px-4 text-right font-medium ${trx.type === 'Credit' ? 'text-[#8B3D28]' : 'text-red-600'
                                                         }`}>
-                                                        {trx.type === 'Credit' ? '+' : '-'}₹{(trx.amount || 0).toFixed(2)}
+                                                        {trx.type === 'Credit' ? '+' : '-'} {"\u20B9"}{(trx.amount || 0).toFixed(2)}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -326,7 +326,7 @@ export default function AdminWallet() {
                                                         </span>
                                                     </td>
                                                     <td className="py-3 px-4 text-right font-medium text-[#8B3D28]">
-                                                        ₹{(earning.amount || 0).toFixed(2)}
+                                                        {"\u20B9"}{(earning.amount || 0).toFixed(2)}
                                                     </td>
                                                 </tr>
                                             ))}

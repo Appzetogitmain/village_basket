@@ -91,11 +91,11 @@ export default function Cart() {
                   )}
                   <div className="flex items-center gap-2 mb-3 md:mb-4">
                     <span className="text-base md:text-lg font-bold text-neutral-900">
-                      ₹{displayPrice.toLocaleString('en-IN')}
+                      {"\u20B9"}{displayPrice.toLocaleString('en-IN')}
                     </span>
                     {hasDiscount && (
                       <span className="text-xs md:text-sm text-neutral-500 line-through">
-                        ₹{mrp.toLocaleString('en-IN')}
+                        {"\u20B9"}{mrp.toLocaleString('en-IN')}
                       </span>
                     )}
                   </div>
@@ -125,7 +125,7 @@ export default function Cart() {
                     </Button>
                     <div className="ml-auto text-right">
                       <div className="text-sm md:text-base font-bold text-neutral-900">
-                        ₹{(displayPrice * item.quantity).toFixed(0)}
+                        {"\u20B9"}{(displayPrice * item.quantity).toFixed(0)}
                       </div>
                     </div>
                   </div>
@@ -152,21 +152,21 @@ export default function Cart() {
           <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
             <div className="flex justify-between text-neutral-700 md:text-base">
               <span>Subtotal</span>
-              <span className="font-medium">₹{cart.total.toLocaleString('en-IN')}</span>
+              <span className="font-medium">{"\u20B9"}{cart.total.toLocaleString('en-IN')}</span>
             </div>
             <div className="flex justify-between text-neutral-700 md:text-base">
               <span>Platform Fee</span>
-              <span className="font-medium">₹{platformFee.toLocaleString('en-IN')}</span>
+              <span className="font-medium">{"\u20B9"}{platformFee.toLocaleString('en-IN')}</span>
             </div>
             <div className="flex justify-between text-neutral-700 md:text-base">
               <span>Delivery Charges</span>
               <span className={`font-black font-poppins ${deliveryFee === 0 ? 'text-[#8B3D28]' : ''}`}>
-                {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee.toLocaleString('en-IN')}`}
+                {deliveryFee === 0 ? 'FREE' : `\u20B9${deliveryFee.toLocaleString('en-IN')}`}
               </span>
             </div>
             {cart.total < appConfig.freeDeliveryThreshold && (
               <div className="text-xs md:text-sm text-[#8B3D28] bg-[#8B3D28]/5 px-2 py-1.5 rounded font-bold font-poppins border border-[#8B3D28]/10">
-                Add ₹{(appConfig.freeDeliveryThreshold - cart.total).toLocaleString('en-IN')} more for free delivery
+                Add {"\u20B9"}{(appConfig.freeDeliveryThreshold - cart.total).toLocaleString('en-IN')} more for free delivery
               </div>
             )}
           </div>
@@ -174,7 +174,7 @@ export default function Cart() {
             <div className="flex justify-between items-center mb-4 md:mb-6">
               <span className="text-lg md:text-xl font-bold text-neutral-900">Total</span>
               <span className="text-xl md:text-2xl font-bold text-neutral-900">
-                ₹{totalAmount.toLocaleString('en-IN')}
+                {"\u20B9"}{totalAmount.toLocaleString('en-IN')}
               </span>
             </div>
             <Button

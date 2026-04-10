@@ -102,7 +102,7 @@ export default function SellerWallet() {
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8"></div>
         <p className="text-xs opacity-80 mb-1 uppercase font-bold tracking-widest">Wallet Balance</p>
-        <h1 className="text-3xl font-black mb-4">₹{balance.toFixed(2)}</h1>
+        <h1 className="text-3xl font-black mb-4">{"\u20B9"}{balance.toFixed(2)}</h1>
         <button
           onClick={() => setShowWithdrawModal(true)}
           className="bg-white/95 text-[#8B3D28] px-5 py-2 rounded-lg text-sm font-black uppercase tracking-wide hover:bg-white transition-all shadow-md"
@@ -196,7 +196,7 @@ export default function SellerWallet() {
                       </p>
                     </div>
                     <p className={`font-bold text-lg ${item.type === 'Credit' ? 'text-[#8B3D28]' : 'text-red-600'} ${item.status === 'Pending' ? 'opacity-60' : ''}`}>
-                      {item.type === 'Credit' ? '+' : '-'}₹{item.amount.toFixed(2)}
+                      {item.type === 'Credit' ? '+' : '-'} {"\u20B9"}{item.amount.toFixed(2)}
                     </p>
                   </div>
                 ));
@@ -214,7 +214,7 @@ export default function SellerWallet() {
                   <div key={withdrawal._id} className="p-3 bg-village-cream/60 rounded-lg border border-neutral-100">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <p className="font-bold text-neutral-800">₹{withdrawal.amount.toFixed(2)}</p>
+                        <p className="font-bold text-neutral-800">{"\u20B9"}{withdrawal.amount.toFixed(2)}</p>
                         <p className="text-xs text-neutral-500">{withdrawal.paymentMethod}</p>
                       </div>
                       <span
@@ -259,10 +259,10 @@ export default function SellerWallet() {
                         <p className="font-medium text-neutral-800 text-sm">Order Commission</p>
                         <p className="text-xs text-neutral-500">Rate: {comm.rate}%</p>
                       </div>
-                      <p className="font-bold text-[#8B3D28]">₹{comm.amount.toFixed(2)}</p>
+                      <p className="font-bold text-[#8B3D28]">{"\u20B9"}{comm.amount.toFixed(2)}</p>
                     </div>
                     <div className="flex justify-between text-xs text-neutral-400">
-                      <span>Order Amount: ₹{comm.orderAmount.toFixed(2)}</span>
+                      <span>Order Amount: {"\u20B9"}{comm.orderAmount.toFixed(2)}</span>
                       <span>{new Date(comm.createdAt).toLocaleDateString('en-IN')}</span>
                     </div>
                   </div>
@@ -286,7 +286,7 @@ export default function SellerWallet() {
               <div className="mb-4">
                 <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">Amount</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm">{"\u20B9"}</span>
                   <input
                     type="number"
                     value={withdrawAmount}
@@ -297,7 +297,7 @@ export default function SellerWallet() {
                     step="0.01"
                   />
                 </div>
-                <p className="text-xs text-neutral-400 mt-1">Available: ₹{balance.toFixed(2)}</p>
+                <p className="text-xs text-neutral-400 mt-1">Available: {"\u20B9"}{balance.toFixed(2)}</p>
               </div>
               <div className="mb-6">
                 <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">Payment Method</label>

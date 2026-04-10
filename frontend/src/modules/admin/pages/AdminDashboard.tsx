@@ -510,16 +510,16 @@ export default function AdminDashboard() {
           </h3>
           <div className="mb-4">
             <p className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
-              ₹{(salesToday || 0).toFixed(2)}
+              {"\u20B9"}{(salesToday || 0).toFixed(2)}
             </p>
             {salesDifference >= 0 ? (
               <p className="text-[11px] font-bold text-[#8B3D28] mt-1 flex items-center gap-1">
-                <span className="bg-green-100 px-1 rounded">▲ ₹{Math.abs(salesDifference).toFixed(2)} (+{salesPercentChange}%)</span>
+                <span className="bg-green-100 px-1 rounded">▲ {"\u20B9"}{Math.abs(salesDifference).toFixed(2)} (+{salesPercentChange}%)</span>
                 <span className="text-neutral-400 font-medium">vs last week</span>
               </p>
             ) : (
               <p className="text-[11px] font-bold text-red-600 mt-1 flex items-center gap-1">
-                <span className="bg-red-100 px-1 rounded">▼ ₹{Math.abs(salesDifference).toFixed(2)} ({salesPercentChange}%)</span>
+                <span className="bg-red-100 px-1 rounded">▼ {"\u20B9"}{Math.abs(salesDifference).toFixed(2)} ({salesPercentChange}%)</span>
                 <span className="text-neutral-400 font-medium">vs last week</span>
               </p>
             )}
@@ -548,7 +548,7 @@ export default function AdminDashboard() {
                       {location.location}
                     </span>
                     <span className="text-[13px] font-black text-neutral-900 bg-neutral-50 px-2 py-0.5 rounded group-hover:bg-[#FAF7F2] transition-colors">
-                      ₹{(location.amount / 1000).toFixed(1)}K
+                      {"\u20B9"}{(location.amount / 1000).toFixed(1)}K
                     </span>
                   </div>
                 ))
@@ -666,7 +666,7 @@ export default function AdminDashboard() {
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 text-[12px] font-black text-neutral-900">₹{(order.amount || 0).toFixed(0)}</td>
+                      <td className="px-4 py-2.5 text-[12px] font-black text-neutral-900">{"\u20B9"}{(order.amount || 0).toFixed(0)}</td>
                       <td className="px-4 py-2.5 text-center">
                         <button className="text-[#A54B31] hover:scale-110 transition-transform p-1.5" aria-label="View order">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -740,7 +740,7 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-4 py-2.5 text-[11px] font-bold text-neutral-600 italic">"{seller.storeName}"</td>
                       <td className="px-4 py-2.5">
-                         <span className="text-[13px] font-black text-[#8B3D28]">₹{(seller.totalRevenue / 1).toFixed(0)}</span>
+                         <span className="text-[13px] font-black text-[#8B3D28]">{"\u20B9"}{(seller.totalRevenue / 1).toFixed(0)}</span>
                       </td>
                       <td className="px-4 py-2.5 text-center">
                         <button className="text-[#8B3D28] hover:scale-110 transition-transform p-1.5" aria-label="View seller">

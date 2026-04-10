@@ -166,11 +166,11 @@ export default function EGiftStore() {
                   <div className="mb-1">
                     <div className="flex items-baseline gap-1">
                       <span className="text-[13px] font-bold text-neutral-900">
-                        ₹{displayPrice.toLocaleString('en-IN')}
+                        {"\u20B9"}{displayPrice.toLocaleString('en-IN')}
                       </span>
                       {hasDiscount && (
                         <span className="text-[10px] text-neutral-400 line-through">
-                          ₹{mrp.toLocaleString('en-IN')}
+                          {"\u20B9"}{mrp.toLocaleString('en-IN')}
                         </span>
                       )}
                     </div>

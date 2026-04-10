@@ -145,14 +145,14 @@ export default function DeliveryWallet() {
             className="village-card paper-texture organic-radius bg-gradient-to-br from-[#8B3D28] to-[#3D2B1F] p-7 text-white border-none shadow-2xl shadow-[#8B3D28]/20 relative overflow-hidden"
         >
             <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
-            <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-3xl pointer-events-none font-black italic text-8xl flex items-center justify-center select-none">₹</div>
+            <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-3xl pointer-events-none font-black italic text-8xl flex items-center justify-center select-none">{"\u20B9"}</div>
             
             <div className="relative z-10">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex flex-col">
                         <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 leading-none mb-2">Available Holdings</span>
                         <div className="flex items-baseline gap-1.5">
-                            <span className="text-xl font-black text-white/30">₹</span>
+                            <span className="text-xl font-black text-white/30">{"\u20B9"}</span>
                             <span className="text-5xl font-black tracking-tighter">{balance.toFixed(2)}</span>
                         </div>
                     </div>
@@ -179,7 +179,7 @@ export default function DeliveryWallet() {
             ].map((stat, i) => (
                 <div key={i} className="village-card paper-texture organic-radius p-3 border-none shadow-sm flex flex-col">
                     <span className="text-[7px] font-black uppercase tracking-[0.15em] text-stone-400 mb-1">{stat.label}</span>
-                    <p className={`text-[12px] font-black tracking-tighter truncate ${stat.color}`}>₹{stat.value?.toFixed(0) || "0"}</p>
+                    <p className={`text-[12px] font-black tracking-tighter truncate ${stat.color}`}>{"\u20B9"}{stat.value?.toFixed(0) || "0"}</p>
                 </div>
             ))}
         </div>
@@ -221,7 +221,7 @@ export default function DeliveryWallet() {
                                         <p className="text-[8px] font-black text-stone-300 uppercase tracking-widest">{new Date(txn.createdAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                                     </div>
                                     <div className={`text-[13px] font-black tracking-tighter shrink-0 ${txn.type === "Credit" ? "text-[#4A7C59]" : "text-red-400"}`}>
-                                        {txn.type === "Credit" ? "+" : "-"}₹{txn.amount.toFixed(0)}
+                                        {txn.type === "Credit" ? "+" : "-"}{"\u20B9"}{txn.amount.toFixed(0)}
                                     </div>
                                 </div>
                             ))
@@ -236,7 +236,7 @@ export default function DeliveryWallet() {
                                 <div key={withdrawal._id} className="village-card paper-texture organic-radius p-4 border-none shadow-sm">
                                     <div className="flex justify-between items-start mb-3">
                                         <div>
-                                            <p className="text-sm font-black text-village-umber tracking-tighter leading-none mb-1">₹{withdrawal.amount.toFixed(2)}</p>
+                                            <p className="text-sm font-black text-village-umber tracking-tighter leading-none mb-1">{"\u20B9"}{withdrawal.amount.toFixed(2)}</p>
                                             <p className="text-[8px] font-black text-stone-300 uppercase tracking-[0.1em]">{withdrawal.paymentMethod}</p>
                                         </div>
                                         <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest leading-none ${
@@ -259,10 +259,10 @@ export default function DeliveryWallet() {
                                 <div key={comm.id} className="village-card paper-texture organic-radius p-4 border-none shadow-sm flex justify-between items-center">
                                     <div className="min-w-0">
                                         <p className="text-[10px] font-black text-village-umber uppercase tracking-tight leading-none mb-1">Fee Partition</p>
-                                        <p className="text-[8px] font-black text-stone-300 uppercase tracking-widest">ORDER VAL: ₹{comm.orderAmount?.toFixed(0)}</p>
+                                        <p className="text-[8px] font-black text-stone-300 uppercase tracking-widest">ORDER VAL: \u20B9{comm.orderAmount?.toFixed(0)}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[12px] font-black text-[#4A7C59] tracking-tighter leading-none mb-1">₹{comm.amount.toFixed(2)}</p>
+                                        <p className="text-[12px] font-black text-[#4A7C59] tracking-tighter leading-none mb-1">{"\u20B9"}{comm.amount.toFixed(2)}</p>
                                         <span className="text-[7px] font-black text-stone-200 uppercase tracking-widest leading-none">RATIO: {comm.rate}%</span>
                                     </div>
                                 </div>
@@ -308,7 +308,7 @@ export default function DeliveryWallet() {
                     <div>
                         <label className="block text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3 ml-1">Quantum of Funds</label>
                         <div className="relative group">
-                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-stone-200 group-focus-within:text-[#8B3D28] transition-colors">₹</span>
+                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-stone-200 group-focus-within:text-[#8B3D28] transition-colors">{"\u20B9"}</span>
                             <input
                                 type="number"
                                 value={withdrawAmount}
@@ -319,7 +319,7 @@ export default function DeliveryWallet() {
                         </div>
                         <div className="flex justify-between mt-3 px-1 text-[8px] font-black uppercase tracking-widest text-stone-300">
                             <span>Maximum Limit</span>
-                            <span className="text-[#8B3D28]">₹ {balance.toFixed(2)}</span>
+                            <span className="text-[#8B3D28]">{"\u20B9"} {balance.toFixed(2)}</span>
                         </div>
                     </div>
 

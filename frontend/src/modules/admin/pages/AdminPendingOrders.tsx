@@ -142,7 +142,7 @@ export default function AdminPendingOrders() {
           order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "",
           order.status || "",
           order.deliveryBoyStatus || "Not Assigned",
-          `?${order.total?.toFixed(2) || "0.00"}`,
+          `\u20B9${order.total?.toFixed(2) || "0.00"}`,
         ].join(",")
       ),
     ].join("\n");
@@ -806,7 +806,7 @@ export default function AdminPendingOrders() {
                         </span>
                       </td>
                       <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">
-                        {order.total?.toFixed(2) || "0.00"}
+                        {"\u20B9"}{order.total?.toFixed(2) || "0.00"}
                       </td>
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-2">

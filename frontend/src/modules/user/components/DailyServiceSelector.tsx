@@ -66,7 +66,7 @@ const DailyServiceSelector: React.FC<DailyServiceSelectorProps> = ({
                     Fresh Morning Delivery
                   </p>
                   <p className="text-[9px] text-village-green font-bold mt-1">
-                    Adds ₹{dailyPrice}/day to your basket
+                    Adds {"\u20B9"}{dailyPrice}/day to your basket
                   </p>
                 </div>
               </div>

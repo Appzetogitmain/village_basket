@@ -531,18 +531,18 @@ export default function AdminManageDeliveryBoy() {
                                                     <div className="text-xs">
                                                         <div className="font-medium">Commission {deliveryBoy.commission}%</div>
                                                         <div className="text-neutral-500 mt-1">
-                                                            Min Amt: {deliveryBoy.minAmount}
+                                                            Min Amt: {"\u20B9"}{deliveryBoy.minAmount}
                                                         </div>
                                                         <div className="text-neutral-500">
-                                                            Max Amt: {deliveryBoy.maxAmount}
+                                                            Max Amt: {"\u20B9"}{deliveryBoy.maxAmount}
                                                         </div>
                                                     </div>
                                                 ) : (
                                                     <span className="text-xs">Fixed</span>
                                                 )}
                                             </td>
-                                            <td className="px-3 py-2 align-middle">{(deliveryBoy.balance || 0).toFixed(2)}</td>
-                                            <td className="px-3 py-2 align-middle">{(deliveryBoy.cashCollected || 0).toFixed(2)}</td>
+                                            <td className="px-3 py-2 align-middle">{"\u20B9"}{(deliveryBoy.balance || 0).toFixed(2)}</td>
+                                            <td className="px-3 py-2 align-middle">{"\u20B9"}{(deliveryBoy.cashCollected || 0).toFixed(2)}</td>
                                             <td className="px-3 py-2 align-middle">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${deliveryBoy.status === 'Active'
                                                     ? 'bg-green-100 text-green-800'

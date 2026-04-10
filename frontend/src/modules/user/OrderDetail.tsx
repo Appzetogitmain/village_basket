@@ -266,18 +266,18 @@ const PromoCarousel = () => {
     {
       bank: "ICICI BANK",
       offer: "15% instant discount",
-      subtext: "Valid on orders above ₹299 | Use code ICICI15",
+      subtext: "Valid on orders above \u20B9299 | Use code ICICI15",
       color: "from-orange-50 to-red-50",
     },
     {
       bank: "SBI CARD",
-      offer: "Flat ₹75 off",
+      offer: "Flat \u20B975 off",
       subtext: "On all orders | No minimum order value",
       color: "from-purple-50 to-pink-50",
     },
     {
       bank: "AXIS BANK",
-      offer: "20% cashback up to ₹100",
+      offer: "20% cashback up to \u20B9100",
       subtext: "Valid on first order | T&C apply",
       color: "from-teal-50 to-cyan-50",
     },
@@ -369,7 +369,7 @@ const TipSection = () => {
               : "border-neutral-100 text-neutral-500 hover:border-neutral-200"
               }`}
             whileTap={{ scale: 0.95 }}>
-            ₹{tip}
+            {"\u20B9"}{tip}
           </motion.button>
         ))}
         <motion.button
@@ -393,7 +393,7 @@ const TipSection = () => {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden">
             <div className="relative mt-3">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-black text-village-umber/40">₹</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-black text-village-umber/40">{"\u20B9"}</span>
               <input
                 type="number"
                 placeholder="Custom amount"
@@ -981,7 +981,7 @@ export default function OrderDetail() {
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[11px] font-black text-village-umber uppercase tracking-tight mb-0.5">
-                  {order.paymentMethod === 'COD' ? 'Pay at Delivery' : 'Payment Pending'}: ₹{order.totalAmount?.toFixed(0) || "0"}
+                  {order.paymentMethod === 'COD' ? 'Pay at Delivery' : 'Payment Pending'}: {"\u20B9"}{order.totalAmount?.toFixed(0) || "0"}
                 </p>
                 <p className="text-[9px] text-neutral-400 font-bold leading-tight italic">
                   {order.paymentMethod === 'COD' 
@@ -1126,29 +1126,29 @@ export default function OrderDetail() {
           <div className="p-3 space-y-2 border-b border-dashed border-village-umber/5">
             <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
               <span>Subtotal</span>
-              <span>₹{order.subtotal || 0}</span>
+              <span>{"\u20B9"}{order.subtotal || 0}</span>
             </div>
             {order.shipping > 0 && (
               <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
                 <span>Shipping</span>
-                <span>₹{order.shipping}</span>
+                <span>{"\u20B9"}{order.shipping}</span>
               </div>
             )}
             {order.discount > 0 && (
               <div className="flex justify-between items-center text-[10px] font-black text-green-600 uppercase tracking-widest">
                 <span>Discount</span>
-                <span>-₹{order.discount}</span>
+                <span>-{"\u20B9"}{order.discount}</span>
               </div>
             )}
             {order.walletAmountUsed > 0 && (
               <div className="flex justify-between items-center text-[10px] font-black text-[#8B3D28] uppercase tracking-widest">
                 <span>Wallet Used</span>
-                <span>-₹{order.walletAmountUsed}</span>
+                <span>-{"\u20B9"}{order.walletAmountUsed}</span>
               </div>
             )}
             <div className="flex justify-between items-center pt-1 border-t border-dashed border-village-umber/5">
               <span className="text-[10px] font-black text-village-umber uppercase tracking-widest">Payable Amount</span>
-              <span className="text-sm font-black text-village-umber tracking-tight">₹{order.payableAmount !== undefined ? order.payableAmount : order.total}</span>
+              <span className="text-sm font-black text-village-umber tracking-tight">{"\u20B9"}{order.payableAmount !== undefined ? order.payableAmount : order.total}</span>
             </div>
           </div>
 
@@ -1334,7 +1334,7 @@ export default function OrderDetail() {
                         <p className="text-xs text-gray-500">{item.variant}</p>
                       )}
                       <p className="text-sm font-semibold text-gray-900 mt-1">
-                        ₹
+                        {"\u20B9"}
                         {item.total?.toFixed(0) ||
                           (item.unitPrice * item.quantity).toFixed(0)}
                       </p>

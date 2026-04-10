@@ -402,13 +402,13 @@ export default function AdminCatalogManager() {
                   <div className="flex items-center gap-1.5">
                     <span className="text-[8px] font-bold text-neutral-400 uppercase">Retail</span>
                     <span className={`text-[10px] font-bold ${selectedProductId === prod._id ? "text-white/90" : "text-[#A54B31]"}`}>
-                      ₹{prod.retailPrice || prod.price}
+                      {"\u20B9"}{prod.retailPrice || prod.price}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="text-[8px] font-bold text-neutral-400 uppercase">Wholesale</span>
                     <span className={`text-[10px] font-bold ${selectedProductId === prod._id ? "text-white/90" : "text-blue-600"}`}>
-                      ₹{prod.wholesalePrice || 0}
+                      {"\u20B9"}{prod.wholesalePrice || 0}
                     </span>
                   </div>
                   {!prod.publish && <span className="text-[9px] font-bold px-1 rounded bg-orange-50 text-orange-600 border border-orange-100 self-start mt-1">DRAFT</span>}

@@ -424,7 +424,7 @@ export default function AdminBestsellerCards() {
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="text-xs font-medium text-neutral-800 truncate">{product.productName}</div>
-                                                            <div className="text-[10px] text-neutral-500">₹{product.price}</div>
+                                                            <div className="text-[10px] text-neutral-500">{"\u20B9"}{product.price}</div>
                                                         </div>
                                                         {selectedProductIds.includes(product._id) && (
                                                             <div className="text-[#A54B31]">

@@ -406,9 +406,9 @@ export default function ProductCard({
 
         <div className="mt-auto flex flex-col pt-1">
           <div className="flex items-baseline gap-1.5">
-            <span className="text-sm md:text-base font-black text-village-umber">₹{displayPrice}</span>
+            <span className="text-sm md:text-base font-black text-village-umber">{"\u20B9"}{displayPrice}</span>
             {mrp && mrp > displayPrice && (
-              <span className="text-[9px] md:text-[10px] text-neutral-400 line-through font-bold">₹{mrp}</span>
+              <span className="text-[9px] md:text-[10px] text-neutral-400 line-through font-bold">{"\u20B9"}{mrp}</span>
             )}
           </div>
 

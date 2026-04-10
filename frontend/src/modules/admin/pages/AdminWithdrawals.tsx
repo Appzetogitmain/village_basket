@@ -165,7 +165,7 @@ export default function AdminWithdrawals() {
                                     </p>
                                 </div>
                                 <div className="text-left md:text-right w-full md:w-auto">
-                                    <p className="text-2xl font-bold text-gray-900">₹{withdrawal.amount?.toFixed(2)}</p>
+                                    <p className="text-2xl font-bold text-gray-900">{"\u20B9"}{withdrawal.amount?.toFixed(2)}</p>
                                     <span
                                         className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mt-2 ${withdrawal.status === 'Completed'
                                             ? 'bg-green-100 text-[#A54B31]'

@@ -135,7 +135,7 @@ export default function AdminAllOrders() {
           order.orderDate || "",
           order.status || "",
           order.deliveryBoyStatus || "Not Assigned",
-          `₹${order.total?.toFixed(2) || "0.00"}`,
+          `\u20B9${order.total?.toFixed(2) || "0.00"}`,
         ].join(",")
       ),
     ].join("\n");
@@ -801,7 +801,7 @@ export default function AdminAllOrders() {
                         </span>
                       </td>
                       <td className="px-3 py-2 text-[12px] font-black text-neutral-900 font-medium">
-                        ₹{order.total?.toFixed(2) || "0.00"}
+                        {"\u20B9"}{order.total?.toFixed(2) || "0.00"}
                       </td>
                       <td className="px-3 py-2">
                         <Link to={`/admin/orders/${order._id}`}>
@@ -897,7 +897,7 @@ export default function AdminAllOrders() {
 
       {/* Footer */}
       <div className="text-center py-4 text-xs sm:text-[12px] font-bold text-neutral-500">
-        Copyright Â© 2025. Developed By{" "}
+        Copyright &copy; 2025. Developed By{" "}
         <Link to="/" className="text-[#8B3D28] hover:text-[#8B3D28]">
           Village Basket
         </Link>

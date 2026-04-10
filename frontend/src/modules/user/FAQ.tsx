@@ -16,7 +16,7 @@ const faqData: FAQItem[] = [
   {
     id: '2',
     question: 'What are the delivery charges?',
-    answer: 'Delivery charges vary based on your location and order value. We offer free delivery on orders above ₹199. For orders below this threshold, a nominal delivery fee applies. You can check the exact charges during checkout.',
+    answer: 'Delivery charges vary based on your location and order value. We offer free delivery on orders above \u20B9199. For orders below this threshold, a nominal delivery fee applies. You can check the exact charges during checkout.',
   },
   {
     id: '3',

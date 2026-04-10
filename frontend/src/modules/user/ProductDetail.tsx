@@ -588,9 +588,9 @@ export default function ProductDetail() {
                 <div>
                   <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-1 block">Price</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-3xl font-black text-village-umber">₹{variantPrice.toLocaleString('en-IN')}</span>
+                    <span className="text-3xl font-black text-village-umber">{"\u20B9"}{variantPrice.toLocaleString('en-IN')}</span>
                     {hasDiscount && (
-                      <span className="text-lg text-neutral-400 line-through">₹{variantMrp.toLocaleString('en-IN')}</span>
+                      <span className="text-lg text-neutral-400 line-through">{"\u20B9"}{variantMrp.toLocaleString('en-IN')}</span>
                     )}
                   </div>
                 </div>
@@ -707,7 +707,7 @@ export default function ProductDetail() {
                             }`}>
                           <span className="whitespace-nowrap">{variantTitle}</span>
                           <span className={`text-[10px] font-black ${isSelected ? "text-[#8B3D28]" : "text-neutral-500"}`}>
-                            ₹{calculateProductPrice(product, index).displayPrice}
+                            {"\u20B9"}{calculateProductPrice(product, index).displayPrice}
                           </span>
                           {isOutOfStock && (
                             <span className="text-[9px] uppercase tracking-tighter opacity-70">Sold Out</span>
@@ -727,12 +727,12 @@ export default function ProductDetail() {
               {/* Price section - Mobile only */}
               <div className="lg:hidden flex items-center gap-1.5 mb-1.5">
                 <span className="text-xl font-black text-village-umber">
-                  ₹{variantPrice.toLocaleString('en-IN')}
+                  {"\u20B9"}{variantPrice.toLocaleString('en-IN')}
                 </span>
                 {hasDiscount && (
                   <>
                     <span className="text-sm text-neutral-500 line-through">
-                      ₹{variantMrp.toLocaleString('en-IN')}
+                      {"\u20B9"}{variantMrp.toLocaleString('en-IN')}
                     </span>
                     {discount > 0 && (
                       <Badge className="!bg-[#4A7C59] !text-white !border-[#4A7C59] text-[10px] px-2 py-1 rounded-full font-black uppercase tracking-wider">
@@ -1133,11 +1133,11 @@ export default function ProductDetail() {
             </span>
             <div className="flex items-center gap-1.5 leading-none">
               <span className="text-sm font-black text-village-umber">
-                ₹{variantPrice.toLocaleString('en-IN')}
+                {"\u20B9"}{variantPrice.toLocaleString('en-IN')}
               </span>
               {hasDiscount && (
                 <span className="text-[9px] text-neutral-400 line-through">
-                  ₹{variantMrp.toLocaleString('en-IN')}
+                  {"\u20B9"}{variantMrp.toLocaleString('en-IN')}
                 </span>
               )}
               {discount > 0 && (

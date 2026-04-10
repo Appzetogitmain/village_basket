@@ -106,6 +106,9 @@ export interface IOrder extends Document {
   cancelledBy?: mongoose.Types.ObjectId;
   isRefunded?: boolean;
 
+  // Donation
+  donationAmount?: number;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -381,6 +384,11 @@ const OrderSchema = new Schema<IOrder>(
     isRefunded: {
       type: Boolean,
       default: false,
+    },
+    donationAmount: {
+      type: Number,
+      default: 0,
+      min: [0, "Donation amount cannot be negative"],
     },
   },
   {

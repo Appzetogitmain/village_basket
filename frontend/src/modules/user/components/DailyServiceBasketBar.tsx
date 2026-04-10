@@ -53,7 +53,7 @@ const DailyServiceBasketBar: React.FC = () => {
                 Total Daily
               </span>
               <span className="text-[13px] font-black text-village-umber leading-none mt-1">
-                ₹{totalDailyPrice.toLocaleString('en-IN')}
+                {"\u20B9"}{totalDailyPrice.toLocaleString('en-IN')}
               </span>
             </div>
             <div className="w-7 h-7 rounded-full bg-village-green flex items-center justify-center text-white shadow-lg shadow-village-green/20 group-hover:translate-x-0.5 transition-transform">

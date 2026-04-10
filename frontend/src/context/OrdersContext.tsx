@@ -127,6 +127,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
         gstin: order.gstin,
         couponCode: order.couponCode,
         giftPackaging: order.giftPackaging || false,
+        donationAmount: order.donationAmount || 0,
         // Pass the new delivery slot if selected
         ...(order.deliverySlot && {
           deliverySlot: {

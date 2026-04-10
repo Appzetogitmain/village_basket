@@ -88,8 +88,8 @@ const CompactPromoPreview = ({ strip }: { strip: PromoStrip }) => {
           </div>
           <div className="text-[20px] mx-auto">📦</div>
           <div className="w-full bg-[#8B3D28] rounded-lg py-0.5 px-1.5 flex items-center justify-center gap-1">
-            <span className="text-white/40 text-[6px] font-black line-through">₹999</span>
-            <span className="text-white text-[8px] font-black">₹499</span>
+            <span className="text-white/40 text-[6px] font-black line-through">\u20B9999</span>
+            <span className="text-white text-[8px] font-black">\u20B9499</span>
           </div>
         </div>
 

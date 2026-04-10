@@ -30,7 +30,7 @@ export const createOrder = async (req: Request, res: Response) => {
             session = null;
         }
 
-        const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, giftPackaging, walletAmountUsed } = req.body;
+        const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, giftPackaging, walletAmountUsed, donationAmount } = req.body;
         const userId = req.user!.userId;
 
         // Log incoming request for debugging
@@ -159,6 +159,7 @@ export const createOrder = async (req: Request, res: Response) => {
             platformFee: fees?.platformFee || 0,
             discount: 0,
             total: 0,
+            donationAmount: Number(donationAmount) || 0,
             items: []
         });
 
@@ -462,7 +463,8 @@ export const createOrder = async (req: Request, res: Response) => {
         // Recalculate Final Total
         const tip = Number(tipAmount) || 0;
         const giftPackagingFee = giftPackaging ? 30 : 0;
-        const finalTotal = calculatedSubtotal + platformFee + deliveryFee + tip + giftPackagingFee - discountAmount;
+        const donation = Number(donationAmount) || 0;
+        const finalTotal = calculatedSubtotal + platformFee + deliveryFee + tip + giftPackagingFee + donation - discountAmount;
 
         // Update Order with calculated values and items
         newOrder.subtotal = Number(calculatedSubtotal.toFixed(2));

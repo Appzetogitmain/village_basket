@@ -50,19 +50,19 @@ export default function AdminPayments() {
             <div className="grid md:grid-cols-4 gapx-3 py-2 mb-6">
                 <div className="bg-white rounded-xl px-3 py-2 shadow-sm">
                     <p className="text-sm text-gray-600 mb-1">Total Payments</p>
-                    <p className="text-2xl font-bold text-gray-900">₹{(summary.total || 0).toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-gray-900">{"\u20B9"}{(summary.total || 0).toFixed(2)}</p>
                 </div>
                 <div className="bg-white rounded-xl px-3 py-2 shadow-sm">
                     <p className="text-sm text-gray-600 mb-1">Successful</p>
-                    <p className="text-2xl font-bold text-[#8B3D28]">₹{(summary.successful || 0).toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-[#8B3D28]">{"\u20B9"}{(summary.successful || 0).toFixed(2)}</p>
                 </div>
                 <div className="bg-white rounded-xl px-3 py-2 shadow-sm">
                     <p className="text-sm text-gray-600 mb-1">Pending</p>
-                    <p className="text-2xl font-bold text-orange-600">₹{(summary.pending || 0).toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-orange-600">{"\u20B9"}{(summary.pending || 0).toFixed(2)}</p>
                 </div>
                 <div className="bg-white rounded-xl px-3 py-2 shadow-sm">
                     <p className="text-sm text-gray-600 mb-1">Failed</p>
-                    <p className="text-2xl font-bold text-red-600">₹{(summary.failed || 0).toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-red-600">{"\u20B9"}{(summary.failed || 0).toFixed(2)}</p>
                 </div>
             </div>
 
@@ -87,7 +87,7 @@ export default function AdminPayments() {
                                 </p>
                             </div>
                             <div className="text-right">
-                                <p className="font-bold text-[#8B3D28]">₹{(payment.commissionAmount || 0).toFixed(2)}</p>
+                                <p className="font-bold text-[#8B3D28]">{"\u20B9"}{(payment.commissionAmount || 0).toFixed(2)}</p>
                                 <span className="inline-block px-2 py-1 bg-green-100 text-[#A54B31] text-xs rounded-full mt-1">
                                     {payment.status || 'Paid'}
                                 </span>
