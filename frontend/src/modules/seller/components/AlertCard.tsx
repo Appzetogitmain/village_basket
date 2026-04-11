@@ -5,11 +5,15 @@ interface AlertCardProps {
   title: string;
   value: number;
   accentColor: string;
+  onClick?: () => void;
 }
 
-export default function AlertCard({ icon, title, value, accentColor }: AlertCardProps) {
+export default function AlertCard({ icon, title, value, accentColor, onClick }: AlertCardProps) {
   return (
-    <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white p-3 sm:p-4 hover:shadow-md transition-all overflow-hidden relative">
+    <div
+      onClick={onClick}
+      className={`bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white p-3 sm:p-4 hover:shadow-md transition-all overflow-hidden relative ${onClick ? 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]' : ''}`}
+    >
       <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
       <div className="flex items-center gap-3 sm:gap-4 relative z-10">
         <div className="p-2 sm:p-2.5 rounded-xl flex-shrink-0" style={{ backgroundColor: `${accentColor}15` }}>

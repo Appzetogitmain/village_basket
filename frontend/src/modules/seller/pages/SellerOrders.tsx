@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { getOrders, Order, GetOrdersParams } from '../../../services/api/orderService';
 
 
@@ -8,13 +8,18 @@ type SortDirection = 'asc' | 'desc';
 
 export default function SellerOrders() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialStatus = searchParams.get('status') || 'All Status';
+  const initialSearch = searchParams.get('search') || '';
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  const [dateRange, setDateRange] = useState('');
-  const [status, setStatus] = useState('All Status');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [status, setStatus] = useState(initialStatus);
   const [entriesPerPage, setEntriesPerPage] = useState('10');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -32,14 +37,9 @@ export default function SellerOrders() {
           sortOrder: sortDirection,
         };
 
-        // Parse date range
-        if (dateRange) {
-          const [startDate, endDate] = dateRange.split(' - ');
-          if (startDate && endDate) {
-            params.dateFrom = startDate;
-            params.dateTo = endDate;
-          }
-        }
+        // Pass date range
+        if (dateFrom) params.dateFrom = dateFrom;
+        if (dateTo) params.dateTo = dateTo;
 
         // Add status filter
         if (status !== 'All Status') {
@@ -65,10 +65,11 @@ export default function SellerOrders() {
     };
 
     fetchOrders();
-  }, [dateRange, status, entriesPerPage, searchQuery, currentPage, sortField, sortDirection]);
+  }, [dateFrom, dateTo, status, entriesPerPage, searchQuery, currentPage, sortField, sortDirection]);
 
   const handleClearDate = () => {
-    setDateRange('');
+    setDateFrom('');
+    setDateTo('');
     setCurrentPage(1);
   };
 
@@ -87,12 +88,18 @@ export default function SellerOrders() {
     const csvContent = [
       headers.join(','),
       ...orders.map(order =>
-        [order.orderId, order.deliveryDate, order.orderDate, order.status, order.amount].join(',')
+        [
+          `"${order.orderId}"`,
+          `"\t${order.deliveryDate || ''}"`,
+          `"\t${order.orderDate || ''}"`,
+          `"${order.status}"`,
+          `"${order.amount}"`
+        ].join(',')
       )
     ].join('\n');
 
-    // Create blob and download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // Create blob with UTF-8 BOM and download
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
@@ -169,44 +176,37 @@ export default function SellerOrders() {
               {/* Date Range Filter */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
                 <label className="text-xs sm:text-sm font-medium text-neutral-700 whitespace-nowrap">
-                  From - To Order Date
+                  From:
                 </label>
-                <div className="flex items-center gap-2 bg-neutral-100 border border-neutral-300 rounded px-2 sm:px-3 py-1.5 sm:py-2 w-full sm:w-auto">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="text-neutral-500 flex-shrink-0"
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => {
+                    setDateFrom(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="px-3 py-1.5 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
+                />
+                <label className="text-xs sm:text-sm font-medium text-neutral-700 whitespace-nowrap">
+                  To:
+                </label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => {
+                    setDateTo(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="px-3 py-1.5 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
+                />
+                {(dateFrom || dateTo) && (
+                  <button
+                    onClick={handleClearDate}
+                    className="px-2 py-1.5 text-xs font-medium text-[#8B3D28] hover:bg-orange-50 rounded transition-colors border border-[#8B3D28]/20"
                   >
-                    <path
-                      d="M8 2V6M16 2V6M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <input
-                    type="text"
-                    value={dateRange}
-                    onChange={(e) => {
-                      setDateRange(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="flex-1 sm:w-48 text-xs sm:text-sm text-neutral-600 bg-transparent focus:outline-none placeholder:text-neutral-400"
-                    placeholder="MM/DD/YYYY - MM/DD/YYYY"
-                  />
-                  {dateRange && (
-                    <button
-                      onClick={handleClearDate}
-                      className="ml-2 px-2 py-1 text-xs font-medium text-neutral-700 bg-neutral-200 hover:bg-neutral-300 rounded transition-colors flex-shrink-0"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
+                    Clear Dates
+                  </button>
+                )}
               </div>
 
               {/* Status Filter */}
@@ -249,10 +249,7 @@ export default function SellerOrders() {
               </div>
 
               {/* Search Bar */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto sm:flex-1">
-                <label className="text-xs sm:text-sm font-medium text-neutral-700 whitespace-nowrap">
-                  Search:
-                </label>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto sm:flex-1 relative">
                 <input
                   type="text"
                   value={searchQuery}
@@ -260,8 +257,8 @@ export default function SellerOrders() {
                     setSearchQuery(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="flex-1 w-full sm:w-auto px-3 py-2 border border-neutral-300 rounded text-xs sm:text-sm text-neutral-900 bg-white/90 backdrop-blur-md border-white/20 focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
-                  placeholder="Search by Order ID, Status, or Amount"
+                  className="flex-1 w-full sm:w-auto px-4 py-2 border border-neutral-400 rounded text-xs sm:text-sm text-neutral-900 bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] transition-all"
+                  placeholder="Search by Order ID, Status, or Amount..."
                 />
               </div>
 
@@ -332,7 +329,7 @@ export default function SellerOrders() {
                         onClick={() => handleSort('orderId')}
                         className="flex items-center gap-2 hover:text-neutral-900 transition-colors"
                       >
-                        O. Id
+                        Order ID
                         <svg
                           width="12"
                           height="12"
@@ -361,7 +358,7 @@ export default function SellerOrders() {
                         onClick={() => handleSort('deliveryDate')}
                         className="flex items-center gap-2 hover:text-neutral-900 transition-colors"
                       >
-                        D. Date
+                        Delivery Date
                         <svg
                           width="12"
                           height="12"
@@ -390,7 +387,7 @@ export default function SellerOrders() {
                         onClick={() => handleSort('orderDate')}
                         className="flex items-center gap-2 hover:text-neutral-900 transition-colors"
                       >
-                        O. Date
+                        Order Date
                         <svg
                           width="12"
                           height="12"

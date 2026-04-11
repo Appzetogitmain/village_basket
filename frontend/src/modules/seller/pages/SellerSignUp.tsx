@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { register, sendOTP, verifyOTP } from '../../../services/api/auth/sellerAuthService';
 import { removeAuthToken } from '../../../services/api/config';
 import OTPInput from '../../../components/OTPInput';
@@ -73,6 +73,31 @@ export default function SellerSignUp() {
         ...prev,
         [name]: finalValue,
       }));
+    } else if (name === 'panCard') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10),
+      }));
+    } else if (name === 'ifsc') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11),
+      }));
+    } else if (name === 'taxNumber') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15),
+      }));
+    } else if (name === 'sellerName' || name === 'city') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value.replace(/[^A-Za-z\s]/g, ''),
+      }));
+    } else if (name === 'taxName') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value.replace(/[^A-Za-z\s]/g, ''),
+      }));
     } else {
       setFormData(prev => ({
         ...prev,
@@ -99,18 +124,37 @@ export default function SellerSignUp() {
     e.preventDefault();
 
     // Validate required fields (password removed - not needed during signup)
+    // 1. Seller Name: only letters and spaces
     if (!formData.sellerName) {
       setError('Please enter your name');
       return;
     }
+    if (!/^[A-Za-z\s]+$/.test(formData.sellerName)) {
+      setError('Seller Name should only allow letters and spaces');
+      return;
+    }
+
+    // 2. Mobile Number
     if (!formData.mobile) {
       setError('Please enter your mobile number');
       return;
     }
+    if (formData.mobile.length !== 10) {
+      setError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
+    // 3. Email: standard format
     if (!formData.email) {
       setError('Please enter your email address');
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address (ex - ags@gmail.com)');
+      return;
+    }
+
     if (!formData.storeName) {
       setError('Please enter your store name');
       return;
@@ -123,13 +167,52 @@ export default function SellerSignUp() {
       setError('Please select your store location');
       return;
     }
+
+    // 4. City: only letters and spaces
     if (!formData.city) {
       setError('Please enter your city');
       return;
     }
+    if (!/^[A-Za-z\s]+$/.test(formData.city)) {
+      setError('City field should only allow letters and spaces');
+      return;
+    }
 
-    if (formData.mobile.length !== 10) {
-      setError('Please enter a valid 10-digit mobile number');
+    // 5. PAN Card: ASDFR12345R format (5 letters, 4 digits, 1 letter)
+    if (!formData.panCard) {
+      setError('Please enter your PAN Card number');
+      return;
+    }
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (!panRegex.test(formData.panCard.toUpperCase())) {
+      setError('PAN Card number should be in format (ex - ASDFR12345R)');
+      return;
+    }
+
+    // 6. Tax Name: only letters and spaces
+    if (!formData.taxName) {
+      setError('Please enter a Legal Name');
+      return;
+    }
+    if (!/^[A-Za-z\s]+$/.test(formData.taxName)) {
+      setError('Legal Name should only allow letters and spaces');
+      return;
+    }
+
+    // 7. Tax Number (GSTIN)
+    if (!formData.taxNumber) {
+      setError('Please enter your GSTIN');
+      return;
+    }
+
+    // 8. IFSC Code: SBIN0001234 format (4 letters, 0, 6 chars)
+    if (!formData.ifsc) {
+      setError('Please enter your IFSC Code');
+      return;
+    }
+    const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+    if (!ifscRegex.test(formData.ifsc.toUpperCase())) {
+      setError('IFSC Code should be in format (ex - SBIN0001234)');
       return;
     }
 
@@ -293,11 +376,24 @@ export default function SellerSignUp() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    onBlur={(e) => {
+                      const emailVal = e.target.value;
+                      if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+                        setError('Please enter a valid email address (ex - ags@gmail.com)');
+                      } else if (emailVal && error === 'Please enter a valid email address (ex - ags@gmail.com)') {
+                        setError('');
+                      }
+                    }}
                     placeholder="Enter email address"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
+                    className={`w-full px-3 py-2.5 text-sm border ${error === 'Please enter a valid email address (ex - ags@gmail.com)' ? 'border-red-500 focus:ring-red-100' : 'border-neutral-300 focus:border-[#8B3D28] focus:ring-orange-100'} rounded-lg focus:outline-none focus:ring-2`}
                     disabled={loading}
                   />
+                  {error === 'Please enter a valid email address (ex - ags@gmail.com)' && (
+                    <p className="mt-1 text-[10px] text-red-600 font-medium animate-fadeIn">
+                      Please enter a valid email address (ex - ags@gmail.com)
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -381,14 +477,38 @@ export default function SellerSignUp() {
                             (position) => {
                               const lat = position.coords.latitude;
                               const lng = position.coords.longitude;
-                              const locationStr = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-                              setFormData(prev => ({
-                                ...prev,
-                                latitude: lat.toString(),
-                                longitude: lng.toString(),
-                                searchLocation: locationStr,
-                              }));
-                              setLoading(false);
+                              const geocoder = new window.google.maps.Geocoder();
+                              geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                                if (status === 'OK' && results?.[0]) {
+                                  const address = results[0].formatted_address;
+                                  // Extract city if possible
+                                  let city = '';
+                                  for (const component of results[0].address_components) {
+                                    if (component.types.includes('locality')) {
+                                      city = component.long_name;
+                                      break;
+                                    }
+                                  }
+
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    latitude: lat.toString(),
+                                    longitude: lng.toString(),
+                                    searchLocation: address,
+                                    address: prev.address || address,
+                                    city: city || prev.city,
+                                  }));
+                                } else {
+                                  const locationStr = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    latitude: lat.toString(),
+                                    longitude: lng.toString(),
+                                    searchLocation: locationStr,
+                                  }));
+                                }
+                                setLoading(false);
+                              });
                             },
                             (error) => {
                               console.error(error);
@@ -506,8 +626,9 @@ export default function SellerSignUp() {
 
               </div>
 
-              {/* Optional Fields Section */}
-              <div className="space-y-4">
+              {/* Business Details Section */}
+              <div className="space-y-4 pt-4 border-t border-neutral-100">
+                <h3 className="text-sm font-bold text-[#8B3D28] uppercase tracking-wider">Business Verification</h3>
 
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -518,7 +639,9 @@ export default function SellerSignUp() {
                       name="panCard"
                       value={formData.panCard}
                       onChange={handleInputChange}
-                      placeholder="PAN Card Number"
+                      placeholder="e.g., ABCDE1234F"
+                      maxLength={10}
+                      required
                       className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                       disabled={loading}
                     />
@@ -531,7 +654,8 @@ export default function SellerSignUp() {
                       name="taxName"
                       value={formData.taxName}
                       onChange={handleInputChange}
-                      placeholder="Tax Name"
+                      placeholder="Legal Name"
+                      required
                       className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                       disabled={loading}
                     />
@@ -544,7 +668,8 @@ export default function SellerSignUp() {
                       name="taxNumber"
                       value={formData.taxNumber}
                       onChange={handleInputChange}
-                      placeholder="Tax Number"
+                      placeholder="GSTIN"
+                      required
                       className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                       disabled={loading}
                     />
@@ -557,7 +682,9 @@ export default function SellerSignUp() {
                       name="ifsc"
                       value={formData.ifsc}
                       onChange={handleInputChange}
-                      placeholder="IFSC Code"
+                      placeholder="eg., SBIN0000123"
+                      maxLength={11}
+                      required
                       className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
                       disabled={loading}
                     />
@@ -650,7 +777,10 @@ export default function SellerSignUp() {
 
       {/* Footer Text */}
       <p className="mt-6 text-xs text-neutral-500 text-center max-w-md">
-        By continuing, you agree to Village Basket's Terms of Service and Privacy Policy
+        By continuing, you agree to Village Basket's{' '}
+        <Link to="/seller/terms-of-service" className="text-[#8B3D28] hover:underline font-medium">Terms of Service</Link>
+        {' '}and{' '}
+        <Link to="/seller/privacy-policy" className="text-[#8B3D28] hover:underline font-medium">Privacy Policy</Link>
       </p>
     </div>
   );

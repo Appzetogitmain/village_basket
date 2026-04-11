@@ -105,6 +105,8 @@ const SellerReturnRequest = lazy(() => import("./modules/seller/pages/SellerRetu
 const SellerAccountSettings = lazy(() => import("./modules/seller/pages/SellerAccountSettings"));
 const SellerLogin = lazy(() => import("./modules/seller/pages/SellerLogin"));
 const SellerSignUp = lazy(() => import("./modules/seller/pages/SellerSignUp"));
+const SellerTermsOfService = lazy(() => import("./modules/seller/pages/SellerTermsOfService"));
+const SellerPrivacyPolicy = lazy(() => import("./modules/seller/pages/SellerPrivacyPolicy"));
 
 // Lazy load admin routes
 const AdminLayout = lazy(() => import("./modules/admin/components/AdminLayout"));
@@ -256,6 +258,22 @@ function App() {
                                   <SellerSignUp />
                                 </Suspense>
                               </PublicRoute>
+                            }
+                          />
+                          <Route
+                            path="/seller/terms-of-service"
+                            element={
+                              <Suspense fallback={null}>
+                                <SellerTermsOfService />
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="/seller/privacy-policy"
+                            element={
+                              <Suspense fallback={null}>
+                                <SellerPrivacyPolicy />
+                              </Suspense>
                             }
                           />
                           <Route

@@ -1,6 +1,6 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getOrderById, updateOrderStatus, OrderDetail, getAvailableDeliveryBoys, assignDeliveryBoy, acknowledgeOrder } from '../../../services/api/orderService';
+import { getOrders, getOrderById, updateOrderStatus, OrderDetail, getAvailableDeliveryBoys, assignDeliveryBoy, acknowledgeOrder } from '../../../services/api/orderService';
 import jsPDF from 'jspdf';
 
 export default function SellerOrderDetail() {
@@ -25,12 +25,24 @@ export default function SellerOrderDetail() {
       setLoading(true);
       setError('');
       try {
-        const response = await getOrderById(id);
+        // Try fetching directly first
+        let response = await getOrderById(id);
+        
+        // Fallback: If not found and it looks like an Order Number (ORD...), try searching for it
+        if (!response.success && (id.startsWith('ORD') || id.length > 15)) {
+          const searchResponse = await getOrders({ search: id });
+          if (searchResponse.success && searchResponse.data.length > 0) {
+            // Found it via search, now fetch details using the real internal ID
+            const realId = searchResponse.data[0].id;
+            response = await getOrderById(realId);
+          }
+        }
+
         if (response.success && response.data) {
           setOrderDetail(response.data);
           setOrderStatus(response.data.status);
         } else {
-          setError(response.message || 'Failed to fetch order details');
+          setError(response.message || 'Resource not found');
         }
       } catch (err: any) {
         setError(err.response?.data?.message || err.message || 'Failed to fetch order details');

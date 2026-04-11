@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { sendOTP, verifyOTP } from '../../../services/api/auth/sellerAuthService';
 import OTPInput from '../../../components/OTPInput';
 import { useAuth } from '../../../context/AuthContext';
@@ -250,7 +250,10 @@ export default function SellerLogin() {
 
       {/* Footer Text */}
       <p className="mt-6 text-xs text-neutral-500 text-center max-w-md">
-        By continuing, you agree to Village Basket's Terms of Service and Privacy Policy
+        By continuing, you agree to Village Basket's{' '}
+        <Link to="/seller/terms-of-service" className="text-[#8B3D28] hover:underline font-medium">Terms of Service</Link>
+        {' '}and{' '}
+        <Link to="/seller/privacy-policy" className="text-[#8B3D28] hover:underline font-medium">Privacy Policy</Link>
       </p>
     </div>
   );
