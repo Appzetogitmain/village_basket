@@ -1,15 +1,22 @@
 import { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface DashboardCardProps {
   icon: ReactNode;
   title: string;
   value: number | string;
   accentColor: string;
+  path?: string;
 }
 
-export default function DashboardCard({ icon, title, value, accentColor }: DashboardCardProps) {
+export default function DashboardCard({ icon, title, value, accentColor, path }: DashboardCardProps) {
+  const navigate = useNavigate();
+
   return (
-    <div className="glass-card organic-clay-radius p-3 sm:p-4 transition-all card-hover font-poppins relative overflow-hidden group border border-[#8B3D28]/5">
+    <div 
+      onClick={() => path && navigate(path)}
+      className={`glass-card organic-clay-radius p-3 sm:p-4 transition-all card-hover font-poppins relative overflow-hidden group border border-[#8B3D28]/5 ${path ? 'cursor-pointer active:scale-95' : ''}`}
+    >
       {/* Village Brand Accent - Organic Shape Overlay */}
       <div 
         className="absolute -top-4 -right-4 w-16 h-16 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none rounded-full"

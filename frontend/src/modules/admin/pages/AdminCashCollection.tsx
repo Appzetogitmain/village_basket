@@ -108,7 +108,23 @@ export default function AdminCashCollection() {
   };
 
   // Note: Filtering is done server-side, so we just use the cashCollections as is
-  const displayedCollections = cashCollections;
+  // Filtering logic
+  const displayedCollections = cashCollections.filter(collection => {
+    // Date filtering
+    if (fromDate) {
+      const start = new Date(fromDate);
+      start.setHours(0, 0, 0, 0);
+      if (new Date(collection.collectedAt) < start) return false;
+    }
+
+    if (toDate) {
+      const end = new Date(toDate);
+      end.setHours(23, 59, 59, 999);
+      if (new Date(collection.collectedAt) > end) return false;
+    }
+
+    return true;
+  });
 
   // For pagination display (simplified - in real app, this would come from API)
   const totalPages = Math.ceil(displayedCollections.length / entriesPerPage);
@@ -225,10 +241,9 @@ export default function AdminCashCollection() {
                       <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
                     <input
-                      type="text"
+                      type="date"
                       value={fromDate}
                       onChange={(e) => setFromDate(e.target.value)}
-                      placeholder="MM/DD/YYYY"
                       className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>
@@ -256,10 +271,9 @@ export default function AdminCashCollection() {
                       <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
                     <input
-                      type="text"
+                      type="date"
                       value={toDate}
                       onChange={(e) => setToDate(e.target.value)}
-                      placeholder="MM/DD/YYYY"
                       className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>

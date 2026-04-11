@@ -134,10 +134,10 @@ export default function AdminBillingSettings() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Platform/Handling Fee (\u20B9)
+                                Platform/Handling Fee (₹)
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">\u20B9</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
                                 <input
                                     type="number"
                                     min="0"
@@ -152,10 +152,10 @@ export default function AdminBillingSettings() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Free Delivery Threshold (\u20B9)
+                                Free Delivery Threshold (₹)
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">\u20B9</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
                                 <input
                                     type="number"
                                     min="0"
@@ -203,10 +203,10 @@ export default function AdminBillingSettings() {
                             className="max-w-md"
                         >
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Fixed Delivery Charge (\u20B9)
+                                Fixed Delivery Charge (₹)
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">\u20B9</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
                                 <input
                                     type="number"
                                     min="0"
@@ -230,10 +230,10 @@ export default function AdminBillingSettings() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Base Charge (\u20B9)
+                                    Base Charge (₹)
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">\u20B9</span>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
                                     <input
                                         type="number"
                                         min="0"
@@ -265,10 +265,10 @@ export default function AdminBillingSettings() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Extra per km Charge (\u20B9)
+                                    Extra per km Charge (₹)
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">\u20B9</span>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
                                     <input
                                         type="number"
                                         min="0"
@@ -282,10 +282,10 @@ export default function AdminBillingSettings() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Delivery Boy Commission (\u20B9/km)
+                                    Delivery Boy Commission (₹/km)
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">\u20B9</span>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
                                     <input
                                         type="number"
                                         min="0"

@@ -174,6 +174,8 @@ export default function AdminSellerTransaction() {
     isAuthenticated,
     token,
     sellers,
+    fromDate,
+    toDate,
   ]);
 
   const handleSort = (column: string) => {
@@ -185,9 +187,9 @@ export default function AdminSellerTransaction() {
     }
   };
 
-  // Filter transactions based on search term
-  const filteredTransactions = transactions.filter(
-    (transaction) =>
+  // Filter transactions based on search term and dates
+  const filteredTransactions = transactions.filter((transaction) => {
+    const matchesSearch =
       transaction.sellerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (transaction.orderId &&
         transaction.orderId.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -197,8 +199,25 @@ export default function AdminSellerTransaction() {
           .includes(searchTerm.toLowerCase())) ||
       transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (transaction.remark &&
-        transaction.remark.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+        transaction.remark.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    if (!matchesSearch) return false;
+
+    // Date filtering
+    if (fromDate) {
+      const start = new Date(fromDate);
+      start.setHours(0, 0, 0, 0);
+      if (new Date(transaction.date) < start) return false;
+    }
+
+    if (toDate) {
+      const end = new Date(toDate);
+      end.setHours(23, 59, 59, 999);
+      if (new Date(transaction.date) > end) return false;
+    }
+
+    return true;
+  });
 
   // Sort transactions
   if (sortColumn) {
@@ -242,7 +261,50 @@ export default function AdminSellerTransaction() {
   );
 
   const handleExport = () => {
-    alert("Export functionality will be implemented here");
+    if (filteredTransactions.length === 0) {
+      alert("No transactions to export");
+      return;
+    }
+
+    const headers = [
+      "ID",
+      "Seller Name",
+      "Order Id",
+      "Order Item Id",
+      "Product Name",
+      "Variation",
+      "Flag",
+      "Amount",
+      "Remark",
+      "Date"
+    ];
+
+    const csvRows = [
+      headers.join(","),
+      ...filteredTransactions.map(tx => [
+        tx.id.slice(-6),
+        `"${tx.sellerName}"`,
+        tx.orderId || "-",
+        tx.orderItemId || "-",
+        `"${tx.productName || tx.type || "-"}"`,
+        `"${tx.variation || "-"}"`,
+        tx.flag,
+        tx.amount.toFixed(2),
+        `"${tx.remark || tx.status || "-"}"`,
+        new Date(tx.date).toLocaleDateString()
+      ].join(","))
+    ];
+
+    const csvString = csvRows.join("\n");
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("hidden", "");
+    a.setAttribute("href", url);
+    a.setAttribute("download", `seller_transactions_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const handleClearDate = () => {
@@ -312,10 +374,9 @@ export default function AdminSellerTransaction() {
                       <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
                     <input
-                      type="text"
+                      type="date"
                       value={fromDate}
                       onChange={(e) => setFromDate(e.target.value)}
-                      placeholder="MM/DD/YYYY"
                       className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>
@@ -343,10 +404,9 @@ export default function AdminSellerTransaction() {
                       <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
                     <input
-                      type="text"
+                      type="date"
                       value={toDate}
                       onChange={(e) => setToDate(e.target.value)}
-                      placeholder="MM/DD/YYYY"
                       className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>

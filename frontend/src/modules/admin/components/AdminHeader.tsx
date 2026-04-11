@@ -160,8 +160,8 @@ export default function AdminHeader({ onMenuClick, isSidebarOpen }: AdminHeaderP
                 Orders
             </button>
             <button 
-                onClick={() => navigate('/admin/manage-customer')}
-                className={`text-[11px] font-bold uppercase tracking-tighter transition-colors ${isActive('/admin/manage-customer') ? 'text-[#8B3D28]' : 'text-[#8B3D28]/50 hover:text-[#8B3D28]'}`}
+                onClick={() => navigate('/admin/customers')}
+                className={`text-[11px] font-bold uppercase tracking-tighter transition-colors ${isActive('/admin/customers') ? 'text-[#8B3D28]' : 'text-[#8B3D28]/50 hover:text-[#8B3D28]'}`}
             >
                 Manage Customers
             </button>

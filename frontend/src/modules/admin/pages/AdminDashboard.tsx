@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardCard from "../components/DashboardCard";
 import OrderChart from "../components/OrderChart";
 import SalesLineChart from "../components/SalesLineChart";
@@ -21,8 +22,10 @@ import {
   type SalesAnalytics,
   type TodaySales,
 } from "../../../services/api/admin/adminDashboardService";
+import { exportOrders } from "../../../services/api/admin/adminOrderService";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const { isAuthenticated, token } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [newOrders, setNewOrders] = useState<RecentOrder[]>([]);
@@ -42,6 +45,11 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [orderSearch, setOrderSearch] = useState("");
+
+  const now = new Date();
+  const currentMonthName = now.toLocaleString("default", { month: "short" });
+  const currentYear = now.getFullYear();
 
   // Fetch dashboard data on component mount
   useEffect(() => {
@@ -356,13 +364,22 @@ export default function AdminDashboard() {
   const salesLastMonth = salesAnalytics?.lastPeriod || [];
 
   // Transform order analytics data for charts (real data from backend)
-  const orderDataDec2025 = orderAnalyticsDaily?.thisPeriod || [];
-  const orderData2025 = orderAnalytics?.thisPeriod || [];
+  const monthlyOrderData = orderAnalyticsDaily?.thisPeriod || [];
+  const yearlyOrderData = orderAnalytics?.thisPeriod || [];
 
-  const totalPagesNewOrders = Math.ceil(newOrders.length / entriesPerPage);
+  const filteredNewOrders = newOrders.filter((order) => {
+    const searchLower = orderSearch.toLowerCase();
+    return (
+      (order.orderNumber && order.orderNumber.toLowerCase().includes(searchLower)) ||
+      (order.customerName && order.customerName.toLowerCase().includes(searchLower)) ||
+      (order.id && order.id.toLowerCase().includes(searchLower))
+    );
+  });
+
+  const totalPagesNewOrders = Math.ceil(filteredNewOrders.length / entriesPerPage);
   const startIndexNewOrders = (currentPage - 1) * entriesPerPage;
   const endIndexNewOrders = startIndexNewOrders + entriesPerPage;
-  const displayedNewOrders = newOrders.slice(
+  const displayedNewOrders = filteredNewOrders.slice(
     startIndexNewOrders,
     endIndexNewOrders
   );
@@ -385,6 +402,23 @@ export default function AdminDashboard() {
       : salesToday > 0 ? "100" : "0";
 
   // Loading state
+  const handleDownloadReport = async () => {
+    try {
+      const blob = await exportOrders();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `Sales_Report_${new Date().toLocaleDateString()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to download report:", err);
+      alert("Failed to download detailed sales report. Please try again.");
+    }
+  };
+
   if (loading) {
     return <VillageLoader message="Loading dashboard data..." />;
   }
@@ -443,60 +477,70 @@ export default function AdminDashboard() {
           title="Total User"
           value={stats.totalUser}
           accentColor="#3b82f6"
+          path="/admin/customers"
         />
         <DashboardCard
           icon={categoryIcon}
           title="Total Category"
           value={stats.totalCategory}
           accentColor="#eab308"
+          path="/admin/category"
         />
         <DashboardCard
           icon={subcategoryIcon}
           title="Total Subcategory"
           value={stats.totalSubcategory ?? 0}
           accentColor="#ec4899"
+          path="/admin/subcategory"
         />
         <DashboardCard
           icon={productIcon}
           title="Total Product"
           value={stats.totalProduct}
           accentColor="#ef4444"
+          path="/admin/product/list"
         />
         <DashboardCard
           icon={ordersIcon}
           title="Total Orders"
           value={stats.totalOrders}
           accentColor="#3b82f6"
+          path="/admin/orders/all"
         />
         <DashboardCard
           icon={completedOrdersIcon}
           title="Completed Orders"
           value={stats.completedOrders}
           accentColor="#16a34a"
+          path="/admin/orders/delivered"
         />
         <DashboardCard
           icon={pendingOrdersIcon}
           title="Pending Orders"
           value={stats.pendingOrders}
           accentColor="#a855f7"
+          path="/admin/orders/pending"
         />
         <DashboardCard
           icon={cancelledOrdersIcon}
           title="Cancelled Orders"
           value={stats.cancelledOrders}
           accentColor="#ef4444"
+          path="/admin/orders/cancelled"
         />
         <DashboardCard
           icon={soldOutIcon}
           title="Product Sold Out"
           value={stats.soldOutProducts}
           accentColor="#ec4899"
+          path="/admin/product/list"
         />
         <DashboardCard
           icon={lowStockIcon}
           title="Product low on Stock"
           value={stats.lowStockProducts}
           accentColor="#eab308"
+          path="/admin/product/list"
         />
       </div>
 
@@ -581,8 +625,8 @@ export default function AdminDashboard() {
         <ErrorBoundary fallback={<div className="text-xs text-red-600 px-3 py-2">Chart failed to load</div>}>
           <div className="bg-white rounded-xl shadow-sm border border-black/5 px-3 py-2 overflow-hidden">
             <OrderChart
-              title="Order - Dec 2025"
-              data={orderDataDec2025}
+              title={`Order - ${currentMonthName} ${currentYear}`}
+              data={monthlyOrderData}
               maxValue={3}
               height={300}
             />
@@ -591,8 +635,8 @@ export default function AdminDashboard() {
         <ErrorBoundary fallback={<div className="text-xs text-red-600 px-3 py-2">Chart failed to load</div>}>
           <div className="bg-white rounded-xl shadow-sm border border-black/5 px-3 py-2 overflow-hidden">
             <OrderChart
-              title="Order - 2025"
-              data={orderData2025}
+              title={`Order - ${currentYear}`}
+              data={yearlyOrderData}
               maxValue={80}
               height={300}
             />
@@ -608,7 +652,10 @@ export default function AdminDashboard() {
             <h2 className="text-sm font-black uppercase tracking-widest font-outfit">
               New Orders
             </h2>
-            <button className="text-[10px] font-bold bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-colors uppercase">
+            <button 
+              onClick={() => navigate('/admin/orders/all')}
+              className="text-[10px] font-bold bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-colors uppercase"
+            >
               View All
             </button>
           </div>
@@ -633,6 +680,11 @@ export default function AdminDashboard() {
               <input 
                  type="text" 
                  placeholder="Filter orders..." 
+                 value={orderSearch}
+                 onChange={(e) => {
+                   setOrderSearch(e.target.value);
+                   setCurrentPage(1);
+                 }}
                  className="text-[11px] px-3 py-1 bg-white border border-neutral-200 rounded-full w-32 focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
               />
             </div>
@@ -668,7 +720,11 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-4 py-2.5 text-[12px] font-black text-neutral-900">{"\u20B9"}{(order.amount || 0).toFixed(0)}</td>
                       <td className="px-4 py-2.5 text-center">
-                        <button className="text-[#A54B31] hover:scale-110 transition-transform p-1.5" aria-label="View order">
+                        <button 
+                          onClick={() => navigate(`/admin/orders/${order.id}`)}
+                          className="text-[#A54B31] hover:scale-110 transition-transform p-1.5" 
+                          aria-label="View order"
+                        >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
@@ -684,7 +740,8 @@ export default function AdminDashboard() {
 
           <div className="px-4 py-2.5 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/30">
             <span className="text-[10px] font-bold text-neutral-400">
-              {startIndexNewOrders + 1}-{Math.min(endIndexNewOrders, newOrders.length)} of {newOrders.length}
+              {filteredNewOrders.length > 0 ? startIndexNewOrders + 1 : 0}-
+              {Math.min(endIndexNewOrders, filteredNewOrders.length)} of {filteredNewOrders.length}
             </span>
             <div className="flex gap-1">
               <button
@@ -743,7 +800,11 @@ export default function AdminDashboard() {
                          <span className="text-[13px] font-black text-[#8B3D28]">{"\u20B9"}{(seller.totalRevenue / 1).toFixed(0)}</span>
                       </td>
                       <td className="px-4 py-2.5 text-center">
-                        <button className="text-[#8B3D28] hover:scale-110 transition-transform p-1.5" aria-label="View seller">
+                        <button 
+                          onClick={() => navigate('/admin/manage-seller/list')}
+                          className="text-[#8B3D28] hover:scale-110 transition-transform p-1.5" 
+                          aria-label="View seller"
+                        >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
@@ -757,17 +818,22 @@ export default function AdminDashboard() {
             </table>
           </div>
           <div className="px-4 py-3 bg-neutral-50/30 text-center">
-             <button className="text-[10px] font-black text-[#A54B31] uppercase tracking-widest hover:underline transition-all">Download Detailed Sales Report</button>
+             <button 
+              onClick={handleDownloadReport}
+              className="text-[10px] font-black text-[#A54B31] uppercase tracking-widest hover:underline transition-all"
+             >
+               Download Detailed Sales Report
+             </button>
           </div>
         </div>
       </div>
 
       {/* Footer - Mini */}
-      <div className="text-center py-4 relative group">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-neutral-200 group-hover:w-24 transition-all duration-500 rounded-full"></div>
-        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mb-1">Generated by System</p>
-        <p className="text-[11px] text-neutral-300 font-bold">
-          Village Basket &copy; 2025 | Premium Admin Interface
+      <div className="text-center py-6 relative group border-t border-neutral-100 mt-8">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-neutral-900 group-hover:w-24 transition-all duration-500 rounded-full"></div>
+        <p className="text-[10px] font-black text-neutral-900 uppercase tracking-[0.2em] mb-1 opacity-80">Generated by System</p>
+        <p className="text-[11px] text-neutral-900 font-black">
+          Village Basket &copy; {currentYear} | Premium Admin Interface
         </p>
       </div>
     </div>
