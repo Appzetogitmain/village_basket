@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { menuSections, type MenuItem, type SubMenuItem } from '../data/adminMenu';
 import villageBasketLogo from '@assets/village_basket-removebg-preview.png';
 
 interface AdminHeaderProps {
@@ -51,7 +52,22 @@ export default function AdminHeader({ onMenuClick, isSidebarOpen }: AdminHeaderP
   const location = useLocation();
   const { logout, user } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<(MenuItem | SubMenuItem)[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const profileRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Flatten menu for searching
+  const flattenedMenu = menuSections.flatMap(section => 
+    section.items.flatMap(item => {
+      const result: (MenuItem | SubMenuItem)[] = [item];
+      if (item.submenuItems) {
+        result.push(...item.submenuItems);
+      }
+      return result;
+    })
+  );
 
   const isActive = (path: string) => location.pathname.includes(path);
 
@@ -60,10 +76,59 @@ export default function AdminHeader({ onMenuClick, isSidebarOpen }: AdminHeaderP
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setShowProfileMenu(false);
       }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchResults([]);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      const filtered = flattenedMenu.filter(item => 
+        item.label.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 8); // Limit to 8 results
+      setSearchResults(filtered);
+      setSelectedIndex(0);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev + 1) % searchResults.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev - 1 + searchResults.length) % searchResults.length);
+    } else if (e.key === 'Enter' && searchResults.length > 0) {
+      e.preventDefault();
+      handleSelectResult(searchResults[selectedIndex]);
+    } else if (e.key === 'Escape') {
+      setSearchResults([]);
+    }
+  };
+
+  const handleSelectResult = (item: MenuItem | SubMenuItem) => {
+    navigate(item.path);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchResults.length > 0) {
+      handleSelectResult(searchResults[selectedIndex]);
+    } else {
+      const query = searchQuery.trim();
+      if (query) {
+        navigate(`/admin/orders/all?search=${encodeURIComponent(query)}`);
+      }
+      setSearchQuery('');
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -110,21 +175,59 @@ export default function AdminHeader({ onMenuClick, isSidebarOpen }: AdminHeaderP
         </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-4">
-        <div className="flex items-center gap-1 sm:gap-2">
-          <button className="p-2 text-[#8B3D28]/60 hover:text-[#8B3D28] hover:bg-[#8B3D28]/5 rounded-lg transition-all" aria-label="Search">
+      <div className="flex-1 max-w-xs sm:max-w-sm md:max-w-md mx-2 sm:mx-6" ref={searchRef}>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8B3D28]/40">
             <SearchIcon />
-          </button>
-          <button className="p-2 text-[#8B3D28]/60 hover:text-[#8B3D28] hover:bg-[#8B3D28]/5 rounded-lg transition-all relative" aria-label="Notifications">
-            <BellIcon />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-          </button>
+          </div>
+          <form onSubmit={handleSearchSubmit} className="w-full relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onKeyDown={handleKeyDown}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Find functionality..."
+              className="w-full h-9 bg-[#8B3D28]/5 border border-[#8B3D28]/10 rounded-xl pl-10 pr-4 text-xs font-bold text-[#8B3D28] placeholder-[#8B3D28]/40 focus:outline-none focus:ring-2 focus:ring-[#8B3D28]/20 transition-all font-outfit"
+            />
+          </form>
+
+          {searchResults.length > 0 && (
+            <div className="absolute top-11 left-0 w-64 glass-card organic-clay-radius p-2 shadow-2xl z-50 animate-slide-up border border-[#8B3D28]/10 bg-white">
+              <div className="px-3 py-1.5 border-b border-[#8B3D28]/5 mb-1">
+                <p className="text-[9px] font-black text-[#8B3D28]/40 uppercase tracking-widest font-outfit">Suggestions</p>
+              </div>
+              <div className="space-y-0.5 max-h-60 overflow-y-auto custom-scrollbar">
+                {searchResults.map((item, idx) => (
+                  <button
+                    key={item.path + idx}
+                    onClick={() => handleSelectResult(item)}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 text-[11px] font-bold rounded-xl transition-all ${idx === selectedIndex ? 'bg-[#8B3D28] text-white shadow-md scale-[1.02]' : 'text-neutral-600 hover:bg-[#8B3D28]/5 hover:text-[#8B3D28]'}`}
+                  >
+                    <span className={idx === selectedIndex ? 'text-white' : 'text-[#8B3D28]/60'}>
+                      {item.icon}
+                    </span>
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+      </div>
 
+      <div className="flex items-center gap-1 sm:gap-2">
+        <button 
+          onClick={() => navigate('/admin/notification')}
+          className="p-2 text-[#8B3D28]/60 hover:text-[#8B3D28] hover:bg-[#8B3D28]/5 rounded-lg transition-all relative" 
+          aria-label="Notifications"
+        >
+          <BellIcon />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+        </button>
         <div className="h-8 w-[1px] bg-[#8B3D28]/10 mx-1 sm:mx-2 hidden sm:block"></div>
-
         <div className="flex items-center gap-2 sm:gap-3 pl-1 sm:pl-2 relative" ref={profileRef}>
-          <div className="hidden sm:flex flex-col items-end">
+          <div className="hidden lg:flex flex-col items-end">
             <span className="text-xs font-black text-[#8B3D28] leading-none uppercase font-outfit truncate max-w-[120px]">{user?.name || 'Administrator'}</span>
             <span className="text-[9px] font-bold text-[#8B3D28]/50 uppercase tracking-tighter">Super Sarpanch</span>
           </div>
@@ -141,7 +244,13 @@ export default function AdminHeader({ onMenuClick, isSidebarOpen }: AdminHeaderP
                 <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest truncate">Logged in as</p>
                 <p className="text-xs font-black text-[#8B3D28] uppercase font-outfit truncate">{user?.email || 'user@village.com'}</p>
               </div>
-              <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-neutral-600 hover:bg-[#8B3D28]/5 hover:text-[#8B3D28] rounded-xl transition-all">
+              <button 
+                onClick={() => {
+                  setShowProfileMenu(false);
+                  navigate('/admin/profile');
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-neutral-600 hover:bg-[#8B3D28]/5 hover:text-[#8B3D28] rounded-xl transition-all"
+              >
                 <UserIcon /> Profile Settings
               </button>
               <div className="h-[1px] bg-[#8B3D28]/5 my-1"></div>

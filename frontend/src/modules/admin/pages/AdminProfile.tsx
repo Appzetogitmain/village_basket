@@ -217,7 +217,7 @@ export default function AdminProfile() {
                             {!isEditing && (
                                 <button
                                     onClick={() => setIsEditing(true)}
-                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
+                                    className="px-4 py-2 bg-[#8B3D28] hover:opacity-90 text-white text-sm font-bold uppercase tracking-tight font-outfit rounded-xl transition-all shadow-sm active:scale-95"
                                 >
                                     Edit Profile
                                 </button>
@@ -238,7 +238,7 @@ export default function AdminProfile() {
                                             name="firstName"
                                             value={formData.firstName}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className="w-full px-3 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8B3D28]/10 focus:border-[#8B3D28] transition-all"
                                         />
                                     ) : (
                                         <p className="text-neutral-900 py-2">{profile.firstName}</p>
@@ -256,7 +256,7 @@ export default function AdminProfile() {
                                             name="lastName"
                                             value={formData.lastName}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className="w-full px-3 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8B3D28]/10 focus:border-[#8B3D28] transition-all"
                                         />
                                     ) : (
                                         <p className="text-neutral-900 py-2">{profile.lastName}</p>
@@ -274,7 +274,7 @@ export default function AdminProfile() {
                                             name="email"
                                             value={formData.email}
                                             onChange={handleInputChange}
-                                            className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className="w-full px-3 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8B3D28]/10 focus:border-[#8B3D28] transition-all"
                                         />
                                     ) : (
                                         <p className="text-neutral-900 py-2">{profile.email}</p>
@@ -293,7 +293,7 @@ export default function AdminProfile() {
                                             value={formData.mobile}
                                             onChange={handleInputChange}
                                             maxLength={10}
-                                            className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            className="w-full px-3 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8B3D28]/10 focus:border-[#8B3D28] transition-all"
                                         />
                                     ) : (
                                         <p className="text-neutral-900 py-2">{profile.mobile}</p>
@@ -306,7 +306,7 @@ export default function AdminProfile() {
                                         Role
                                     </label>
                                     <p className="text-neutral-900 py-2">
-                                        <span className="px-3 py-1 bg-blue-100 text-[#8B3D28] rounded-full text-sm font-medium">
+                                        <span className="px-3 py-1 bg-[#8B3D28]/5 text-[#8B3D28] rounded-full text-[10px] font-black uppercase tracking-wider font-outfit border border-[#8B3D28]/10">
                                             {profile.role}
                                         </span>
                                     </p>
@@ -329,7 +329,7 @@ export default function AdminProfile() {
                                 <button
                                     onClick={handleTestNotification}
                                     disabled={testNotifLoading}
-                                    className="flex items-center gap-2 px-4 py-2 border border-blue-600 text-[#8B3D28] hover:bg-blue-50 font-medium rounded transition-colors disabled:opacity-50"
+                                    className="flex items-center gap-2 px-4 py-2 border border-[#8B3D28]/20 text-[#8B3D28] hover:bg-[#8B3D28]/5 font-black uppercase tracking-tight text-[11px] font-outfit rounded-xl transition-all disabled:opacity-50"
                                 >
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -349,14 +349,14 @@ export default function AdminProfile() {
                                     <button
                                         onClick={handleSave}
                                         disabled={saving}
-                                        className="px-6 py-2 bg-[#8B3D28] hover:opacity-90 text-white font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-6 py-2 bg-[#8B3D28] hover:opacity-90 text-white font-black uppercase tracking-tight text-xs font-outfit rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {saving ? 'Saving...' : 'Save Changes'}
                                     </button>
                                     <button
                                         onClick={handleCancel}
                                         disabled={saving}
-                                        className="px-6 py-2 bg-neutral-400 hover:bg-neutral-500 text-white font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-6 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-black uppercase tracking-tight text-xs font-outfit rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Cancel
                                     </button>

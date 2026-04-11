@@ -838,8 +838,12 @@ export default function AdminManageSellerList() {
                                             <p className="text-sm font-medium text-neutral-900">{editingSeller.phone}</p>
                                         </div>
                                         <div>
-                                            <label className="text-xs text-neutral-500">Category</label>
-                                            <p className="text-sm font-medium text-neutral-900">{editingSeller.category || 'N/A'}</p>
+                                            <label className="text-xs text-neutral-500">Categories</label>
+                                            <p className="text-sm font-medium text-neutral-900">
+                                                {editingSeller.categories && editingSeller.categories.length > 0 
+                                                    ? editingSeller.categories.join(', ') 
+                                                    : editingSeller.category || 'N/A'}
+                                            </p>
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Commission</label>
@@ -864,7 +868,7 @@ export default function AdminManageSellerList() {
                                             <label className="text-xs text-neutral-500">Serviceable Area</label>
                                             <p className="text-sm font-medium text-neutral-900">{editingSeller.serviceableArea || 'N/A'}</p>
                                         </div>
-                                        {editingSeller.searchLocation && (
+                                        {editingSeller.searchLocation && editingSeller.searchLocation !== editingSeller.address && (
                                             <div className="md:col-span-2">
                                                 <label className="text-xs text-neutral-500">Location</label>
                                                 <p className="text-sm font-medium text-neutral-900">{editingSeller.searchLocation}</p>

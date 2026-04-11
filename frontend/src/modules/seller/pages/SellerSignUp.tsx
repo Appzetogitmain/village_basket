@@ -362,7 +362,8 @@ export default function SellerSignUp() {
                             searchLocation: address,
                             latitude: lat.toString(),
                             longitude: lng.toString(),
-                            address: address,
+                            // Only update address if it's currently empty
+                            address: prev.address || address,
                             city: components?.city || prev.city,
                           }));
                         }}
@@ -386,7 +387,6 @@ export default function SellerSignUp() {
                                 latitude: lat.toString(),
                                 longitude: lng.toString(),
                                 searchLocation: locationStr,
-                                address: prev.address || locationStr // Ensure address is not empty
                               }));
                               setLoading(false);
                             },
@@ -464,6 +464,22 @@ export default function SellerSignUp() {
                   <p className="mt-1 text-xs text-neutral-500">
                     Only customers within this radius can see and order your products
                   </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Full Address (Building, Street, Area) <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    name="address"
+                    value={formData.address}
+                    onChange={(e: any) => handleInputChange(e)}
+                    placeholder="Enter full shop address"
+                    required
+                    rows={2}
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-orange-100"
+                    disabled={loading}
+                  />
                 </div>
 
                 <div>
