@@ -315,7 +315,7 @@ export default function SellerProductList() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border border-neutral-300 rounded py-1 px-2 text-[11px] focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                 <option value="All Category">All Category</option>
                 {allCategories.map((cat) => (
                   <option key={cat._id} value={cat._id}>
@@ -331,7 +331,7 @@ export default function SellerProductList() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border border-neutral-300 rounded py-1 px-2 text-[11px] focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                 <option value="All Products">All Products</option>
                 <option value="Published">Published</option>
                 <option value="Unpublished">Unpublished</option>
@@ -344,7 +344,7 @@ export default function SellerProductList() {
               <select
                 value={stockFilter}
                 onChange={(e) => setStockFilter(e.target.value)}
-                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border border-neutral-300 rounded py-1 px-2 text-[11px] focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                 <option value="All Products">All Products</option>
                 <option value="In Stock">In Stock</option>
                 <option value="Out of Stock">Out of Stock</option>
@@ -357,62 +357,62 @@ export default function SellerProductList() {
               <select
                 value={rowsPerPage}
                 onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                className="bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded py-1.5 px-3 text-sm focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
+                className="bg-white/90 backdrop-blur-md border border-neutral-300 rounded py-1 px-2 text-[11px] focus:ring-1 focus:ring-[#8B3D28] focus:outline-none cursor-pointer">
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
               </select>
             </div>
-            <button
-              onClick={() => {
-                const headers = [
-                  "Product Id",
-                  "Variation Id",
-                  "Product Name",
-                  "Seller Name",
-                  "Brand Name",
-                  "Category",
-                  "Retail Price",
-                  "Retail Disc Price",
-                  "Wholesale Price",
-                  "Wholesale Disc Price",
-                  "Variation",
-                ];
-                const csvContent = [
-                  headers.join(","),
-                  ...filteredVariations.map((v) =>
-                    [
-                      v.productId,
-                      v.variationId,
-                      `"${v.productName}"`,
-                      `"${v.sellerName}"`,
-                      `"${v.brandName}"`,
-                      `"${v.category}"`,
-                      v.price,
-                      v.discPrice,
-                      v.wholesalePrice,
-                      v.wholesaleDiscPrice,
-                      `"${v.variation}"`,
-                    ].join(",")
-                  ),
-                ].join("\n");
-                const blob = new Blob([csvContent], {
-                  type: "text/csv;charset=utf-8;",
-                });
-                const link = document.createElement("a");
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute(
-                  "download",
-                  `products_${new Date().toISOString().split("T")[0]}.csv`
-                );
-                link.style.visibility = "hidden";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }}
-              className="bg-[#8B3D28] hover:bg-[#723221] text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-1 transition-colors">
+              <button
+                onClick={() => {
+                  const headers = [
+                    "Product Id",
+                    "Variation Id",
+                    "Product Name",
+                    "Seller Name",
+                    "Brand Name",
+                    "Category",
+                    "Retail Price",
+                    "Retail Disc Price",
+                    "Wholesale Price",
+                    "Wholesale Disc Price",
+                    "Variation",
+                  ];
+                  const csvContent = [
+                    headers.join(","),
+                    ...filteredVariations.map((v) =>
+                      [
+                        v.productId,
+                        v.variationId,
+                        `"${v.productName}"`,
+                        `"${v.sellerName}"`,
+                        `"${v.brandName}"`,
+                        `"${v.category}"`,
+                        v.price,
+                        v.discPrice,
+                        v.wholesalePrice,
+                        v.wholesaleDiscPrice,
+                        `"${v.variation}"`,
+                      ].join(",")
+                    ),
+                  ].join("\n");
+                  const blob = new Blob([csvContent], {
+                    type: "text/csv;charset=utf-8;",
+                  });
+                  const link = document.createElement("a");
+                  const url = URL.createObjectURL(blob);
+                  link.setAttribute("href", url);
+                  link.setAttribute(
+                    "download",
+                    `products_${new Date().toISOString().split("T")[0]}.csv`
+                  );
+                  link.style.visibility = "hidden";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                className="bg-[#8B3D28] hover:bg-[#723221] text-white px-2 py-1.5 rounded text-[11px] font-medium flex items-center gap-1 transition-colors">
               <svg
                 width="16"
                 height="16"
@@ -441,15 +441,12 @@ export default function SellerProductList() {
               </svg>
             </button>
             <div className="relative">
-              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">
-                Search:
-              </span>
               <input
                 type="text"
-                className="pl-14 pr-3 py-1.5 bg-neutral-100 border-none rounded text-sm focus:ring-1 focus:ring-[#8B3D28] w-48"
+                className="pl-3 pr-3 py-1 bg-white border border-neutral-300 rounded text-[11px] focus:ring-1 focus:ring-[#8B3D28] w-40"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder=""
+                placeholder="Search..."
               />
             </div>
           </div>
@@ -477,335 +474,331 @@ export default function SellerProductList() {
 
         {/* Table */}
         {!loading && !error && (
-        <div className="overflow-x-auto flex-1">
-          <table className="w-full text-left border-collapse border border-neutral-200">
-            <thead>
-              <tr className="bg-white/40 text-xs font-bold text-neutral-800">
-                <th className="p-4 w-16 border border-neutral-200">
-                  <div className="flex items-center justify-between">
-                    Product Id
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("variationId")}>
-                  <div className="flex items-center justify-between">
-                    Variation Id <SortIcon column="variationId" />
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("productName")}>
-                  <div className="flex items-center justify-between">
-                    Product Name <SortIcon column="productName" />
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("sellerName")}>
-                  <div className="flex items-center justify-between">
-                    Seller Name <SortIcon column="sellerName" />
-                  </div>
-                </th>
-                <th className="p-4 border border-neutral-200">
-                  <div className="flex items-center justify-center">Action</div>
-                </th>
-                <th className="p-4 border border-neutral-200">
-                  <div className="flex items-center justify-between">
-                    product Image
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("brandName")}>
-                  <div className="flex items-center justify-between">
-                    Brand Name <SortIcon column="brandName" />
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("category")}>
-                  <div className="flex items-center justify-between">
-                    Category <SortIcon column="category" />
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("subCategory")}>
-                  <div className="flex items-center justify-between">
-                    SubCategory <SortIcon column="subCategory" />
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("price")}>
-                  <div className="flex items-center justify-between">
-                    Retail Price <SortIcon column="price" />
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("discPrice")}>
-                  <div className="flex items-center justify-between">
-                    Retail Disc Price <SortIcon column="discPrice" />
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("wholesalePrice")}>
-                  <div className="flex items-center justify-between">
-                    Wholesale Price <SortIcon column="wholesalePrice" />
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("wholesaleDiscPrice")}>
-                  <div className="flex items-center justify-between">
-                    Wholesale Disc Price <SortIcon column="wholesaleDiscPrice" />
-                  </div>
-                </th>
-                <th
-                  className="p-4 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
-                  onClick={() => handleSort("variation")}>
-                  <div className="flex items-center justify-between">
-                    Variation <SortIcon column="variation" />
-                  </div>
-                </th>
-
-              </tr>
-            </thead>
-            <tbody>
-              {displayedVariations.map((variation, index) => {
-                const isFirstVariation =
-                  index === 0 ||
-                  displayedVariations[index - 1].productId !==
+          <div className="overflow-x-auto flex-1 px-2 sm:px-4">
+            <table className="w-full text-left border-collapse border border-neutral-200">
+              <thead>
+                <tr className="bg-neutral-50 text-[10px] font-bold text-neutral-800 uppercase tracking-wider">
+                  <th className="p-2 border border-neutral-200">
+                    <div className="flex items-center justify-between">
+                      Product ID
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("variationId")}>
+                    <div className="flex items-center justify-between">
+                      Variation ID <SortIcon column="variationId" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("productName")}>
+                    <div className="flex items-center justify-between">
+                      Product Name <SortIcon column="productName" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("sellerName")}>
+                    <div className="flex items-center justify-between">
+                      Seller Name <SortIcon column="sellerName" />
+                    </div>
+                  </th>
+                  <th className="p-2 border border-neutral-200">
+                    <div className="flex items-center justify-center">Action</div>
+                  </th>
+                  <th className="p-2 border border-neutral-200">
+                    <div className="flex items-center justify-center">
+                      Image
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("brandName")}>
+                    <div className="flex items-center justify-between">
+                      Brand <SortIcon column="brandName" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("category")}>
+                    <div className="flex items-center justify-between">
+                      Category <SortIcon column="category" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("subCategory")}>
+                    <div className="flex items-center justify-between">
+                      SubCategory <SortIcon column="subCategory" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("price")}>
+                    <div className="flex items-center justify-between">
+                      Retail Price <SortIcon column="price" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("discPrice")}>
+                    <div className="flex items-center justify-between text-red-600">
+                      Discount <SortIcon column="discPrice" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("wholesalePrice")}>
+                    <div className="flex items-center justify-between text-blue-700">
+                      Wholesale <SortIcon column="wholesalePrice" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("wholesaleDiscPrice")}>
+                    <div className="flex items-center justify-between text-blue-800">
+                      Wholesale Disc <SortIcon column="wholesaleDiscPrice" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2 border border-neutral-200 cursor-pointer hover:bg-neutral-100 transition-colors"
+                    onClick={() => handleSort("variation")}>
+                    <div className="flex items-center justify-between">
+                      Variation <SortIcon column="variation" />
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayedVariations.map((variation, index) => {
+                  const isFirstVariation =
+                    index === 0 ||
+                    displayedVariations[index - 1].productId !==
                     variation.productId;
-                const product = products.find(
-                  (p) => p._id === variation.productId
-                );
-                const hasMultipleVariations =
-                  product && product.variations.length > 1;
-                const isExpanded = expandedProducts.has(variation.productId);
+                  const product = products.find(
+                    (p) => p._id === variation.productId
+                  );
+                  const hasMultipleVariations =
+                    product && product.variations.length > 1;
+                  const isExpanded = expandedProducts.has(variation.productId);
 
-                return (
-                  <tr
-                    key={`${variation.productId}-${variation.variationId}`}
-                    className="hover:bg-white/40 transition-colors text-sm text-neutral-700">
-                    <td className="p-4 align-middle border border-neutral-200">
-                      <div className="flex items-center gap-2">
-                        {isFirstVariation && hasMultipleVariations && (
+                  return (
+                    <tr
+                      key={`${variation.productId}-${variation.variationId}`}
+                      className="hover:bg-neutral-50 transition-colors text-[11px] text-neutral-700">
+                      <td className="p-2 align-middle border border-neutral-200 max-w-[80px]">
+                        <div className="flex items-center gap-1">
+                          {isFirstVariation && hasMultipleVariations && (
+                            <button
+                              onClick={() => toggleProduct(variation.productId)}
+                              className="text-blue-600 hover:text-blue-700">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round">
+                                {isExpanded ? (
+                                  <polyline points="6 9 12 15 18 9"></polyline>
+                                ) : (
+                                  <polyline points="9 18 15 12 9 6"></polyline>
+                                )}
+                              </svg>
+                            </button>
+                          )}
+                          <span className="truncate" title={variation.productId}>{variation.productId}</span>
+                        </div>
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200 max-w-[80px]">
+                        <div className="truncate" title={variation.variationId}>{variation.variationId}</div>
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200 font-medium">
+                        <div className="flex flex-col gap-0.5">
+                          <span>{variation.productName}</span>
+                        </div>
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200">
+                        {variation.sellerName}
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200">
+                        <div className="flex items-center justify-center gap-1.5">
                           <button
-                            onClick={() => toggleProduct(variation.productId)}
-                            className="text-blue-600 hover:text-blue-700">
+                            onClick={() => handleEdit(variation.productId)}
+                            className="flex items-center gap-1 px-1.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white rounded transition-all text-[10px] font-bold border border-blue-200"
+                            title="Edit">
                             <svg
-                              width="16"
-                              height="16"
+                              width="10"
+                              height="10"
                               viewBox="0 0 24 24"
                               fill="none"
                               stroke="currentColor"
-                              strokeWidth="2"
+                              strokeWidth="2.5"
                               strokeLinecap="round"
                               strokeLinejoin="round">
-                              {isExpanded ? (
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                              ) : (
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                              )}
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                             </svg>
+                            <span>Edit</span>
                           </button>
-                        )}
-                        <span>{variation.productId}</span>
-                      </div>
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200">
-                      {variation.variationId}
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200">
-                      <div className="flex flex-col gap-1">
-                        <span>{variation.productName}</span>
-                      </div>
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200">
-                      {variation.sellerName}
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200">
-                      <div className="flex items-center justify-center gap-3">
-                        <button
-                          onClick={() => handleEdit(variation.productId)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg transition-all text-xs font-bold border border-blue-200 shadow-sm"
-                          title="Edit Product">
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                          </svg>
-                          <span>Edit</span>
-                        </button>
-                        <button
-                          onClick={() => handleDelete(variation.productId)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-600 hover:text-white rounded-lg transition-all text-xs font-bold border border-red-200 shadow-sm"
-                          title="Delete Product">
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                          </svg>
-                          <span>Delete</span>
-                        </button>
-                      </div>
-                    </td>
-                    <td className="p-4 border border-neutral-200">
-                      <div className="w-16 h-12 bg-white/90 backdrop-blur-md border-white/20 border border-neutral-200 rounded p-1 flex items-center justify-center mx-auto">
-                        <img
-                          src={variation.productImage}
-                          alt={variation.productName}
-                          className="max-w-full max-h-full object-contain"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              "https://placehold.co/60x40?text=Img";
-                          }}
-                        />
-                      </div>
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200">
-                      {variation.brandName || "-"}
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200">
-                      {variation.category}
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200">
-                      {variation.subCategory}
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200 font-bold text-[#8B3D28]">
-                      {"\u20B9"}{variation.price.toFixed(2)}
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200 text-[#8B3D28]">
-                      {variation.discPrice > 0
-                        ? `\u20B9${variation.discPrice.toFixed(2)}`
-                        : "-"}
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200 font-bold text-blue-700">
-                      {"\u20B9"}{variation.wholesalePrice.toFixed(2)}
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200 text-blue-700">
-                      {variation.wholesaleDiscPrice > 0
-                        ? `\u20B9${variation.wholesaleDiscPrice.toFixed(2)}`
-                        : "-"}
-                    </td>
-                    <td className="p-4 align-middle border border-neutral-200">
-                      {variation.variation}
-                    </td>
+                          <button
+                            onClick={() => handleDelete(variation.productId)}
+                            className="flex items-center gap-1 px-1.5 py-1 bg-red-50 text-red-700 hover:bg-red-600 hover:text-white rounded transition-all text-[10px] font-bold border border-red-200"
+                            title="Delete">
+                            <svg
+                              width="10"
+                              height="10"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              <line x1="10" y1="11" x2="10" y2="17"></line>
+                              <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                            <span>Delete</span>
+                          </button>
+                        </div>
+                      </td>
+                      <td className="p-2 border border-neutral-200">
+                        <div className="w-10 h-8 bg-white border border-neutral-200 rounded p-0.5 flex items-center justify-center mx-auto">
+                          <img
+                            src={variation.productImage}
+                            alt={variation.productName}
+                            className="max-w-full max-h-full object-contain"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "https://placehold.co/40x30?text=Img";
+                            }}
+                          />
+                        </div>
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200">
+                        {variation.brandName || "-"}
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200">
+                        {variation.category}
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200">
+                        {variation.subCategory}
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200 font-bold text-[#8B3D28]">
+                        {"\u20B9"}{variation.price.toFixed(0)}
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200 text-[#8B3D28]">
+                        {variation.discPrice > 0
+                          ? `\u20B9${variation.discPrice.toFixed(0)}`
+                          : "-"}
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200 font-bold text-blue-700">
+                        {"\u20B9"}{variation.wholesalePrice.toFixed(0)}
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200 text-blue-700">
+                        {variation.wholesaleDiscPrice > 0
+                          ? `\u20B9${variation.wholesaleDiscPrice.toFixed(0)}`
+                          : "-"}
+                      </td>
+                      <td className="p-2 align-middle border border-neutral-200">
+                        {variation.variation}
+                      </td>
 
+                    </tr>
+                  );
+                })}
+                {displayedVariations.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={14}
+                      className="p-8 text-center text-neutral-400 border border-neutral-200">
+                      No products found.
+                    </td>
                   </tr>
-                );
-              })}
-              {displayedVariations.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={14}
-                    className="p-8 text-center text-neutral-400 border border-neutral-200">
-                    No products found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {/* Pagination Footer */}
         {!loading && !error && (
-        <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
-          <div className="text-xs sm:text-sm text-neutral-700">
-            Showing {startIndex + 1} to {endIndex} of{" "}
-            {useServerPagination && paginationInfo
-              ? paginationInfo.total
-              : filteredVariations.length}{" "}
-            entries
+          <div className="px-4 sm:px-6 py-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+            <div className="text-xs sm:text-sm text-neutral-700">
+              Showing {startIndex + 1} to {endIndex} of{" "}
+              {useServerPagination && paginationInfo
+                ? paginationInfo.total
+                : filteredVariations.length}{" "}
+              entries
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className={`p-2 border border-[#8B3D28] rounded ${currentPage === 1
+                    ? "text-neutral-400 cursor-not-allowed bg-white/40"
+                    : "text-[#8B3D28] hover:bg-white/40"
+                  }`}
+                aria-label="Previous page">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M15 18L9 12L15 6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              {Array.from({ length: displayTotalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1.5 border border-[#8B3D28] rounded font-medium text-sm ${currentPage === page
+                        ? "bg-[#8B3D28] text-white"
+                        : "text-[#8B3D28] hover:bg-white/40"
+                      }`}>
+                    {page}
+                  </button>
+                )
+              )}
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(displayTotalPages, prev + 1))
+                }
+                disabled={currentPage === displayTotalPages}
+                className={`p-2 border border-[#8B3D28] rounded ${currentPage === displayTotalPages
+                    ? "text-neutral-400 cursor-not-allowed bg-white/40"
+                    : "text-[#8B3D28] hover:bg-white/40"
+                  }`}
+                aria-label="Next page">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M9 18L15 12L9 6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className={`p-2 border border-[#8B3D28] rounded ${
-                currentPage === 1
-                  ? "text-neutral-400 cursor-not-allowed bg-white/40"
-                  : "text-[#8B3D28] hover:bg-white/40"
-              }`}
-              aria-label="Previous page">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M15 18L9 12L15 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            {Array.from({ length: displayTotalPages }, (_, i) => i + 1).map(
-              (page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-1.5 border border-[#8B3D28] rounded font-medium text-sm ${
-                    currentPage === page
-                      ? "bg-[#8B3D28] text-white"
-                      : "text-[#8B3D28] hover:bg-white/40"
-                  }`}>
-                  {page}
-                </button>
-              )
-            )}
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(displayTotalPages, prev + 1))
-              }
-              disabled={currentPage === displayTotalPages}
-              className={`p-2 border border-[#8B3D28] rounded ${
-                currentPage === displayTotalPages
-                  ? "text-neutral-400 cursor-not-allowed bg-white/40"
-                  : "text-[#8B3D28] hover:bg-white/40"
-              }`}
-              aria-label="Next page">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M9 18L15 12L9 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
         )}
       </div>
     </div>
