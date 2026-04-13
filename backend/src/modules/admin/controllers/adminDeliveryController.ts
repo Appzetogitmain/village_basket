@@ -71,6 +71,7 @@ export const getAllDeliveryBoys = asyncHandler(
       page = 1,
       limit = 10,
       status,
+      approvalStatus,
       available,
       search,
       sortBy = "createdAt",
@@ -78,16 +79,34 @@ export const getAllDeliveryBoys = asyncHandler(
     } = req.query;
 
     const query: any = {};
+    const andConditions: any[] = [];
 
     if (status) query.status = status;
     if (available) query.available = available;
+
+    if (approvalStatus) {
+      if (approvalStatus === "Pending") {
+        andConditions.push({
+          $or: [{ approvalStatus: "Pending" }, { approvalStatus: { $exists: false } }],
+        });
+      } else {
+        query.approvalStatus = approvalStatus;
+      }
+    }
+
     if (search) {
-      query.$or = [
-        { name: { $regex: search as string, $options: "i" } },
-        { mobile: { $regex: search as string, $options: "i" } },
-        { email: { $regex: search as string, $options: "i" } },
-        { address: { $regex: search as string, $options: "i" } },
-      ];
+      andConditions.push({
+        $or: [
+          { name: { $regex: search as string, $options: "i" } },
+          { mobile: { $regex: search as string, $options: "i" } },
+          { email: { $regex: search as string, $options: "i" } },
+          { address: { $regex: search as string, $options: "i" } },
+        ],
+      });
+    }
+
+    if (andConditions.length > 0) {
+      query.$and = andConditions;
     }
 
     const sort: any = {};
@@ -233,11 +252,67 @@ export const updateDeliveryStatus = asyncHandler(
       });
     }
 
+    const existingDeliveryBoy = await Delivery.findById(id).select("approvalStatus");
+    if (!existingDeliveryBoy) {
+      return res.status(404).json({
+        success: false,
+        message: "Delivery boy not found",
+      });
+    }
+
+    if (status === "Active" && existingDeliveryBoy.approvalStatus !== "Approved") {
+      return res.status(400).json({
+        success: false,
+        message: "Approve delivery boy first before activating account",
+      });
+    }
+
     const deliveryBoy = await Delivery.findByIdAndUpdate(
       id,
       { status },
       { new: true, runValidators: true }
     ).select("-password");
+
+    return res.status(200).json({
+      success: true,
+      message: "Delivery boy status updated successfully",
+      data: deliveryBoy,
+    });
+  }
+);
+
+/**
+ * Approve or reject delivery boy
+ */
+export const updateDeliveryApproval = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { approvalStatus, approvalRemark } = req.body;
+
+    if (!["Pending", "Approved", "Rejected"].includes(approvalStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: "approvalStatus must be Pending, Approved, or Rejected",
+      });
+    }
+
+    const updateData: any = {
+      approvalStatus,
+      approvalRemark,
+      approvalUpdatedAt: new Date(),
+    };
+
+    if (approvalStatus === "Approved") {
+      updateData.status = "Active";
+    } else {
+      updateData.status = "Inactive";
+      updateData.isOnline = false;
+    }
+
+    const deliveryBoy = await Delivery.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
 
     if (!deliveryBoy) {
       return res.status(404).json({
@@ -248,7 +323,7 @@ export const updateDeliveryStatus = asyncHandler(
 
     return res.status(200).json({
       success: true,
-      message: "Delivery boy status updated successfully",
+      message: `Delivery boy ${approvalStatus.toLowerCase()} successfully`,
       data: deliveryBoy,
     });
   }

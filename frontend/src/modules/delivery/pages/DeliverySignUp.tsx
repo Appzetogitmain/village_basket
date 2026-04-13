@@ -62,6 +62,7 @@ export default function DeliverySignUp() {
   const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isCityLoading, setIsCityLoading] = useState(false);
 
   const bonusTypes = [
@@ -170,6 +171,7 @@ export default function DeliverySignUp() {
 
     setLoading(true);
     setError("");
+    setSuccessMessage("");
 
     try {
       let drivingLicenseUrl = formData.drivingLicenseUrl;
@@ -199,13 +201,12 @@ export default function DeliverySignUp() {
 
       if (response.success) {
         removeAuthToken();
-        try {
-          const otpRes = await sendOTP(formData.mobile);
-          if (otpRes.sessionId) setSessionId(otpRes.sessionId);
-          setShowOTP(true);
-        } catch (otpErr: any) {
-          setError(otpErr.message || "Registration successful but failed to send OTP.");
-        }
+        setSuccessMessage(
+          response.message ||
+            "Registration successful. Your account is pending admin approval."
+        );
+        setShowOTP(false);
+        setTimeout(() => navigate("/delivery/login"), 2000);
       }
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.");
@@ -434,6 +435,7 @@ export default function DeliverySignUp() {
                 </div>
 
                 {error && <div className="text-[9px] font-black uppercase tracking-widest text-[#8B3D28] bg-red-50 py-3 px-4 rounded-xl text-center border border-red-100">{error}</div>}
+                {successMessage && <div className="text-[9px] font-black uppercase tracking-widest text-green-700 bg-green-50 py-3 px-4 rounded-xl text-center border border-green-100">{successMessage}</div>}
 
                 <button
                   type="submit" disabled={loading || uploadingDocs}
@@ -498,4 +500,3 @@ export default function DeliverySignUp() {
     </div>
   );
 }
-

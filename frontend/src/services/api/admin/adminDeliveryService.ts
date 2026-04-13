@@ -26,6 +26,9 @@ export interface DeliveryBoy {
   balance: number;
   cashCollected: number;
   status: "Active" | "Inactive";
+  approvalStatus?: "Pending" | "Approved" | "Rejected";
+  approvalRemark?: string;
+  approvalUpdatedAt?: string;
   available: "Available" | "Not Available";
   currentLocation?: {
     latitude: number;
@@ -104,6 +107,7 @@ export interface GetDeliveryParams {
   limit?: number;
   search?: string;
   status?: "Active" | "Inactive";
+  approvalStatus?: "Pending" | "Approved" | "Rejected";
   available?: "Available" | "Not Available";
   city?: string;
   sortBy?: string;
@@ -191,6 +195,18 @@ export const updateDeliveryBoyAvailability = async (
   const response = await api.patch<ApiResponse<DeliveryBoy>>(
     `/admin/delivery/${id}/availability`,
     { available }
+  );
+  return response.data;
+};
+
+export const updateDeliveryBoyApproval = async (
+  id: string,
+  approvalStatus: "Pending" | "Approved" | "Rejected",
+  approvalRemark?: string
+): Promise<ApiResponse<DeliveryBoy>> => {
+  const response = await api.patch<ApiResponse<DeliveryBoy>>(
+    `/admin/delivery/${id}/approval`,
+    { approvalStatus, approvalRemark }
   );
   return response.data;
 };

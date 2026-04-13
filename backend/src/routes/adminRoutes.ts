@@ -176,6 +176,7 @@ router.get("/delivery", deliveryController.getAllDeliveryBoys);
 router.get("/delivery/:id", deliveryController.getDeliveryBoyById);
 router.put("/delivery/:id", deliveryController.updateDeliveryBoy);
 router.patch("/delivery/:id/status", deliveryController.updateDeliveryStatus);
+router.patch("/delivery/:id/approval", deliveryController.updateDeliveryApproval);
 router.patch(
   "/delivery/:id/availability",
   deliveryController.updateDeliveryBoyAvailability

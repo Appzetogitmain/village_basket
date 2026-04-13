@@ -31,6 +31,30 @@ export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
+  const approvalStatus =
+    delivery.approvalStatus || (delivery.status === "Active" ? "Approved" : "Pending");
+
+  if (approvalStatus === "Rejected") {
+    return res.status(403).json({
+      success: false,
+      message: "Your account has been rejected by admin. Please contact support.",
+    });
+  }
+
+  if (approvalStatus !== "Approved") {
+    return res.status(403).json({
+      success: false,
+      message: "Your account is pending admin approval.",
+    });
+  }
+
+  if (delivery.status !== "Active") {
+    return res.status(403).json({
+      success: false,
+      message: "Your account is inactive. Please contact admin.",
+    });
+  }
+
   // Send SMS OTP
   const result = await sendSmsOtpService(mobile, "Delivery");
 
@@ -94,6 +118,30 @@ export const verifySmsOtp = asyncHandler(
       });
     }
 
+    const approvalStatus =
+      delivery.approvalStatus || (delivery.status === "Active" ? "Approved" : "Pending");
+
+    if (approvalStatus === "Rejected") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been rejected by admin. Please contact support.",
+      });
+    }
+
+    if (approvalStatus !== "Approved") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is pending admin approval.",
+      });
+    }
+
+    if (delivery.status !== "Active") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is inactive. Please contact admin.",
+      });
+    }
+
     // Generate JWT token
     const token = generateToken(delivery._id.toString(), "Delivery");
 
@@ -109,6 +157,7 @@ export const verifySmsOtp = asyncHandler(
           email: delivery.email,
           city: delivery.city,
           status: delivery.status,
+          approvalStatus: delivery.approvalStatus || "Approved",
         },
       },
     });
@@ -182,6 +231,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     ifscCode,
     bonusType,
     status: "Inactive", // New delivery partners start as Inactive
+    approvalStatus: "Pending",
     balance: 0,
     cashCollected: 0,
   } as any);
@@ -191,7 +241,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   return res.status(201).json({
     success: true,
-    message: "Delivery partner registered successfully.",
+    message: "Delivery partner registered successfully. Your account is pending admin approval.",
     // No token returned here, flow continues to OTP
   });
 });
