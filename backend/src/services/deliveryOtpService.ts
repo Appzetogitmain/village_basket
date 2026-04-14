@@ -50,7 +50,10 @@ export async function verifyDeliveryOtp(orderId: string, otp: string): Promise<{
     }
 
     if (order.status === 'Delivered') {
-      throw new Error('Order is already delivered');
+      return {
+        success: true,
+        message: 'Order is already delivered.',
+      };
     }
 
     // Get customer's permanent delivery OTP

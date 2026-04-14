@@ -7,6 +7,7 @@ import DeliveryAssignment from "../../../models/DeliveryAssignment";
 import Return from "../../../models/Return";
 import { notifySellersOfOrderUpdate } from "../../../services/sellerNotificationService";
 import { Server as SocketIOServer } from "socket.io";
+import { completeDeliveryLifecycle } from "../../../services/codService";
 
 /**
  * Get all orders with filters
@@ -154,10 +155,25 @@ export const updateOrderStatus = asyncHandler(
       updateData.cancelledBy = req.user?.userId;
     }
 
-    const order = await Order.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-    })
+    if (status === "Delivered") {
+      await completeDeliveryLifecycle({
+        orderId: id,
+        paymentCollectedBy: req.body?.paymentCollectedBy,
+        customerTip: Number(req.body?.customerTip || 0),
+      });
+    }
+
+    const deliveredUpdatePatch: Record<string, any> = {};
+    if (adminNotes) deliveredUpdatePatch.adminNotes = adminNotes;
+
+    const order = await Order.findByIdAndUpdate(
+      id,
+      status === "Delivered" ? deliveredUpdatePatch : updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
       .populate("customer", "name email phone")
       .populate("deliveryBoy", "name mobile")
       .populate("items");

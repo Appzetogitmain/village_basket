@@ -56,6 +56,18 @@ export interface SellerTransaction {
   description: string;
 }
 
+export interface CodSettlement {
+  deliveryBoyId: string;
+  deliveryBoyName: string;
+  deliveryBoyMobile: string;
+  amount: number;
+  status: string;
+  createdAt: string;
+  razorpayOrderId: string | null;
+  razorpayPaymentId: string | null;
+  reference: string;
+}
+
 // API METHODS
 
 /**
@@ -87,6 +99,19 @@ export const getWalletTransactions = async (
 ): Promise<ApiResponse<WalletTransaction[]>> => {
   const response = await api.get<ApiResponse<WalletTransaction[]>>(
     "/admin/wallet/transactions",
+    { params }
+  );
+  return response.data;
+};
+
+/**
+ * Get COD settlements (delivery deposits)
+ */
+export const getCodSettlements = async (
+  params?: { page?: number; limit?: number; deliveryBoyId?: string }
+): Promise<ApiResponse<CodSettlement[]>> => {
+  const response = await api.get<ApiResponse<CodSettlement[]>>(
+    "/admin/wallet/cod-settlements",
     { params }
   );
   return response.data;

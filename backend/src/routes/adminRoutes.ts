@@ -214,6 +214,8 @@ router.put(
   "/settings/sms-gateway",
   settingsController.updateSMSGatewaySettings
 );
+router.get("/settings/razorpay", settingsController.getRazorpayConfig);
+router.put("/settings/razorpay", settingsController.updateRazorpayConfig);
 
 // ==================== Coupon Routes ====================
 router.post("/coupons", couponController.createCoupon);
@@ -244,6 +246,7 @@ router.patch(
 router.get("/financial/dashboard", walletController.getFinancialDashboard);
 router.get("/wallet/earnings", walletController.getAdminEarnings);
 router.get("/wallet/transactions", walletController.getWalletTransactions);
+router.get("/wallet/cod-settlements", walletController.getCodSettlements);
 router.get("/wallet/withdrawals", withdrawalController.getAllWithdrawals);
 router.post("/wallet/withdrawal/process", walletController.processWithdrawalWrapper);
 

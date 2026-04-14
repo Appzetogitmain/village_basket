@@ -48,6 +48,15 @@ export interface IOrder extends Document {
   paymentMethod: string;
   paymentStatus: "Pending" | "Paid" | "Failed" | "Refunded";
   paymentId?: string;
+  payment?: {
+    method: "razorpay" | "cash" | "wallet" | "upi" | "card";
+    status: "pending" | "processing" | "completed" | "failed" | "refunded";
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    razorpaySignature?: string;
+    transactionId?: string;
+  };
+  paymentCollectedBy?: "cash" | "qr";
 
   // Order Status
   status:
@@ -262,6 +271,37 @@ const OrderSchema = new Schema<IOrder>(
       type: String,
       trim: true,
     },
+    payment: {
+      method: {
+        type: String,
+        enum: ["razorpay", "cash", "wallet", "upi", "card"],
+      },
+      status: {
+        type: String,
+        enum: ["pending", "processing", "completed", "failed", "refunded"],
+      },
+      razorpayOrderId: {
+        type: String,
+        trim: true,
+      },
+      razorpayPaymentId: {
+        type: String,
+        trim: true,
+      },
+      razorpaySignature: {
+        type: String,
+        trim: true,
+      },
+      transactionId: {
+        type: String,
+        trim: true,
+      },
+    },
+    paymentCollectedBy: {
+      type: String,
+      enum: ["cash", "qr"],
+      default: "cash",
+    },
 
     // Order Status
     status: {
@@ -408,11 +448,48 @@ OrderSchema.pre("validate", async function (this: IOrder, next) {
   next();
 });
 
+// Keep legacy and nested payment fields synchronized for backward compatibility.
+OrderSchema.pre("save", function (this: IOrder, next) {
+  if (this.payment?.method) {
+    const methodMap: Record<string, string> = {
+      cash: "COD",
+      wallet: "Wallet",
+      razorpay: "Online",
+      upi: "UPI",
+      card: "Card",
+    };
+    const statusMap: Record<string, IOrder["paymentStatus"]> = {
+      pending: "Pending",
+      processing: "Pending",
+      completed: "Paid",
+      failed: "Failed",
+      refunded: "Refunded",
+    };
+
+    this.paymentMethod = methodMap[this.payment.method] || this.paymentMethod;
+    this.paymentStatus = statusMap[this.payment.status] || this.paymentStatus;
+  } else {
+    const normalizedMap: Record<string, IOrder["payment"]> = {
+      COD: { method: "cash", status: "pending" },
+      Wallet: { method: "wallet", status: this.paymentStatus === "Paid" ? "completed" : "pending" },
+      UPI: { method: "upi", status: this.paymentStatus === "Paid" ? "completed" : "pending" },
+      Card: { method: "card", status: this.paymentStatus === "Paid" ? "completed" : "pending" },
+      Online: { method: "razorpay", status: this.paymentStatus === "Paid" ? "completed" : "pending" },
+    };
+    if (this.paymentMethod && normalizedMap[this.paymentMethod]) {
+      this.payment = normalizedMap[this.paymentMethod];
+    }
+  }
+
+  next();
+});
+
 // Indexes for faster queries
 OrderSchema.index({ customer: 1, orderDate: -1 });
 OrderSchema.index({ status: 1 });
 OrderSchema.index({ orderDate: -1 });
 OrderSchema.index({ deliveryBoy: 1 });
+OrderSchema.index({ "payment.method": 1, "payment.status": 1 });
 
 const Order = mongoose.models.Order || mongoose.model<IOrder>("Order", OrderSchema);
 

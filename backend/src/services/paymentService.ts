@@ -3,21 +3,15 @@ import crypto from 'crypto';
 import Payment from '../models/Payment';
 import Order from '../models/Order';
 import mongoose from 'mongoose';
+import {
+    createPaymentRecordId,
+    getRazorpayCredentials,
+    getRazorpayInstanceFromDb,
+    verifyRazorpaySignatureFromDb,
+} from './codService';
 
 // Initialize Razorpay instance
-const getRazorpayInstance = () => {
-    const keyId = process.env.RAZORPAY_KEY_ID;
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
-
-    if (!keyId || !keySecret) {
-        throw new Error('Razorpay credentials not configured');
-    }
-
-    return new Razorpay({
-        key_id: keyId,
-        key_secret: keySecret,
-    });
-};
+const getRazorpayInstance = async (): Promise<Razorpay> => getRazorpayInstanceFromDb();
 
 /**
  * Create a Razorpay order
@@ -28,7 +22,8 @@ export const createRazorpayOrder = async (
     currency: string = 'INR'
 ) => {
     try {
-        const razorpay = getRazorpayInstance();
+        const razorpay = await getRazorpayInstance();
+        const { keyId } = await getRazorpayCredentials();
 
         const options = {
             amount: Math.round(amount * 100), // Amount in paise
@@ -45,7 +40,7 @@ export const createRazorpayOrder = async (
             success: true,
             data: {
                 razorpayOrderId: razorpayOrder.id,
-                razorpayKey: process.env.RAZORPAY_KEY_ID, // Send key to frontend
+                razorpayKey: keyId, // Send key to frontend
                 amount: razorpayOrder.amount,
                 currency: razorpayOrder.currency,
                 receipt: razorpayOrder.receipt,
@@ -63,25 +58,17 @@ export const createRazorpayOrder = async (
 /**
  * Verify Razorpay payment signature
  */
-export const verifyPaymentSignature = (
+export const verifyPaymentSignature = async (
     razorpayOrderId: string,
     razorpayPaymentId: string,
     razorpaySignature: string
-): boolean => {
+): Promise<boolean> => {
     try {
-        const keySecret = process.env.RAZORPAY_KEY_SECRET;
-
-        if (!keySecret) {
-            throw new Error('Razorpay key secret not configured');
-        }
-
-        const body = razorpayOrderId + '|' + razorpayPaymentId;
-        const expectedSignature = crypto
-            .createHmac('sha256', keySecret)
-            .update(body)
-            .digest('hex');
-
-        return expectedSignature === razorpaySignature;
+        return verifyRazorpaySignatureFromDb(
+            razorpayOrderId,
+            razorpayPaymentId,
+            razorpaySignature
+        );
     } catch (error) {
         console.error('Error verifying payment signature:', error);
         return false;
@@ -102,7 +89,7 @@ export const capturePayment = async (
 
     try {
         // Verify signature
-        const isValid = verifyPaymentSignature(
+        const isValid = await verifyPaymentSignature(
             razorpayOrderId,
             razorpayPaymentId,
             razorpaySignature
@@ -118,29 +105,52 @@ export const capturePayment = async (
             throw new Error('Order not found');
         }
 
-        // Create payment record
-        const payment = new Payment({
-            order: orderId,
-            customer: order.customer,
-            paymentMethod: 'Online',
-            paymentGateway: 'Razorpay',
-            razorpayOrderId,
-            razorpayPaymentId,
-            razorpaySignature,
-            amount: order.total,
-            currency: 'INR',
-            status: 'Completed',
-            paidAt: new Date(),
-            gatewayResponse: {
-                success: true,
-                message: 'Payment captured successfully',
+        // Upsert payment record (idempotent)
+        const payment = await Payment.findOneAndUpdate(
+            { order: orderId },
+            {
+                $setOnInsert: {
+                    paymentId: createPaymentRecordId("PAY"),
+                    order: orderId,
+                    customer: order.customer,
+                    userId: order.customer,
+                    currency: "INR",
+                    paymentDate: new Date(),
+                },
+                $set: {
+                    method: 'razorpay',
+                    paymentMethod: 'Online',
+                    paymentGateway: 'Razorpay',
+                    razorpayOrderId,
+                    razorpayPaymentId,
+                    razorpaySignature,
+                    amount: order.total,
+                    status: 'completed',
+                    completedAt: new Date(),
+                    paidAt: new Date(),
+                    gatewayResponse: {
+                        success: true,
+                        message: 'Payment captured successfully',
+                    },
+                },
             },
-        });
-
-        await payment.save({ session });
+            {
+                upsert: true,
+                new: true,
+                session,
+            }
+        );
 
         // Update order
         order.paymentStatus = 'Paid';
+        order.payment = {
+            method: 'razorpay',
+            status: 'completed',
+            razorpayOrderId,
+            razorpayPaymentId,
+            razorpaySignature,
+            transactionId: razorpayPaymentId,
+        };
         (order as any).paymentId = razorpayPaymentId;
         // Change order status from 'Pending' to 'Received' or 'Confirmed' after successful payment
         if (order.status === 'Pending') {
@@ -163,7 +173,7 @@ export const capturePayment = async (
             success: true,
             message: 'Payment captured successfully',
             data: {
-                paymentId: payment._id,
+                paymentId: payment?._id,
                 orderId: order._id,
             },
         };
@@ -197,7 +207,7 @@ export const processRefund = async (
             throw new Error('Razorpay payment ID not found');
         }
 
-        const razorpay = getRazorpayInstance();
+        const razorpay = await getRazorpayInstance();
 
         const refundAmount = amount || payment.amount;
 
@@ -209,7 +219,7 @@ export const processRefund = async (
         });
 
         // Update payment record
-        payment.status = 'Refunded';
+        payment.status = 'refunded';
         payment.refundAmount = refundAmount;
         payment.refundedAt = new Date();
         payment.refundReason = reason;
@@ -303,15 +313,23 @@ const handlePaymentCaptured = async (payload: any) => {
         const payment = await Payment.findOne({ razorpayOrderId });
 
         if (payment) {
-            payment.status = 'Completed';
+            payment.status = 'completed';
             payment.razorpayPaymentId = razorpayPaymentId;
             payment.paidAt = new Date();
+            payment.completedAt = new Date();
             await payment.save();
 
             // Update order
             await Order.findByIdAndUpdate(payment.order, {
                 paymentStatus: 'Paid',
                 paymentId: razorpayPaymentId,
+                payment: {
+                    method: 'razorpay',
+                    status: 'completed',
+                    razorpayOrderId,
+                    razorpayPaymentId,
+                    transactionId: razorpayPaymentId,
+                }
             });
         }
     } catch (error) {
@@ -327,7 +345,7 @@ const handlePaymentFailed = async (payload: any) => {
         const payment = await Payment.findOne({ razorpayOrderId });
 
         if (payment) {
-            payment.status = 'Failed';
+            payment.status = 'failed';
             payment.gatewayResponse = {
                 success: false,
                 message: payload.error_description || 'Payment failed',
@@ -338,6 +356,11 @@ const handlePaymentFailed = async (payload: any) => {
             // Update order
             await Order.findByIdAndUpdate(payment.order, {
                 paymentStatus: 'Failed',
+                payment: {
+                    method: 'razorpay',
+                    status: 'failed',
+                    razorpayOrderId,
+                }
             });
         }
     } catch (error) {
@@ -353,7 +376,7 @@ const handleRefundCreated = async (payload: any) => {
         const payment = await Payment.findOne({ razorpayPaymentId });
 
         if (payment) {
-            payment.status = 'Refunded';
+            payment.status = 'refunded';
             payment.refundAmount = payload.amount / 100; // Convert from paise
             payment.refundedAt = new Date();
             await payment.save();

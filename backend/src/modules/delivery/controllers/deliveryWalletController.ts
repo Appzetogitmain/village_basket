@@ -6,6 +6,29 @@ import {
     getWithdrawalRequests,
 } from '../../../services/walletManagementService';
 import { getCommissionSummary } from '../../../services/commissionService';
+import DeliveryWallet from '../../../models/DeliveryWallet';
+import Delivery from '../../../models/Delivery';
+import {
+    getRazorpayCredentials,
+    getRazorpayInstanceFromDb,
+    verifyRazorpaySignatureFromDb,
+} from '../../../services/codService';
+
+const ensureDeliveryWallet = async (deliveryBoyId: string) => {
+    return DeliveryWallet.findOneAndUpdate(
+        { deliveryBoy: deliveryBoyId },
+        {
+            $setOnInsert: {
+                deliveryBoy: deliveryBoyId,
+                totalBalance: 0,
+                cashInHand: 0,
+                transactions: [],
+                processedEvents: [],
+            },
+        },
+        { upsert: true, new: true }
+    );
+};
 
 /**
  * Get delivery boy wallet balance
@@ -14,10 +37,15 @@ export const getBalance = async (req: Request, res: Response) => {
     try {
         const deliveryBoyId = req.user!.userId;
         const balance = await getWalletBalance(deliveryBoyId, 'DELIVERY_BOY');
+        const ledger = await ensureDeliveryWallet(deliveryBoyId);
 
         return res.status(200).json({
             success: true,
-            data: { balance },
+            data: {
+                balance,
+                totalBalance: Number(ledger?.totalBalance || 0),
+                cashInHand: Number(ledger?.cashInHand || 0),
+            },
         });
     } catch (error: any) {
         console.error('Error getting wallet balance:', error);
@@ -147,6 +175,192 @@ export const getCommissions = async (req: Request, res: Response) => {
         return res.status(500).json({
             success: false,
             message: error.message || 'Failed to get commission earnings',
+        });
+    }
+};
+
+/**
+ * Create Razorpay order to deposit collected COD cash
+ */
+export const createCashDepositOrder = async (req: Request, res: Response) => {
+    try {
+        const deliveryBoyId = req.user!.userId;
+        const amount = Number(req.body?.amount || 0);
+
+        if (!amount || amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Valid amount is required',
+            });
+        }
+
+        const wallet = await ensureDeliveryWallet(deliveryBoyId);
+        if (!wallet) {
+            return res.status(404).json({
+                success: false,
+                message: 'Delivery wallet not found',
+            });
+        }
+
+        if (amount > Number(wallet.cashInHand || 0)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Deposit amount cannot exceed cash in hand',
+            });
+        }
+
+        const razorpay = await getRazorpayInstanceFromDb();
+        const { keyId } = await getRazorpayCredentials();
+
+        const razorpayOrder = await razorpay.orders.create({
+            amount: Math.round(amount * 100),
+            currency: 'INR',
+            receipt: `dep_${deliveryBoyId}_${Date.now()}`,
+            notes: {
+                type: 'cash_limit_deposit',
+                deliveryId: deliveryBoyId,
+                amount: String(amount),
+            },
+        });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                razorpayOrderId: razorpayOrder.id,
+                razorpayKey: keyId,
+                amount: razorpayOrder.amount,
+                currency: razorpayOrder.currency,
+            },
+        });
+    } catch (error: any) {
+        console.error('Error creating cash deposit order:', error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to create deposit order',
+        });
+    }
+};
+
+/**
+ * Verify cash deposit and settle delivery cash in hand
+ */
+export const verifyCashDeposit = async (req: Request, res: Response) => {
+    try {
+        const deliveryBoyId = req.user!.userId;
+        const amount = Number(req.body?.amount || 0);
+        const razorpayOrderId = String(req.body?.razorpayOrderId || '');
+        const razorpayPaymentId = String(req.body?.razorpayPaymentId || '');
+        const razorpaySignature = String(req.body?.razorpaySignature || '');
+
+        if (!amount || amount <= 0 || !razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required verification details',
+            });
+        }
+
+        const signatureValid = await verifyRazorpaySignatureFromDb(
+            razorpayOrderId,
+            razorpayPaymentId,
+            razorpaySignature
+        );
+
+        if (!signatureValid) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Razorpay signature',
+            });
+        }
+
+        await ensureDeliveryWallet(deliveryBoyId);
+        const existing = await DeliveryWallet.findOne({
+            deliveryBoy: deliveryBoyId,
+            transactions: {
+                $elemMatch: { "metadata.razorpayPaymentId": razorpayPaymentId },
+            },
+        });
+
+        if (existing) {
+            return res.status(200).json({
+                success: true,
+                message: 'Deposit already verified',
+                data: {
+                    cashInHand: Number(existing.cashInHand || 0),
+                    alreadyProcessed: true,
+                },
+            });
+        }
+
+        const updateResult = await DeliveryWallet.updateOne(
+            {
+                deliveryBoy: deliveryBoyId,
+                cashInHand: { $gte: amount },
+                transactions: {
+                    $not: {
+                        $elemMatch: { "metadata.razorpayPaymentId": razorpayPaymentId },
+                    },
+                },
+            },
+            {
+                $inc: { cashInHand: -amount },
+                $push: {
+                    transactions: {
+                        type: 'deposit',
+                        status: 'Completed',
+                        amount,
+                        reference: `deposit_${razorpayPaymentId}`,
+                        metadata: {
+                            razorpayOrderId,
+                            razorpayPaymentId,
+                        },
+                        createdAt: new Date(),
+                    },
+                },
+            }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+            const postCheck = await DeliveryWallet.findOne({
+                deliveryBoy: deliveryBoyId,
+                transactions: {
+                    $elemMatch: { "metadata.razorpayPaymentId": razorpayPaymentId },
+                },
+            });
+
+            if (postCheck) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'Deposit already verified',
+                    data: {
+                        cashInHand: Number(postCheck.cashInHand || 0),
+                        alreadyProcessed: true,
+                    },
+                });
+            }
+
+            return res.status(400).json({
+                success: false,
+                message: 'Amount exceeds cash in hand',
+            });
+        }
+
+        const updatedWallet = await DeliveryWallet.findOne({ deliveryBoy: deliveryBoyId });
+        const cashInHand = Number(updatedWallet?.cashInHand || 0);
+
+        await Delivery.findByIdAndUpdate(deliveryBoyId, {
+            $set: { cashCollected: cashInHand },
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Deposit verified successfully',
+            data: { cashInHand },
+        });
+    } catch (error: any) {
+        console.error('Error verifying cash deposit:', error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to verify deposit',
         });
     }
 };
