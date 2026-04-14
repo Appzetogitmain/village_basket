@@ -180,9 +180,8 @@ export default function Invoice() {
                 <p className="text-gray-600 mt-1">Invoice</p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-600 mb-1">Invoice Number</p>
                 <p className="text-lg font-semibold text-gray-900">
-                  {order.id?.split("-").slice(-1)[0] || order.id || "N/A"}
+                  {order.orderNumber || order.id || "N/A"}
                 </p>
                 <p className="text-sm text-gray-600 mt-3 mb-1">Date</p>
                 <p className="text-sm font-medium text-gray-900">
@@ -222,7 +221,7 @@ export default function Invoice() {
               <div className="text-gray-700 space-y-1">
                 <p>
                   <span className="font-medium">Order ID:</span>{" "}
-                  {order.id || "N/A"}
+                  {order.orderNumber || order.id || "N/A"}
                 </p>
                 <p>
                   <span className="font-medium">Status:</span>{" "}

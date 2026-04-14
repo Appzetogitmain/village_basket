@@ -809,8 +809,11 @@ export default function DeliveryOrderDetail() {
                                 <h3 className="text-2xl font-black tracking-tighter">{"\u20B9"} {order.deliveryEarning?.toFixed(2) || '0.00'}</h3>
                             </div>
                             <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm border border-white/10">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" strokeLinecap="round" strokeLinejoin="round" />
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M6 3h12" />
+                                    <path d="M6 8h12" />
+                                    <path d="M6 13l8.5 8" />
+                                    <path d="M6 13h3a5 5 0 0 0 5-5 5 5 0 0 0-5-5" />
                                 </svg>
                             </div>
                         </div>

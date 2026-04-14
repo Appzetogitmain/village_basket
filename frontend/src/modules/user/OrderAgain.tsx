@@ -127,7 +127,7 @@ export default function OrderAgain() {
                           {order.status}
                         </div>
                       </div>
-                      <h4 className="text-[10px] md:text-sm font-black text-village-umber uppercase truncate max-w-[140px] md:max-w-xs tracking-tight">#{order.id}</h4>
+                      <h4 className="text-[10px] md:text-sm font-black text-village-umber uppercase truncate max-w-[140px] md:max-w-xs tracking-tight">#{order.orderNumber || order.id}</h4>
                       <span className="text-[10px] md:text-xs font-bold text-neutral-400 mt-1">
                         {formatDate(order.createdAt)}
                       </span>
@@ -135,7 +135,7 @@ export default function OrderAgain() {
 
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs md:text-xl font-black text-village-umber">{"\u20B9"}{order.totalAmount.toFixed(0)}</span>
+                        <span className="text-xs md:text-xl font-black text-village-umber">₹{order.totalAmount.toFixed(0)}</span>
                       </div>
                       <div className="bg-[#4b7d5a]/10 px-2 py-0.5 rounded text-[8px] md:text-[10px] font-black text-[#4b7d5a] uppercase tracking-tighter">
                         {order.totalItems} {order.totalItems === 1 ? 'item' : 'items'} Ordered

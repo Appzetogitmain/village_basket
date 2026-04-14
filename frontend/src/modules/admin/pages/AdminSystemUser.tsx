@@ -697,7 +697,7 @@ export default function AdminSystemUser() {
 
       {/* Footer */}
       <div className="text-center text-sm text-neutral-500 py-4 px-6">
-        Copyright © 2025. Developed By{' '}
+        Copyright © {new Date().getFullYear()}. Developed By{' '}
         <a href="#" className="text-[#A54B31] hover:text-teal-700">
           Village Basket
         </a>

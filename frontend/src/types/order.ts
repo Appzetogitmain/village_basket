@@ -35,6 +35,7 @@ export interface DeliverySlotSelection {
 
 export interface Order {
   id: string;
+  orderNumber?: string;
   items: CartItem[];
   totalItems: number;
   subtotal: number;
@@ -49,7 +50,6 @@ export interface Order {
   donationAmount?: number;
   gstin?: string;
   couponCode?: string;
-  giftPackaging?: boolean;
   /** @deprecated Use deliverySlot */
   deliveryShift?: DeliveryShift;
   deliverySlot?: DeliverySlotSelection;

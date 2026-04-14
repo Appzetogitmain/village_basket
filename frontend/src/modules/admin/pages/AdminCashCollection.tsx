@@ -653,7 +653,7 @@ export default function AdminCashCollection() {
 
       {/* Footer */}
       <div className="bg-neutral-800 text-white text-center text-sm py-4">
-        Copyright © 2025. Developed By{" "}
+        Copyright © {new Date().getFullYear()}. Developed By{" "}
         <a href="#" className="text-[#8B3D28] hover:text-[#8B3D28]">
           Village Basket
         </a>

@@ -581,7 +581,7 @@ export default function SellerOrders() {
       {/* Footer */}
       <footer className="px-3 sm:px-4 md:px-6 text-center py-4 sm:py-6">
         <p className="text-xs sm:text-sm text-neutral-600">
-          Copyright © 2025. Developed By{' '}
+          Copyright © {new Date().getFullYear()}. Developed By{' '}
           <Link to="/seller" className="text-blue-600 hover:text-blue-700">
             Village Basket
           </Link>

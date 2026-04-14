@@ -1,5 +1,5 @@
 import Order from "../models/Order";
-import { IOrderItem } from "../models/OrderItem";
+import OrderItem, { IOrderItem } from "../models/OrderItem";
 import Inventory from "../models/Inventory";
 import { clearOrderCache } from "../socket/socketService";
 
@@ -29,6 +29,8 @@ export const processOrderStatusTransition = async (
       if (["Processed", "Shipped"].includes(previousStatus)) {
         await restoreInventory(order.items as any[]);
       }
+      // Update item statuses
+      await OrderItem.updateMany({ order: orderId }, { status: "Cancelled" });
       break;
 
     case "Processed":
@@ -39,6 +41,8 @@ export const processOrderStatusTransition = async (
     case "Delivered":
       // Create commissions for sellers
       await createCommissions(order.items as any[]);
+      // Update item statuses
+      await OrderItem.updateMany({ order: orderId }, { status: "Delivered" });
       break;
   }
 

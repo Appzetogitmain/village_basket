@@ -897,7 +897,7 @@ export default function AdminAllOrders() {
 
       {/* Footer */}
       <div className="text-center py-4 text-xs sm:text-[12px] font-bold text-neutral-500">
-        Copyright &copy; 2025. Developed By{" "}
+        Copyright &copy; {new Date().getFullYear()}. Developed By{" "}
         <Link to="/" className="text-[#8B3D28] hover:text-[#8B3D28]">
           Village Basket
         </Link>

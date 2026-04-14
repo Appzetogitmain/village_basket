@@ -1,5 +1,5 @@
-import { ReactNode, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { ReactNode, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DeliveryBottomNav from './DeliveryBottomNav';
 import { DeliveryStatusProvider, useDeliveryStatus } from '../context/DeliveryStatusContext';
 import { DeliveryUserProvider, useDeliveryUser } from '../context/DeliveryUserContext';
@@ -14,8 +14,10 @@ interface DeliveryLayoutContentProps {
 
 function DeliveryLayoutContent({ children }: DeliveryLayoutContentProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const mainScrollRef = useRef<HTMLElement>(null);
   const { isOnline } = useDeliveryStatus();
-  const { setUserName } = useDeliveryUser();
+  const { setUserName, setProfileImage } = useDeliveryUser();
   const {
     currentNotification,
     acceptOrder,
@@ -29,13 +31,23 @@ function DeliveryLayoutContent({ children }: DeliveryLayoutContentProps) {
         if (profile?.name) {
           setUserName(profile.name);
         }
+        setProfileImage(profile?.profileImage || '');
       } catch (error) {
         console.error('Failed to fetch profile in layout:', error);
       }
     };
 
     fetchProfile();
-  }, [setUserName]);
+  }, [setProfileImage, setUserName]);
+
+  useEffect(() => {
+    // Ensure each delivery page opens from the top and does not inherit
+    // scroll offset from previously opened pages.
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTop = 0;
+    }
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <div 
@@ -51,7 +63,10 @@ function DeliveryLayoutContent({ children }: DeliveryLayoutContentProps) {
       {/* Texture Overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
       
-      <main className={`flex-1 overflow-y-auto scrollbar-hide pb-20 relative z-10 transition-all ${!isOnline ? 'opacity-80' : ''}`}>
+      <main
+        ref={mainScrollRef}
+        className={`flex-1 overflow-y-auto scrollbar-hide pb-20 relative z-10 transition-all ${!isOnline ? 'opacity-80' : ''}`}
+      >
         {children}
       </main>
       <DeliveryBottomNav />

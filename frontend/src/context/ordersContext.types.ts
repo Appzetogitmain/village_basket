@@ -3,7 +3,7 @@ import { Order } from '../types/order';
 
 export interface OrdersContextType {
   orders: Order[];
-  addOrder: (order: Order) => Promise<string | undefined>;
+  addOrder: (order: Order) => Promise<{ id: string; orderNumber: string } | undefined>;
   getOrderById: (id: string) => Order | undefined;
   fetchOrderById: (id: string) => Promise<Order | undefined>;
   updateOrderStatus: (id: string, status: Order["status"]) => void;

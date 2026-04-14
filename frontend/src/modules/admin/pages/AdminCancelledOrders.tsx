@@ -708,7 +708,7 @@ export default function AdminCancelledOrders() {
 
       {/* Footer */}
       <div className="text-center py-4 text-xs sm:text-[12px] font-bold text-neutral-500">
-        Copyright © 2025. Developed By{' '}
+        Copyright © {new Date().getFullYear()}. Developed By{' '}
         <Link to="/" className="text-[#8B3D28] hover:text-[#8B3D28]">
           Village Basket
         </Link>
