@@ -124,7 +124,7 @@ export default function OrderAgain() {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[9px] md:text-[11px] font-black text-village-umber/40 uppercase tracking-tighter">Order ID</span>
                         <div className={`px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-black uppercase tracking-tighter ${getStatusColor(order.status)} shadow-sm`}>
-                          {order.status}
+                          {order.status === 'Received' ? 'Order Placed' : order.status}
                         </div>
                       </div>
                       <h4 className="text-[10px] md:text-sm font-black text-village-umber uppercase truncate max-w-[140px] md:max-w-xs tracking-tight">#{order.id}</h4>

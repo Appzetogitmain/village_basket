@@ -37,6 +37,7 @@ import deliveryWalletRoutes from "./deliveryWalletRoutes";
 import adminWithdrawalRoutes from "./adminWithdrawalRoutes";
 import adminRewardRoutes from "./adminRewardRoutes";
 import customerRewardRoutes from "./customerRewardRoutes";
+import inquiryRoutes from "./inquiryRoutes";
 // import pageConfigRoutes from "./pageConfig.routes";
 import {
   createOrder,
@@ -172,6 +173,7 @@ router.use("/admin/withdrawals", authenticate, requireUserType("Admin"), adminWi
 
 
 // Add more routes here
+router.use("/inquiries", inquiryRoutes);
 // router.use('/users', userRoutes);
 
 export default router;

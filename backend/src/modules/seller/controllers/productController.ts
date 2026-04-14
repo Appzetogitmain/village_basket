@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import Product from "../../../models/Product";
 import Shop from "../../../models/Shop";
 import Category from "../../../models/Category";
+import Seller from "../../../models/Seller";
 import { asyncHandler } from "../../../utils/asyncHandler";
 
 /**
@@ -99,10 +100,17 @@ export const createProduct = asyncHandler(
       }
     }
 
-    // 6. Set product status - All products are published automatically without approval
-    newProductData.publish = true;
-    newProductData.status = "Active";
-    newProductData.requiresApproval = false;
+    // 6. Set product status based on seller settings
+    const seller = await Seller.findById(sellerId);
+    if (seller?.requireProductApproval) {
+      newProductData.publish = false;
+      newProductData.status = "Pending";
+      newProductData.requiresApproval = true;
+    } else {
+      newProductData.publish = true;
+      newProductData.status = "Active";
+      newProductData.requiresApproval = false;
+    }
 
     // Set default values for other required fields if not provided
     if (!newProductData.popular) newProductData.popular = false;

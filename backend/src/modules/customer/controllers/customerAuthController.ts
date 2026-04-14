@@ -12,17 +12,35 @@ import { asyncHandler } from "../../../utils/asyncHandler";
  * Returns session_id for verification
  */
 export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
-  const { mobile } = req.body;
+  const { mobile, isSignUp } = req.body;
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  if (!mobile || !/^[0-9]{10,12}$/.test(mobile)) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
 
-  // Send SMS OTP - no need to check if customer exists
-  // New customers will be auto-created upon OTP verification
+  // Check if customer exists
+  const normalizedMobile = mobile.slice(-10);
+  const customer = await Customer.findOne({ phone: normalizedMobile });
+  const isSignUpRequest = isSignUp === true || isSignUp === 'true';
+
+  if (!customer && !isSignUpRequest) {
+    return res.status(404).json({
+      success: false,
+      message: "Mobile number is not registered. Please sign up first.",
+    });
+  }
+
+  if (customer && isSignUpRequest) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile number is already registered. Please login.",
+    });
+  }
+
+  // Send SMS OTP
   const result = await sendSmsOtpService(mobile, "Customer");
 
   return res.status(200).json({
@@ -41,12 +59,14 @@ export const verifySmsOtp = asyncHandler(
   async (req: Request, res: Response) => {
     const { mobile, otp, sessionId, customerType } = req.body;
 
-    if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+    if (!mobile || !/^[0-9]{10,12}$/.test(mobile)) {
       return res.status(400).json({
         success: false,
         message: "Valid 10-digit mobile number is required",
       });
     }
+
+    const normalizedMobile = mobile.slice(-10);
 
     if (!otp || !/^[0-9]{4}$/.test(otp)) {
       return res.status(400).json({
@@ -66,7 +86,7 @@ export const verifySmsOtp = asyncHandler(
     const isValid = await verifySmsOtpService(
       sessionId,
       otp,
-      mobile,
+      normalizedMobile,
       "Customer",
     );
     if (!isValid) {
@@ -77,15 +97,17 @@ export const verifySmsOtp = asyncHandler(
     }
 
     // Find or create customer
-    let customer = await Customer.findOne({ phone: mobile });
+    let customer = await Customer.findOne({ phone: normalizedMobile });
     let isNewUser = false;
 
     if (!customer) {
-      // Auto-create new customer with placeholder data
+      // Use provided name and email or placeholders
+      const { name, email } = req.body;
+      
       customer = await Customer.create({
-        phone: mobile,
-        name: "User",
-        email: `${mobile}@villagebasket.temp`,
+        phone: normalizedMobile,
+        name: name || "User",
+        email: email || `${normalizedMobile}@villagebasket.temp`,
         status: "Active",
         walletAmount: 0,
         totalOrders: 0,

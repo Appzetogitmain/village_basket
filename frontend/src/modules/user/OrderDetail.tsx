@@ -466,13 +466,11 @@ export default function OrderDetail() {
 
   // Modal states
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
   const [showItemsModal, setShowItemsModal] = useState(false);
+  const [showCustomerModal, setShowCustomerModal] = useState(false);
 
 
   // Form states
-  const [deliveryInstructions, setDeliveryInstructions] = useState("");
-
   const [cancellationReason, setCancellationReason] = useState("");
   const [selectedTip, setSelectedTip] = useState<number | "other" | null>(null);
   const [customTip, setCustomTip] = useState("");
@@ -627,10 +625,12 @@ export default function OrderDetail() {
   };
 
   const handleShare = async () => {
+    const orderIdToShare = id || order?.id || order?._id || "";
+    const shortId = orderIdToShare.split("-").pop() || orderIdToShare;
+
     const shareData = {
-      title: `Order #${order?.id?.split("-").slice(-1)[0]}`,
-      text: `Track my Village Basket order: Order #${order?.id?.split("-").slice(-1)[0]
-        }`,
+      title: `Order #${shortId}`,
+      text: `Track my Village Basket order: Order #${shortId}`,
       url: window.location.href,
     };
 
@@ -644,6 +644,18 @@ export default function OrderDetail() {
       }
     } catch (error) {
       console.error("Error sharing:", error);
+      // Extra fallback if copy to clipboard fails
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = window.location.href;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        alert("Link copied to clipboard!");
+      } catch (err) {
+        console.error("Fallback copy failed:", err);
+      }
     }
   };
 
@@ -676,18 +688,7 @@ export default function OrderDetail() {
     }
   };
 
-  const handleSaveInstructions = async () => {
-    try {
-      if (!id) return;
-      await updateOrderNotes(id, { deliveryInstructions });
-      setShowInstructionsModal(false);
-      // alert("Delivery instructions saved!");
-      handleRefresh();
-    } catch (error) {
-      console.error("Failed to save instructions:", error);
-      alert("Failed to save instructions");
-    }
-  };
+
 
 
 
@@ -722,7 +723,7 @@ export default function OrderDetail() {
     { title: string; subtitle: string; color: string; icon?: string }
   > = {
     Received: {
-      title: "Order received",
+      title: "Order placed",
       subtitle: "Order will reach you shortly",
       color: "bg-[#8B3D28]",
     },
@@ -1059,18 +1060,15 @@ export default function OrderDetail() {
             icon={PhoneIcon}
             title={`${order.address?.name || "Customer"}`}
             subtitle={order.address?.phone || "9XXXXXXXX"}
+            onClick={() => setShowCustomerModal(true)}
           />
           <SectionItem
             icon={HomeIcon}
             title="Delivery Address"
             subtitle={order.address ? `${order.address.address}, ${order.address.city}` : "Add delivery address"}
+            onClick={() => setShowCustomerModal(true)}
           />
-          <SectionItem
-            icon={MessageSquareIcon}
-            title="Instructions"
-            subtitle="Add notes for partner"
-            onClick={() => setShowInstructionsModal(true)}
-          />
+
         </motion.div>
 
         {/* Store Card */}
@@ -1237,55 +1235,6 @@ export default function OrderDetail() {
         )}
       </AnimatePresence>
 
-      {/* Delivery Instructions Modal */}
-      <AnimatePresence>
-        {showInstructionsModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
-            onClick={() => setShowInstructionsModal(false)}>
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl p-6 max-w-md w-full">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Add Delivery Instructions
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Share details to help the delivery partner find you
-              </p>
-              <textarea
-                className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
-                rows={4}
-                maxLength={200}
-                placeholder="e.g., Ring the bell, Leave at door, etc."
-                value={deliveryInstructions}
-                onChange={(e) => setDeliveryInstructions(e.target.value)}
-              />
-              <p className="text-xs text-gray-500 mb-4">
-                {deliveryInstructions.length}/200
-              </p>
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setShowInstructionsModal(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                  onClick={handleSaveInstructions}>
-                  Save
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Order Items Detail Modal */}
       <AnimatePresence>
@@ -1353,6 +1302,88 @@ export default function OrderDetail() {
       </AnimatePresence>
 
 
+
+      {/* Customer Detail Modal */}
+      <AnimatePresence>
+        {showCustomerModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setShowCustomerModal(false)}>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#FAF7F2] rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
+              
+              {/* Header */}
+              <div className="bg-[#8B3D28] p-6 text-center relative">
+                 <div className="absolute top-4 right-4">
+                    <button onClick={() => setShowCustomerModal(false)} className="text-white/70 hover:text-white transition-colors bg-white/10 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
+                       ✕
+                    </button>
+                 </div>
+                 <div className="w-16 h-16 bg-white/10 border-2 border-white/20 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <span className="text-3xl">👤</span>
+                 </div>
+                 <h2 className="text-xl font-black text-white tracking-wide">
+                   {order.address?.name || "Customer Profile"}
+                 </h2>
+                 <p className="text-white/70 text-xs font-bold uppercase tracking-widest mt-1">Delivery Contact</p>
+              </div>
+              
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                 <div className="bg-white p-4 rounded-xl border border-[#8B3D28]/10 flex items-center gap-4 shadow-sm">
+                     <div className="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center text-[#8B3D28]">
+                         <PhoneIcon className="w-5 h-5" />
+                     </div>
+                     <div>
+                         <p className="text-[10px] font-black text-[#8B3D28]/50 uppercase tracking-widest">Phone Number</p>
+                         <p className="text-sm font-bold text-neutral-800">{order.address?.phone || "N/A"}</p>
+                     </div>
+                 </div>
+
+                 <div className="bg-white p-4 rounded-xl border border-[#8B3D28]/10 flex items-start gap-4 shadow-sm">
+                     <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 shrink-0 mt-1">
+                         <HomeIcon className="w-5 h-5" />
+                     </div>
+                     <div>
+                         <p className="text-[10px] font-black text-blue-600/50 uppercase tracking-widest">Delivery Address</p>
+                         <p className="text-xs font-bold text-neutral-800 mt-1 leading-snug">
+                             {order.address ? `${order.address.address}, ${order.address.city}` : "N/A"}
+                         </p>
+                         {order.address?.landmark && (
+                             <p className="text-[10px] font-bold text-neutral-500 mt-1.5 italic">
+                                 Landmark: {order.address.landmark}
+                             </p>
+                         )}
+                         {order.address?.pincode && (
+                             <p className="text-[10px] font-bold text-neutral-500 mt-0.5">
+                                 Pincode: {order.address.pincode}
+                             </p>
+                         )}
+                         {order.address?.state && (
+                             <p className="text-[10px] font-bold text-neutral-500 mt-0.5">
+                                 State: {order.address.state}
+                             </p>
+                         )}
+                     </div>
+                 </div>
+
+                 <Button
+                    className="w-full mt-4 bg-[#8B3D28] hover:bg-[#723221] text-white py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-md active:scale-95 transition-all"
+                    onClick={() => setShowCustomerModal(false)}>
+                    Close Profile
+                 </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <RazorpayCheckoutWrapper
         show={showRazorpay}

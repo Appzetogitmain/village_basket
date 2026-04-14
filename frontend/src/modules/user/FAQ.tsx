@@ -238,7 +238,7 @@ export default function FAQ() {
                   Email Us
                 </a>
                 <a
-                  href="tel:+91-XXXXX-XXXXX"
+                  href="tel:+919109599487"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-green-600 border-2 border-green-600 rounded-lg font-semibold hover:bg-green-50 transition-colors text-sm"
                 >
                   <svg

@@ -29,38 +29,48 @@ export default function Search() {
 
   // Voice Search Logic
   const handleVoiceSearch = () => {
+    if (isListening) return;
+
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
-      alert("Voice search is not supported in this browser.");
+      alert("Voice search is not supported in this browser. Please use Chrome or Safari.");
       return;
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-IN'; // Support Indian English
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-IN, hi-IN'; // Support Indian English and Hindi
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
-    recognition.onstart = () => {
-      setIsListening(true);
-    };
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
 
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setLocalSearchQuery(transcript);
-      navigate(`/user/search?q=${encodeURIComponent(transcript)}`);
-    };
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setLocalSearchQuery(transcript);
+        navigate(`/user/search?q=${encodeURIComponent(transcript)}`);
+      };
 
-    recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'not-allowed') {
+          alert('Microphone access denied. Please allow microphone permissions.');
+        }
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.error('Failed to start speech recognition:', err);
       setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognition.start();
+    }
   };
 
   const handleSearchSubmit = (e?: React.FormEvent) => {

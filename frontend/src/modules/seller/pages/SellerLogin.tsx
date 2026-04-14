@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { sendOTP, verifyOTP } from '../../../services/api/auth/sellerAuthService';
 import OTPInput from '../../../components/OTPInput';
@@ -13,9 +13,26 @@ export default function SellerLogin() {
   const [showOTP, setShowOTP] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [timer, setTimer] = useState(120);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (showOTP && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [showOTP, timer]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleMobileLogin = async () => {
-    if (mobileNumber.length !== 10) return;
+    if (mobileNumber.length < 10 || mobileNumber.length > 12) return;
 
     setLoading(true);
     setError('');
@@ -25,6 +42,7 @@ export default function SellerLogin() {
       if (response.success) {
         // Only show OTP screen on success
         setShowOTP(true);
+        setTimer(120); // Reset timer
         setError(''); // Clear any previous errors
       } else {
         // If not successful, show error and stay on page
@@ -145,10 +163,10 @@ export default function SellerLogin() {
                   <input
                     type="tel"
                     value={mobileNumber}
-                    onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
                     placeholder="Enter mobile number"
                     className="flex-1 px-3 py-2.5 text-sm placeholder:text-neutral-400 focus:outline-none"
-                    maxLength={10}
+                    maxLength={12}
                     disabled={loading}
                   />
                 </div>
@@ -162,8 +180,8 @@ export default function SellerLogin() {
 
               <button
                 onClick={handleMobileLogin}
-                disabled={mobileNumber.length !== 10 || loading}
-                className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${mobileNumber.length === 10 && !loading
+                disabled={(mobileNumber.length < 10 || mobileNumber.length > 12) || loading}
+                className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${mobileNumber.length >= 10 && mobileNumber.length <= 12 && !loading
                   ? 'bg-[#8B3D28] text-white hover:opacity-90 shadow-md'
                   : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
                   }`}
@@ -208,6 +226,7 @@ export default function SellerLogin() {
                       const response = await sendOTP(mobileNumber);
                       if (response.success) {
                         // OTP resent successfully, clear any previous errors
+                        setTimer(120); // Reset timer
                         setError('');
                       } else {
                         // Show error but stay on page
@@ -220,10 +239,10 @@ export default function SellerLogin() {
                       setLoading(false);
                     }
                   }}
-                  disabled={loading}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#8B3D28] text-white hover:opacity-90 transition-colors"
+                  disabled={loading || timer > 0}
+                  className={`flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#8B3D28] text-white transition-colors ${loading || timer > 0 ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
                 >
-                  {loading ? 'Sending...' : 'Resend OTP'}
+                  {loading ? 'Sending...' : timer > 0 ? `Resend in ${formatTime(timer)}` : 'Resend OTP'}
                 </button>
               </div>
             </div>

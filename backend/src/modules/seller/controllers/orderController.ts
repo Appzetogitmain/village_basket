@@ -85,6 +85,10 @@ export const getOrders = asyncHandler(
     // Get total count for pagination
     const total = await Order.countDocuments(query);
 
+    // Get seller settings for privacy check
+    const seller = await Seller.findById(sellerId);
+    const showCustomerDetails = seller?.viewCustomerDetails ?? false;
+
     // Format response for frontend
     const formattedOrders = orders.map(order => ({
       id: order._id,
@@ -96,7 +100,7 @@ export const getOrders = asyncHandler(
       status: order.status === 'On the way' ? 'On the way' : order.status,
       amount: order.total,
       customerName: (order.customer as any)?.name || order.customerName || '',
-      customerPhone: (order.customer as any)?.phone || order.customerPhone || '',
+      customerPhone: showCustomerDetails ? ((order.customer as any)?.phone || order.customerPhone || '') : '********' + ((order.customer as any)?.phone || order.customerPhone || '').slice(-2),
       deliveryBoyName: (order.deliveryBoy as any)?.name || '',
     }));
 
@@ -199,6 +203,10 @@ export const getOrderById = asyncHandler(
       };
     });
 
+    // Get seller settings for privacy check
+    const seller = await Seller.findById(sellerId);
+    const showCustomerDetails = seller?.viewCustomerDetails ?? false;
+
     // Format order data for frontend
     const orderDetail = {
       id: order._id,
@@ -208,8 +216,8 @@ export const getOrderById = asyncHandler(
       timeSlot: order.deliverySlot?.label || order.timeSlot || 'N/A',
       status: order.status === 'On the way' ? 'Out For Delivery' : order.status,
       customerName: (order.customer as any)?.name || order.customerName || '',
-      customerEmail: (order.customer as any)?.email || order.customerEmail || '',
-      customerPhone: (order.customer as any)?.phone || order.customerPhone || '',
+      customerEmail: showCustomerDetails ? ((order.customer as any)?.email || order.customerEmail || '') : 'Protected',
+      customerPhone: showCustomerDetails ? ((order.customer as any)?.phone || order.customerPhone || '') : '********' + ((order.customer as any)?.phone || order.customerPhone || '').slice(-2),
       deliveryBoyName: (order.deliveryBoy as any)?.name || '',
       deliveryBoyPhone: (order.deliveryBoy as any)?.mobile || '',
       items: formattedItems,
@@ -219,7 +227,14 @@ export const getOrderById = asyncHandler(
       paymentMethod: order.paymentMethod || 'N/A',
       paymentStatus: order.paymentStatus || 'Pending',
       isRefunded: order.isRefunded || false,
-      deliveryAddress: order.deliveryAddress || {},
+      deliveryAddress: showCustomerDetails 
+        ? (order.deliveryAddress || {}) 
+        : { 
+            ...order.deliveryAddress,
+            address: 'Protected (Admin Permission Required)',
+            phone: 'Protected',
+            landmark: 'Protected'
+          },
     };
 
     return res.status(200).json({
