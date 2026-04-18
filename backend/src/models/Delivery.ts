@@ -21,6 +21,7 @@ export interface IDelivery extends Document {
   bankName?: string;
   accountNumber?: string;
   ifscCode?: string;
+  profileImage?: string;
 
   // Vehicle Information
   vehicleNumber?: string;
@@ -135,6 +136,10 @@ const DeliverySchema = new Schema<IDelivery>(
       trim: true,
     },
     ifscCode: {
+      type: String,
+      trim: true,
+    },
+    profileImage: {
       type: String,
       trim: true,
     },

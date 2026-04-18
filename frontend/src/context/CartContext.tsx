@@ -29,6 +29,7 @@ interface CartContextType {
   refreshCart: (latitude?: number, longitude?: number) => Promise<void>;
   lastAddEvent: AddToCartEvent | null;
   loading: boolean;
+  isInitialized: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -55,7 +56,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   });
   const [lastAddEvent, setLastAddEvent] = useState<AddToCartEvent | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const pendingOperationsRef = useRef<Set<string>>(new Set());
+  const fetchIdRef = useRef(0);
 
   const { isAuthenticated, user } = useAuth();
   const isWholesale = user?.customerType === 'wholesale';
@@ -94,12 +97,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Helper to sync cart from API
   const fetchCart = async (lat?: number, lng?: number) => {
+    const currentFetchId = ++fetchIdRef.current;
+    setLoading(true);
     if (!isAuthenticated || user?.userType !== 'Customer') {
-      // If we cleared it above but had things in localStorage, we keep them for guests?
-      // For now, if logged out, we clear if it was an authenticated session.
-      // But if guest, we might want to keep it.
-      // Let's only clear if we are transition from logged in to logged out.
-      setLoading(false);
+      if (currentFetchId === fetchIdRef.current) {
+        setLoading(false);
+        setIsInitialized(true);
+      }
       return;
     }
 
@@ -112,6 +116,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         latitude: queryLat,
         longitude: queryLng
       });
+      
+      if (currentFetchId !== fetchIdRef.current) return;
+
       if (response && response.data && response.data.items) {
         setItems(mapApiItemsToState(response.data.items));
         setEstimatedFee(response.data.estimatedDeliveryFee);
@@ -128,7 +135,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Failed to fetch cart:", error);
     } finally {
-      setLoading(false);
+      if (currentFetchId === fetchIdRef.current) {
+        setLoading(false);
+        setIsInitialized(true);
+      }
     }
   };
 
@@ -139,6 +149,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } else {
       // Guest cart is already in 'items' from localStorage if it existed
       setLoading(false);
+      setIsInitialized(true);
     }
   }, [isAuthenticated, user?.userType, location?.latitude, location?.longitude]);
 
@@ -476,7 +487,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, refreshCart, lastAddEvent, loading }}
+      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, refreshCart, lastAddEvent, loading, isInitialized }}
     >
       {children}
     </CartContext.Provider>

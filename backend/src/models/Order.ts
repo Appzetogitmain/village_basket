@@ -114,6 +114,7 @@ export interface IOrder extends Document {
   cancelledAt?: Date;
   cancelledBy?: mongoose.Types.ObjectId;
   isRefunded?: boolean;
+  commissionsProcessed?: boolean;
 
   // Donation
   donationAmount?: number;
@@ -422,6 +423,10 @@ const OrderSchema = new Schema<IOrder>(
       type: Schema.Types.ObjectId,
     },
     isRefunded: {
+      type: Boolean,
+      default: false,
+    },
+    commissionsProcessed: {
       type: Boolean,
       default: false,
     },

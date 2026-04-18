@@ -761,7 +761,7 @@ export default function AdminManageDeliveryBoy() {
 
             {/* Footer */}
             <footer className="text-center py-4 text-[12px] font-bold text-neutral-500 border-t border-neutral-200 bg-white">
-                Copyright © 2026. Developed By{' '}
+                Copyright © {new Date().getFullYear()}. Developed By{' '}
                 <a href="#" className="text-[#8B3D28] hover:underline">Village Basket</a>
             </footer>
         </div>

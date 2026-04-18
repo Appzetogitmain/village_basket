@@ -627,20 +627,21 @@ export default function OrderDetail() {
   };
 
   const handleShare = async () => {
+    const orderId = order?.orderNumber || order?.id;
+    const shareText = `Track my order here: ${window.location.href}\nOrder ID: ${orderId}\nStatus: ${currentStatus.title}`;
+    
     const shareData = {
-      title: `Order #${order?.id?.split("-").slice(-1)[0]}`,
-      text: `Track my Village Basket order: Order #${order?.id?.split("-").slice(-1)[0]
-        }`,
-      url: window.location.href,
+      title: `Order #${orderId}`,
+      text: shareText,
     };
 
     try {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        // Fallback: copy link to clipboard
-        await navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
+        // Fallback: copy formatted message to clipboard
+        await navigator.clipboard.writeText(shareText);
+        alert("Order details and link copied to clipboard!");
       }
     } catch (error) {
       console.error("Error sharing:", error);
@@ -648,9 +649,9 @@ export default function OrderDetail() {
   };
 
   const handleCallStore = () => {
-    // Default store number, should be from order/seller data
-    const storeNumber = order?.seller?.phone || "1234567890";
-    window.location.href = `tel:${storeNumber}`;
+    // Get store number from order items seller info (backend uses 'mobile')
+    const sellerPhone = order?.items?.[0]?.seller?.mobile || order?.items?.[0]?.seller?.phone || order?.seller?.mobile || order?.seller?.phone || "1234567890";
+    window.location.href = `tel:${sellerPhone}`;
   };
 
   const handleCancelOrder = async () => {
@@ -666,7 +667,12 @@ export default function OrderDetail() {
       await cancelOrder(id, cancellationReason);
       setOrderStatus("Cancelled" as any);
       setShowCancelModal(false);
-      alert("Order cancelled successfully. Your amount will be refunded to your Village Wallet.");
+      
+      const refundMessage = order?.paymentMethod === 'COD'
+        ? "Order cancelled successfully."
+        : "Order cancelled successfully. Your amount will be refunded to your Village Wallet.";
+      alert(refundMessage);
+
       // Refresh order to get updated status
       handleRefresh();
     } catch (error: any) {
@@ -722,54 +728,54 @@ export default function OrderDetail() {
     { title: string; subtitle: string; color: string; icon?: string }
   > = {
     Received: {
-      title: "Order received",
+      title: "Order Placed",
       subtitle: "Order will reach you shortly",
       color: "bg-[#8B3D28]",
     },
     Accepted: {
-      title: "Preparing your order",
+      title: "Preparing Order",
       subtitle: "",
       color: "bg-[#8B3D28]",
     },
     "Picked up": {
-      title: "Order picked up",
+      title: "Order Picked Up",
       subtitle: "Partner is on the way to you",
       color: "bg-[#8B3D28]",
     },
     "On the way": {
-      title: "Order picked up",
+      title: "Order Picked Up",
       subtitle: "Partner is on the way to you",
       color: "bg-[#8B3D28]",
     },
     Delivered: {
-      title: "Order delivered",
+      title: "Order Delivered",
       subtitle: "Enjoy your meal!",
       color: "bg-[#8B3D28]",
     },
     // Backend status mappings
     Pending: {
-      title: "Order pending",
+      title: "Order Pending",
       subtitle: "Waiting for confirmation",
       color: "bg-yellow-600",
     },
     Processed: {
-      title: "Order processed",
+      title: "Order Processed",
       subtitle: "Preparing for delivery",
       color: "bg-[#8B3D28]",
     },
     Shipped: {
-      title: "Order shipped",
+      title: "Order Shipped",
       subtitle: "On the way to you",
       color: "bg-blue-600",
     },
     "Ready for pickup": {
-      title: "Ready for pickup",
+      title: "Ready For Pickup",
       subtitle: "Order is ready at the store",
       color: "bg-[#8B3D28]",
     },
     Cancelled: {
       title: "Order Cancelled",
-      subtitle: "Refunded to your Village Wallet",
+      subtitle: order?.paymentMethod === 'COD' ? "Order cancelled successfully" : "Refunded to your Village Wallet",
       color: "bg-red-600",
       icon: "🚫",
     },
@@ -802,7 +808,7 @@ export default function OrderDetail() {
             </button>
             <div className="hidden md:flex flex-col">
                <h1 className="text-[12px] font-black uppercase tracking-[0.2em] text-white/90 leading-none">Order Details</h1>
-               <span className="text-[10px] font-bold text-white/50 mt-1">#{id}</span>
+               <span className="text-[10px] font-bold text-white/50 mt-1">#{order.orderNumber || id}</span>
             </div>
           </div>
 
@@ -824,7 +830,7 @@ export default function OrderDetail() {
           <div className="flex items-center gap-2">
             <div className="md:hidden flex flex-col items-center mr-2">
                <h1 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90 leading-none">Order Details</h1>
-               <span className="text-[8px] font-bold text-white/50 mt-1">#{id}</span>
+               <span className="text-[8px] font-bold text-white/50 mt-1">#{order.orderNumber || id}</span>
             </div>
             <motion.button
               className="p-2 flex items-center justify-center hover:bg-white/15 rounded-xl bg-white/10"
@@ -1080,16 +1086,33 @@ export default function OrderDetail() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}>
           <div className="flex items-center gap-3 p-3 border-b border-dashed border-village-umber/5">
-            <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center border border-amber-100">
-              <span className="text-xl">🛒</span>
+            <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center border border-amber-100 shadow-inner">
+              <span className="text-xl">🏪</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-black text-village-umber uppercase tracking-tight">Village Basket Store</p>
-              <p className="text-[9px] text-neutral-400 font-bold italic">Official Outlet</p>
+              <p className="text-[11px] font-black text-village-umber uppercase tracking-tight truncate">
+                {order?.items?.[0]?.seller?.storeName || "Village Basket Store"}
+              </p>
+              <button 
+                onClick={() => {
+                  const phone = order?.items?.[0]?.seller?.mobile || order?.items?.[0]?.seller?.phone;
+                  if (phone) window.location.href = `tel:${phone}`;
+                }}
+                className="group flex items-center gap-1.5 mt-0.5 active:scale-95 transition-all text-left"
+              >
+                <p className="text-[10px] text-neutral-400 font-bold italic group-hover:text-village-umber transition-colors">
+                  {order?.items?.[0]?.seller?.mobile || order?.items?.[0]?.seller?.phone || "Official Outlet"}
+                </p>
+                {(order?.items?.[0]?.seller?.mobile || order?.items?.[0]?.seller?.phone) && (
+                  <span className="px-1.5 py-0.5 bg-green-50 text-green-600 text-[7px] font-black rounded-md uppercase tracking-widest border border-green-100 group-hover:bg-green-100 transition-colors">
+                    Click to Call
+                  </span>
+                )}
+              </button>
             </div>
           </div>
           <motion.button
-            className="w-full p-3 flex items-center justify-between group bg-village-umber/5"
+            className="w-full p-3 flex items-center justify-between group bg-village-umber/5 hover:bg-village-umber/10 transition-colors"
             onClick={handleCallStore}
             whileTap={{ scale: 0.99 }}>
             <div className="flex items-center gap-2">
@@ -1118,7 +1141,7 @@ export default function OrderDetail() {
                 <p className="text-[11px] font-black text-village-umber uppercase tracking-tight">
                   Bill Summary
                 </p>
-                <p className="text-[9px] font-bold text-neutral-400 italic">#{order.id.split("-").slice(-1)[0]} • {order.items?.length} Items</p>
+                <p className="text-[9px] font-bold text-neutral-400 italic">#{order.orderNumber || order.id} • {order.items?.length} Items</p>
               </div>
               <ChevronRightIcon className="w-4 h-4 text-neutral-300" />
             </div>
@@ -1126,29 +1149,29 @@ export default function OrderDetail() {
           <div className="p-3 space-y-2 border-b border-dashed border-village-umber/5">
             <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
               <span>Subtotal</span>
-              <span>{"\u20B9"}{order.subtotal || 0}</span>
+              <span>₹{order.subtotal || 0}</span>
             </div>
             {order.shipping > 0 && (
               <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
                 <span>Shipping</span>
-                <span>{"\u20B9"}{order.shipping}</span>
+                <span>₹{order.shipping}</span>
               </div>
             )}
             {order.discount > 0 && (
               <div className="flex justify-between items-center text-[10px] font-black text-green-600 uppercase tracking-widest">
                 <span>Discount</span>
-                <span>-{"\u20B9"}{order.discount}</span>
+                <span>-₹{order.discount}</span>
               </div>
             )}
             {order.walletAmountUsed > 0 && (
               <div className="flex justify-between items-center text-[10px] font-black text-[#8B3D28] uppercase tracking-widest">
                 <span>Wallet Used</span>
-                <span>-{"\u20B9"}{order.walletAmountUsed}</span>
+                <span>-₹{order.walletAmountUsed}</span>
               </div>
             )}
             <div className="flex justify-between items-center pt-1 border-t border-dashed border-village-umber/5">
               <span className="text-[10px] font-black text-village-umber uppercase tracking-widest">Payable Amount</span>
-              <span className="text-sm font-black text-village-umber tracking-tight">{"\u20B9"}{order.payableAmount !== undefined ? order.payableAmount : order.total}</span>
+              <span className="text-sm font-black text-village-umber tracking-tight">₹{order.payableAmount !== undefined ? order.payableAmount : order.total}</span>
             </div>
           </div>
 
@@ -1166,27 +1189,23 @@ export default function OrderDetail() {
             subtitle="Visit FAQ"
             onClick={() => navigate("/user/faq")}
           />
-          <SectionItem
-            icon={CircleSlashIcon}
-            title="Cancel Order"
-            subtitle="Only available before store accepts"
-            onClick={() => setShowCancelModal(true)}
-          />
+          {!['Delivered', 'Cancelled', 'Returned', 'Rejected', 'Out for Delivery', 'Shipped'].includes(orderStatus) && (
+            <SectionItem
+              icon={CircleSlashIcon}
+              title="Cancel Order"
+              subtitle="Only available before store accepts"
+              onClick={() => setShowCancelModal(true)}
+            />
+          )}
         </motion.div>
 
         {/* Secondary Actions */}
-        <div className="flex gap-2.5 mt-2">
+        <div className="flex mt-2">
           <Link to="/user/orders" className="flex-1">
             <button className="w-full h-8 bg-neutral-100 text-neutral-500 text-[10px] font-black uppercase tracking-widest rounded-lg active:scale-95 transition-all">
               View All Orders
             </button>
           </Link>
-          <button
-            onClick={handleShare}
-            className="w-12 h-8 bg-neutral-100 text-neutral-500 flex items-center justify-center rounded-lg active:scale-95 transition-all"
-          >
-            <Share2Icon className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
@@ -1334,8 +1353,7 @@ export default function OrderDetail() {
                         <p className="text-xs text-gray-500">{item.variant}</p>
                       )}
                       <p className="text-sm font-semibold text-gray-900 mt-1">
-                        {"\u20B9"}
-                        {item.total?.toFixed(0) ||
+                        ₹{item.total?.toFixed(0) ||
                           (item.unitPrice * item.quantity).toFixed(0)}
                       </p>
                     </div>

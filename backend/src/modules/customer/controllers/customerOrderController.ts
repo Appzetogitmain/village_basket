@@ -36,7 +36,7 @@ export const createOrder = async (req: Request, res: Response) => {
             session = null;
         }
 
-        const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, giftPackaging, walletAmountUsed, donationAmount } = req.body;
+        const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, walletAmountUsed, donationAmount } = req.body;
         const userId = req.user!.userId;
         const normalizedPaymentMethod = normalizePaymentMethod(paymentMethod);
         const legacyPaymentMethod = toLegacyPaymentMethod(normalizedPaymentMethod);
@@ -472,9 +472,8 @@ export const createOrder = async (req: Request, res: Response) => {
 
         // Recalculate Final Total
         const tip = Number(tipAmount) || 0;
-        const giftPackagingFee = giftPackaging ? 30 : 0;
         const donation = Number(donationAmount) || 0;
-        const finalTotal = calculatedSubtotal + platformFee + deliveryFee + tip + giftPackagingFee + donation - discountAmount;
+        const finalTotal = calculatedSubtotal + platformFee + deliveryFee + tip + donation - discountAmount;
 
         // Update Order with calculated values and items
         newOrder.subtotal = Number(calculatedSubtotal.toFixed(2));
@@ -496,7 +495,6 @@ export const createOrder = async (req: Request, res: Response) => {
             deliveryFee,
             discount: discountAmount,
             tip,
-            giftPackagingFee,
             finalTotalInDB: newOrder.total,
             walletBalance: customer.walletAmount,
             requestedWalletUse: walletAmountUsed
@@ -780,7 +778,7 @@ export const getOrderById = async (req: Request, res: Response) => {
                 path: 'items',
                 populate: [
                     { path: 'product', select: 'productName mainImage pack manufacturer retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mrp' },
-                    { path: 'seller', select: 'storeName city phone fssaiLicNo' }
+                    { path: 'seller', select: 'storeName city mobile fssaiLicNo' }
                 ]
             })
             .populate('deliveryBoy', 'name phone profileImage vehicleNumber');

@@ -388,6 +388,7 @@ export default function DeliveryDashboard() {
             title="In Possession"
             value={stats?.returnItems || 0}
             accentColor="#4A7C59"
+            onClick={() => navigate("/delivery/orders")}
           />
         </div>
 
