@@ -64,6 +64,7 @@ export interface IAppSettings extends Document {
     kmRate: number;
     deliveryBoyKmRate?: number;
   };
+  deliveryCashLimit?: number;
 
   // Tax Settings
   gstEnabled: boolean;
@@ -274,6 +275,10 @@ const AppSettingsSchema = new Schema<IAppSettings>(
       baseDistance: { type: Number, default: 0 },
       kmRate: { type: Number, default: 0 },
       deliveryBoyKmRate: { type: Number, default: 0 },
+    },
+    deliveryCashLimit: {
+      type: Number,
+      min: [0, "Delivery cash limit cannot be negative"],
     },
     // Tax Settings
     gstEnabled: {

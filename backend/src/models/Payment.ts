@@ -1,14 +1,17 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IPayment extends Document {
+  paymentId: string;
   order: mongoose.Types.ObjectId;
   customer: mongoose.Types.ObjectId;
+  userId?: mongoose.Types.ObjectId;
 
   // Payment Info
+  method?: "razorpay" | "cash" | "wallet" | "upi" | "card";
   paymentMethod: string;
   paymentGateway?: string;
   transactionId?: string;
-  paymentId?: string;
+  metadata?: Record<string, any>;
 
   // Razorpay Specific
   razorpayOrderId?: string;
@@ -21,6 +24,12 @@ export interface IPayment extends Document {
 
   // Status
   status:
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed"
+  | "refunded"
+  | "cancelled"
   | "Pending"
   | "Processing"
   | "Completed"
@@ -29,6 +38,7 @@ export interface IPayment extends Document {
   | "Cancelled";
 
   // Payment Details
+  completedAt?: Date;
   paymentDate?: Date;
   paidAt?: Date;
 
@@ -53,18 +63,36 @@ export interface IPayment extends Document {
 
 const PaymentSchema = new Schema<IPayment>(
   {
+    paymentId: {
+      type: String,
+      required: [true, "Payment ID is required"],
+      unique: true,
+      trim: true,
+      index: true,
+    },
     order: {
       type: Schema.Types.ObjectId,
       ref: "Order",
       required: [true, "Order is required"],
+      index: true,
     },
     customer: {
       type: Schema.Types.ObjectId,
       ref: "Customer",
       required: [true, "Customer is required"],
+      index: true,
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "Customer",
+      index: true,
     },
 
     // Payment Info
+    method: {
+      type: String,
+      enum: ["razorpay", "cash", "wallet", "upi", "card"],
+    },
     paymentMethod: {
       type: String,
       required: [true, "Payment method is required"],
@@ -80,9 +108,8 @@ const PaymentSchema = new Schema<IPayment>(
       unique: true,
       sparse: true,
     },
-    paymentId: {
-      type: String,
-      trim: true,
+    metadata: {
+      type: Schema.Types.Mixed,
     },
 
     // Razorpay Specific
@@ -121,11 +148,20 @@ const PaymentSchema = new Schema<IPayment>(
         "Failed",
         "Refunded",
         "Cancelled",
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "refunded",
+        "cancelled",
       ],
       default: "Pending",
     },
 
     // Payment Details
+    completedAt: {
+      type: Date,
+    },
     paymentDate: {
       type: Date,
       default: Date.now,
@@ -170,6 +206,8 @@ PaymentSchema.index({ order: 1 });
 PaymentSchema.index({ customer: 1 });
 PaymentSchema.index({ status: 1 });
 PaymentSchema.index({ paymentDate: -1 });
+PaymentSchema.index({ paymentId: 1 }, { unique: true });
+PaymentSchema.index({ method: 1, status: 1 });
 
 const Payment = mongoose.model<IPayment>("Payment", PaymentSchema);
 

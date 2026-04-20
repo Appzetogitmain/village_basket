@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import Commission from '../../../models/Commission';
 import WalletTransaction from '../../../models/WalletTransaction';
 import WithdrawRequest from '../../../models/WithdrawRequest';
+import DeliveryWallet from '../../../models/DeliveryWallet';
+import Delivery from '../../../models/Delivery';
 import { asyncHandler } from '../../../utils/asyncHandler';
 import { approveWithdrawal, rejectWithdrawal, completeWithdrawal } from './adminWithdrawalController';
 
@@ -253,6 +255,7 @@ export const processWithdrawalWrapper = asyncHandler(async (req: Request, res: R
 });
 
 /**
+<<<<<<< HEAD
  * Create Fund Transfer (Manual adjustment of wallet balance by Admin)
  */
 export const createFundTransfer = asyncHandler(async (req: Request, res: Response) => {
@@ -324,11 +327,79 @@ export const createFundTransfer = asyncHandler(async (req: Request, res: Respons
         reference: `FT-${Date.now()}`,
         openingBalance,
         closingBalance
+=======
+ * COD settlement dashboard (delivery deposits)
+ */
+export const getCodSettlements = asyncHandler(async (req: Request, res: Response) => {
+    const { page = 1, limit = 20, deliveryBoyId } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const matchWallet: any = {};
+    if (deliveryBoyId) {
+        matchWallet.deliveryBoy = new mongoose.Types.ObjectId(String(deliveryBoyId));
+    }
+
+    const pipeline: mongoose.PipelineStage[] = [
+        { $match: matchWallet },
+        { $unwind: "$transactions" },
+        { $match: { "transactions.type": "deposit" } },
+        {
+            $project: {
+                _id: 0,
+                deliveryBoy: 1,
+                amount: "$transactions.amount",
+                status: "$transactions.status",
+                createdAt: "$transactions.createdAt",
+                reference: "$transactions.reference",
+                metadata: "$transactions.metadata",
+            },
+        },
+        { $sort: { createdAt: -1 } },
+        {
+            $facet: {
+                rows: [{ $skip: skip }, { $limit: Number(limit) }],
+                total: [{ $count: "count" }],
+            },
+        },
+    ];
+
+    const result = await DeliveryWallet.aggregate(pipeline);
+    const rows = result?.[0]?.rows || [];
+    const total = Number(result?.[0]?.total?.[0]?.count || 0);
+
+    const deliveryIds = [...new Set(rows.map((row: any) => String(row.deliveryBoy)))];
+    const deliveries = await Delivery.find({ _id: { $in: deliveryIds } }).select("name mobile");
+    const deliveryMap = new Map(deliveries.map((d: any) => [String(d._id), d]));
+
+    const settlements = rows.map((row: any) => {
+        const delivery = deliveryMap.get(String(row.deliveryBoy));
+        return {
+            deliveryBoyId: row.deliveryBoy,
+            deliveryBoyName: delivery?.name || "Unknown",
+            deliveryBoyMobile: delivery?.mobile || "",
+            amount: Number(row.amount || 0),
+            status: row.status,
+            createdAt: row.createdAt,
+            razorpayOrderId: row.metadata?.razorpayOrderId || null,
+            razorpayPaymentId: row.metadata?.razorpayPaymentId || null,
+            reference: row.reference,
+        };
+>>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
     });
 
     return res.status(200).json({
         success: true,
+<<<<<<< HEAD
         message: 'Fund transfer successful',
         data: transaction
+=======
+        data: settlements,
+        pagination: {
+            page: Number(page),
+            limit: Number(limit),
+            total,
+            pages: Math.ceil(total / Number(limit)),
+        },
+>>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
     });
 });

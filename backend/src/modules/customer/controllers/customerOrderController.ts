@@ -16,6 +16,12 @@ import Refund from "../../../models/Refund";
 import WalletTransaction from "../../../models/WalletTransaction";
 import Return from "../../../models/Return";
 import { Server as SocketIOServer } from "socket.io";
+import {
+    buildOrderPaymentSnapshot,
+    createBestEffortPaymentRecord,
+    normalizePaymentMethod,
+    toLegacyPaymentMethod,
+} from "../../../services/codService";
 
 // Create a new order
 export const createOrder = async (req: Request, res: Response) => {
@@ -33,6 +39,9 @@ export const createOrder = async (req: Request, res: Response) => {
 
         const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, walletAmountUsed, donationAmount } = req.body;
         const userId = req.user!.userId;
+        const normalizedPaymentMethod = normalizePaymentMethod(paymentMethod);
+        const legacyPaymentMethod = toLegacyPaymentMethod(normalizedPaymentMethod);
+        const initialOrderStatus = normalizedPaymentMethod === "cash" ? "Pending" : "Received";
 
         // Log incoming request for debugging
         console.log("DEBUG: Order creation request:", {
@@ -151,9 +160,10 @@ export const createOrder = async (req: Request, res: Response) => {
                     label: deliverySlot.label || deliverySlot.timeRange || '',
                 }
             }),
-            paymentMethod: paymentMethod || 'COD',
+            paymentMethod: legacyPaymentMethod,
             paymentStatus: 'Pending',
-            status: 'Received',
+            payment: buildOrderPaymentSnapshot(normalizedPaymentMethod, "pending"),
+            status: initialOrderStatus,
             subtotal: 0,
             tax: 0,
             shipping: fees?.deliveryFee || 0,
@@ -543,7 +553,7 @@ export const createOrder = async (req: Request, res: Response) => {
         }
 
         // --- Full Wallet Payment Logic (Override/Fallback) ---
-        if (paymentMethod === 'Wallet') {
+        if (normalizedPaymentMethod === 'wallet') {
             const remaining = newOrder.total - totalDebitedFromWallet;
 
             if (remaining > 0) {
@@ -588,6 +598,7 @@ export const createOrder = async (req: Request, res: Response) => {
 
             // Mark order as paid if totally paid by wallet
             newOrder.paymentStatus = 'Paid';
+            newOrder.payment = buildOrderPaymentSnapshot("wallet", "completed");
         }
 
 
@@ -602,6 +613,20 @@ export const createOrder = async (req: Request, res: Response) => {
                 throw validationError;
             }
             await newOrder.save();
+        }
+
+        // Ensure nested payment fields stay aligned for COD and prepaid pending states.
+        if (!newOrder.payment) {
+            const status = newOrder.paymentStatus === "Paid" ? "completed" : "pending";
+            newOrder.payment = buildOrderPaymentSnapshot(normalizedPaymentMethod, status);
+            await newOrder.save();
+        }
+
+        // Best-effort payment tracking record (non-blocking by design).
+        try {
+            await createBestEffortPaymentRecord(newOrder);
+        } catch (paymentTrackingError) {
+            console.error("Best-effort payment tracking failed:", paymentTrackingError);
         }
 
 
@@ -637,6 +662,7 @@ export const createOrder = async (req: Request, res: Response) => {
             success: true,
             message: "Order placed successfully",
             data: newOrder,
+            razorpay: normalizedPaymentMethod === "cash" ? null : undefined,
         });
 
     } catch (error: any) {

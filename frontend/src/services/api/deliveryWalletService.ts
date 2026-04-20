@@ -71,3 +71,34 @@ export const getDeliveryCommissions = async () => {
         throw error;
     }
 };
+
+/**
+ * Create Razorpay order for COD cash deposit settlement
+ */
+export const createDeliveryCashDepositOrder = async (amount: number) => {
+    try {
+        const response = await api.post('/delivery/wallet/deposit/create-order', { amount });
+        return response.data;
+    } catch (error: any) {
+        console.error('Error creating cash deposit order:', error);
+        throw error;
+    }
+};
+
+/**
+ * Verify COD cash deposit settlement
+ */
+export const verifyDeliveryCashDeposit = async (payload: {
+    amount: number;
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+}) => {
+    try {
+        const response = await api.post('/delivery/wallet/deposit/verify', payload);
+        return response.data;
+    } catch (error: any) {
+        console.error('Error verifying cash deposit:', error);
+        throw error;
+    }
+};

@@ -26,6 +26,9 @@ export interface DeliveryBoy {
   balance: number;
   cashCollected: number;
   status: "Active" | "Inactive";
+  approvalStatus?: "Pending" | "Approved" | "Rejected";
+  approvalRemark?: string;
+  approvalUpdatedAt?: string;
   available: "Available" | "Not Available";
   currentLocation?: {
     latitude: number;
@@ -104,6 +107,7 @@ export interface GetDeliveryParams {
   limit?: number;
   search?: string;
   status?: "Active" | "Inactive";
+  approvalStatus?: "Pending" | "Approved" | "Rejected";
   available?: "Available" | "Not Available";
   city?: string;
   sortBy?: string;
@@ -195,6 +199,18 @@ export const updateDeliveryBoyAvailability = async (
   return response.data;
 };
 
+export const updateDeliveryBoyApproval = async (
+  id: string,
+  approvalStatus: "Pending" | "Approved" | "Rejected",
+  approvalRemark?: string
+): Promise<ApiResponse<DeliveryBoy>> => {
+  const response = await api.patch<ApiResponse<DeliveryBoy>>(
+    `/admin/delivery/${id}/approval`,
+    { approvalStatus, approvalRemark }
+  );
+  return response.data;
+};
+
 /**
  * Cash Collection APIs
  */
@@ -251,6 +267,7 @@ export const getDeliveryBoyCashCollections = async (
   );
   return response.data;
 };
+<<<<<<< HEAD
 
 export const getDeliveryAssignments = async (
   id: string,
@@ -259,6 +276,21 @@ export const getDeliveryAssignments = async (
   const response = await api.get<ApiResponse<any[]>>(
     `/admin/delivery/${id}/assignments`,
     { params }
+=======
+export const getUnpaidCodOrders = async (
+  deliveryBoyId: string
+): Promise<ApiResponse<any[]>> => {
+  const response = await api.get<ApiResponse<any[]>>(
+    "/admin/orders",
+    {
+      params: {
+        deliveryBoy: deliveryBoyId, // This might need backend update to support direct deliveryBoy filter
+        paymentMethod: "COD",
+        paymentStatus: "Pending",
+        status: "Delivered",
+      }
+    }
+>>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
   );
   return response.data;
 };

@@ -176,6 +176,7 @@ router.get("/delivery", deliveryController.getAllDeliveryBoys);
 router.get("/delivery/:id", deliveryController.getDeliveryBoyById);
 router.put("/delivery/:id", deliveryController.updateDeliveryBoy);
 router.patch("/delivery/:id/status", deliveryController.updateDeliveryStatus);
+router.patch("/delivery/:id/approval", deliveryController.updateDeliveryApproval);
 router.patch(
   "/delivery/:id/availability",
   deliveryController.updateDeliveryBoyAvailability
@@ -213,6 +214,8 @@ router.put(
   "/settings/sms-gateway",
   settingsController.updateSMSGatewaySettings
 );
+router.get("/settings/razorpay", settingsController.getRazorpayConfig);
+router.put("/settings/razorpay", settingsController.updateRazorpayConfig);
 
 // ==================== Coupon Routes ====================
 router.post("/coupons", couponController.createCoupon);
@@ -243,7 +246,11 @@ router.patch(
 router.get("/financial/dashboard", walletController.getFinancialDashboard);
 router.get("/wallet/earnings", walletController.getAdminEarnings);
 router.get("/wallet/transactions", walletController.getWalletTransactions);
+<<<<<<< HEAD
 router.post("/wallet/fund-transfer", walletController.createFundTransfer);
+=======
+router.get("/wallet/cod-settlements", walletController.getCodSettlements);
+>>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
 router.get("/wallet/withdrawals", withdrawalController.getAllWithdrawals);
 router.post("/wallet/withdrawal/process", walletController.processWithdrawalWrapper);
 
@@ -277,6 +284,10 @@ router.put(
 router.delete(
   "/cash-collections/:id",
   cashCollectionController.deleteCashCollection
+);
+router.put(
+  "/cash-collections/:id/approve",
+  cashCollectionController.approveCashCollection
 );
 
 // ==================== FAQ Routes ====================
