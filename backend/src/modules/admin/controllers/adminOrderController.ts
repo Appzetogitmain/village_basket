@@ -23,10 +23,14 @@ export const getAllOrders = asyncHandler(
       dateFrom,
       dateTo,
       search,
+      deliveryBoy,
+      paymentMethod,
     } = req.query;
 
     const query: any = {};
 
+    if (deliveryBoy) query.deliveryBoy = deliveryBoy;
+    if (paymentMethod) query.paymentMethod = paymentMethod;
     if (status) query.status = status;
     if (paymentStatus) query.paymentStatus = paymentStatus;
     if (dateFrom || dateTo) {

@@ -364,3 +364,53 @@ export const verifyCashDeposit = async (req: Request, res: Response) => {
         });
     }
 };
+/**
+ * Submit manual cash settlement (Delivery Boy reporting handover)
+ */
+export const submitManualSettlement = async (req: Request, res: Response) => {
+    try {
+        const deliveryBoyId = req.user!.userId;
+        const amount = Number(req.body?.amount || 0);
+        const orderId = req.body?.orderId === "" ? undefined : req.body?.orderId;
+        const remark = req.body?.remark;
+
+        if (!amount || amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Valid amount is required',
+            });
+        }
+
+        const wallet = await ensureDeliveryWallet(deliveryBoyId);
+        if (amount > Number(wallet.cashInHand || 0)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Settlement amount cannot exceed cash in hand',
+            });
+        }
+
+        const CashCollection = (await import('../../../models/CashCollection')).default;
+        
+        const settlement = await CashCollection.create({
+            deliveryBoy: deliveryBoyId,
+            order: orderId, // If orderId is provided, track it
+            amount,
+            remark,
+            status: 'Pending',
+            initiatedBy: 'DeliveryBoy',
+            collectedAt: new Date(),
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: 'Settlement request submitted successfully',
+            data: settlement,
+        });
+    } catch (error: any) {
+        console.error('Error submitting manual settlement:', error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to submit settlement',
+        });
+    }
+};

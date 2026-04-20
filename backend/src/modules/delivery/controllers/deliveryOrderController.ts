@@ -27,17 +27,21 @@ const mapOrderItems = (items: any[]) => {
  */
 export const getAllOrdersHistory = asyncHandler(async (req: Request, res: Response) => {
     const deliveryId = req.user?.userId;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
-    const skip = (page - 1) * limit;
+    const { page = 1, limit = 20, paymentStatus, paymentMethod, status } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
 
-    const orders = await Order.find({ deliveryBoy: deliveryId })
-        .populate("items") // Populate OrderItems
+    const query: any = { deliveryBoy: deliveryId };
+    if (paymentStatus) query.paymentStatus = paymentStatus;
+    if (paymentMethod) query.paymentMethod = paymentMethod;
+    if (status) query.status = status;
+
+    const orders = await Order.find(query)
+        .populate("items")
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit);
+        .limit(Number(limit));
 
-    const total = await Order.countDocuments({ deliveryBoy: deliveryId });
+    const total = await Order.countDocuments(query);
 
     // Batched Commission Fetch for Efficiency
     const { default: Commission } = await import("../../../models/Commission");

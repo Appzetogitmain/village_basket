@@ -267,3 +267,19 @@ export const getDeliveryBoyCashCollections = async (
   );
   return response.data;
 };
+export const getUnpaidCodOrders = async (
+  deliveryBoyId: string
+): Promise<ApiResponse<any[]>> => {
+  const response = await api.get<ApiResponse<any[]>>(
+    "/admin/orders",
+    {
+      params: {
+        deliveryBoy: deliveryBoyId, // This might need backend update to support direct deliveryBoy filter
+        paymentMethod: "COD",
+        paymentStatus: "Pending",
+        status: "Delivered",
+      }
+    }
+  );
+  return response.data;
+};

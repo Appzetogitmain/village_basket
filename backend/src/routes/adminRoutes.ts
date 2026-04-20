@@ -280,6 +280,10 @@ router.delete(
   "/cash-collections/:id",
   cashCollectionController.deleteCashCollection
 );
+router.put(
+  "/cash-collections/:id/approve",
+  cashCollectionController.approveCashCollection
+);
 
 // ==================== FAQ Routes ====================
 router.get("/faqs", faqController.getFAQs);
