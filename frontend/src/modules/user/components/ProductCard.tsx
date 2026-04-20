@@ -93,7 +93,7 @@ export default function ProductCard({
     ? (product.variations.length === 1 && isDefaultVariationOutOfStock)
     : isOutOfStock;
 
-  const isActuallyDisabled = product.isAvailable === false || isSoldOut;
+  const isActuallyDisabled = product.isAvailable === false || !!isSoldOut;
 
   // Get quantity in cart - properly matching the default variation for this card
   const cartItem = cart.items.find((item) => {

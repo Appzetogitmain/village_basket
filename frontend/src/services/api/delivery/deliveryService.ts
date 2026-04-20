@@ -323,3 +323,12 @@ export const submitManualSettlement = async (data: {
     throw handleApiError(error);
   }
 };
+
+export const getUnpaidCodOrders = async (): Promise<any[]> => {
+  try {
+    const response = await api.get("/delivery/orders/unpaid-cod");
+    return response.data?.data || [];
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};

@@ -88,11 +88,13 @@ export interface CashCollection {
   deliveryBoyId: string;
   deliveryBoyName: string;
   orderId: string;
+  orderNumber?: string;
   total: number;
   amount: number;
   remark?: string;
   collectedAt: string;
   collectedBy: string;
+  status?: "Pending" | "Approved" | "Rejected" | "Completed";
 }
 
 export interface CreateCashCollectionData {
