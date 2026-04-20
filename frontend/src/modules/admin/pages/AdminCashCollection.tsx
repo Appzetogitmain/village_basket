@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   getCashCollections,
   createCashCollection,
-  getDeliveryAssignments,
   type CashCollection,
   type CreateCashCollectionData,
 } from "../../../services/api/admin/adminDeliveryService";
@@ -29,12 +28,11 @@ export default function AdminCashCollection() {
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-<<<<<<< HEAD
   const [modalDeliveryBoy, setModalDeliveryBoy] = useState("");
-  const [modalOrder, setModalOrder] = useState("");
+  const [modalOrders, setModalOrders] = useState<any[]>([]);
+  const [modalOrderId, setModalOrderId] = useState("");
   const [modalAmount, setModalAmount] = useState("");
   const [modalRemark, setModalRemark] = useState("");
-  const [deliveryBoyOrders, setDeliveryBoyOrders] = useState<any[]>([]);
   const [fetchingOrders, setFetchingOrders] = useState(false);
 
   const fetchData = async () => {
@@ -90,15 +88,6 @@ export default function AdminCashCollection() {
       setLoading(false);
     }
   };
-=======
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [modalDeliveryBoy, setModalDeliveryBoy] = useState("");
-  const [modalOrders, setModalOrders] = useState<any[]>([]);
-  const [modalOrderId, setModalOrderId] = useState("");
-  const [modalAmount, setModalAmount] = useState("");
-  const [modalRemark, setModalRemark] = useState("");
-  const [fetchingOrders, setFetchingOrders] = useState(false);
->>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
 
   // Fetch delivery boys and cash collections on component mount
   useEffect(() => {
@@ -121,44 +110,28 @@ export default function AdminCashCollection() {
 
   // Fetch orders when delivery boy is selected in modal
   useEffect(() => {
-    if (modalDeliveryBoy && modalDeliveryBoy !== "") {
-      const fetchOrders = async () => {
-        try {
-          setFetchingOrders(true);
-          // Only fetch delivered orders
-          const response = await getDeliveryAssignments(modalDeliveryBoy, { 
-            status: 'Delivered',
-            limit: 50 
-          });
-          
-          if (response.success) {
-            // Filter for COD orders (if order info is fully populated)
-            // Sometimes backend doesn't populate paymentMethod, but let's try to filter or show all delivered
-            setDeliveryBoyOrders(response.data.filter((a: any) => a.order && a.order.paymentMethod === 'COD'));
-          }
-        } catch (err) {
-          console.error("Error fetching orders:", err);
-        } finally {
-          setFetchingOrders(false);
-        }
-      };
-      fetchOrders();
-    } else {
-      setDeliveryBoyOrders([]);
-    }
-  }, [modalDeliveryBoy]);
-
-  // Set amount when order is selected in modal
-  useEffect(() => {
-    if (modalOrder) {
-      const selected = deliveryBoyOrders.find(a => a.order._id === modalOrder);
-      if (selected) {
-        setModalAmount(selected.order.total.toString());
+    const fetchOrders = async () => {
+      if (!modalDeliveryBoy || modalDeliveryBoy === "") {
+        setModalOrders([]);
+        return;
       }
-    } else {
-      setModalAmount("");
+      try {
+        setFetchingOrders(true);
+        const { getUnpaidCodOrders } = await import("../../../services/api/admin/adminDeliveryService");
+        const response = await getUnpaidCodOrders(modalDeliveryBoy);
+        if (response.success) {
+          setModalOrders(response.data);
+        }
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+      } finally {
+        setFetchingOrders(false);
+      }
+    };
+    if (showAddModal) {
+      fetchOrders();
     }
-  }, [modalOrder, deliveryBoyOrders]);
+  }, [modalDeliveryBoy, showAddModal]);
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -212,106 +185,46 @@ export default function AdminCashCollection() {
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = startIndex + entriesPerPage;
 
-<<<<<<< HEAD
   const handleAddCollection = () => {
     setModalDeliveryBoy("");
-    setModalOrder("");
+    setModalOrderId("");
     setModalAmount("");
     setModalRemark("");
+    setModalOrders([]);
     setShowAddModal(true);
   };
 
-  const handleCreateSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!modalDeliveryBoy || !modalOrder || !modalAmount) {
-      setError("Please fill in all required fields");
+  const handleSubmitCollection = async () => {
+    if (!modalDeliveryBoy || !modalOrderId || !modalAmount) {
+      alert("Please fill all required fields");
       return;
     }
 
     try {
       setSubmitting(true);
-      setError(null);
-      
-      const payload: CreateCashCollectionData = {
+      const data: CreateCashCollectionData = {
         deliveryBoyId: modalDeliveryBoy,
-        orderId: modalOrder,
-        amount: parseFloat(modalAmount),
+        orderId: modalOrderId,
+        amount: Number(modalAmount),
         remark: modalRemark,
       };
-
-      const response = await createCashCollection(payload);
+      const response = await createCashCollection(data);
       if (response.success) {
-        setSuccessMessage("Cash collection recorded successfully");
         setShowAddModal(false);
-        fetchData(); // Refresh list
+        setModalDeliveryBoy("");
+        setModalOrderId("");
+        setModalAmount("");
+        setModalRemark("");
+        setSuccessMessage("Cash collection recorded successfully");
+        fetchData();
         setTimeout(() => setSuccessMessage(null), 3000);
       } else {
         setError(response.message || "Failed to create cash collection");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create cash collection");
+      setError(err.response?.data?.message || "Failed to create collection");
     } finally {
       setSubmitting(false);
-=======
-  const handleAddCollection = async () => {
-    setShowAddModal(true);
-  };
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-        if (!modalDeliveryBoy || modalDeliveryBoy === "") {
-            setModalOrders([]);
-            return;
-        }
-        try {
-            setFetchingOrders(true);
-            const { getUnpaidCodOrders } = await import("../../../services/api/admin/adminDeliveryService");
-            const response = await getUnpaidCodOrders(modalDeliveryBoy);
-            if (response.success) {
-                setModalOrders(response.data);
-            }
-        } catch (err) {
-            console.error("Error fetching orders:", err);
-        } finally {
-            setFetchingOrders(false);
-        }
-    };
-    if (showAddModal) {
-        fetchOrders();
-    }
-  }, [modalDeliveryBoy, showAddModal]);
-
-  const handleSubmitCollection = async () => {
-    if (!modalDeliveryBoy || !modalOrderId || !modalAmount) {
-        alert("Please fill all required fields");
-        return;
-    }
-
-    try {
-        setSubmitting(true);
-        const data: CreateCashCollectionData = {
-            deliveryBoyId: modalDeliveryBoy,
-            orderId: modalOrderId,
-            amount: Number(modalAmount),
-            remark: modalRemark
-        };
-        const response = await createCashCollection(data);
-        if (response.success) {
-            setShowAddModal(false);
-            setModalDeliveryBoy("");
-            setModalOrderId("");
-            setModalAmount("");
-            setModalRemark("");
-            // Refresh list
-            setCurrentPage(1);
-            // In a real app we'd trigger a reload or update state
-            window.location.reload(); 
-        }
-    } catch (err: any) {
-        alert(err.response?.data?.message || "Failed to create collection");
-    } finally {
-        setSubmitting(false);
->>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
     }
   };
 
@@ -368,13 +281,8 @@ export default function AdminCashCollection() {
           Delivery Boy Cash Collection List
         </h1>
         <button 
-<<<<<<< HEAD
           onClick={handleAddCollection}
           className="bg-[#8B3D28] hover:bg-[#8B3D28] text-white px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors">
-=======
-            onClick={handleAddCollection}
-            className="bg-[#8B3D28] hover:bg-[#8B3D28] text-white px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors">
->>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
           <svg
             width="16"
             height="16"
@@ -898,128 +806,6 @@ export default function AdminCashCollection() {
       </div>
 
       {/* Add Cash Collection Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-            <div className="bg-[#A54B31] px-4 py-3 flex justify-between items-center">
-              <h3 className="text-white text-lg font-semibold">Add Cash Collection</h3>
-              <button 
-                onClick={() => setShowAddModal(false)}
-                className="text-white hover:text-neutral-200"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-            
-            <form onSubmit={handleCreateSubmit} className="p-4 space-y-4">
-              {/* Delivery Boy Selection */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
-                  Delivery Boy <span className="text-red-500">*</span>
-                </label>
-                <select
-                  required
-                  value={modalDeliveryBoy}
-                  onChange={(e) => setModalDeliveryBoy(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
-                >
-                  <option value="">Select Delivery Boy</option>
-                  {deliveryBoys.map(boy => (
-                    <option key={boy._id} value={boy._id}>{boy.name} ({boy.mobile})</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Order Selection */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
-                  Select Delivered COD Order <span className="text-red-500">*</span>
-                </label>
-                <select
-                  required
-                  disabled={!modalDeliveryBoy || fetchingOrders}
-                  value={modalOrder}
-                  onChange={(e) => setModalOrder(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-[#8B3D28] disabled:bg-neutral-50"
-                >
-                  <option value="">{fetchingOrders ? "Loading orders..." : modalDeliveryBoy ? "Select Order" : "Select delivery boy first"}</option>
-                  {deliveryBoyOrders.map(a => (
-                    <option key={a.order._id} value={a.order._id}>
-                      {a.order.orderNumber} - ₹{a.order.total}
-                    </option>
-                  ))}
-                </select>
-                {modalDeliveryBoy && !fetchingOrders && deliveryBoyOrders.length === 0 && (
-                  <p className="text-xs text-red-500 mt-1">No delivered COD orders found for this boy.</p>
-                )}
-              </div>
-
-              {/* Amount */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
-                  Amount Collected <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  required
-                  value={modalAmount}
-                  onChange={(e) => setModalAmount(e.target.value)}
-                  placeholder="Amount"
-                  className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
-                />
-              </div>
-
-              {/* Remark */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
-                  Remark
-                </label>
-                <textarea
-                  value={modalRemark}
-                  onChange={(e) => setModalRemark(e.target.value)}
-                  rows={3}
-                  placeholder="Enter remark..."
-                  className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
-                ></textarea>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting || !modalOrder}
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#A54B31] hover:bg-[#8B3D28] rounded transition-colors flex items-center gap-2 disabled:bg-neutral-400"
-                >
-                  {submitting && (
-                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
-                  )}
-                  {submitting ? "Saving..." : "Save Collection"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Footer */}
-      <div className="bg-neutral-800 text-white text-center text-sm py-4">
-        Copyright © {new Date().getFullYear()}. Developed By{" "}
-        <a href="#" className="text-[#8B3D28] hover:text-[#8B3D28]">
-          Village Basket
-        </a>
-      </div>
-
-      {/* Add Collection Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">

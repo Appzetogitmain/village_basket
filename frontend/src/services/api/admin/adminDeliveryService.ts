@@ -267,8 +267,6 @@ export const getDeliveryBoyCashCollections = async (
   );
   return response.data;
 };
-<<<<<<< HEAD
-
 export const getDeliveryAssignments = async (
   id: string,
   params?: { status?: string; page?: number; limit?: number }
@@ -276,7 +274,10 @@ export const getDeliveryAssignments = async (
   const response = await api.get<ApiResponse<any[]>>(
     `/admin/delivery/${id}/assignments`,
     { params }
-=======
+  );
+  return response.data;
+};
+
 export const getUnpaidCodOrders = async (
   deliveryBoyId: string
 ): Promise<ApiResponse<any[]>> => {
@@ -284,13 +285,12 @@ export const getUnpaidCodOrders = async (
     "/admin/orders",
     {
       params: {
-        deliveryBoy: deliveryBoyId, // This might need backend update to support direct deliveryBoy filter
+        deliveryBoy: deliveryBoyId,
         paymentMethod: "COD",
         paymentStatus: "Pending",
         status: "Delivered",
       }
     }
->>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
   );
   return response.data;
 };
