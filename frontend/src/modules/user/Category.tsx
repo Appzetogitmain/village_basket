@@ -22,6 +22,8 @@ export default function CategoryPage() {
   }, [subcategories]);
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [selectedSort, setSelectedSort] = useState("relevance");
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [filterSearchQuery, setFilterSearchQuery] = useState("");
   const [selectedFilterCategory, setSelectedFilterCategory] = useState("Type");
@@ -29,6 +31,14 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true);
   const [categoryLoading, setCategoryLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const sortOptions = [
+    { id: "relevance", label: "Relevance" },
+    { id: "price-low", label: "Price: Low to High" },
+    { id: "price-high", label: "Price: High to Low" },
+    { id: "rating", label: "Customer Rating" },
+    { id: "newest", label: "Newest First" },
+  ];
 
   // Fetch Category Details
   useEffect(() => {
@@ -144,8 +154,76 @@ export default function CategoryPage() {
     }
   }, [id, selectedSubcategory, category?._id, userLocation]);
 
-  // Client-side filtering removed in favor of backend subcategory filtering
-  const categoryProducts = products;
+  // Apply sorting and filtering to products
+  const categoryProducts = useMemo(() => {
+    let result = [...products];
+
+    // Apply Filters (if any)
+    if (selectedFilters.length > 0) {
+      result = result.filter((product) => {
+        return selectedFilters.every((filter) => {
+          const name = (product.name || product.productName || "").toLowerCase();
+          const tags = product.tags || [];
+          
+          // Check Properties first
+          if (filter === "Organic") {
+            return name.includes("organic") || tags.some((t: string) => t.toLowerCase().includes("organic"));
+          }
+          if (filter === "Discounted") {
+            return product.discount > 0 || (product.mrp > product.price);
+          }
+          if (filter === "In Stock") {
+            return product.stock > 0 || product.variations?.some((v: any) => v.stock > 0);
+          }
+          if (filter === "Premium") {
+            return name.includes("premium");
+          }
+
+          // Default: check if name contains the filter (for "Type" filters)
+          // Handle common variations (e.g. "Tomato" filter should match "Tomatoes")
+          const filterLower = filter.toLowerCase();
+          if (name.includes(filterLower)) return true;
+          
+          // Singular/Plural matching fallback
+          if (filterLower.endsWith('o')) { // Tomato -> Tomatoes
+             if (name.includes(filterLower + 'es')) return true;
+          }
+          if (filterLower.endsWith('y')) { // Berry -> Berries
+             if (name.includes(filterLower.slice(0, -1) + 'ies')) return true;
+          }
+          if (!filterLower.endsWith('s')) {
+             if (name.includes(filterLower + 's')) return true;
+          }
+
+          return false;
+        });
+      });
+    }
+
+    // Apply Sorting
+    switch (selectedSort) {
+      case "price-low":
+        result.sort((a, b) => (a.price || 0) - (b.price || 0));
+        break;
+      case "price-high":
+        result.sort((a, b) => (b.price || 0) - (a.price || 0));
+        break;
+      case "rating":
+        result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      case "newest":
+        result.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        break;
+      default:
+        // Relevance - keep original order from API
+        break;
+    }
+
+    return result;
+  }, [products, selectedSort, selectedFilters]);
 
   if ((categoryLoading || loading) && !products.length && !category) {
     return null; // Let global IconLoader handle it
@@ -186,55 +264,89 @@ export default function CategoryPage() {
 
   // Extract filter options from products
   const getFilterOptions = () => {
-    const categoryProducts = products.filter((p) => p.categoryId === id);
     const filterMap = new Map<string, number>();
 
-    categoryProducts.forEach((product) => {
-      // Extract main ingredient/type from product name
-      const name = product.name.toLowerCase();
-      // Remove common prefixes like "fresh", "organic", etc.
-      const cleanName = name
-        .replace(/^(fresh|organic|premium|best|new)\s+/i, "")
-        .trim();
+    if (selectedFilterCategory === "Type") {
+      products.forEach((product) => {
+        // Extract main ingredient/type from product name
+        const name = (product.name || product.productName || "").toLowerCase();
+        // Remove common prefixes like "fresh", "organic", etc.
+        const cleanName = name
+          .replace(/^(fresh|organic|premium|best|new)\s+/i, "")
+          .trim();
 
-      const commonTypes = [
-        { keywords: ["tomato", "tomatoes"], display: "Tomato" },
-        { keywords: ["potato", "potatoes"], display: "Potato" },
-        { keywords: ["chilli", "chili", "chilies"], display: "Chilli" },
-        { keywords: ["spinach"], display: "Spinach" },
-        { keywords: ["brinjal", "eggplant"], display: "Brinjal" },
-        { keywords: ["onion", "onions"], display: "Onion" },
-        { keywords: ["peanut", "peanuts"], display: "Peanuts" },
-        { keywords: ["lemon", "lemons"], display: "Lemon" },
-        { keywords: ["mushroom", "mushrooms"], display: "Mushroom" },
-        {
-          keywords: ["capsicum", "bell pepper", "pepper"],
-          display: "Capsicum",
+        const commonTypes = [
+          { keywords: ["tomato", "tomatoes"], display: "Tomato" },
+          { keywords: ["potato", "potatoes"], display: "Potato" },
+          { keywords: ["chilli", "chili", "chilies"], display: "Chilli" },
+          { keywords: ["spinach", "palak"], display: "Spinach" },
+          { keywords: ["brinjal", "eggplant"], display: "Brinjal" },
+          { keywords: ["onion", "onions"], display: "Onion" },
+          { keywords: ["peanut", "peanuts"], display: "Peanuts" },
+          { keywords: ["lemon", "lemons"], display: "Lemon" },
+          { keywords: ["mushroom", "mushrooms"], display: "Mushroom" },
+          {
+            keywords: ["capsicum", "bell pepper", "pepper"],
+            display: "Capsicum",
+          },
+          { keywords: ["ginger"], display: "Ginger" },
+          { keywords: ["carrot", "carrots"], display: "Carrot" },
+          { keywords: ["fenugreek", "methi"], display: "Fenugreek" },
+          { keywords: ["broccoli"], display: "Broccoli" },
+          { keywords: ["cucumber", "cucumbers"], display: "Cucumber" },
+          { keywords: ["cabbage"], display: "Cabbage" },
+          { keywords: ["cauliflower"], display: "Cauliflower" },
+          { keywords: ["ladyfinger", "okra", "bhindi"], display: "Ladyfinger" },
+          { keywords: ["beans"], display: "Beans" },
+          { keywords: ["peas", "matar"], display: "Peas" },
+          { keywords: ["garlic", "lehsun"], display: "Garlic" },
+          { keywords: ["apple", "apples"], display: "Apple" },
+          { keywords: ["banana", "bananas"], display: "Banana" },
+          { keywords: ["orange", "oranges"], display: "Orange" },
+          { keywords: ["mango", "mangoes"], display: "Mango" },
+        ];
+
+        for (const type of commonTypes) {
+          if (type.keywords.some((keyword) => cleanName.includes(keyword))) {
+            filterMap.set(type.display, (filterMap.get(type.display) || 0) + 1);
+            break;
+          }
+        }
+      });
+    } else if (selectedFilterCategory === "Properties") {
+      // Add Property filters
+      const properties = [
+        { 
+          name: "Organic", 
+          icon: "🍃", 
+          check: (p: any) => 
+            (p.name || p.productName || "").toLowerCase().includes("organic") || 
+            (p.tags || []).some((t: string) => t.toLowerCase().includes("organic"))
         },
-        { keywords: ["ginger"], display: "Ginger" },
-        { keywords: ["carrot", "carrots"], display: "Carrot" },
-        { keywords: ["fenugreek", "methi"], display: "Fenugreek" },
-        { keywords: ["broccoli"], display: "Broccoli" },
-        { keywords: ["cucumber", "cucumbers"], display: "Cucumber" },
-        { keywords: ["cabbage"], display: "Cabbage" },
-        { keywords: ["cauliflower"], display: "Cauliflower" },
-        { keywords: ["ladyfinger", "okra"], display: "Ladyfinger" },
-        { keywords: ["beans"], display: "Beans" },
-        { keywords: ["peas"], display: "Peas" },
-        { keywords: ["garlic"], display: "Garlic" },
-        { keywords: ["apple", "apples"], display: "Apple" },
-        { keywords: ["banana", "bananas"], display: "Banana" },
-        { keywords: ["orange", "oranges"], display: "Orange" },
-        { keywords: ["mango", "mangoes"], display: "Mango" },
+        { 
+          name: "Discounted", 
+          icon: "🏷️", 
+          check: (p: any) => p.discount > 0 || (p.mrp > p.price)
+        },
+        { 
+          name: "In Stock", 
+          icon: "📦", 
+          check: (p: any) => p.stock > 0 || p.variations?.some((v: any) => v.stock > 0)
+        },
+        {
+          name: "Premium",
+          icon: "⭐",
+          check: (p: any) => (p.name || p.productName || "").toLowerCase().includes("premium")
+        }
       ];
 
-      for (const type of commonTypes) {
-        if (type.keywords.some((keyword) => cleanName.includes(keyword))) {
-          filterMap.set(type.display, (filterMap.get(type.display) || 0) + 1);
-          break;
+      properties.forEach(prop => {
+        const count = products.filter(prop.check).length;
+        if (count > 0) {
+          filterMap.set(prop.name, count);
         }
-      }
-    });
+      });
+    }
 
     return Array.from(filterMap.entries())
       .map(([name, count]) => ({ name, count, icon: getIconForFilter(name) }))
@@ -264,6 +376,10 @@ export default function CategoryPage() {
       Banana: "🍌",
       Orange: "🍊",
       Mango: "🥭",
+      Organic: "🍃",
+      Discounted: "🏷️",
+      "In Stock": "📦",
+      Premium: "⭐",
     };
     return iconMap[name] || "🥬";
   };
@@ -393,9 +509,14 @@ export default function CategoryPage() {
                     />
                   </svg>
                 </button>
-                <h1 className="text-base md:text-xl font-bold text-white font-poppins capitalize">
-                  {category?.name}
-                </h1>
+                <div
+                  onClick={() => navigate('/user/home')}
+                  className="flex items-center gap-2 cursor-pointer active:scale-95 transition-transform"
+                >
+                  <h1 className="text-base md:text-xl font-bold text-white font-poppins capitalize">
+                    {category?.name}
+                  </h1>
+                </div>
               </div>
             </div>
           </div>
@@ -407,7 +528,10 @@ export default function CategoryPage() {
             {/* Filters Button */}
             <button
               onClick={() => setIsFiltersOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-white/10 border border-white/20 rounded-full hover:bg-white/20 transition-all flex-shrink-0 whitespace-nowrap active:scale-95 shadow-sm">
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border transition-all flex-shrink-0 whitespace-nowrap active:scale-95 shadow-sm ${selectedFilters.length > 0
+                ? "bg-green-50 text-green-700 border-green-200"
+                : "bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50"
+                }`}>
               <svg
                 width="12"
                 height="12"
@@ -415,21 +539,25 @@ export default function CategoryPage() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 className="flex-shrink-0">
-                <circle cx="6" cy="8" r="1.5" fill="currentColor" />
-                <circle cx="6" cy="16" r="1.5" fill="currentColor" />
                 <path
-                  d="M3 8h6M3 16h6M10 8h11M10 16h11"
+                  d="M3 6h18M6 12h12M10 18h4"
                   stroke="currentColor"
-                  strokeWidth="1.5"
+                  strokeWidth="2.5"
                   strokeLinecap="round"
                 />
               </svg>
               <span>Filters</span>
-              <span className="text-neutral-500 text-[10px] ml-0.5">▾</span>
+              {selectedFilters.length > 0 && (
+                <span className="flex items-center justify-center w-4 h-4 bg-green-600 text-white text-[9px] font-black rounded-full ml-0.5">
+                  {selectedFilters.length}
+                </span>
+              )}
             </button>
 
             {/* Sort Button */}
-            <button className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50 transition-colors flex-shrink-0 whitespace-nowrap">
+            <button
+              onClick={() => setIsSortOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-neutral-700 bg-white border border-neutral-200 rounded-full hover:bg-neutral-50 transition-all flex-shrink-0 whitespace-nowrap active:scale-95 shadow-sm">
               <svg
                 width="12"
                 height="12"
@@ -440,13 +568,13 @@ export default function CategoryPage() {
                 <path
                   d="M7 8l5-5 5 5M7 16l5 5 5-5"
                   stroke="currentColor"
-                  strokeWidth="1.5"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
-              <span>Sort</span>
-              <span className="text-neutral-500 text-[10px] ml-0.5">▾</span>
+              <span>{sortOptions.find(opt => opt.id === selectedSort)?.label || 'Sort'}</span>
+              <span className="text-neutral-400 text-[10px] ml-0.5">▾</span>
             </button>
 
             {/* Category Buttons */}
@@ -512,6 +640,67 @@ export default function CategoryPage() {
 
 
       <AnimatePresence>
+        {isSortOpen && (
+          <>
+            <div className="fixed inset-0 z-[100]">
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/40"
+                onClick={() => setIsSortOpen(false)}
+              />
+
+              {/* Sort Modal */}
+              <motion.div
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl flex flex-col">
+                <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+                  <h2 className="text-base font-bold text-neutral-900">Sort By</h2>
+                  <button
+                    onClick={() => setIsSortOpen(false)}
+                    className="p-1 hover:bg-neutral-100 rounded-full transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="p-2">
+                  {sortOptions.map((option) => {
+                    const isSelected = selectedSort === option.id;
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => {
+                          setSelectedSort(option.id);
+                          setIsSortOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-neutral-50 rounded-xl transition-colors text-left">
+                        <span className={`text-sm font-medium ${isSelected ? "text-green-700 font-bold" : "text-neutral-700"}`}>
+                          {option.label}
+                        </span>
+                        {isSelected && (
+                          <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
+                              <path d="M20 6L9 17l-5-5" />
+                            </svg>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="h-6" /> {/* Bottom safe area spacer */}
+              </motion.div>
+            </div>
+          </>
+        )}
+
         {isFiltersOpen && (
           <>
             {/* Hide footer when modal is open */}
@@ -595,41 +784,36 @@ export default function CategoryPage() {
 
                   {/* Right Column - Filter Options */}
                   <div className="flex-1 overflow-y-auto">
-                    <div className="p-4">
+                    <div className="p-4 space-y-2">
                       {filteredOptions.map((option) => {
-                        const isChecked = selectedFilters.includes(option.name);
+                        const isSelected = selectedFilters.includes(option.name);
                         return (
                           <button
                             key={option.name}
                             onClick={() => handleFilterToggle(option.name)}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-neutral-50 rounded-lg transition-colors">
-                            <span className="text-xl flex-shrink-0 w-6 h-6 flex items-center justify-center">
-                              {option.icon}
-                            </span>
-                            <span className="flex-1 text-left text-sm font-medium text-neutral-700">
-                              {option.name}
-                            </span>
-                            <span className="text-sm text-neutral-500">
-                              ({option.count})
-                            </span>
-                            <div className="w-5 h-5 flex items-center justify-center flex-shrink-0 ml-2">
-                              {isChecked ? (
-                                <div className="w-5 h-5 border-2 border-green-600 bg-green-600 rounded-sm flex items-center justify-center">
-                                  <svg
-                                    className="w-3 h-3 text-white"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={3}
-                                      d="M5 13l4 4L19 7"
-                                    />
-                                  </svg>
-                                </div>
-                              ) : (
-                                <div className="w-5 h-5 border-2 border-neutral-300 rounded-sm bg-white"></div>
+                            className={`w-full flex items-center justify-between p-3.5 rounded-xl border-2 transition-all active:scale-[0.98] ${isSelected
+                              ? "border-green-600 bg-green-50/50"
+                              : "border-neutral-100 bg-white hover:border-neutral-200"
+                              }`}>
+                            <div className="flex items-center gap-3">
+                              <span className="text-xl leading-none">{option.icon}</span>
+                              <div className="flex flex-col items-start">
+                                <span className={`text-sm font-bold ${isSelected ? "text-green-800" : "text-neutral-800"}`}>
+                                  {option.name}
+                                </span>
+                                <span className="text-[10px] font-medium text-neutral-400">
+                                  {option.count} products
+                                </span>
+                              </div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${isSelected
+                              ? "bg-green-600 border-green-600"
+                              : "border-neutral-300"
+                              }`}>
+                              {isSelected && (
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
+                                  <path d="M20 6L9 17l-5-5" />
+                                </svg>
                               )}
                             </div>
                           </button>
@@ -648,11 +832,7 @@ export default function CategoryPage() {
                   </button>
                   <button
                     onClick={handleApplyFilters}
-                    className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors ${selectedFilters.length > 0
-                      ? "bg-green-600 text-white hover:bg-green-700"
-                      : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
-                      }`}
-                    disabled={selectedFilters.length === 0}>
+                    className="flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors bg-green-600 text-white hover:bg-green-700">
                     Apply
                   </button>
                 </div>

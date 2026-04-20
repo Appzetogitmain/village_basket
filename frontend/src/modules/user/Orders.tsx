@@ -77,14 +77,14 @@ export default function Orders() {
               <div className="flex justify-between items-start mb-1">
                 <div className="flex flex-col min-w-0">
                   <span className="text-[8px] font-black text-village-umber/40 uppercase tracking-tighter">Order</span>
-                  <h4 className="text-[10px] font-black text-village-umber uppercase truncate max-w-[160px]">#{order.id}</h4>
+                  <h4 className="text-[10px] font-black text-village-umber uppercase truncate max-w-[160px]">#{order.orderNumber || order.id}</h4>
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   <div className="flex items-center gap-1.5">
                     <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${getStatusColor(order.status)}`}>
                       {order.status === 'Received' ? 'Order Placed' : order.status}
                     </span>
-                    <span className="text-xs font-black text-village-umber">{"\u20B9"}{order.totalAmount.toFixed(0)}</span>
+                    <span className="text-xs font-black text-village-umber">₹{order.totalAmount.toFixed(0)}</span>
                   </div>
                   <span className="text-[9px] font-bold text-neutral-400 italic">
                     {order.totalItems} {order.totalItems === 1 ? 'item' : 'items'}

@@ -12,6 +12,7 @@ import { OrdersContext } from "./ordersContext.types";
 interface ApiOrder {
   _id?: string;
   id?: string;
+  orderNumber?: string;
   items: Order['items'];
   totalItems: number;
   subtotal: number;
@@ -95,7 +96,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, user?.userType, user?.id]);
 
-  const addOrder = async (order: Order): Promise<string | undefined> => {
+  const addOrder = async (order: Order): Promise<{ id: string; orderNumber: string } | undefined> => {
     try {
       // Construct payload
       const payload = {
@@ -126,7 +127,6 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
         tipAmount: order.tipAmount || 0,
         gstin: order.gstin,
         couponCode: order.couponCode,
-        giftPackaging: order.giftPackaging || false,
         donationAmount: order.donationAmount || 0,
         // Pass the new delivery slot if selected
         ...(order.deliverySlot && {
@@ -142,10 +142,13 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       const response = await createOrder(payload);
       await fetchOrders();
 
-      // Return the created order ID from response
+      // Return the created order details from response
       if (response && response.data) {
-        const orderData = response.data as { _id?: string; id?: string };
-        return orderData._id || orderData.id;
+        const orderData = response.data as { _id: string; id?: string; orderNumber: string };
+        return {
+          id: orderData._id || orderData.id || '',
+          orderNumber: orderData.orderNumber || ''
+        };
       }
       return undefined;
     } catch (error: unknown) {

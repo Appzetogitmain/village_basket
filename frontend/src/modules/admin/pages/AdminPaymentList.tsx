@@ -285,7 +285,7 @@ export default function AdminPaymentList() {
 
       {/* Footer */}
       <div className="text-center text-sm text-neutral-500 py-4">
-        Copyright © 2025. Developed By{" "}
+        Copyright © {new Date().getFullYear()}. Developed By{" "}
         <a href="#" className="text-[#A54B31] hover:text-teal-700">
           Village Basket
         </a>

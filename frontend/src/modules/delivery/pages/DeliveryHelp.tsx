@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getHelpSupport } from '../../../services/api/delivery/deliveryService';
+import { useToast } from '../../../context/ToastContext';
 
 // Icons
 const Icons = {
@@ -34,6 +35,7 @@ const Icons = {
 
 export default function DeliveryHelp() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [faqs, setFaqs] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,17 +95,50 @@ export default function DeliveryHelp() {
         <div className="mb-8">
             <h3 className="text-[#8B3D28] text-[9px] font-black uppercase tracking-[0.3em] mb-4 ml-1">Dispatch Channels</h3>
             <div className="village-card paper-texture organic-radius bg-white divide-y divide-stone-100 overflow-hidden shadow-sm border-none pr-2 pl-2">
-                {contacts.map((option, index) => (
-                    <div key={index} className="p-5 flex items-center justify-between group active:bg-stone-50 transition-colors">
-                        <div className="flex-1 pr-4">
-                            <p className="text-village-umber text-[11px] font-black uppercase tracking-tight mb-1">{option.label}</p>
-                            <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest opacity-70 leading-none">{option.value}</p>
+                {contacts
+                  .filter(option => !option.label?.toLowerCase().includes('chat'))
+                  .map((option, index) => {
+                    const type = (option.icon || '').toLowerCase();
+                    const label = (option.label || '').toLowerCase();
+                    const value = (option.value || '').trim();
+                    
+                    const isPhone = type === 'phone' || label.includes('call') || label.includes('phone');
+                    const isEmail = type === 'email' || type === 'mail' || label.includes('email') || value.includes('@');
+                    
+                    const href = isPhone ? `tel:${value.replace(/\s/g, '')}` : isEmail ? `mailto:${value.toLowerCase()}` : '#';
+
+                    const handleInternalClick = async (e: React.MouseEvent) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        try {
+                            await navigator.clipboard.writeText(value);
+                            showToast(`${option.label || 'Contact'} copied to clipboard`, 'success');
+                            
+                            setTimeout(() => {
+                                window.location.href = href;
+                            }, 500);
+                        } catch (err) {
+                            window.location.href = href;
+                        }
+                    };
+
+                    return (
+                        <div 
+                          key={index} 
+                          onClick={handleInternalClick}
+                          className="p-5 flex items-center justify-between group active:bg-stone-50 transition-colors cursor-pointer no-underline block relative z-50"
+                        >
+                            <div className="flex-1 pr-4">
+                                <p className="text-village-umber text-[11px] font-black uppercase tracking-tight mb-1">{option.label}</p>
+                                <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest opacity-70 leading-none">{option.value}</p>
+                            </div>
+                            <div className="w-10 h-10 rounded-xl bg-stone-50 flex items-center justify-center text-[#8B3D28]/40 transition-all group-active:scale-90 ring-1 ring-stone-100/50">
+                                {getThemedIcon(option.icon)}
+                            </div>
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-stone-50 flex items-center justify-center text-[#8B3D28]/40 transition-all group-active:scale-90 ring-1 ring-stone-100/50">
-                            {getThemedIcon(option.icon)}
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
 
@@ -114,22 +149,14 @@ export default function DeliveryHelp() {
                 {faqs.map((item, index) => (
                     <div key={index} className="village-card paper-texture organic-radius p-5 border-none shadow-sm bg-white hover:shadow-md transition-shadow">
                         <p className="text-village-umber text-[11px] font-black uppercase tracking-tight mb-2.5 leading-tight">{item.question}</p>
-                        <p className="text-stone-500 text-[10px] font-black uppercase tracking-widest leading-relaxed opacity-60 italic">{item.answer}</p>
+                        <p className="text-black text-[10px] font-semibold leading-relaxed italic">{item.answer}</p>
                     </div>
                 ))}
             </div>
         </div>
 
-        {/* Tactical Extraction / Contact Button */}
-        <button className="w-full mt-6 bg-gradient-to-br from-[#8B3D28] to-[#3D2B1F] text-white py-5 rounded-3xl font-black text-[11px] uppercase tracking-[0.25em] shadow-2xl shadow-[#8B3D28]/30 transition-all active:scale-[0.98] relative overflow-hidden group">
-            <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
-            <span className="relative z-10">INITIATE EMERGENCY CHAT</span>
-        </button>
-
         {/* Secondary Info */}
-        <div className="mt-8 text-center">
-            <p className="text-[7px] font-black text-stone-300 uppercase tracking-[0.3em]">Operational Readiness: 99.8% UP</p>
-        </div>
+
       </div>
     </div>
   );

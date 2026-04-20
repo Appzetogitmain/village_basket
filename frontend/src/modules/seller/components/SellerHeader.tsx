@@ -196,10 +196,33 @@ export default function SellerHeader({ onMenuClick, isSidebarOpen }: SellerHeade
             </button>
             {showLocationDropdown && (
               <div className="absolute right-0 mt-2 w-56 bg-white/90 backdrop-blur-md border-white/20 rounded-lg shadow-lg border border-neutral-200 py-2 z-50">
-                <div className="px-4 py-2 border-b border-neutral-200">
-                  <p className="text-xs text-neutral-500 mb-1">Store Location</p>
-                  <p className="text-sm font-medium text-neutral-900">
-                    {user?.city ? `${user.city}${user.address ? `, ${user.address}` : ''}` : 'No location set'}
+                <div className="px-4 py-3 border-b border-neutral-200">
+                  <div className="flex justify-between items-start mb-1.5">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-neutral-500">Store Location</p>
+                    <button
+                      onClick={() => {
+                        navigate('/seller/account-settings?tab=store');
+                        setShowLocationDropdown(false);
+                      }}
+                      className="p-1.5 text-neutral-400 hover:text-village-umber transition-all rounded-lg hover:bg-neutral-50 border border-transparent hover:border-neutral-100"
+                      title="Edit Location"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p className="text-xs font-bold text-neutral-800 leading-relaxed">
+                    {(() => {
+                      const address = (user as any)?.address || user?.city || '';
+                      const isCoords = /^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/.test(address);
+                      return !isCoords && address ? (
+                        <span className="block italic">{address}</span>
+                      ) : (
+                        'No location set'
+                      );
+                    })()}
                   </p>
                 </div>
 

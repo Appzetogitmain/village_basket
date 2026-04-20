@@ -7,7 +7,14 @@ import { OrderStatus } from "../../types/order";
 import GoogleMapsTracking from "../../components/GoogleMapsTracking";
 import { useDeliveryTracking } from "../../hooks/useDeliveryTracking";
 import DeliveryPartnerCard from "../../components/DeliveryPartnerCard";
-import { cancelOrder, updateOrderNotes, getSellerLocationsForOrder, refreshDeliveryOtp } from "../../services/api/customerOrderService";
+import {
+  cancelOrder,
+  updateOrderNotes,
+  getSellerLocationsForOrder,
+  refreshDeliveryOtp,
+  createReturnRequest,
+  getMyReturnRequests,
+} from "../../services/api/customerOrderService";
 import { useAuth } from "../../context/AuthContext";
 import RazorpayCheckout from "../../components/RazorpayCheckout";
 
@@ -441,6 +448,12 @@ const SectionItem = ({
   </motion.button>
 );
 
+type ReturnRequestItem = {
+  _id: string;
+  orderItem: string | { _id?: string };
+  status: string;
+};
+
 export default function OrderDetail() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
@@ -468,12 +481,19 @@ export default function OrderDetail() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showItemsModal, setShowItemsModal] = useState(false);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
+  const [showReturnModal, setShowReturnModal] = useState(false);
 
 
   // Form states
   const [cancellationReason, setCancellationReason] = useState("");
   const [selectedTip, setSelectedTip] = useState<number | "other" | null>(null);
   const [customTip, setCustomTip] = useState("");
+  const [selectedReturnItemId, setSelectedReturnItemId] = useState("");
+  const [returnReason, setReturnReason] = useState("");
+  const [returnDescription, setReturnDescription] = useState("");
+  const [returnQuantity, setReturnQuantity] = useState(1);
+  const [isSubmittingReturn, setIsSubmittingReturn] = useState(false);
+  const [returnRequests, setReturnRequests] = useState<ReturnRequestItem[]>([]);
 
   // Real-time delivery tracking via WebSocket
   const {
@@ -547,6 +567,22 @@ export default function OrderDetail() {
 
     fetchSellerLocations();
   }, [id, order?.status]);
+
+  useEffect(() => {
+    const fetchReturnRequests = async () => {
+      if (!id) return;
+      try {
+        const response = await getMyReturnRequests({ orderId: id });
+        if (response?.success && Array.isArray(response.data)) {
+          setReturnRequests(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch return requests:", error);
+      }
+    };
+
+    fetchReturnRequests();
+  }, [id]);
 
   // Update orderStatus when order state changes
   useEffect(() => {
@@ -625,12 +661,11 @@ export default function OrderDetail() {
   };
 
   const handleShare = async () => {
-    const orderIdToShare = id || order?.id || order?._id || "";
-    const shortId = orderIdToShare.split("-").pop() || orderIdToShare;
-
+    const orderNum = order?.orderNumber || order?.id?.split("-").slice(-1)[0];
+    const shareText = `Track my Village Basket order: Order #${orderNum}\nLink: ${window.location.href}`;
     const shareData = {
-      title: `Order #${shortId}`,
-      text: `Track my Village Basket order: Order #${shortId}`,
+      title: `Order #${orderNum}`,
+      text: `Track my Village Basket order: Order #${orderNum}`,
       url: window.location.href,
     };
 
@@ -638,9 +673,9 @@ export default function OrderDetail() {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        // Fallback: copy link to clipboard
-        await navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
+        // Fallback: copy formatted message to clipboard
+        await navigator.clipboard.writeText(shareText);
+        alert("Order details and link copied to clipboard!");
       }
     } catch (error) {
       console.error("Error sharing:", error);
@@ -660,9 +695,9 @@ export default function OrderDetail() {
   };
 
   const handleCallStore = () => {
-    // Default store number, should be from order/seller data
-    const storeNumber = order?.seller?.phone || "1234567890";
-    window.location.href = `tel:${storeNumber}`;
+    // Get store number from order items seller info (backend uses 'mobile')
+    const sellerPhone = order?.items?.[0]?.seller?.mobile || order?.items?.[0]?.seller?.phone || order?.seller?.mobile || order?.seller?.phone || "1234567890";
+    window.location.href = `tel:${sellerPhone}`;
   };
 
   const handleCancelOrder = async () => {
@@ -678,13 +713,74 @@ export default function OrderDetail() {
       await cancelOrder(id, cancellationReason);
       setOrderStatus("Cancelled" as any);
       setShowCancelModal(false);
-      alert("Order cancelled successfully. Your amount will be refunded to your Village Wallet.");
+      
+      const refundMessage = order?.paymentMethod === 'COD'
+        ? "Order cancelled successfully."
+        : "Order cancelled successfully. Your amount will be refunded to your Village Wallet.";
+      alert(refundMessage);
+
       // Refresh order to get updated status
       handleRefresh();
     } catch (error: any) {
       console.error("Error cancelling order:", error);
       const errorMessage = error.response?.data?.message || "Failed to cancel order";
       alert(errorMessage);
+    }
+  };
+
+  const getItemId = (item: any): string => item?._id || item?.id || "";
+
+  const isReturnRequestedForItem = (itemId: string) => {
+    return returnRequests.some((req) => {
+      const requestItemId =
+        typeof req.orderItem === "string" ? req.orderItem : req.orderItem?._id;
+      return requestItemId === itemId && ["Pending", "Approved", "Processing", "Completed"].includes(req.status);
+    });
+  };
+
+  const selectedReturnItem = order?.items?.find((item: any) => getItemId(item) === selectedReturnItemId);
+
+  const handleOpenReturnModal = () => {
+    const firstEligible = order?.items?.find((item: any) => !isReturnRequestedForItem(getItemId(item)));
+    if (firstEligible) {
+      setSelectedReturnItemId(getItemId(firstEligible));
+      setReturnQuantity(1);
+    }
+    setReturnReason("");
+    setReturnDescription("");
+    setShowReturnModal(true);
+  };
+
+  const handleSubmitReturn = async () => {
+    if (!id) return;
+    if (!selectedReturnItemId) {
+      alert("Please select an item to return");
+      return;
+    }
+    if (!returnReason.trim()) {
+      alert("Please provide a return reason");
+      return;
+    }
+
+    try {
+      setIsSubmittingReturn(true);
+      await createReturnRequest(id, {
+        orderItemId: selectedReturnItemId,
+        reason: returnReason.trim(),
+        description: returnDescription.trim() || undefined,
+        quantity: returnQuantity,
+      });
+      alert("Return request submitted successfully");
+      setShowReturnModal(false);
+      const response = await getMyReturnRequests({ orderId: id });
+      if (response?.success && Array.isArray(response.data)) {
+        setReturnRequests(response.data);
+      }
+    } catch (error: any) {
+      console.error("Failed to create return request:", error);
+      alert(error?.response?.data?.message || "Failed to submit return request");
+    } finally {
+      setIsSubmittingReturn(false);
     }
   };
 
@@ -723,54 +819,54 @@ export default function OrderDetail() {
     { title: string; subtitle: string; color: string; icon?: string }
   > = {
     Received: {
-      title: "Order placed",
+      title: "Order received",
       subtitle: "Order will reach you shortly",
       color: "bg-[#8B3D28]",
     },
     Accepted: {
-      title: "Preparing your order",
+      title: "Preparing Order",
       subtitle: "",
       color: "bg-[#8B3D28]",
     },
     "Picked up": {
-      title: "Order picked up",
+      title: "Order Picked Up",
       subtitle: "Partner is on the way to you",
       color: "bg-[#8B3D28]",
     },
     "On the way": {
-      title: "Order picked up",
+      title: "Order Picked Up",
       subtitle: "Partner is on the way to you",
       color: "bg-[#8B3D28]",
     },
     Delivered: {
-      title: "Order delivered",
+      title: "Order Delivered",
       subtitle: "Enjoy your meal!",
       color: "bg-[#8B3D28]",
     },
     // Backend status mappings
     Pending: {
-      title: "Order pending",
+      title: "Order Pending",
       subtitle: "Waiting for confirmation",
       color: "bg-yellow-600",
     },
     Processed: {
-      title: "Order processed",
+      title: "Order Processed",
       subtitle: "Preparing for delivery",
       color: "bg-[#8B3D28]",
     },
     Shipped: {
-      title: "Order shipped",
+      title: "Order Shipped",
       subtitle: "On the way to you",
       color: "bg-blue-600",
     },
     "Ready for pickup": {
-      title: "Ready for pickup",
+      title: "Ready For Pickup",
       subtitle: "Order is ready at the store",
       color: "bg-[#8B3D28]",
     },
     Cancelled: {
       title: "Order Cancelled",
-      subtitle: "Refunded to your Village Wallet",
+      subtitle: order?.paymentMethod === 'COD' ? "Order cancelled successfully" : "Refunded to your Village Wallet",
       color: "bg-red-600",
       icon: "🚫",
     },
@@ -803,8 +899,13 @@ export default function OrderDetail() {
             </button>
             <div className="hidden md:flex flex-col">
                <h1 className="text-[12px] font-black uppercase tracking-[0.2em] text-white/90 leading-none">Order Details</h1>
-               <span className="text-[10px] font-bold text-white/50 mt-1">#{id}</span>
+               <span className="text-[10px] font-bold text-white/50 mt-1">#{order.orderNumber || id}</span>
             </div>
+          </div>
+
+          <div className="md:hidden absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
+            <h1 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90 leading-none">Order Details</h1>
+            <span className="text-[8px] font-bold text-white/50 mt-1">#{order.orderNumber || id}</span>
           </div>
 
           {/* Desktop status center piece */}
@@ -823,10 +924,6 @@ export default function OrderDetail() {
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="md:hidden flex flex-col items-center mr-2">
-               <h1 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90 leading-none">Order Details</h1>
-               <span className="text-[8px] font-bold text-white/50 mt-1">#{id}</span>
-            </div>
             <motion.button
               className="p-2 flex items-center justify-center hover:bg-white/15 rounded-xl bg-white/10"
               whileTap={{ scale: 0.9 }}
@@ -1078,16 +1175,33 @@ export default function OrderDetail() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}>
           <div className="flex items-center gap-3 p-3 border-b border-dashed border-village-umber/5">
-            <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center border border-amber-100">
-              <span className="text-xl">🛒</span>
+            <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center border border-amber-100 shadow-inner">
+              <span className="text-xl">🏪</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-black text-village-umber uppercase tracking-tight">Village Basket Store</p>
-              <p className="text-[9px] text-neutral-400 font-bold italic">Official Outlet</p>
+              <p className="text-[11px] font-black text-village-umber uppercase tracking-tight truncate">
+                {order?.items?.[0]?.seller?.storeName || "Village Basket Store"}
+              </p>
+              <button 
+                onClick={() => {
+                  const phone = order?.items?.[0]?.seller?.mobile || order?.items?.[0]?.seller?.phone;
+                  if (phone) window.location.href = `tel:${phone}`;
+                }}
+                className="group flex items-center gap-1.5 mt-0.5 active:scale-95 transition-all text-left"
+              >
+                <p className="text-[10px] text-neutral-400 font-bold italic group-hover:text-village-umber transition-colors">
+                  {order?.items?.[0]?.seller?.mobile || order?.items?.[0]?.seller?.phone || "Official Outlet"}
+                </p>
+                {(order?.items?.[0]?.seller?.mobile || order?.items?.[0]?.seller?.phone) && (
+                  <span className="px-1.5 py-0.5 bg-green-50 text-green-600 text-[7px] font-black rounded-md uppercase tracking-widest border border-green-100 group-hover:bg-green-100 transition-colors">
+                    Click to Call
+                  </span>
+                )}
+              </button>
             </div>
           </div>
           <motion.button
-            className="w-full p-3 flex items-center justify-between group bg-village-umber/5"
+            className="w-full p-3 flex items-center justify-between group bg-village-umber/5 hover:bg-village-umber/10 transition-colors"
             onClick={handleCallStore}
             whileTap={{ scale: 0.99 }}>
             <div className="flex items-center gap-2">
@@ -1116,7 +1230,7 @@ export default function OrderDetail() {
                 <p className="text-[11px] font-black text-village-umber uppercase tracking-tight">
                   Bill Summary
                 </p>
-                <p className="text-[9px] font-bold text-neutral-400 italic">#{order.id.split("-").slice(-1)[0]} • {order.items?.length} Items</p>
+                <p className="text-[9px] font-bold text-neutral-400 italic">#{order.orderNumber || order.id} • {order.items?.length} Items</p>
               </div>
               <ChevronRightIcon className="w-4 h-4 text-neutral-300" />
             </div>
@@ -1124,29 +1238,29 @@ export default function OrderDetail() {
           <div className="p-3 space-y-2 border-b border-dashed border-village-umber/5">
             <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
               <span>Subtotal</span>
-              <span>{"\u20B9"}{order.subtotal || 0}</span>
+              <span>₹{order.subtotal || 0}</span>
             </div>
             {order.shipping > 0 && (
               <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
                 <span>Shipping</span>
-                <span>{"\u20B9"}{order.shipping}</span>
+                <span>₹{order.shipping}</span>
               </div>
             )}
             {order.discount > 0 && (
               <div className="flex justify-between items-center text-[10px] font-black text-green-600 uppercase tracking-widest">
                 <span>Discount</span>
-                <span>-{"\u20B9"}{order.discount}</span>
+                <span>-₹{order.discount}</span>
               </div>
             )}
             {order.walletAmountUsed > 0 && (
               <div className="flex justify-between items-center text-[10px] font-black text-[#8B3D28] uppercase tracking-widest">
                 <span>Wallet Used</span>
-                <span>-{"\u20B9"}{order.walletAmountUsed}</span>
+                <span>-₹{order.walletAmountUsed}</span>
               </div>
             )}
             <div className="flex justify-between items-center pt-1 border-t border-dashed border-village-umber/5">
               <span className="text-[10px] font-black text-village-umber uppercase tracking-widest">Payable Amount</span>
-              <span className="text-sm font-black text-village-umber tracking-tight">{"\u20B9"}{order.payableAmount !== undefined ? order.payableAmount : order.total}</span>
+              <span className="text-sm font-black text-village-umber tracking-tight">₹{order.payableAmount !== undefined ? order.payableAmount : order.total}</span>
             </div>
           </div>
 
@@ -1164,27 +1278,31 @@ export default function OrderDetail() {
             subtitle="Visit FAQ"
             onClick={() => navigate("/user/faq")}
           />
-          <SectionItem
-            icon={CircleSlashIcon}
-            title="Cancel Order"
-            subtitle="Only available before store accepts"
-            onClick={() => setShowCancelModal(true)}
-          />
+          {!['Delivered', 'Cancelled', 'Returned', 'Rejected', 'Out for Delivery', 'Shipped'].includes(orderStatus) && (
+            <SectionItem
+              icon={CircleSlashIcon}
+              title="Cancel Order"
+              subtitle="Only available before store accepts"
+              onClick={() => setShowCancelModal(true)}
+            />
+          )}
+          {orderStatus === 'Delivered' && (
+            <SectionItem
+              icon={ReceiptIcon}
+              title="Request Return"
+              subtitle="Raise a return for delivered items"
+              onClick={handleOpenReturnModal}
+            />
+          )}
         </motion.div>
 
         {/* Secondary Actions */}
-        <div className="flex gap-2.5 mt-2">
+        <div className="flex mt-2">
           <Link to="/user/orders" className="flex-1">
             <button className="w-full h-8 bg-neutral-100 text-neutral-500 text-[10px] font-black uppercase tracking-widest rounded-lg active:scale-95 transition-all">
               View All Orders
             </button>
           </Link>
-          <button
-            onClick={handleShare}
-            className="w-12 h-8 bg-neutral-100 text-neutral-500 flex items-center justify-center rounded-lg active:scale-95 transition-all"
-          >
-            <Share2Icon className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
@@ -1228,6 +1346,99 @@ export default function OrderDetail() {
                   className="flex-1 bg-red-600 hover:bg-red-700 text-white"
                   onClick={handleCancelOrder}>
                   Cancel Order
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
+      {/* Return Request Modal */}
+      <AnimatePresence>
+        {showReturnModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+            onClick={() => setShowReturnModal(false)}>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl p-6 max-w-md w-full">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Request Return</h2>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm text-gray-700 block mb-1">Select Item</label>
+                  <select
+                    value={selectedReturnItemId}
+                    onChange={(e) => {
+                      setSelectedReturnItemId(e.target.value);
+                      setReturnQuantity(1);
+                    }}
+                    className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
+                  >
+                    {order?.items?.map((item: any) => {
+                      const itemId = getItemId(item);
+                      const isRequested = isReturnRequestedForItem(itemId);
+                      return (
+                        <option key={itemId} value={itemId} disabled={isRequested}>
+                          {item.product?.name || item.productName} {isRequested ? "(Already requested)" : ""}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-700 block mb-1">Quantity</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={selectedReturnItem?.quantity || 1}
+                    value={returnQuantity}
+                    onChange={(e) => setReturnQuantity(Math.max(1, Number(e.target.value) || 1))}
+                    className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-700 block mb-1">Reason</label>
+                  <input
+                    type="text"
+                    value={returnReason}
+                    onChange={(e) => setReturnReason(e.target.value)}
+                    placeholder="e.g. Damaged item, Wrong product"
+                    className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-700 block mb-1">Description (optional)</label>
+                  <textarea
+                    rows={3}
+                    value={returnDescription}
+                    onChange={(e) => setReturnDescription(e.target.value)}
+                    placeholder="Add details to help faster approval"
+                    className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-5">
+                <Button variant="outline" className="flex-1" onClick={() => setShowReturnModal(false)}>
+                  Close
+                </Button>
+                <Button
+                  className="flex-1 bg-[#8B3D28] hover:bg-[#723221] text-white"
+                  onClick={handleSubmitReturn}
+                  disabled={isSubmittingReturn}
+                >
+                  {isSubmittingReturn ? "Submitting..." : "Submit Return"}
                 </Button>
               </div>
             </motion.div>
@@ -1283,8 +1494,7 @@ export default function OrderDetail() {
                         <p className="text-xs text-gray-500">{item.variant}</p>
                       )}
                       <p className="text-sm font-semibold text-gray-900 mt-1">
-                        {"\u20B9"}
-                        {item.total?.toFixed(0) ||
+                        ₹{item.total?.toFixed(0) ||
                           (item.unitPrice * item.quantity).toFixed(0)}
                       </p>
                     </div>

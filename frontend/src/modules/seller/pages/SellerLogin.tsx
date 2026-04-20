@@ -156,8 +156,8 @@ export default function SellerLogin() {
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   Mobile Number
                 </label>
-                <div className="flex items-center bg-white/90 backdrop-blur-md border-white/20 border border-neutral-300 rounded-lg overflow-hidden focus-within:border-[#8B3D28] focus-within:ring-2 focus-within:ring-[#8B3D28]/20 transition-all">
-                  <div className="px-3 py-2.5 text-sm font-medium text-neutral-600 border-r border-neutral-300 bg-white/40">
+                <div className="flex items-center bg-white border border-neutral-200 rounded-xl overflow-hidden focus-within:border-[#8B3D28] focus-within:ring-4 focus-within:ring-[#8B3D28]/10 transition-all shadow-sm">
+                  <div className="px-3 py-2.5 text-sm font-medium text-neutral-500 border-r border-neutral-100 bg-neutral-50/50">
                     +91
                   </div>
                   <input
@@ -180,8 +180,8 @@ export default function SellerLogin() {
 
               <button
                 onClick={handleMobileLogin}
-                disabled={(mobileNumber.length < 10 || mobileNumber.length > 12) || loading}
-                className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${mobileNumber.length >= 10 && mobileNumber.length <= 12 && !loading
+                disabled={mobileNumber.length !== 10 || loading}
+                className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${mobileNumber.length === 10 && !loading
                   ? 'bg-[#8B3D28] text-white hover:opacity-90 shadow-md'
                   : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
                   }`}
@@ -214,7 +214,7 @@ export default function SellerLogin() {
                     setError('');
                   }}
                   disabled={loading}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors border border-neutral-300"
+                  className="flex-1 py-2.5 rounded-xl font-semibold text-sm bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors border border-neutral-300"
                 >
                   Change Number
                 </button>
@@ -239,8 +239,8 @@ export default function SellerLogin() {
                       setLoading(false);
                     }
                   }}
-                  disabled={loading || timer > 0}
-                  className={`flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#8B3D28] text-white transition-colors ${loading || timer > 0 ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+                  disabled={loading}
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#8B3D28] text-white hover:opacity-90 transition-colors"
                 >
                   {loading ? 'Sending...' : timer > 0 ? `Resend in ${formatTime(timer)}` : 'Resend OTP'}
                 </button>

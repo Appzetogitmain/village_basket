@@ -251,3 +251,14 @@ export const getDeliveryBoyCashCollections = async (
   );
   return response.data;
 };
+
+export const getDeliveryAssignments = async (
+  id: string,
+  params?: { status?: string; page?: number; limit?: number }
+): Promise<ApiResponse<any[]>> => {
+  const response = await api.get<ApiResponse<any[]>>(
+    `/admin/delivery/${id}/assignments`,
+    { params }
+  );
+  return response.data;
+};

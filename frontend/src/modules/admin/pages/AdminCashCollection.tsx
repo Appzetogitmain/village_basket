@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   getCashCollections,
   createCashCollection,
+  getDeliveryAssignments,
   type CashCollection,
   type CreateCashCollectionData,
 } from "../../../services/api/admin/adminDeliveryService";
@@ -23,7 +24,71 @@ export default function AdminCashCollection() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  
+  // Modal states
+  const [showAddModal, setShowAddModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [modalDeliveryBoy, setModalDeliveryBoy] = useState("");
+  const [modalOrder, setModalOrder] = useState("");
+  const [modalAmount, setModalAmount] = useState("");
+  const [modalRemark, setModalRemark] = useState("");
+  const [deliveryBoyOrders, setDeliveryBoyOrders] = useState<any[]>([]);
+  const [fetchingOrders, setFetchingOrders] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch delivery boys for the dropdown
+      const deliveryBoysResponse = await getDeliveryBoys({
+        status: "Active",
+        limit: 100,
+      });
+      if (deliveryBoysResponse.success) {
+        setDeliveryBoys(deliveryBoysResponse.data);
+      }
+
+      // Fetch cash collections
+      const params: any = {
+        page: currentPage,
+        limit: entriesPerPage,
+      };
+
+      if (selectedDeliveryBoy !== "all") {
+        params.deliveryBoyId = selectedDeliveryBoy;
+      }
+
+      if (fromDate) {
+        params.fromDate = fromDate;
+      }
+
+      if (toDate) {
+        params.toDate = toDate;
+      }
+
+      if (searchTerm) {
+        params.search = searchTerm;
+      }
+
+      const cashResponse = await getCashCollections(params);
+
+      if (cashResponse.success) {
+        setCashCollections(cashResponse.data);
+      } else {
+        setError("Failed to load cash collections");
+      }
+    } catch (err: any) {
+      console.error("Error fetching data:", err);
+      setError(
+        err.response?.data?.message ||
+        "Failed to load data. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch delivery boys and cash collections on component mount
   useEffect(() => {
@@ -31,60 +96,6 @@ export default function AdminCashCollection() {
       setLoading(false);
       return;
     }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch delivery boys for the dropdown
-        const deliveryBoysResponse = await getDeliveryBoys({
-          status: "Active",
-          limit: 100,
-        });
-        if (deliveryBoysResponse.success) {
-          setDeliveryBoys(deliveryBoysResponse.data);
-        }
-
-        // Fetch cash collections
-        const params: any = {
-          page: currentPage,
-          limit: entriesPerPage,
-        };
-
-        if (selectedDeliveryBoy !== "all") {
-          params.deliveryBoyId = selectedDeliveryBoy;
-        }
-
-        if (fromDate) {
-          params.fromDate = fromDate;
-        }
-
-        if (toDate) {
-          params.toDate = toDate;
-        }
-
-        if (searchTerm) {
-          params.search = searchTerm;
-        }
-
-        const cashResponse = await getCashCollections(params);
-
-        if (cashResponse.success) {
-          setCashCollections(cashResponse.data);
-        } else {
-          setError("Failed to load cash collections");
-        }
-      } catch (err: any) {
-        console.error("Error fetching data:", err);
-        setError(
-          err.response?.data?.message ||
-          "Failed to load data. Please try again."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchData();
   }, [
@@ -97,6 +108,47 @@ export default function AdminCashCollection() {
     toDate,
     searchTerm,
   ]);
+
+  // Fetch orders when delivery boy is selected in modal
+  useEffect(() => {
+    if (modalDeliveryBoy && modalDeliveryBoy !== "") {
+      const fetchOrders = async () => {
+        try {
+          setFetchingOrders(true);
+          // Only fetch delivered orders
+          const response = await getDeliveryAssignments(modalDeliveryBoy, { 
+            status: 'Delivered',
+            limit: 50 
+          });
+          
+          if (response.success) {
+            // Filter for COD orders (if order info is fully populated)
+            // Sometimes backend doesn't populate paymentMethod, but let's try to filter or show all delivered
+            setDeliveryBoyOrders(response.data.filter((a: any) => a.order && a.order.paymentMethod === 'COD'));
+          }
+        } catch (err) {
+          console.error("Error fetching orders:", err);
+        } finally {
+          setFetchingOrders(false);
+        }
+      };
+      fetchOrders();
+    } else {
+      setDeliveryBoyOrders([]);
+    }
+  }, [modalDeliveryBoy]);
+
+  // Set amount when order is selected in modal
+  useEffect(() => {
+    if (modalOrder) {
+      const selected = deliveryBoyOrders.find(a => a.order._id === modalOrder);
+      if (selected) {
+        setModalAmount(selected.order.total.toString());
+      }
+    } else {
+      setModalAmount("");
+    }
+  }, [modalOrder, deliveryBoyOrders]);
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -127,13 +179,50 @@ export default function AdminCashCollection() {
   });
 
   // For pagination display (simplified - in real app, this would come from API)
-  const totalPages = Math.ceil(displayedCollections.length / entriesPerPage);
+  const totalPages = Math.ceil(displayedCollections.length / entriesPerPage) || 1;
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = startIndex + entriesPerPage;
 
-  const handleAddCollection = async () => {
-    // For now, just show an alert. In a real app, this would open a modal to add a cash collection
-    alert("Add cash collection functionality would be implemented here");
+  const handleAddCollection = () => {
+    setModalDeliveryBoy("");
+    setModalOrder("");
+    setModalAmount("");
+    setModalRemark("");
+    setShowAddModal(true);
+  };
+
+  const handleCreateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modalDeliveryBoy || !modalOrder || !modalAmount) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError(null);
+      
+      const payload: CreateCashCollectionData = {
+        deliveryBoyId: modalDeliveryBoy,
+        orderId: modalOrder,
+        amount: parseFloat(modalAmount),
+        remark: modalRemark,
+      };
+
+      const response = await createCashCollection(payload);
+      if (response.success) {
+        setSuccessMessage("Cash collection recorded successfully");
+        setShowAddModal(false);
+        fetchData(); // Refresh list
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        setError(response.message || "Failed to create cash collection");
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to create cash collection");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleExport = () => {
@@ -188,7 +277,9 @@ export default function AdminCashCollection() {
         <h1 className="text-white text-xl sm:text-2xl font-semibold">
           Delivery Boy Cash Collection List
         </h1>
-        <button className="bg-[#8B3D28] hover:bg-[#8B3D28] text-white px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors">
+        <button 
+          onClick={handleAddCollection}
+          className="bg-[#8B3D28] hover:bg-[#8B3D28] text-white px-3 py-1.5 rounded text-[11px] font-black flex items-center gap-2 transition-colors">
           <svg
             width="16"
             height="16"
@@ -204,6 +295,18 @@ export default function AdminCashCollection() {
           Add Cash Collection
         </button>
       </div>
+
+      {/* Messages */}
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 text-red-700 text-sm">
+          {error}
+        </div>
+      )}
+      {successMessage && (
+        <div className="bg-green-50 border-l-4 border-green-500 p-4 text-green-700 text-sm">
+          {successMessage}
+        </div>
+      )}
 
       {/* Main Content Card */}
       <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
@@ -273,7 +376,10 @@ export default function AdminCashCollection() {
                     <input
                       type="date"
                       value={toDate}
-                      onChange={(e) => setToDate(e.target.value)}
+                      onChange={(e) => {
+                        setToDate(e.target.value);
+                        setCurrentPage(1);
+                      }}
                       className="pl-10 pr-3 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#8B3D28] focus:border-[#8B3D28] min-w-[140px]"
                     />
                   </div>
@@ -552,7 +658,18 @@ export default function AdminCashCollection() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-neutral-200">
-              {displayedCollections.length === 0 ? (
+              {loading ? (
+                <tr>
+                   <td
+                    colSpan={7}
+                    className="px-4 py-8 text-center text-sm text-neutral-500">
+                     <div className="flex items-center justify-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#8B3D28]"></div>
+                        Loading dataset...
+                     </div>
+                  </td>
+                </tr>
+              ) : displayedCollections.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}
@@ -651,9 +768,123 @@ export default function AdminCashCollection() {
         </div>
       </div>
 
+      {/* Add Cash Collection Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+            <div className="bg-[#A54B31] px-4 py-3 flex justify-between items-center">
+              <h3 className="text-white text-lg font-semibold">Add Cash Collection</h3>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="text-white hover:text-neutral-200"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleCreateSubmit} className="p-4 space-y-4">
+              {/* Delivery Boy Selection */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Delivery Boy <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={modalDeliveryBoy}
+                  onChange={(e) => setModalDeliveryBoy(e.target.value)}
+                  className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
+                >
+                  <option value="">Select Delivery Boy</option>
+                  {deliveryBoys.map(boy => (
+                    <option key={boy._id} value={boy._id}>{boy.name} ({boy.mobile})</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Order Selection */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Select Delivered COD Order <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  disabled={!modalDeliveryBoy || fetchingOrders}
+                  value={modalOrder}
+                  onChange={(e) => setModalOrder(e.target.value)}
+                  className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-[#8B3D28] disabled:bg-neutral-50"
+                >
+                  <option value="">{fetchingOrders ? "Loading orders..." : modalDeliveryBoy ? "Select Order" : "Select delivery boy first"}</option>
+                  {deliveryBoyOrders.map(a => (
+                    <option key={a.order._id} value={a.order._id}>
+                      {a.order.orderNumber} - ₹{a.order.total}
+                    </option>
+                  ))}
+                </select>
+                {modalDeliveryBoy && !fetchingOrders && deliveryBoyOrders.length === 0 && (
+                  <p className="text-xs text-red-500 mt-1">No delivered COD orders found for this boy.</p>
+                )}
+              </div>
+
+              {/* Amount */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Amount Collected <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  required
+                  value={modalAmount}
+                  onChange={(e) => setModalAmount(e.target.value)}
+                  placeholder="Amount"
+                  className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
+                />
+              </div>
+
+              {/* Remark */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Remark
+                </label>
+                <textarea
+                  value={modalRemark}
+                  onChange={(e) => setModalRemark(e.target.value)}
+                  rows={3}
+                  placeholder="Enter remark..."
+                  className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-[#8B3D28]"
+                ></textarea>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting || !modalOrder}
+                  className="px-4 py-2 text-sm font-medium text-white bg-[#A54B31] hover:bg-[#8B3D28] rounded transition-colors flex items-center gap-2 disabled:bg-neutral-400"
+                >
+                  {submitting && (
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                  )}
+                  {submitting ? "Saving..." : "Save Collection"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <div className="bg-neutral-800 text-white text-center text-sm py-4">
-        Copyright © 2025. Developed By{" "}
+        Copyright © {new Date().getFullYear()}. Developed By{" "}
         <a href="#" className="text-[#8B3D28] hover:text-[#8B3D28]">
           Village Basket
         </a>

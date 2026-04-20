@@ -243,8 +243,10 @@ router.patch(
 router.get("/financial/dashboard", walletController.getFinancialDashboard);
 router.get("/wallet/earnings", walletController.getAdminEarnings);
 router.get("/wallet/transactions", walletController.getWalletTransactions);
+router.post("/wallet/fund-transfer", walletController.createFundTransfer);
 router.get("/wallet/withdrawals", withdrawalController.getAllWithdrawals);
 router.post("/wallet/withdrawal/process", walletController.processWithdrawalWrapper);
+
 
 // Direct withdrawal routes (if used elsewhere)
 router.put("/withdrawals/:id/approve", withdrawalController.approveWithdrawal);

@@ -69,7 +69,7 @@ export default function SellerAddProduct() {
     wholesalePrice: "",
     wholesaleDiscPrice: "0",
     stock: "0",
-    status: "Available" as "Available" | "Sold out",
+    status: "Available" as "Available" | "Out of Stock",
     minWholesaleQuantity: "1",
   });
 
@@ -276,6 +276,16 @@ export default function SellerAddProduct() {
     >
   ) => {
     const { name, value } = e.target;
+    
+    // Validate numerical inputs
+    if (name === 'maxReturnDays' || name === 'totalAllowedQuantity') {
+      const numValue = parseInt(value);
+      if (numValue < 0) {
+        setFormData((prev) => ({ ...prev, [name]: "0" }));
+        return;
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -931,7 +941,7 @@ export default function SellerAddProduct() {
                       }
                       className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] bg-white">
                       <option value="Available">Available</option>
-                      <option value="Sold out">Sold out</option>
+                      <option value="Out of Stock">Out of Stock</option>
                     </select>
                   </div>
                   <div>
@@ -1153,6 +1163,7 @@ export default function SellerAddProduct() {
                     value={formData.maxReturnDays}
                     onChange={handleChange}
                     placeholder="Enter Max Return Days"
+                    min="0"
                     className="w-full px-4 py-2 border border-neutral-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B3D28] focus:border-[#8B3D28]"
                   />
                 </div>

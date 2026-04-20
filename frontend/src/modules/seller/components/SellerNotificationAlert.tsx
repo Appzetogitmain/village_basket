@@ -49,6 +49,19 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
     }
   }, [volume]);
 
+  // Lock body scroll when notification is open
+  useEffect(() => {
+    if (notification) {
+      document.body.style.setProperty('overflow', 'hidden', 'important');
+    } else {
+      document.body.style.removeProperty('overflow');
+    }
+    
+    return () => {
+      document.body.style.removeProperty('overflow');
+    };
+  }, [notification]);
+
   if (!notification) return null;
 
   return (
@@ -71,7 +84,9 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
             </div>
             <div>
               <h2 className="text-xl font-bold">
-                {notification.type === 'NEW_ORDER' ? 'New Order Received!' : 'Order Status Updated'}
+                {notification.type === 'NEW_ORDER' 
+                   ? 'New Order Received!' 
+                   : (notification.type === 'ORDER_CANCELLED' ? 'Order Cancelled' : 'Order Status Updated')}
               </h2>
               <p className="text-sm opacity-90">#{notification.orderNumber}</p>
             </div>
@@ -132,6 +147,16 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
             </div>
           </section>
 
+          {/* Cancellation Reason */}
+          {notification.type === 'ORDER_CANCELLED' && notification.cancellationReason && (
+            <section className="mb-6">
+              <h3 className="text-sm font-semibold text-red-500 uppercase tracking-wider mb-2">Cancellation Reason</h3>
+              <div className="bg-red-50 border border-red-100 rounded-lg p-3">
+                <p className="text-red-700 italic font-medium">"{notification.cancellationReason}"</p>
+              </div>
+            </section>
+          )}
+
           {/* Order Details */}
           <section>
             <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-3">Order Details</h3>
@@ -141,17 +166,17 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
                   <div className="flex-1">
                     <p className="font-medium text-neutral-800">{item.productName}</p>
                     <p className="text-sm text-neutral-500">
-                      Qty: {item.quantity} × \u20B9{item.price.toFixed(2)}
+                      Qty: {item.quantity} × ₹{item.price.toFixed(2)}
                       {item.variation && <span className="ml-2 px-1.5 py-0.5 bg-neutral-100 rounded text-[10px]">{item.variation}</span>}
                     </p>
                   </div>
-                  <p className="font-bold text-neutral-800">\u20B9{item.total.toFixed(2)}</p>
+                  <p className="font-bold text-neutral-800">₹{item.total.toFixed(2)}</p>
                 </div>
               ))}
 
               <div className="flex justify-between items-center pt-4 mt-2 border-t-2 border-neutral-100">
                 <span className="text-lg font-bold text-neutral-800">Total (Your Items)</span>
-                <span className="text-2xl font-black text-[#8B3D28]">\u20B9{notification.totalAmount.toFixed(2)}</span>
+                <span className="text-2xl font-black text-[#8B3D28]">₹{notification.totalAmount.toFixed(2)}</span>
               </div>
             </div>
           </section>

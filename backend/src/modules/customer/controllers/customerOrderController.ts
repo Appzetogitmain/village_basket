@@ -14,6 +14,7 @@ import Coupon from "../../../models/Coupon";
 import Payment from "../../../models/Payment";
 import Refund from "../../../models/Refund";
 import WalletTransaction from "../../../models/WalletTransaction";
+import Return from "../../../models/Return";
 import { Server as SocketIOServer } from "socket.io";
 
 // Create a new order
@@ -30,7 +31,7 @@ export const createOrder = async (req: Request, res: Response) => {
             session = null;
         }
 
-        const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, giftPackaging, walletAmountUsed, donationAmount } = req.body;
+        const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, walletAmountUsed, donationAmount } = req.body;
         const userId = req.user!.userId;
 
         // Log incoming request for debugging
@@ -462,9 +463,8 @@ export const createOrder = async (req: Request, res: Response) => {
 
         // Recalculate Final Total
         const tip = Number(tipAmount) || 0;
-        const giftPackagingFee = giftPackaging ? 30 : 0;
         const donation = Number(donationAmount) || 0;
-        const finalTotal = calculatedSubtotal + platformFee + deliveryFee + tip + giftPackagingFee + donation - discountAmount;
+        const finalTotal = calculatedSubtotal + platformFee + deliveryFee + tip + donation - discountAmount;
 
         // Update Order with calculated values and items
         newOrder.subtotal = Number(calculatedSubtotal.toFixed(2));
@@ -486,7 +486,6 @@ export const createOrder = async (req: Request, res: Response) => {
             deliveryFee,
             discount: discountAmount,
             tip,
-            giftPackagingFee,
             finalTotalInDB: newOrder.total,
             walletBalance: customer.walletAmount,
             requestedWalletUse: walletAmountUsed
@@ -754,7 +753,7 @@ export const getOrderById = async (req: Request, res: Response) => {
                 path: 'items',
                 populate: [
                     { path: 'product', select: 'productName mainImage pack manufacturer retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice mrp' },
-                    { path: 'seller', select: 'storeName city phone fssaiLicNo' }
+                    { path: 'seller', select: 'storeName city mobile fssaiLicNo' }
                 ]
             })
             .populate('deliveryBoy', 'name phone profileImage vehicleNumber');
@@ -1212,6 +1211,172 @@ export const updateOrderNotes = async (req: Request, res: Response) => {
             success: false,
             message: "Failed to update order notes",
             error: error.message
+        });
+    }
+};
+
+/**
+ * Create return request for an order item
+ */
+export const createReturnRequest = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user!.userId;
+        const { orderItemId, reason, description, quantity, images } = req.body;
+
+        if (!orderItemId) {
+            return res.status(400).json({
+                success: false,
+                message: "Order item is required",
+            });
+        }
+
+        if (!reason || !String(reason).trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Return reason is required",
+            });
+        }
+
+        const order = await Order.findOne({ _id: id, customer: userId }).populate("items");
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found",
+            });
+        }
+
+        if (order.status !== "Delivered") {
+            return res.status(400).json({
+                success: false,
+                message: "Return can only be requested for delivered orders",
+            });
+        }
+
+        const orderItem = await OrderItem.findOne({
+            _id: orderItemId,
+            order: order._id,
+        });
+
+        if (!orderItem) {
+            return res.status(404).json({
+                success: false,
+                message: "Order item not found for this order",
+            });
+        }
+
+        const requestedQty = Math.max(1, Number(quantity) || 1);
+        if (requestedQty > orderItem.quantity) {
+            return res.status(400).json({
+                success: false,
+                message: "Return quantity cannot exceed ordered quantity",
+            });
+        }
+
+        const existingReturn = await Return.findOne({
+            customer: userId,
+            order: order._id,
+            orderItem: orderItem._id,
+            status: { $in: ["Pending", "Approved", "Processing"] },
+        });
+
+        if (existingReturn) {
+            return res.status(400).json({
+                success: false,
+                message: "A return request already exists for this item",
+            });
+        }
+
+        const createdReturn = await Return.create({
+            order: order._id,
+            orderItem: orderItem._id,
+            customer: userId,
+            reason: String(reason).trim(),
+            description: description ? String(description).trim() : undefined,
+            quantity: requestedQty,
+            images: Array.isArray(images) ? images : [],
+            pickupAddress: {
+                address: order.deliveryAddress?.address || "",
+                city: order.deliveryAddress?.city || "",
+                pincode: order.deliveryAddress?.pincode || "",
+            },
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Return request submitted successfully",
+            data: createdReturn,
+        });
+    } catch (error: any) {
+        console.error("Error creating return request:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to create return request",
+            error: error.message,
+        });
+    }
+};
+
+/**
+ * Get authenticated customer's return requests
+ */
+export const getMyReturnRequests = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user!.userId;
+        const { orderId, status } = req.query;
+
+        const query: any = { customer: userId };
+        if (orderId) query.order = orderId;
+        if (status) query.status = status;
+
+        const returnRequests = await Return.find(query)
+            .populate("order", "orderNumber")
+            .populate("orderItem", "productName productImage quantity unitPrice total variation")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            data: returnRequests,
+        });
+    } catch (error: any) {
+        console.error("Error fetching return requests:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch return requests",
+            error: error.message,
+        });
+    }
+};
+
+/**
+ * Get single return request detail for authenticated customer
+ */
+export const getMyReturnRequestById = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user!.userId;
+        const { returnId } = req.params;
+
+        const returnRequest = await Return.findOne({ _id: returnId, customer: userId })
+            .populate("order", "orderNumber status deliveryAddress")
+            .populate("orderItem", "productName productImage quantity unitPrice total variation");
+
+        if (!returnRequest) {
+            return res.status(404).json({
+                success: false,
+                message: "Return request not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: returnRequest,
+        });
+    } catch (error: any) {
+        console.error("Error fetching return request detail:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch return request detail",
+            error: error.message,
         });
     }
 };

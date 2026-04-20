@@ -348,10 +348,19 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
         {/* Decorative Warli Pattern Overlay */}
         <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
 
-        {/* Top Row: Logo & Cart */}
+        {/* Top Row: Logo, Notifications & Cart */}
         <div className="flex items-center justify-between mb-2.5 relative z-20">
           <div className="flex items-center gap-2">
-            <div className="bg-white p-2 rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.15)] border-2 border-white/20 transform hover:scale-105 transition-transform duration-300">
+            <div
+              onClick={() => {
+                if (window.location.pathname === '/' || window.location.pathname === '/user/home') {
+                  window.location.reload();
+                } else {
+                  navigate('/user/home');
+                }
+              }}
+              className="bg-white p-2 rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.15)] border-2 border-white/20 transform hover:scale-105 transition-transform duration-300 cursor-pointer"
+            >
               <img
                 src={brandLogo}
                 alt="Village Basket"
@@ -360,21 +369,37 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
             </div>
           </div>
 
-          <button
-            onClick={() => navigate('/user/checkout')}
-            className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 shadow-lg flex items-center justify-center text-white relative active:scale-95 transition-all"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 01-8 0" />
-            </svg>
-            {(cart?.itemCount || 0) > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-[#4b7d5a] text-white text-[9px] font-black rounded-lg min-w-[18px] h-[18px] px-1 flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
-                {cart?.itemCount || 0}
-              </span>
-            )}
-          </button>
+          <div className="flex items-center gap-2.5">
+            {/* Notification Icon */}
+            <button
+              onClick={() => navigate('/user/notifications')}
+              className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 shadow-lg flex items-center justify-center text-white relative active:scale-95 transition-all"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              {/* Optional: Unread indicator dot */}
+              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#8B3D28]"></span>
+            </button>
+
+            {/* Cart Icon */}
+            <button
+              onClick={() => navigate('/user/checkout')}
+              className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 shadow-lg flex items-center justify-center text-white relative active:scale-95 transition-all"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
+                <path d="M3 6h18" />
+                <path d="M16 10a4 4 0 01-8 0" />
+              </svg>
+              {(cart?.itemCount || 0) > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-[#4b7d5a] text-white text-[9px] font-black rounded-lg min-w-[18px] h-[18px] px-1 flex items-center justify-center shadow-lg border-2 border-[#8B3D28]">
+                  {cart?.itemCount || 0}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="mb-2.5 relative z-20">

@@ -85,6 +85,9 @@ const DeliverySettings = lazy(() => import("./modules/delivery/pages/DeliverySet
 const DeliveryHelp = lazy(() => import("./modules/delivery/pages/DeliveryHelp"));
 const DeliveryAbout = lazy(() => import("./modules/delivery/pages/DeliveryAbout"));
 const DeliverySellersInRange = lazy(() => import("./modules/delivery/pages/DeliverySellersInRange"));
+const DeliveryPrivacy = lazy(() => import("./modules/delivery/pages/DeliveryPrivacy"));
+const DeliveryTerms = lazy(() => import("./modules/delivery/pages/DeliveryTerms"));
+const DeliveryLanguage = lazy(() => import("./modules/delivery/pages/DeliveryLanguage"));
 const DeliveryLogin = lazy(() => import("./modules/delivery/pages/DeliveryLogin"));
 const DeliverySignUp = lazy(() => import("./modules/delivery/pages/DeliverySignUp"));
 
@@ -331,6 +334,9 @@ function App() {
                                       <Route path="help" element={<DeliveryHelp />} />
                                       <Route path="about" element={<DeliveryAbout />} />
                                       <Route path="sellers-in-range" element={<DeliverySellersInRange />} />
+                                      <Route path="privacy" element={<DeliveryPrivacy />} />
+                                      <Route path="terms" element={<DeliveryTerms />} />
+                                      <Route path="language" element={<DeliveryLanguage />} />
                                     </Routes>
                                   </DeliveryLayout>
                                 </Suspense>

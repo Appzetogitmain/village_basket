@@ -310,6 +310,45 @@ export const addToCart = async (req: Request, res: Response) => {
             product: productId,
             variation: variation || null
         });
+
+        // Stock Validation
+        const currentQtyInCart = cartItem ? cartItem.quantity : 0;
+        const totalRequestedQty = currentQtyInCart + quantity;
+
+        if (variation && product.variations?.length) {
+            // Check variation stock
+            let variationId = variation;
+            if (typeof variation === 'object' && (variation as any)._id) {
+                variationId = (variation as any)._id;
+            }
+
+            const varObj = product.variations.find((v: any) =>
+                (v._id && v._id.toString() === variationId.toString()) ||
+                v.title === variationId ||
+                v.name === variationId ||
+                v.value === variationId ||
+                v.pack === variationId
+            );
+
+            if (varObj) {
+                if (varObj.stock !== undefined && varObj.stock < totalRequestedQty) {
+                    return res.status(400).json({
+                        success: false,
+                        message: varObj.stock <= 0 ? 'This variation is out of stock' : `Only ${varObj.stock} units available for this variation`,
+                        availableStock: varObj.stock
+                    });
+                }
+            }
+        } else {
+            // Check top-level stock
+            if (product.stock !== undefined && product.stock < totalRequestedQty) {
+                return res.status(400).json({
+                    success: false,
+                    message: product.stock <= 0 ? 'This product is out of stock' : `Only ${product.stock} units available`,
+                    availableStock: product.stock
+                });
+            }
+        }
         
         // Enforce Minimum Wholesale Quantity
         const userType = req.user?.customerType || 'retail';
@@ -462,6 +501,42 @@ export const updateCartItem = async (req: Request, res: Response) => {
                 success: false,
                 message: 'This item is no longer available in your location'
             });
+        }
+
+        // Stock Validation
+        if (cartItem.variation && product.variations?.length) {
+            // Check variation stock
+            let variationId = cartItem.variation;
+            if (typeof variationId === 'object' && (variationId as any)._id) {
+                variationId = (variationId as any)._id;
+            }
+
+            const varObj = product.variations.find((v: any) =>
+                (v._id && v._id.toString() === variationId.toString()) ||
+                v.title === variationId ||
+                v.name === variationId ||
+                v.value === variationId ||
+                v.pack === variationId
+            );
+
+            if (varObj) {
+                if (varObj.stock !== undefined && varObj.stock < quantity) {
+                    return res.status(400).json({
+                        success: false,
+                        message: varObj.stock <= 0 ? 'This variation is out of stock' : `Only ${varObj.stock} units available for this variation`,
+                        availableStock: varObj.stock
+                    });
+                }
+            }
+        } else {
+            // Check top-level stock
+            if (product.stock !== undefined && product.stock < quantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: product.stock <= 0 ? 'This product is out of stock' : `Only ${product.stock} units available`,
+                    availableStock: product.stock
+                });
+            }
         }
 
         // Enforce Minimum Wholesale Quantity

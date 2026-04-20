@@ -224,10 +224,9 @@ export default function SellerOrderDetail() {
     doc.text(`Date: ${formatDate(orderDetail.orderDate)}`, rightX, yPos - 30, { align: 'right' });
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Invoice #${orderDetail.invoiceNumber}`, rightX, yPos - 20, { align: 'right' });
+    doc.text(`Order ID: #${orderDetail.invoiceNumber}`, rightX, yPos - 20, { align: 'right' });
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Order ID: ${orderDetail.id}`, rightX, yPos - 14, { align: 'right' });
     doc.text(`Delivery Date: ${formatDate(orderDetail.deliveryDate)}`, rightX, yPos - 8, { align: 'right' });
     doc.text(`Time Slot: ${orderDetail.timeSlot}`, rightX, yPos - 2, { align: 'right' });
 
@@ -262,7 +261,7 @@ export default function SellerOrderDetail() {
     ];
 
     let xPos = margin;
-    const headers = ['Sr. No.', 'Product', 'Price', 'Tax \u20B9 (%)', 'Qty', 'Subtotal'];
+    const headers = ['Sr. No.', 'Product', 'Price', 'Tax ₹ (%)', 'Qty', 'Subtotal'];
 
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
@@ -287,10 +286,10 @@ export default function SellerOrderDetail() {
       const rowData = [
         item.srNo.toString(),
         item.product,
-        `\u20B9${item.price.toFixed(2)}`,
+        `₹${item.price.toFixed(2)}`,
         `${item.tax.toFixed(2)} (${item.taxPercent.toFixed(2)}%)`,
         item.qty.toString(),
-        `\u20B9${item.subtotal.toFixed(2)}`,
+        `₹${item.subtotal.toFixed(2)}`,
       ];
 
       rowData.forEach((data, index) => {
@@ -331,17 +330,17 @@ export default function SellerOrderDetail() {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text('Subtotal:', pageWidth - margin - 60, yPos, { align: 'right' });
-    doc.text(`\u20B9${totalSubtotal.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
+    doc.text(`₹${totalSubtotal.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
     yPos += 7;
 
     doc.text('Tax:', pageWidth - margin - 60, yPos, { align: 'right' });
-    doc.text(`\u20B9${totalTax.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
+    doc.text(`₹${totalTax.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
     yPos += 7;
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
     doc.text('Grand Total:', pageWidth - margin - 60, yPos, { align: 'right' });
-    doc.text(`\u20B9${grandTotal.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
+    doc.text(`₹${grandTotal.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
     yPos += 15;
 
     // Footer
@@ -358,7 +357,7 @@ export default function SellerOrderDetail() {
     yPos += 8;
 
     doc.setFontSize(8);
-    doc.text('Copyright Â© 2025. Developed By Village Basket', pageWidth / 2, yPos, { align: 'center' });
+    doc.text('Copyright Â© {new Date().getFullYear()}. Developed By Village Basket', pageWidth / 2, yPos, { align: 'center' });
 
     // Save the PDF
     const fileName = `Invoice_${orderDetail.invoiceNumber}_${orderDetail.id}.pdf`;
@@ -583,10 +582,7 @@ export default function SellerOrderDetail() {
               <div className="text-sm text-neutral-600 mb-4">
                 <span className="font-medium">Date:</span> {formatDate(orderDetail.orderDate)}
               </div>
-              <div className="text-lg font-semibold text-neutral-900 mb-1">Invoice #{orderDetail.invoiceNumber}</div>
-              <div className="text-sm text-neutral-600 mb-1">
-                <span className="font-medium">Order ID:</span> {orderDetail.id}
-              </div>
+              <div className="text-lg font-semibold text-neutral-900 mb-1">Order ID: #{orderDetail.invoiceNumber}</div>
               <div className="text-sm text-neutral-600 mb-1">
                 <span className="font-medium">Delivery Date:</span> {formatDate(orderDetail.deliveryDate)}
               </div>
@@ -621,7 +617,7 @@ export default function SellerOrderDetail() {
                   <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Product</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Unit</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Price</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Tax \u20B9 (%)</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Tax ₹ (%)</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Qty</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Subtotal</th>
                 </tr>
@@ -632,12 +628,12 @@ export default function SellerOrderDetail() {
                     <td className="px-4 py-3 text-sm text-neutral-900">{item.srNo}</td>
                     <td className="px-4 py-3 text-sm text-neutral-900">{item.product}</td>
                     <td className="px-4 py-3 text-sm text-neutral-900">{formatUnit(item.unit, item.qty)}</td>
-                    <td className="px-4 py-3 text-sm text-neutral-900">{"\u20B9"}{item.price.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-neutral-900">₹{item.price.toFixed(2)}</td>
                     <td className="px-4 py-3 text-sm text-neutral-600">
                       {item.tax.toFixed(2)} ({item.taxPercent.toFixed(2)}%)
                     </td>
                     <td className="px-4 py-3 text-sm text-neutral-900">{item.qty}</td>
-                    <td className="px-4 py-3 text-sm text-neutral-900 font-medium">{"\u20B9"}{item.subtotal.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-neutral-900 font-medium">₹{item.subtotal.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -656,7 +652,7 @@ export default function SellerOrderDetail() {
       {/* Footer */}
       <footer className="mt-6 px-4 sm:px-6 text-center py-4 bg-neutral-100 rounded-lg">
         <p className="text-xs sm:text-sm text-neutral-600">
-          Copyright © 2025. Developed By{' '}
+          Copyright © {new Date().getFullYear()}. Developed By{' '}
           <span className="font-semibold text-[#8B3D28]">Village Basket</span>
         </p>
       </footer>

@@ -49,6 +49,14 @@ export interface MyOrdersParams {
     status?: string;
 }
 
+export interface CreateReturnRequestPayload {
+    orderItemId: string;
+    reason: string;
+    description?: string;
+    quantity?: number;
+    images?: string[];
+}
+
 /**
  * Create a new order
  */
@@ -102,5 +110,29 @@ export const cancelOrder = async (id: string, reason: string): Promise<OrderResp
  */
 export const updateOrderNotes = async (id: string, data: { deliveryInstructions?: string; specialRequests?: string }): Promise<OrderResponse> => {
     const response = await api.patch<OrderResponse>(`/customer/orders/${id}/notes`, data);
+    return response.data;
+};
+
+/**
+ * Create return request for an order item
+ */
+export const createReturnRequest = async (orderId: string, data: CreateReturnRequestPayload): Promise<OrderResponse> => {
+    const response = await api.post<OrderResponse>(`/customer/orders/${orderId}/returns`, data);
+    return response.data;
+};
+
+/**
+ * Get current customer's return requests
+ */
+export const getMyReturnRequests = async (params?: { orderId?: string; status?: string }): Promise<any> => {
+    const response = await api.get('/customer/returns', { params });
+    return response.data;
+};
+
+/**
+ * Get current customer's return request detail
+ */
+export const getMyReturnRequestById = async (returnId: string): Promise<any> => {
+    const response = await api.get(`/customer/returns/${returnId}`);
     return response.data;
 };

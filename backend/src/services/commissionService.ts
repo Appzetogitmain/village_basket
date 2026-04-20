@@ -191,7 +191,7 @@ export const createPendingCommissions = async (orderId: string) => {
         // Check if commissions already exist
         const existingCommissions = await Commission.find({ order: orderId });
         if (existingCommissions.length > 0) {
-            console.log(`Commissions already exist for order ${orderId}`);
+            console.log(`[Commission] Commissions already exist for order ${order.orderNumber} (ID: ${orderId})`);
             return;
         }
 
@@ -265,7 +265,7 @@ export const createPendingCommissions = async (orderId: string) => {
             const commissionAmount = (item.total * commissionRate) / 100;
             const netEarning = item.total - commissionAmount;
 
-            console.log(`[Commission] Item: ${product?.productName}, Rate: ${commissionRate}% (${rateSource}), Amount: ${commissionAmount}, Net: ${netEarning}`);
+            console.log(`[Commission] Order ${order.orderNumber} - Item: ${product?.productName}, Rate: ${commissionRate}% (${rateSource}), Amount: ${commissionAmount}, Net: ${netEarning}`);
 
             // Create commission record as PAID immediately
             const commission = await Commission.create({
@@ -293,10 +293,10 @@ export const createPendingCommissions = async (orderId: string) => {
             }
         }
 
-        console.log(`Commissions processed and credited for order ${orderId}`);
+        console.log(`[Commission] Commissions processed and credited for order ${order.orderNumber}`);
 
     } catch (error) {
-        console.error("Error creating commissions:", error);
+        console.error(`[Commission] Error creating commissions for order ${orderId}:`, error);
         throw error;
     }
 };
@@ -309,55 +309,105 @@ export const distributeCommissions = async (orderId: string) => {
     session.startTransaction();
 
     try {
-        const order = await Order.findById(orderId).session(session);
+        const order = await Order.findById(orderId).populate('items').session(session);
         if (!order) {
-            throw new Error('Order not found');
+            throw new Error(`Order ${orderId} not found`);
         }
 
-        // Check if order is delivered
+        // 1. Idempotency Check
+        if ((order as any).commissionsProcessed) {
+            console.log(`[Commission] Commissions already processed for order ${order.orderNumber}. Skipping.`);
+            await session.abortTransaction();
+            return { success: true, message: 'Commissions already processed' };
+        }
+
+        // 2. Order State Validation
         if (order.status !== 'Delivered') {
-            throw new Error('Commissions can only be distributed for delivered orders');
+            throw new Error(`Order ${order.orderNumber} is not marked as Delivered (Current status: ${order.status})`);
         }
 
-        // Find Pending commissions
-        const pendingCommissions = await Commission.find({ order: orderId, status: 'Pending' }).session(session);
+        console.log(`[Commission] Distributing commissions for order ${order.orderNumber}...`);
 
-        // If no pending commissions, maybe we missed creating them (e.g. legacy/error), try to create them now?
-        // Or if they are already Paid?
+        // 3. Find existing Pending commissions
+        let commissionsToProcess = await Commission.find({ 
+            order: orderId, 
+            status: 'Pending' 
+        }).session(session);
 
-        // Do not block here. We will check specifically for each type later.
+        // 4. Lazy Commission Creation (Fallback for COD/Wallet-paid orders where commissions weren't created on payment)
+        if (commissionsToProcess.length === 0) {
+            const alreadyProcessed = await Commission.countDocuments({ 
+                order: orderId, 
+                status: 'Paid' 
+            }).session(session);
 
-        let commissionsToProcess = pendingCommissions;
+            if (alreadyProcessed > 0 && !(order as any).commissionsProcessed) {
+                console.warn(`[Commission] Paid commissions found for order ${order.orderNumber} but processed flag was false. Fixing flag and continuing.`);
+            } else if (alreadyProcessed === 0) {
+                console.log(`[Commission] No commission records found for order ${order.orderNumber}. Attempting lazy creation...`);
+                
+                // --- Lazy Creation Logic for Sellers ---
+                for (const itemId of order.items) {
+                    const item = await OrderItem.findById(itemId).session(session);
+                    if (!item) continue;
 
-        if (pendingCommissions.length === 0) {
-            console.warn(`No pending commissions found for order ${orderId}, attempting to calculate now...`);
-            // Fallback: If for some reason they weren't created on payment, create them now directly as Paid?
-            // Or create as Pending and then Process.
-            // Since we are inside a transaction, calling the async createPendingCommissions (which doesn't take session) is risky.
-            // Better to fail or handle gracefully. For now, let's assume strict flow.
-            // Actually, let's allow "Lazy Creation" logic here if needed, but for now strict.
-            // Reverting to throw error might block delivery if data is missing.
-            // Let's implement inline calculation if missing (copy of logic) or just return if truly nothing to do.
-            console.log("Skipping commission distribution as no pending records found.");
-            // return { success: true, message: "No pending commissions to distribute" };
-            // Wait, if we return here, seller gets nothing. We SHOULD calculate if missing.
-            // But for this task, let's assume they will be created. 
-            // Ideally we should call `createPendingCommissions` here but pass the session.
+                    const seller = await Seller.findById(item.seller).session(session);
+                    if (!seller) continue;
+
+                    let commissionRate = 0;
+                    const product = await Product.findById(item.product).session(session);
+
+                    if (product) {
+                        // Check Category -> SubCategory -> SubSubCategory/Global hierarchy
+                        if (product.subSubCategory) {
+                             const subSubCat = await Category.findById(product.subSubCategory).session(session);
+                             if (subSubCat?.commissionRate && subSubCat.commissionRate > 0) commissionRate = subSubCat.commissionRate;
+                        }
+                        if (commissionRate === 0 && product.subcategory) {
+                             const subCat = await SubCategory.findById(product.subcategory).session(session);
+                             if (subCat?.commissionRate && subCat.commissionRate > 0) commissionRate = subCat.commissionRate;
+                        }
+                        if (commissionRate === 0 && product.category) {
+                             const cat = await Category.findById(product.category).session(session);
+                             if (cat?.commissionRate && cat.commissionRate > 0) commissionRate = cat.commissionRate;
+                        }
+                    }
+
+                    if (commissionRate === 0 && seller.commission > 0) commissionRate = seller.commission;
+                    if (commissionRate === 0) {
+                        const settings = await AppSettings.findOne().session(session);
+                        // @ts-ignore
+                        commissionRate = settings?.globalCommissionRate || 10;
+                    }
+
+                    const commissionAmount = (item.total * commissionRate) / 100;
+                    
+                    const newComm = await Commission.create([{
+                        order: orderId,
+                        orderItem: item._id,
+                        seller: item.seller,
+                        type: 'SELLER',
+                        orderAmount: item.total,
+                        commissionRate,
+                        commissionAmount,
+                        status: 'Pending', // Create as pending first, we will mark as paid below
+                    }], { session });
+                    
+                    commissionsToProcess.push(newComm[0]);
+                }
+            }
         }
 
         const processedCommissions: any[] = [];
-
-        // Group by Seller to credit wallet once per seller
         const sellerEarnings = new Map<string, { netAmount: number, commissionIds: string[] }>();
 
+        // 5. Process grouped commissions for Wallet Credit
         for (const comm of commissionsToProcess) {
-            // Update status to Paid
             comm.status = 'Paid';
             comm.paidAt = new Date();
             await comm.save({ session });
             processedCommissions.push(comm);
 
-            // Group for wallet credit
             if (comm.type === 'SELLER' && comm.seller) {
                 const sellerId = comm.seller.toString();
                 const netAmount = comm.orderAmount - comm.commissionAmount;
@@ -371,105 +421,95 @@ export const distributeCommissions = async (orderId: string) => {
             }
         }
 
-        // Credit Seller Wallets
+        // 6. Credit Seller Wallets
         for (const [sellerId, data] of sellerEarnings.entries()) {
-            await creditWallet(
+            const creditResult = await creditWallet(
                 sellerId,
                 'SELLER',
                 data.netAmount,
                 `Sale proceeds for order ${order.orderNumber}`,
                 orderId,
-                data.commissionIds[0], // Link to first commission for ref
+                data.commissionIds[0],
                 session
             );
+            if (!creditResult.success) {
+                throw new Error(`Failed to credit seller wallet (${sellerId}): ${creditResult.message}`);
+            }
         }
 
-        // Handle Delivery Boy Commission
-        // Check if commission exists for delivery boy
+        // 7. Handle Delivery Boy Commission (Lazy creation if missing)
         if (order.deliveryBoy) {
             const deliveryBoyId = order.deliveryBoy.toString();
-            const existingDeliveryComm = await Commission.findOne({
+            let deliveryComm = await Commission.findOne({
                 order: orderId,
                 type: 'DELIVERY_BOY'
             }).session(session);
 
-            if (!existingDeliveryComm) {
-                console.log(`Creating missing commission for Delivery Boy ${deliveryBoyId}`);
+            if (!deliveryComm || deliveryComm.status === 'Pending') {
+                if (!deliveryComm) {
+                    console.log(`[Commission] Order ${order.orderNumber} - Creating missing commission for Delivery Boy ${deliveryBoyId}`);
+                    let commissionAmount = 0;
+                    let commissionRate = 0;
+                    let usedDistanceBased = false;
 
-                // Calculate Commission Logic (Copied from calculateOrderCommissions)
-                let commissionAmount = 0;
-                let commissionRate = 0;
-                let usedDistanceBased = false;
-
-                try {
-                    // @ts-ignore
-                    const settings = await AppSettings.getSettings();
-                    if (settings &&
-                        settings.deliveryConfig?.isDistanceBased === true &&
-                        settings.deliveryConfig?.deliveryBoyKmRate &&
-                        order.deliveryDistanceKm &&
-                        order.deliveryDistanceKm > 0
-                    ) {
-                        commissionRate = settings.deliveryConfig.deliveryBoyKmRate;
-                        commissionAmount = order.deliveryDistanceKm * commissionRate;
-                        usedDistanceBased = true;
+                    try {
+                        const settings = await AppSettings.findOne().session(session);
+                        if (settings && 
+                            settings.deliveryConfig?.isDistanceBased === true && 
+                            order.deliveryDistanceKm > 0) {
+                            commissionRate = settings.deliveryConfig.deliveryBoyKmRate || 0;
+                            commissionAmount = order.deliveryDistanceKm * commissionRate;
+                            usedDistanceBased = true;
+                        }
+                    } catch (err) {
+                        console.error(`[Commission] Order ${order.orderNumber} - Error fetching settings for DB commission:`, err);
                     }
-                } catch (err) {
-                    console.error("Error checking settings for commission:", err);
+
+                    if (!usedDistanceBased) {
+                        commissionRate = await getDeliveryBoyCommissionRate(deliveryBoyId);
+                        commissionAmount = (order.subtotal * commissionRate) / 100;
+                    }
+
+                    const newDBComm = await Commission.create([{
+                        order: order._id,
+                        deliveryBoy: order.deliveryBoy,
+                        type: 'DELIVERY_BOY',
+                        orderAmount: usedDistanceBased ? (order.deliveryDistanceKm || 0) : order.subtotal,
+                        commissionRate,
+                        commissionAmount: Math.round(commissionAmount * 100) / 100,
+                        status: 'Paid',
+                        paidAt: new Date()
+                    }], { session });
+                    deliveryComm = newDBComm[0];
+                } else {
+                    deliveryComm.status = 'Paid';
+                    deliveryComm.paidAt = new Date();
+                    await deliveryComm.save({ session });
                 }
 
-                if (!usedDistanceBased) {
-                    // Fallback to percentage based logic
-                    const { getDeliveryBoyCommissionRate } = await import('./commissionService');
-                    commissionRate = await getDeliveryBoyCommissionRate(deliveryBoyId);
-                    commissionAmount = (order.subtotal * commissionRate) / 100;
+                processedCommissions.push(deliveryComm);
+
+                const dbCreditResult = await creditWallet(
+                    deliveryBoyId,
+                    'DELIVERY_BOY',
+                    deliveryComm.commissionAmount,
+                    `Delivery earning for order ${order.orderNumber}`,
+                    orderId,
+                    deliveryComm._id.toString(),
+                    session
+                );
+                if (!dbCreditResult.success) {
+                    throw new Error(`Failed to credit delivery boy wallet: ${dbCreditResult.message}`);
                 }
-
-                // Create Commission Record
-                const newComm = await Commission.create([{
-                    order: order._id,
-                    deliveryBoy: order.deliveryBoy,
-                    type: 'DELIVERY_BOY',
-                    orderAmount: usedDistanceBased ? (order.deliveryDistanceKm || 0) : order.subtotal,
-                    commissionRate,
-                    commissionAmount: Math.round(commissionAmount * 100) / 100,
-                    status: 'Paid',
-                    paidAt: new Date()
-                }], { session });
-
-                const comm = newComm[0];
-                processedCommissions.push(comm);
-
-                // Credit Wallet Immediately
-                await creditWallet(
-                    deliveryBoyId,
-                    'DELIVERY_BOY',
-                    comm.commissionAmount,
-                    `Delivery earning for order ${order.orderNumber}`,
-                    orderId,
-                    comm._id.toString(),
-                    session
-                );
-            } else if (existingDeliveryComm.status === 'Pending') {
-                // If it existed as pending, mark as paid and credit
-                existingDeliveryComm.status = 'Paid';
-                existingDeliveryComm.paidAt = new Date();
-                await existingDeliveryComm.save({ session });
-                processedCommissions.push(existingDeliveryComm);
-
-                await creditWallet(
-                    deliveryBoyId,
-                    'DELIVERY_BOY',
-                    existingDeliveryComm.commissionAmount,
-                    `Delivery earning for order ${order.orderNumber}`,
-                    orderId,
-                    existingDeliveryComm._id.toString(),
-                    session
-                );
             }
         }
 
+        // 8. Mark Order as Processed (Idempotency Flag)
+        (order as any).commissionsProcessed = true;
+        await order.save({ session });
+
         await session.commitTransaction();
+        console.log(`[Commission] Successfully distributed commissions for order ${order.orderNumber}`);
 
         return {
             success: true,
@@ -480,7 +520,7 @@ export const distributeCommissions = async (orderId: string) => {
         };
     } catch (error: any) {
         await session.abortTransaction();
-        console.error('Error distributing commissions:', error);
+        console.error(`[Commission] CRITICAL FAILURE for order ${orderId}:`, error);
         return {
             success: false,
             message: error.message || 'Failed to distribute commissions',
@@ -539,7 +579,7 @@ export const getCommissionSummary = async (
             data: summary,
         };
     } catch (error: any) {
-        console.error('Error getting commission summary:', error);
+        console.error(`[Commission] Error getting commission summary for user ${userId}:`, error);
         return {
             success: false,
             message: error.message || 'Failed to get commission summary',
@@ -597,7 +637,7 @@ export const reverseCommissions = async (orderId: string) => {
         };
     } catch (error: any) {
         await session.abortTransaction();
-        console.error('Error reversing commissions:', error);
+        console.error(`[Commission] Error reversing commissions for order ${orderId}:`, error);
         return {
             success: false,
             message: error.message || 'Failed to reverse commissions',

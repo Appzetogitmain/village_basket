@@ -105,6 +105,7 @@ export interface IOrder extends Document {
   cancelledAt?: Date;
   cancelledBy?: mongoose.Types.ObjectId;
   isRefunded?: boolean;
+  commissionsProcessed?: boolean;
 
   // Donation
   donationAmount?: number;
@@ -385,6 +386,10 @@ const OrderSchema = new Schema<IOrder>(
       type: Boolean,
       default: false,
     },
+    commissionsProcessed: {
+      type: Boolean,
+      default: false,
+    },
     donationAmount: {
       type: Number,
       default: 0,
@@ -399,11 +404,31 @@ const OrderSchema = new Schema<IOrder>(
 // Generate order number before validation
 OrderSchema.pre("validate", async function (this: IOrder, next) {
   if (!this.orderNumber) {
-    const timestamp = Date.now().toString();
-    const random = Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, "0");
-    this.orderNumber = `ORD${timestamp}${random}`;
+    let isUnique = false;
+    let newOrderNumber = "";
+    
+    // Try up to 10 times to find a unique 8-digit order number
+    let attempts = 0;
+    while (!isUnique && attempts < 10) {
+      // Generate 8 digit random number
+      newOrderNumber = Math.floor(10000000 + Math.random() * 90000000).toString();
+      
+      // Check if this orderNumber already exists
+      const existingOrder = await mongoose.models.Order.findOne({ orderNumber: newOrderNumber });
+      if (!existingOrder) {
+        isUnique = true;
+      }
+      attempts++;
+    }
+    
+    // Fallback if somehow 10 attempts fail (highly unlikely with 8 digits)
+    if (!isUnique) {
+      const timestamp = Date.now().toString().slice(-5);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
+      newOrderNumber = `${timestamp}${random}`;
+    }
+    
+    this.orderNumber = newOrderNumber;
   }
   next();
 });

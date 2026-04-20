@@ -28,7 +28,7 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
 
   return (
     <div 
-      className="flex min-h-screen font-poppins relative"
+      className={`flex min-h-screen font-poppins relative ${activeNotification ? 'overflow-hidden h-screen' : ''}`}
       style={{
         backgroundColor: 'var(--village-cream, #FAF7F2)',
       }}
@@ -69,7 +69,7 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
         <SellerHeader onMenuClick={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto scrollbar-hide p-3 sm:p-4 md:p-6 bg-transparent">{children}</main>
+        <main className={`flex-1 ${activeNotification ? 'overflow-hidden' : 'overflow-y-auto'} scrollbar-hide p-3 sm:p-4 md:p-6 bg-transparent`}>{children}</main>
       </div>
     </div>
   );

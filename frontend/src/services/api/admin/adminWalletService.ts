@@ -129,3 +129,16 @@ export const getSellerTransactions = async (
   );
   return response.data;
 };
+
+/**
+ * Create Fund Transfer
+ */
+export const createFundTransfer = async (
+  data: { userId: string; userType: string; amount: number; type: string; description: string; }
+): Promise<ApiResponse<any>> => {
+  const response = await api.post<ApiResponse<any>>(
+    "/admin/wallet/fund-transfer",
+    data
+  );
+  return response.data;
+};

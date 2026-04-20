@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSellerProfile, updateSellerProfile } from '../../../services/api/auth/sellerAuthService';
 import { useAuth } from '../../../context/AuthContext';
@@ -7,9 +8,52 @@ import GoogleMapsAutocomplete from '../../../components/GoogleMapsAutocomplete';
 import LocationPickerMap from '../../../components/LocationPickerMap';
 import { sendTestNotification } from '../../../services/pushNotificationService';
 import { useToast } from '../../../context/ToastContext';
+import { uploadImage } from '../../../services/api/uploadService';
+
+const isCoordinateString = (value?: string) => {
+    if (!value) return false;
+    return /^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/.test(value);
+};
+
+const cleanResolvedAddress = (address: string): string => {
+    if (!address) return address;
+    return address
+        .replace(/^[A-Z0-9]{2,4}\+[A-Z0-9]{2,4}([,\s]+)?/i, '')
+        .replace(/([,\s]+)?[A-Z0-9]{2,4}\+[A-Z0-9]{2,4}$/i, '')
+        .replace(/\s{2,}/g, ' ')
+        .replace(/,\s*,+/g, ',')
+        .replace(/^[,\s]+|[,\s]+$/g, '')
+        .trim();
+};
+
+const reverseGeocodeLatLng = async (lat: number, lng: number): Promise<string> => {
+    try {
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+        if (!apiKey) return '';
+
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        const formatted = data?.results?.[0]?.formatted_address || '';
+        return cleanResolvedAddress(formatted);
+    } catch (error) {
+        console.error('Reverse geocoding failed:', error);
+        return '';
+    }
+};
+
+const getReadableLocation = (data: any) => {
+    const searchLocation = data?.searchLocation || '';
+    const address = data?.address || '';
+
+    if (searchLocation && !isCoordinateString(searchLocation)) return searchLocation;
+    if (address && !isCoordinateString(address)) return address;
+    return '';
+};
 
 const SellerAccountSettings = () => {
     const { user, updateUser } = useAuth();
+    const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState('profile');
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -18,6 +62,15 @@ const SellerAccountSettings = () => {
     const [saveLoading, setSaveLoading] = useState(false);
     const { showToast } = useToast();
     const [testNotifLoading, setTestNotifLoading] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [profileUploading, setProfileUploading] = useState(false);
+    const [logoUploading, setLogoUploading] = useState(false);
+    const [bannerUploading, setBannerUploading] = useState(false);
+    const [editingSnapshot, setEditingSnapshot] = useState<any | null>(null);
+    const profileInputRef = useRef<HTMLInputElement>(null);
+    const logoInputRef = useRef<HTMLInputElement>(null);
+    const bannerInputRef = useRef<HTMLInputElement>(null);
+    const reverseGeocodeTimerRef = useRef<number | null>(null);
 
     // Initial state with empty values
     const [sellerData, setSellerData] = useState({
@@ -51,6 +104,19 @@ const SellerAccountSettings = () => {
     useEffect(() => {
         fetchProfile();
         fetchCategories();
+        
+        const tab = searchParams.get('tab');
+        if (tab && ['profile', 'store', 'branding', 'bank'].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
+
+    useEffect(() => {
+        return () => {
+            if (reverseGeocodeTimerRef.current) {
+                window.clearTimeout(reverseGeocodeTimerRef.current);
+            }
+        };
     }, []);
 
     const fetchCategories = async () => {
@@ -70,13 +136,63 @@ const SellerAccountSettings = () => {
                 const data = response.data;
                 // Map location data to state
                 const locationCoords = data.location?.coordinates || [];
+                const readableLocation = getReadableLocation(data);
+                const latitude = data.latitude || (locationCoords[1]?.toString() || '');
+                const longitude = data.longitude || (locationCoords[0]?.toString() || '');
                 setSellerData({
                     ...data,
-                    latitude: data.latitude || (locationCoords[1]?.toString() || ''),
-                    longitude: data.longitude || (locationCoords[0]?.toString() || ''),
-                    searchLocation: data.searchLocation || data.address || '',
+                    latitude,
+                    longitude,
+                    searchLocation: readableLocation,
+                    address: readableLocation || data.address || '',
                     serviceRadiusKm: (data.serviceRadiusKm || 10).toString(),
                 });
+                setEditingSnapshot({
+                    ...data,
+                    latitude,
+                    longitude,
+                    searchLocation: readableLocation,
+                    address: readableLocation || data.address || '',
+                    serviceRadiusKm: (data.serviceRadiusKm || 10).toString(),
+                });
+
+                if (updateUser) {
+                    updateUser({
+                        ...user,
+                        ...data,
+                        latitude,
+                        longitude,
+                        address: readableLocation || (isCoordinateString(data.address) ? '' : data.address),
+                        id: data._id || user?.id
+                    });
+                }
+
+                // If old data stores only coordinates, resolve and show exact address.
+                if (!readableLocation && latitude && longitude) {
+                    const latNum = parseFloat(latitude);
+                    const lngNum = parseFloat(longitude);
+                    if (!Number.isNaN(latNum) && !Number.isNaN(lngNum)) {
+                        const resolvedAddress = await reverseGeocodeLatLng(latNum, lngNum);
+                        if (resolvedAddress) {
+                            setSellerData(prev => ({ ...prev, searchLocation: resolvedAddress, address: resolvedAddress }));
+                            if (updateUser) {
+                                updateUser({
+                                    ...user,
+                                    ...data,
+                                    latitude,
+                                    longitude,
+                                    address: resolvedAddress,
+                                    id: data._id || user?.id
+                                });
+                            }
+                            setEditingSnapshot((prev: any) => prev ? ({
+                                ...prev,
+                                searchLocation: resolvedAddress,
+                                address: resolvedAddress,
+                            }) : prev);
+                        }
+                    }
+                }
             } else {
                 setError(response.message || 'Failed to fetch profile');
             }
@@ -88,11 +204,172 @@ const SellerAccountSettings = () => {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+        const { name } = e.target;
+        let { value } = e.target;
+
+        if (name === 'accountName' || name === 'bankName') {
+            // Allow only letters and spaces, collapse repeated spaces.
+            value = value.replace(/[^A-Za-z\s]/g, '').replace(/\s{2,}/g, ' ');
+        }
+        if (name === 'accountNumber') {
+            // Allow only digits and cap to 15 digits.
+            value = value.replace(/\D/g, '').slice(0, 15);
+        }
+        if (name === 'ifsc') {
+            // IFSC: 11 chars, uppercase alphanumeric only.
+            value = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11);
+        }
+        if (name === 'taxNumber') {
+            // Tax Number (GST): 15 chars, uppercase alphanumeric only.
+            value = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
+        }
+        if (name === 'panCard') {
+            // PAN Card: 10 chars, uppercase alphanumeric only.
+            value = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+        }
+
         setSellerData(prev => ({
             ...prev,
             [name]: value
         }));
+        setFieldErrors(prev => ({
+            ...prev,
+            [name]: ''
+        }));
+    };
+
+    const validateField = (name: string, value: string) => {
+        if ((name === 'accountName' || name === 'bankName') && value && !/^[A-Za-z\s]+$/.test(value)) {
+            const fieldLabel = name === 'accountName' ? 'Account name' : 'Bank name';
+            return `${fieldLabel} must contain only letters and spaces`;
+        }
+        if (name === 'accountNumber' && value && !/^\d{9,15}$/.test(value)) {
+            return 'Account number must be 9 to 15 digits';
+        }
+        if (name === 'ifsc' && value && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(value)) {
+            return 'IFSC code must be in valid format (e.g., SBIN0001234)';
+        }
+        if (name === 'taxNumber' && value && value.length !== 15) {
+            return 'Tax number (GST) must be exactly 15 characters';
+        }
+        if (name === 'panCard' && value && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
+            return 'PAN card must be in valid format (e.g., ABCDE1234F)';
+        }
+        return '';
+    };
+
+    const handleFieldBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        const message = validateField(name, value);
+        setFieldErrors(prev => ({
+            ...prev,
+            [name]: message
+        }));
+    };
+
+    const handleProfileImagePick = () => {
+        if (!isEditing || profileUploading) return;
+        profileInputRef.current?.click();
+    };
+
+    const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showToast('Please select a valid image file', 'error');
+            e.target.value = '';
+            return;
+        }
+
+        try {
+            setProfileUploading(true);
+            const result = await uploadImage(file, 'villagebasket/seller/profile');
+            const imageUrl = result.secureUrl || result.url;
+
+            setSellerData(prev => ({
+                ...prev,
+                profile: imageUrl,
+            }));
+
+            showToast('Profile photo uploaded successfully', 'success');
+        } catch (err: any) {
+            const message = err?.response?.data?.message || err?.message || 'Failed to upload profile photo';
+            showToast(message, 'error');
+        } finally {
+            setProfileUploading(false);
+            e.target.value = '';
+        }
+    };
+
+    const handleLogoPick = () => {
+        if (!isEditing || logoUploading) return;
+        logoInputRef.current?.click();
+    };
+
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showToast('Please select a valid image file', 'error');
+            e.target.value = '';
+            return;
+        }
+
+        try {
+            setLogoUploading(true);
+            const result = await uploadImage(file, 'villagebasket/seller/logo');
+            const imageUrl = result.secureUrl || result.url;
+
+            setSellerData(prev => ({
+                ...prev,
+                logo: imageUrl,
+            }));
+
+            showToast('Store photo uploaded successfully', 'success');
+        } catch (err: any) {
+            const message = err?.response?.data?.message || err?.message || 'Failed to upload store photo';
+            showToast(message, 'error');
+        } finally {
+            setLogoUploading(false);
+            e.target.value = '';
+        }
+    };
+
+    const handleBannerPick = () => {
+        if (!isEditing || bannerUploading) return;
+        bannerInputRef.current?.click();
+    };
+
+    const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showToast('Please select a valid image file', 'error');
+            e.target.value = '';
+            return;
+        }
+
+        try {
+            setBannerUploading(true);
+            const result = await uploadImage(file, 'villagebasket/seller/banner');
+            const imageUrl = result.secureUrl || result.url;
+
+            setSellerData(prev => ({
+                ...prev,
+                storeBanner: imageUrl,
+            }));
+
+            showToast('Store banner uploaded successfully', 'success');
+        } catch (err: any) {
+            const message = err?.response?.data?.message || err?.message || 'Failed to upload store banner';
+            showToast(message, 'error');
+        } finally {
+            setBannerUploading(false);
+            e.target.value = '';
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -100,6 +377,27 @@ const SellerAccountSettings = () => {
         try {
             setSaveLoading(true);
             setError('');
+
+            const accountNameError = validateField('accountName', sellerData.accountName);
+            const bankNameError = validateField('bankName', sellerData.bankName);
+            const accountNumberError = validateField('accountNumber', sellerData.accountNumber);
+            const ifscError = validateField('ifsc', sellerData.ifsc);
+            const taxNumberError = validateField('taxNumber', sellerData.taxNumber);
+            const panCardError = validateField('panCard', sellerData.panCard);
+            
+            if (accountNameError || bankNameError || accountNumberError || ifscError || taxNumberError || panCardError) {
+                setFieldErrors(prev => ({
+                    ...prev,
+                    accountName: accountNameError,
+                    bankName: bankNameError,
+                    accountNumber: accountNumberError,
+                    ifsc: ifscError,
+                    taxNumber: taxNumberError,
+                    panCard: panCardError,
+                }));
+                setSaveLoading(false);
+                return;
+            }
 
             // Validate location if address is being updated
             if (sellerData.searchLocation && (!sellerData.latitude || !sellerData.longitude)) {
@@ -126,11 +424,21 @@ const SellerAccountSettings = () => {
                 setIsEditing(false);
                 const data = response.data;
                 const locationCoords = data.location?.coordinates || [];
+                const readableLocation = getReadableLocation(data);
                 setSellerData({
                     ...data,
                     latitude: data.latitude || (locationCoords[1]?.toString() || ''),
                     longitude: data.longitude || (locationCoords[0]?.toString() || ''),
-                    searchLocation: data.searchLocation || data.address || '',
+                    searchLocation: readableLocation,
+                    address: readableLocation || data.address || '',
+                    serviceRadiusKm: (data.serviceRadiusKm || 10).toString(),
+                });
+                setEditingSnapshot({
+                    ...data,
+                    latitude: data.latitude || (locationCoords[1]?.toString() || ''),
+                    longitude: data.longitude || (locationCoords[0]?.toString() || ''),
+                    searchLocation: readableLocation,
+                    address: readableLocation || data.address || '',
                     serviceRadiusKm: (data.serviceRadiusKm || 10).toString(),
                 });
                 if (updateUser) {
@@ -141,6 +449,7 @@ const SellerAccountSettings = () => {
                     });
                 }
                 setError('');
+                setFieldErrors({});
             } else {
                 setError(response.message || 'Failed to update profile');
             }
@@ -149,6 +458,15 @@ const SellerAccountSettings = () => {
         } finally {
             setSaveLoading(false);
         }
+    };
+
+    const handleCancelEditing = () => {
+        if (editingSnapshot) {
+            setSellerData(editingSnapshot);
+        }
+        setFieldErrors({});
+        setIsEditing(false);
+        setError(null);
     };
 
     const handleTestNotification = async () => {
@@ -227,7 +545,14 @@ const SellerAccountSettings = () => {
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            onClick={() => setIsEditing(!isEditing)}
+                            onClick={() => {
+                                if (isEditing) {
+                                    handleCancelEditing();
+                                } else {
+                                    setEditingSnapshot(sellerData);
+                                    setIsEditing(true);
+                                }
+                            }}
                             className={`px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 shadow-sm flex items-center gap-2 ${isEditing
                                 ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
                                 : 'bg-[#8B3D28] text-white hover:bg-[#723221] hover:shadow-md'
@@ -322,6 +647,13 @@ const SellerAccountSettings = () => {
                                             <div className="space-y-8">
                                                 <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-neutral-100">
                                                     <div className="relative group">
+                                                        <input
+                                                            ref={profileInputRef}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="hidden"
+                                                            onChange={handleProfileImageUpload}
+                                                        />
                                                         <div className="absolute inset-0 bg-gradient-to-tr from-[#8B3D28] to-[#8B3D28] rounded-full blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
                                                         <img
                                                             src={sellerData.profile || 'https://placehold.co/150'}
@@ -329,12 +661,17 @@ const SellerAccountSettings = () => {
                                                             className="relative w-32 h-32 rounded-full object-cover border-4 border-white shadow-md bg-white/90 backdrop-blur-md border-white/20"
                                                         />
                                                         {isEditing && (
-                                                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm z-10">
+                                                            <button
+                                                                type="button"
+                                                                onClick={handleProfileImagePick}
+                                                                disabled={profileUploading}
+                                                                className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm z-10 disabled:cursor-not-allowed"
+                                                            >
                                                                 <span className="text-white text-xs font-bold uppercase tracking-wider flex flex-col items-center gap-1">
                                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                                                    Change
+                                                                    {profileUploading ? 'Uploading...' : 'Change'}
                                                                 </span>
-                                                            </div>
+                                                            </button>
                                                         )}
                                                     </div>
                                                     <div className="text-center sm:text-left">
@@ -389,6 +726,13 @@ const SellerAccountSettings = () => {
                                             <div className="space-y-8">
                                                 <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-neutral-100">
                                                     <div className="relative group flex-shrink-0">
+                                                        <input
+                                                            ref={logoInputRef}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="hidden"
+                                                            onChange={handleLogoUpload}
+                                                        />
                                                         <div className="w-20 h-20 rounded-xl bg-neutral-50 border border-neutral-200 flex items-center justify-center overflow-hidden">
                                                             <img
                                                                 src={sellerData.logo || 'https://placehold.co/100'}
@@ -397,9 +741,16 @@ const SellerAccountSettings = () => {
                                                             />
                                                         </div>
                                                         {isEditing && (
-                                                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl cursor-pointer opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm">
-                                                                <span className="text-white text-xs font-bold">UPLOAD</span>
-                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={handleLogoPick}
+                                                                disabled={logoUploading}
+                                                                className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl cursor-pointer opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm disabled:cursor-not-allowed"
+                                                            >
+                                                                <span className="text-white text-xs font-bold">
+                                                                    {logoUploading ? 'UPLOADING...' : 'UPLOAD'}
+                                                                </span>
+                                                            </button>
                                                         )}
                                                     </div>
                                                     <div>
@@ -471,6 +822,20 @@ const SellerAccountSettings = () => {
                                                                                 latitude: lat.toString(),
                                                                                 longitude: lng.toString()
                                                                             }));
+
+                                                                            if (reverseGeocodeTimerRef.current) {
+                                                                                window.clearTimeout(reverseGeocodeTimerRef.current);
+                                                                            }
+                                                                            reverseGeocodeTimerRef.current = window.setTimeout(async () => {
+                                                                                const resolvedAddress = await reverseGeocodeLatLng(lat, lng);
+                                                                                if (resolvedAddress) {
+                                                                                    setSellerData(prev => ({
+                                                                                        ...prev,
+                                                                                        searchLocation: resolvedAddress,
+                                                                                        address: resolvedAddress,
+                                                                                    }));
+                                                                                }
+                                                                            }, 450);
                                                                         }}
                                                                     />
                                                                     <p className="mt-1 text-xs text-neutral-500 text-center">
@@ -525,20 +890,37 @@ const SellerAccountSettings = () => {
                                                 <div className="space-y-3">
                                                     <label className="text-xs font-black text-neutral-700 ml-1 uppercase tracking-wider">Store Banner</label>
                                                     <div className="relative group rounded-xl overflow-hidden bg-neutral-100 border-2 border-dashed border-neutral-300 aspect-[21/9] transition-all hover:border-[#8B3D28]">
+                                                        <input
+                                                            ref={bannerInputRef}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="hidden"
+                                                            onChange={handleBannerUpload}
+                                                        />
                                                         <img
                                                             src={sellerData.storeBanner || 'https://placehold.co/1200x400?text=Store+Banner'}
                                                             alt="Store Banner"
                                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                                         />
                                                         {isEditing && (
-                                                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm">
+                                                            <button
+                                                                type="button"
+                                                                onClick={handleBannerPick}
+                                                                disabled={bannerUploading}
+                                                                className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm disabled:cursor-not-allowed"
+                                                            >
                                                                 <div className="bg-white/20 p-4 rounded-full border border-white/30 backdrop-blur-md">
                                                                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                                                                 </div>
-                                                            </div>
+                                                                {bannerUploading && (
+                                                                    <span className="absolute bottom-4 text-white text-xs font-bold uppercase tracking-wider">
+                                                                        Uploading...
+                                                                    </span>
+                                                                )}
+                                                            </button>
                                                         )}
                                                     </div>
-                                                    <p className="text-xs text-neutral-400 ml-1">Recommended size: 1200x400px. Supports JPG, PNG.</p>
+                                                    <p className="text-xs text-neutral-400 ml-1">Recommended size: 1200x400px. Supports JPG, PNG. Max file size: 5MB.</p>
                                                 </div>
 
                                                 <div className="space-y-3">
@@ -569,10 +951,10 @@ const SellerAccountSettings = () => {
                                                         <h4 className="text-base font-black text-village-umber">Bank Details</h4>
                                                     </div>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-neutral-50/50 p-5 rounded-xl border border-neutral-100">
-                                                        <InputGroup label="Account Holder Name" name="accountName" value={sellerData.accountName} onChange={handleInputChange} disabled={!isEditing} />
-                                                        <InputGroup label="Bank Name" name="bankName" value={sellerData.bankName} onChange={handleInputChange} disabled={!isEditing} />
-                                                        <InputGroup label="Account Number" name="accountNumber" value={sellerData.accountNumber} onChange={handleInputChange} disabled={!isEditing} />
-                                                        <InputGroup label="IFSC Code" name="ifsc" value={sellerData.ifsc} onChange={handleInputChange} disabled={!isEditing} />
+                                                        <InputGroup label="Account Holder Name" name="accountName" value={sellerData.accountName} onChange={handleInputChange} onBlur={handleFieldBlur} error={fieldErrors.accountName} disabled={!isEditing} />
+                                                        <InputGroup label="Bank Name" name="bankName" value={sellerData.bankName} onChange={handleInputChange} onBlur={handleFieldBlur} error={fieldErrors.bankName} disabled={!isEditing} />
+                                                        <InputGroup label="Account Number" name="accountNumber" value={sellerData.accountNumber} onChange={handleInputChange} onBlur={handleFieldBlur} error={fieldErrors.accountNumber} disabled={!isEditing} />
+                                                        <InputGroup label="IFSC Code" name="ifsc" value={sellerData.ifsc} onChange={handleInputChange} onBlur={handleFieldBlur} error={fieldErrors.ifsc} disabled={!isEditing} />
                                                     </div>
                                                 </section>
 
@@ -584,8 +966,8 @@ const SellerAccountSettings = () => {
                                                         <h4 className="text-base font-black text-village-umber">Tax Information</h4>
                                                     </div>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-neutral-50/50 p-5 rounded-xl border border-neutral-100">
-                                                        <InputGroup label="PAN Card Number" name="panCard" value={sellerData.panCard} onChange={handleInputChange} disabled={!isEditing} />
-                                                        <InputGroup label="Tax Number (GST)" name="taxNumber" value={sellerData.taxNumber} onChange={handleInputChange} disabled={!isEditing} />
+                                                        <InputGroup label="PAN Card Number" name="panCard" value={sellerData.panCard} onChange={handleInputChange} onBlur={handleFieldBlur} error={fieldErrors.panCard} disabled={!isEditing} maxLength={10} />
+                                                        <InputGroup label="Tax Number (GST)" name="taxNumber" value={sellerData.taxNumber} onChange={handleInputChange} onBlur={handleFieldBlur} error={fieldErrors.taxNumber} disabled={!isEditing} maxLength={15} />
                                                     </div>
                                                 </section>
                                             </div>
@@ -600,7 +982,7 @@ const SellerAccountSettings = () => {
                                         >
                                             <button
                                                 type="button"
-                                                onClick={() => setIsEditing(false)}
+                                                onClick={handleCancelEditing}
                                                 className="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-white/90 backdrop-blur-md border-white/20 hover:shadow-sm border border-transparent hover:border-gray-200 transition-all"
                                             >
                                                 Cancel
@@ -629,7 +1011,7 @@ const SellerAccountSettings = () => {
     );
 };
 
-const InputGroup = ({ label, name, value, onChange, disabled, type = "text", placeholder = "", autoComplete }: any) => (
+const InputGroup = ({ label, name, value, onChange, onBlur, error, disabled, type = "text", placeholder = "", autoComplete, maxLength }: any) => (
 
     <div className="space-y-1.5">
         <label className="text-xs font-black text-neutral-700 ml-1 uppercase tracking-wider">{label}</label>
@@ -638,13 +1020,17 @@ const InputGroup = ({ label, name, value, onChange, disabled, type = "text", pla
             name={name}
             value={value || ''}
             onChange={onChange}
+            onBlur={onBlur}
             disabled={disabled}
             placeholder={placeholder}
             autoComplete={autoComplete}
+            inputMode={name === 'accountNumber' ? 'numeric' : undefined}
+            maxLength={maxLength || (name === 'accountNumber' ? 15 : undefined)}
             className={`w-full px-4 py-2.5 rounded-lg border border-neutral-200 focus:ring-2 focus:ring-[#8B3D28]/20 focus:border-[#8B3D28] outline-none transition-all text-sm ${disabled ? 'bg-neutral-50/80 text-neutral-500 cursor-default' : 'bg-white'
 
             }`}
         />
+        {error ? <p className="text-xs text-red-600 ml-1">{error}</p> : null}
     </div>
 );
 

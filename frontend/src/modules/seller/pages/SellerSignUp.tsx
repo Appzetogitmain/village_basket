@@ -204,6 +204,10 @@ export default function SellerSignUp() {
       setError('Please enter your GSTIN');
       return;
     }
+    if (formData.taxNumber.length !== 15) {
+      setError('GSTIN should be 15 alphanumeric characters');
+      return;
+    }
 
     // 8. IFSC Code: SBIN0001234 format (4 letters, 0, 6 chars)
     if (!formData.ifsc) {

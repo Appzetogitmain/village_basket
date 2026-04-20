@@ -76,6 +76,7 @@ export default function DeliveryMenu() {
       // Clear all delivery related session data
       logout(); // This handles tokens and user object in the global state
       localStorage.removeItem("delivery_user_name");
+      localStorage.removeItem("delivery_user_profile_image");
       
       // Navigate to login with replace to prevent going back to the menu
       navigate("/delivery/login", { replace: true });

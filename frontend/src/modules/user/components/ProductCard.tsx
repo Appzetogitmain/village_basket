@@ -85,6 +85,15 @@ export default function ProductCard({
   const defaultVarId = defaultVariation ? getIdStr(defaultVariation._id || (defaultVariation as any).id) : null;
   const defaultVarTitle = defaultVariation ? (defaultVariation.value || defaultVariation.name || defaultVariation.title) : (product.pack || null);
 
+  const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+  const isDefaultVariationOutOfStock = defaultVariation && defaultVariation.stock !== undefined && defaultVariation.stock <= 0;
+  
+  // If there's only 1 variation or no variations, we can determine stock status immediately
+  const isSoldOut = product.variations && product.variations.length > 0
+    ? (product.variations.length === 1 && isDefaultVariationOutOfStock)
+    : isOutOfStock;
+
+  const isActuallyDisabled = product.isAvailable === false || isSoldOut;
 
   // Get quantity in cart - properly matching the default variation for this card
   const cartItem = cart.items.find((item) => {
@@ -105,7 +114,12 @@ export default function ProductCard({
     }
     return true;
   });
+
+  const currentStock = product.variations && product.variations.length > 0 
+    ? (defaultVariation?.stock ?? 0) 
+    : (product.stock ?? 0);
   const inCartQty = cartItem?.quantity || 0;
+  const canIncrease = inCartQty < currentStock;
 
   // Get Price and MRP using utility
   const { displayPrice, mrp, discount } = calculateProductPrice(product, undefined, user?.customerType);
@@ -125,6 +139,11 @@ export default function ProductCard({
 
     // Prevent any operation while another is in progress
     if (isOperationPendingRef.current) {
+      return;
+    }
+
+    if (!canIncrease) {
+      showToast('Maximum available quantity reached', 'error');
       return;
     }
 
@@ -319,11 +338,11 @@ export default function ProductCard({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     ref={addButtonRef}
-                    disabled={product.isAvailable === false}
+                    disabled={isActuallyDisabled}
                     onClick={handleCustomAdd}
-                    className="bg-white/95 backdrop-blur-sm text-[#4b7d5a] border-2 border-[#4b7d5a] text-[10px] font-black px-3 py-1 rounded shadow-md hover:bg-white transition-colors uppercase tracking-wider"
+                    className="bg-white/95 backdrop-blur-sm text-[#4b7d5a] border-2 border-[#4b7d5a] text-[10px] font-black px-3 py-1 rounded shadow-md hover:bg-white transition-colors uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Add
+                    {isSoldOut ? 'Out of Stock' : 'Add'}
                   </motion.button>
                 ) : (
                   <motion.div
@@ -350,7 +369,8 @@ export default function ProductCard({
                     />
                     <button
                       onClick={handleIncrease}
-                      className="w-4 h-4 flex items-center justify-center text-white font-bold text-lg active:scale-90 transition-transform leading-none"
+                      disabled={!canIncrease}
+                      className="w-4 h-4 flex items-center justify-center text-white font-bold text-lg active:scale-90 transition-transform leading-none disabled:opacity-50 disabled:cursor-not-allowed"
                     >+</button>
                   </motion.div>
                 )}
@@ -417,14 +437,14 @@ export default function ProductCard({
               {inCartQty === 0 ? (
                 <button
                   ref={addButtonRef}
-                  disabled={product.isAvailable === false}
+                  disabled={isActuallyDisabled}
                   onClick={handleCustomAdd}
-                  className={`w-full h-8 md:h-10 rounded-xl text-[10px] md:text-sm font-black uppercase tracking-widest transition-all active:scale-95 ${product.isAvailable === false
+                  className={`w-full h-8 md:h-10 rounded-xl text-[10px] md:text-sm font-black uppercase tracking-widest transition-all active:scale-95 ${isActuallyDisabled
                     ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed uppercase border-none'
                     : 'bg-[#4b7d5a] text-white md:bg-white md:border-[1.5px] md:border-[#4b7d5a] md:text-[#4b7d5a] md:shadow-none md:hover:bg-[#4b7d5a] md:hover:text-white translate-z-0'
                     }`}
                 >
-                  {product.isAvailable === false ? 'Out' : 'Add'}
+                  {isActuallyDisabled ? (isSoldOut ? 'Out of Stock' : 'Out') : 'Add'}
                 </button>
               ) : (
                 <div className="flex items-center justify-between bg-[#4b7d5a]/5 rounded-xl border border-[#4b7d5a]/10 h-8 md:h-10 px-1 shadow-inner">
@@ -445,7 +465,8 @@ export default function ProductCard({
                   />
                   <button
                     onClick={handleIncrease}
-                    className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-[#4b7d5a] text-white shadow-md flex items-center justify-center font-bold text-lg active:scale-90 transition-transform"
+                    disabled={!canIncrease}
+                    className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-[#4b7d5a] text-white shadow-md flex items-center justify-center font-bold text-lg active:scale-90 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
                   >+</button>
                 </div>
               )}

@@ -27,6 +27,21 @@ export default function Search() {
     setLocalSearchQuery(searchQuery);
   }, [searchQuery]);
 
+  // Debounced Search Logic
+  useEffect(() => {
+    if (localSearchQuery.trim() === searchQuery) return;
+
+    const timer = setTimeout(() => {
+      if (localSearchQuery.trim()) {
+        navigate(`/user/search?q=${encodeURIComponent(localSearchQuery)}`, { replace: true });
+      } else {
+        navigate(`/user/search`, { replace: true });
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [localSearchQuery, searchQuery, navigate]);
+
   // Voice Search Logic
   const handleVoiceSearch = () => {
     if (isListening) return;
@@ -206,18 +221,11 @@ export default function Search() {
           <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6">
             Search Results {searchResults.length > 0 && `(${searchResults.length})`}
           </h2>
-          {isRouteLoading && searchResults.length === 0 ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-pulse space-y-4 w-full">
-                <div className="h-40 bg-neutral-200 rounded-xl w-full"></div>
-                <div className="h-40 bg-neutral-200 rounded-xl w-full"></div>
-              </div>
-            </div>
-          ) : searchResults.length > 0 ? (
+          {searchResults.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
               {searchResults.map((product) => (
                 <ProductCard
-                  key={product.id}
+                  key={product._id || product.id}
                   product={product}
                   categoryStyle={true}
                   showBadge={true}
@@ -227,9 +235,10 @@ export default function Search() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 md:py-16 text-neutral-500">
-              <p className="text-lg md:text-xl mb-2">No products found</p>
-              <p className="text-sm md:text-base">Try a different search term</p>
+            <div className="text-center py-12 md:py-16 text-neutral-500 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-neutral-100 mx-auto max-w-lg">
+              <div className="text-4xl mb-4">🔍</div>
+              <p className="text-lg font-bold text-neutral-800 mb-2">No products found for &quot;{searchQuery}&quot;</p>
+              <p className="text-sm text-neutral-500 px-8">We couldn&apos;t find any matches. Try checking for typos or searching with more general terms like &quot;fruits&quot; or &quot;vegetables&quot;.</p>
             </div>
           )}
         </div>

@@ -141,7 +141,7 @@ export default function ProductDetail() {
     const isPlaceholder = !vName || vName.toLowerCase() === 'variation' || vName.toLowerCase() === 'standard';
     return (isPlaceholder ? (selectedVariant.value || selectedVariant.title || vName) : vName).trim() || product?.pack || "Standard";
   })();
-  const isVariantAvailable = selectedVariant?.status !== "Sold out" && (variantStock > 0 || variantStock === 0); // 0 means unlimited
+  const isVariantAvailable = selectedVariant?.status !== "Sold out" && selectedVariant?.status !== "Out of Stock" && (variantStock > 0); 
 
   // Get all images for gallery
   const allImages = product?.allImages || [product?.imageUrl || ""].filter(Boolean);
@@ -264,7 +264,7 @@ export default function ProductDetail() {
       alert("This product is not available for delivery at your location.");
       return;
     }
-    if (!isVariantAvailable && variantStock !== 0) {
+    if (!isVariantAvailable) {
       alert("This variant is currently out of stock.");
       return;
     }
@@ -608,15 +608,15 @@ export default function ProductDetail() {
                     {inCartQty === 0 ? (
                       <button
                         onClick={handleAddToCart}
-                        disabled={!isAvailableAtLocation || (!isVariantAvailable && variantStock !== 0)}
-                        className={`w-full py-4 text-sm font-black uppercase tracking-widest rounded-xl shadow-xl transition-all active:scale-[0.98] ${!isAvailableAtLocation || (!isVariantAvailable && variantStock !== 0)
+                        disabled={!isAvailableAtLocation || !isVariantAvailable}
+                        className={`w-full py-4 text-sm font-black uppercase tracking-widest rounded-xl shadow-xl transition-all active:scale-[0.98] ${!isAvailableAtLocation || !isVariantAvailable
                           ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
                           : "bg-village-green text-white hover:bg-[#3D664A] shadow-village-green/20"
                           }`}
                       >
                         {!isAvailableAtLocation
                           ? "Unavailable at Location"
-                          : !isVariantAvailable && variantStock !== 0
+                          : !isVariantAvailable
                             ? "Out of Stock"
                             : "Add to cart"}
                       </button>
@@ -643,9 +643,12 @@ export default function ProductDetail() {
                             onClick={() => {
                               const productId = product.id || product._id;
                               const variantId = selectedVariant?._id;
-                              updateQuantity(productId, inCartQty + 1, variantId, variantTitle);
+                              if (inCartQty < variantStock) {
+                                updateQuantity(productId, inCartQty + 1, variantId, variantTitle);
+                              }
                             }}
-                            className="w-10 h-10 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all text-xl bg-village-umber"
+                            disabled={inCartQty >= variantStock}
+                            className={`w-10 h-10 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all text-xl ${inCartQty >= variantStock ? 'bg-neutral-300 cursor-not-allowed' : 'bg-village-umber'}`}
                           >
                             +
                           </button>
@@ -659,7 +662,7 @@ export default function ProductDetail() {
                 <div className="grid grid-cols-3 gap-2 pt-4 border-t border-stone-200">
                   <div className="text-center">
                     <div className="text-[10px] font-bold text-neutral-400 uppercase mb-1">Stock</div>
-                    <div className="text-xs font-black text-village-umber">{variantStock === 0 ? 'Unlimited' : variantStock > 0 ? `${variantStock} Units` : 'Sold Out'}</div>
+                    <div className="text-xs font-black text-village-umber">{variantStock > 0 ? `${variantStock} Units` : 'Out of Stock'}</div>
                   </div>
                   <div className="text-center border-x border-stone-200">
                     <div className="text-[10px] font-bold text-neutral-400 uppercase mb-1">Pack</div>
@@ -691,7 +694,7 @@ export default function ProductDetail() {
                       const vName = (variant.name || '').trim();
                       const isPlaceholder = !vName || vName.toLowerCase() === 'variation' || vName.toLowerCase() === 'standard';
                       const variantTitle = (isPlaceholder ? (variant.value || variant.title || vName) : vName).trim() || `Variant ${index + 1}`;
-                      const isOutOfStock = variant.status === "Sold out" || (variant.stock === 0 && variant.stock !== undefined && variant.stock !== null);
+                      const isOutOfStock = variant.status === "Sold out" || variant.status === "Out of Stock" || (variant.stock === 0 && variant.stock !== undefined && variant.stock !== null);
                       const isSelected = index === selectedVariantIndex;
 
                       return (
@@ -710,7 +713,7 @@ export default function ProductDetail() {
                             {"\u20B9"}{calculateProductPrice(product, index).displayPrice}
                           </span>
                           {isOutOfStock && (
-                            <span className="text-[9px] uppercase tracking-tighter opacity-70">Sold Out</span>
+                            <span className="text-[9px] uppercase tracking-tighter opacity-70">Out of Stock</span>
                           )}
                         </button>
                       );
@@ -1176,43 +1179,52 @@ export default function ProductDetail() {
                   </button>
                 </motion.div>
               ) : (
-                <motion.div
-                  key="stepper"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className="flex items-center gap-2.5 bg-stone-50 border border-stone-200/50 rounded-xl px-1.5 py-1 h-9 shadow-inner">
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => {
-                      const productId = product.id || product._id;
-                      const variantId = selectedVariant?._id;
-                      updateQuantity(productId, inCartQty - 1, variantId, variantTitle);
-                    }}
-                    className="w-6 h-6 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-stone-200/50 p-0 leading-none text-sm bg-white"
+                <div className="flex flex-col items-end gap-1.5">
+                  <motion.div
+                    key="stepper"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="flex items-center gap-2.5 bg-stone-50 border border-stone-200/50 rounded-xl px-1.5 py-1 h-9 shadow-inner">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => {
+                        const productId = product.id || product._id;
+                        const variantId = selectedVariant?._id;
+                        updateQuantity(productId, inCartQty - 1, variantId, variantTitle);
+                      }}
+                      className="w-6 h-6 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-stone-200/50 p-0 leading-none text-sm bg-white"
+                    >
+                      <span>−</span>
+                    </motion.button>
+                    <motion.span
+                      key={inCartQty}
+                      initial={{ scale: 1.2, y: -2 }}
+                      animate={{ scale: 1, y: 0 }}
+                      className="text-xs font-black text-village-umber min-w-[1.25rem] text-center"
+                    >
+                      {inCartQty}
+                    </motion.span>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => {
+                        const productId = product.id || product._id;
+                        const variantId = selectedVariant?._id;
+                        updateQuantity(productId, inCartQty + 1, variantId, variantTitle);
+                      }}
+                      className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-umber"
+                    >
+                      <span>+</span>
+                    </motion.button>
+                  </motion.div>
+                  <button 
+                    onClick={() => navigate('/user/checkout')}
+                    className="text-[10px] font-black text-village-green uppercase tracking-[0.1em] flex items-center gap-1 active:scale-95 transition-transform"
                   >
-                    <span>−</span>
-                  </motion.button>
-                  <motion.span
-                    key={inCartQty}
-                    initial={{ scale: 1.2, y: -2 }}
-                    animate={{ scale: 1, y: 0 }}
-                    className="text-xs font-black text-village-umber min-w-[1.25rem] text-center"
-                  >
-                    {inCartQty}
-                  </motion.span>
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => {
-                      const productId = product.id || product._id;
-                      const variantId = selectedVariant?._id;
-                      updateQuantity(productId, inCartQty + 1, variantId, variantTitle);
-                    }}
-                    className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-umber"
-                  >
-                    <span>+</span>
-                  </motion.button>
-                </motion.div>
+                    <span>View Cart</span>
+                    <span className="text-[12px]">🛒</span>
+                  </button>
+                </div>
               )}
             </AnimatePresence>
           </div>

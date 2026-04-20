@@ -733,7 +733,7 @@ export default function AdminManageSellerList() {
 
             {/* Footer */}
             <footer className="text-center py-4 text-[12px] font-bold text-neutral-500 border-t border-neutral-200 bg-white">
-                Copyright © 2025. Developed By{' '}
+                Copyright © {new Date().getFullYear()}. Developed By{' '}
                 <a href="#" className="text-[#8B3D28] hover:underline">Village Basket</a>
             </footer>
 

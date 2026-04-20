@@ -212,7 +212,7 @@ export const getProducts = asyncHandler(async (req: Request, res: Response) => {
     query["variations.stock"] = { $gt: 0 };
   } else if (stock === "outOfStock") {
     query["variations.stock"] = 0;
-    query["variations.status"] = "Sold out";
+    query["variations.status"] = { $in: ["Sold out", "Out of Stock"] };
   }
 
   // Pagination
