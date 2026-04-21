@@ -246,11 +246,8 @@ router.patch(
 router.get("/financial/dashboard", walletController.getFinancialDashboard);
 router.get("/wallet/earnings", walletController.getAdminEarnings);
 router.get("/wallet/transactions", walletController.getWalletTransactions);
-<<<<<<< HEAD
 router.post("/wallet/fund-transfer", walletController.createFundTransfer);
-=======
 router.get("/wallet/cod-settlements", walletController.getCodSettlements);
->>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
 router.get("/wallet/withdrawals", withdrawalController.getAllWithdrawals);
 router.post("/wallet/withdrawal/process", walletController.processWithdrawalWrapper);
 

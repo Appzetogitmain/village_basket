@@ -255,7 +255,6 @@ export const processWithdrawalWrapper = asyncHandler(async (req: Request, res: R
 });
 
 /**
-<<<<<<< HEAD
  * Create Fund Transfer (Manual adjustment of wallet balance by Admin)
  */
 export const createFundTransfer = asyncHandler(async (req: Request, res: Response) => {
@@ -327,7 +326,16 @@ export const createFundTransfer = asyncHandler(async (req: Request, res: Respons
         reference: `FT-${Date.now()}`,
         openingBalance,
         closingBalance
-=======
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: 'Fund transfer successful',
+        data: transaction
+    });
+});
+
+/**
  * COD settlement dashboard (delivery deposits)
  */
 export const getCodSettlements = asyncHandler(async (req: Request, res: Response) => {
@@ -384,15 +392,10 @@ export const getCodSettlements = asyncHandler(async (req: Request, res: Response
             razorpayPaymentId: row.metadata?.razorpayPaymentId || null,
             reference: row.reference,
         };
->>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
     });
 
     return res.status(200).json({
         success: true,
-<<<<<<< HEAD
-        message: 'Fund transfer successful',
-        data: transaction
-=======
         data: settlements,
         pagination: {
             page: Number(page),
@@ -400,6 +403,5 @@ export const getCodSettlements = asyncHandler(async (req: Request, res: Response
             total,
             pages: Math.ceil(total / Number(limit)),
         },
->>>>>>> ef29bc83516281e5b88b3b9160a9163308a4e355
     });
 });

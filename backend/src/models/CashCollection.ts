@@ -5,6 +5,8 @@ export interface ICashCollection extends Document {
     order: Types.ObjectId;
     amount: number;
     remark?: string;
+    status?: "Pending" | "Completed" | "Rejected";
+    initiatedBy?: "Admin" | "DeliveryBoy";
     collectedBy: Types.ObjectId;
     collectedAt: Date;
     createdAt: Date;

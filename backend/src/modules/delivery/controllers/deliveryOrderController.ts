@@ -78,7 +78,7 @@ export const getAllOrdersHistory = asyncHandler(async (req: Request, res: Respon
         data: formattedOrders,
         pagination: {
             current: page,
-            pages: Math.ceil(total / limit),
+            pages: Math.ceil(total / Number(limit)),
             total
         }
     });
