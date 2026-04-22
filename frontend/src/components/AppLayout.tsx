@@ -139,7 +139,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const isProductDetailPage = location.pathname.startsWith('/user/product/');
   const isSearchPage = location.pathname === '/user/search';
-  const isCheckoutPage = location.pathname === '/user/checkout' || location.pathname.startsWith('/user/checkout/') || location.pathname === '/user/daily-service/checkout' || location.pathname.startsWith('/user/daily-service/checkout');
+  const isCheckoutPage = location.pathname === '/user/checkout' || location.pathname.startsWith('/user/checkout/') || location.pathname === '/user/daily-service/checkout' || location.pathname.startsWith('/user/daily-service/checkout') || location.pathname === '/user/cart';
   const isOrderDetailPage = location.pathname.startsWith('/user/orders/');
   const showHeader = !isCheckoutPage && !isOrderDetailPage;
   const showSearchBar = isSearchPage;
@@ -282,7 +282,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   {/* Cart Indicator */}
                   {(cart?.itemCount || 0) > 0 && (
                     <button
-                      onClick={() => navigate('/user/checkout')}
+                      onClick={() => navigate('/user/cart')}
                       className={`ml-2 w-10 h-10 rounded-2xl flex items-center justify-center relative hover:bg-white/30 transition-all font-bold shadow-inner ${isScrolled ? 'bg-white/20 text-white' : 'bg-black/10 text-village-umber'}`}
                     >
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

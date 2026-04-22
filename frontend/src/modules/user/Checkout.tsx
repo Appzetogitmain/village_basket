@@ -101,7 +101,7 @@ export default function Checkout() {
   // Redirect if empty - ONLY after initialization is complete
   useEffect(() => {
     if (cartInitialized && !cartLoading && cart.items.length === 0 && !showOrderSuccess) {
-      navigate('/user');
+      navigate('/user/cart');
     }
   }, [cart.items.length, cartLoading, cartInitialized, navigate, showOrderSuccess]);
 
