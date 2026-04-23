@@ -77,7 +77,11 @@ import * as promoStripController from "../modules/admin/controllers/adminPromoSt
 // Delivery Slot Controllers
 import * as deliverySlotController from "../modules/admin/controllers/adminDeliverySlotController";
 
+// Festival Module Controllers
+import * as festivalModuleController from "../modules/admin/controllers/adminFestivalModuleController";
+
 const router = Router();
+
 
 // All routes require admin authentication
 router.use(authenticate);
@@ -364,4 +368,13 @@ router.put("/delivery-slots/:id", deliverySlotController.updateDeliverySlot);
 router.patch("/delivery-slots/:id/status", deliverySlotController.toggleDeliverySlotStatus);
 router.delete("/delivery-slots/:id", deliverySlotController.deleteDeliverySlot);
 
+// ==================== Festival Module Routes ====================
+router.get("/festival-modules", festivalModuleController.getAllFestivalModules);
+router.get("/festival-modules/:id", festivalModuleController.getFestivalModuleById);
+router.post("/festival-modules", festivalModuleController.createFestivalModule);
+router.put("/festival-modules/:id", festivalModuleController.updateFestivalModule);
+router.delete("/festival-modules/:id", festivalModuleController.deleteFestivalModule);
+router.put("/festival-modules/reorder", festivalModuleController.reorderFestivalModules);
+
 export default router;
+

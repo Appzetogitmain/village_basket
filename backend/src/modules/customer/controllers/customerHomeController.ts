@@ -9,6 +9,8 @@ import HomeSection from "../../../models/HomeSection";
 import PromoStrip from "../../../models/PromoStrip";
 import BestsellerCard from "../../../models/BestsellerCard";
 import LowestPricesProduct from "../../../models/LowestPricesProduct";
+import FestivalModule from "../../../models/FestivalModule";
+
 import mongoose from "mongoose";
 import { findSellersWithinRange } from "../../../utils/locationHelper";
 
@@ -677,7 +679,36 @@ export const getHomeContent = async (req: Request, res: Response) => {
       })
     );
 
+    // -> Festival Module (Fetch all active modules)
+    const now = new Date();
+    const festivalModuleDocs = await FestivalModule.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      $or: [
+        { headerCategorySlug: effectiveHeaderSlug },
+        { headerCategorySlug: "all" }
+      ]
+    })
+    .populate("categoryTiles.categoryId", "name slug image")
+    .populate("categoryTiles.subCategoryId", "name slug image")
+    .sort({ order: 1, createdAt: -1 })
+    .lean();
+    
+    const festivalModules = (festivalModuleDocs || []).map(m => ({
+      ...m,
+      id: m._id.toString(),
+      categoryTiles: m.categoryTiles.map((tile: any) => ({
+        ...tile,
+        categoryId: tile.categoryId?._id?.toString() || tile.categoryId?.toString(),
+        categorySlug: tile.categoryId?.slug,
+        subCategoryId: tile.subCategoryId?._id?.toString() || tile.subCategoryId?.toString(),
+        subCategorySlug: tile.subCategoryId?.slug,
+      }))
+    }));
+
     res.status(200).json({
+
       success: true,
       data: {
         categories: allCategories, // Category tiles (dynamic based on tab)
@@ -690,7 +721,9 @@ export const getHomeContent = async (req: Request, res: Response) => {
         cookingIdeas: [],
         promoCards: [],
         promoStrip: promoStrip,
+        festivalModules: festivalModules,
         bestsellerCards: bestsellerCards,
+
         promoBanners: []
       },
     });
