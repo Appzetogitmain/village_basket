@@ -76,10 +76,15 @@ export const getOrderDetails = async (id: string) => {
   }
 };
 
-export const updateOrderStatus = async (id: string, status: string) => {
+export const updateOrderStatus = async (
+  id: string,
+  status: string,
+  paymentDetails?: { paymentCollectedBy?: "cash" | "qr"; customerTip?: number },
+) => {
   try {
     const response = await api.put(`${BASE_URL}/orders/${id}/status`, {
       status,
+      ...paymentDetails,
     });
     return response.data;
   } catch (error) {
@@ -107,11 +112,15 @@ export const sendDeliveryOtp = async (id: string) => {
   }
 };
 
-export const verifyDeliveryOtp = async (id: string, otp: string) => {
+export const verifyDeliveryOtp = async (
+  id: string,
+  otp: string,
+  paymentDetails?: { paymentCollectedBy?: "cash" | "qr"; customerTip?: number },
+) => {
   try {
     const response = await api.post(
       `${BASE_URL}/orders/${id}/verify-delivery-otp`,
-      { otp },
+      { otp, ...paymentDetails },
     );
     return response.data;
   } catch (error) {
@@ -297,6 +306,28 @@ export const markNotificationRead = async (id: string) => {
   try {
     const response = await api.put(`${BASE_URL}/notifications/${id}/read`);
     return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const submitManualSettlement = async (data: {
+  amount: number;
+  orderId?: string;
+  remark?: string;
+}): Promise<any> => {
+  try {
+    const response = await api.post("/delivery/wallet/manual-settlement", data);
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const getUnpaidCodOrders = async (): Promise<any[]> => {
+  try {
+    const response = await api.get("/delivery/orders/unpaid-cod");
+    return response.data?.data || [];
   } catch (error) {
     throw handleApiError(error);
   }

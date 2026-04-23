@@ -152,3 +152,61 @@ export const updateSMSGatewaySettings = asyncHandler(
     });
   }
 );
+
+/**
+ * Get Razorpay configuration from DB
+ */
+export const getRazorpayConfig = asyncHandler(
+  async (_req: Request, res: Response) => {
+    const settings = await AppSettings.findOne().select("paymentGateways");
+    const razorpay = settings?.paymentGateways?.razorpay;
+
+    return res.status(200).json({
+      success: true,
+      message: "Razorpay config fetched successfully",
+      data: {
+        enabled: razorpay?.enabled ?? false,
+        keyId: razorpay?.keyId || "",
+        keySecret: razorpay?.keySecret || "",
+      },
+    });
+  }
+);
+
+/**
+ * Update Razorpay configuration in DB
+ */
+export const updateRazorpayConfig = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { RAZORPAY_API_KEY, RAZORPAY_SECRET_KEY, enabled = true } = req.body || {};
+
+    if (!RAZORPAY_API_KEY || !RAZORPAY_SECRET_KEY) {
+      return res.status(400).json({
+        success: false,
+        message: "RAZORPAY_API_KEY and RAZORPAY_SECRET_KEY are required",
+      });
+    }
+
+    const settings = await AppSettings.findOneAndUpdate(
+      {},
+      {
+        $set: {
+          "paymentGateways.razorpay.enabled": Boolean(enabled),
+          "paymentGateways.razorpay.keyId": String(RAZORPAY_API_KEY),
+          "paymentGateways.razorpay.keySecret": String(RAZORPAY_SECRET_KEY),
+          updatedBy: req.user?.userId,
+        },
+      },
+      { new: true, upsert: true, runValidators: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Razorpay config updated successfully",
+      data: {
+        enabled: settings?.paymentGateways?.razorpay?.enabled ?? true,
+        keyId: settings?.paymentGateways?.razorpay?.keyId || "",
+      },
+    });
+  }
+);

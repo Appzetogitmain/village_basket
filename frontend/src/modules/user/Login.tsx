@@ -37,11 +37,34 @@ export default function Login() {
     location.state?.accountType || location.state?.customerType || 'retail'
   ) as 'retail' | 'wholesale';
 
-  const [mobileNumber, setMobileNumber] = useState('');
+  const isSignUpMode = !!location.state?.isSignUp;
+  const signUpDetails = isSignUpMode ? {
+    name: location.state?.name,
+    email: location.state?.email
+  } : null;
+
+  const [mobileNumber, setMobileNumber] = useState(location.state?.mobile || '');
   const [showOTP, setShowOTP] = useState(false);
   const [sessionId, setSessionId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [timer, setTimer] = useState(120);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (showOTP && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [showOTP, timer]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const [phase, setPhase] = useState(0);
 
@@ -57,9 +80,10 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      const response = await sendOTP(mobileNumber);
+      const response = await sendOTP(mobileNumber, isSignUpMode);
       if (response.sessionId) setSessionId(response.sessionId);
       setShowOTP(true);
+      setTimer(120); // Reset timer on resend
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to initiate call. Please try again.');
     } finally {
@@ -71,7 +95,14 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      const response = await verifyOTP(mobileNumber, otp, sessionId, intendedCustomerType);
+      const response = await verifyOTP(
+        mobileNumber, 
+        otp, 
+        sessionId, 
+        intendedCustomerType,
+        signUpDetails?.name,
+        signUpDetails?.email
+      );
       if (response.success && response.data) {
         login(response.data.token, {
           ...response.data.user,
@@ -205,10 +236,10 @@ export default function Login() {
                   </button>
                   <button
                     onClick={handleContinue}
-                    disabled={loading}
-                    className="vb-action-btn vb-action-resend"
+                    disabled={loading || timer > 0}
+                    className={`vb-action-btn vb-action-resend ${timer > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {loading ? 'Sending...' : 'Resend Code'}
+                    {loading ? 'Sending...' : timer > 0 ? `Resend in ${formatTime(timer)}` : 'Resend Code'}
                   </button>
                 </div>
               </div>

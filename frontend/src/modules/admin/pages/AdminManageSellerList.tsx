@@ -106,8 +106,11 @@ export default function AdminManageSellerList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingSeller, setEditingSeller] = useState<Seller | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isUpdatingRadius, setIsUpdatingRadius] = useState(false);
+     const [isUpdatingRadius, setIsUpdatingRadius] = useState(false);
     const [newRadius, setNewRadius] = useState<number>(10);
+    const [isUpdatingCommission, setIsUpdatingCommission] = useState(false);
+    const [tempCommission, setTempCommission] = useState<number>(0);
+    const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
 
     // Fetch sellers from backend
     useEffect(() => {
@@ -238,9 +241,10 @@ export default function AdminManageSellerList() {
     const handleEdit = (id: number | string) => {
         const sellerId = typeof id === 'number' ? sellers.find(s => s.id === id)?._id : id;
         const seller = sellers.find(s => s._id === sellerId);
-        if (seller) {
+         if (seller) {
             setEditingSeller(seller);
             setNewRadius(seller.serviceRadiusKm || 10);
+            setTempCommission(seller.commission || 0);
             setIsEditModalOpen(true);
         }
     };
@@ -264,6 +268,50 @@ export default function AdminManageSellerList() {
             setTimeout(() => setError(''), 3000);
         } finally {
             setIsUpdatingRadius(false);
+        }
+    };
+
+    const handleUpdateCommission = async () => {
+        if (!editingSeller) return;
+
+        try {
+            setIsUpdatingCommission(true);
+            const response = await updateSeller(editingSeller._id, { commission: tempCommission });
+            if (response.success) {
+                setEditingSeller({ ...editingSeller, commission: tempCommission });
+                // Also update the seller in the main list
+                setSellers(sellers.map(s => s._id === editingSeller._id ? { ...s, commission: tempCommission } : s));
+                setSuccessMessage('Commission updated successfully');
+                setTimeout(() => setSuccessMessage(''), 3000);
+            }
+        } catch (error) {
+            console.error('Error updating commission:', error);
+            setError('Failed to update commission');
+            setTimeout(() => setError(''), 3000);
+        } finally {
+            setIsUpdatingCommission(false);
+        }
+    };
+
+    const handleToggleSetting = async (field: 'requireProductApproval' | 'viewCustomerDetails', value: boolean) => {
+        if (!editingSeller) return;
+
+        try {
+            setIsUpdatingSettings(true);
+            const response = await updateSeller(editingSeller._id, { [field]: value });
+            if (response.success) {
+                setEditingSeller({ ...editingSeller, [field]: value });
+                // Also update the seller in the main list
+                setSellers(sellers.map(s => s._id === editingSeller._id ? { ...s, [field]: value } : s));
+                setSuccessMessage(`${field === 'requireProductApproval' ? 'Product Approval' : 'View Customer Details'} setting updated`);
+                setTimeout(() => setSuccessMessage(''), 3000);
+            }
+        } catch (error) {
+            console.error('Error updating setting:', error);
+            setError('Failed to update setting');
+            setTimeout(() => setError(''), 3000);
+        } finally {
+            setIsUpdatingSettings(false);
         }
     };
 
@@ -844,9 +892,26 @@ export default function AdminManageSellerList() {
                                                     : editingSeller.category || 'N/A'}
                                             </p>
                                         </div>
-                                        <div>
-                                            <label className="text-xs text-neutral-500">Commission</label>
-                                            <p className="text-sm font-medium text-neutral-900">{(editingSeller.commission || 0).toFixed(2)}%</p>
+                                         <div>
+                                            <label className="text-xs text-neutral-500">Commission (%)</label>
+                                            <div className="flex gap-2 mt-1">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max="100"
+                                                    step="0.01"
+                                                    value={tempCommission}
+                                                    onChange={(e) => setTempCommission(parseFloat(e.target.value))}
+                                                    className="w-full px-3 py-1.5 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                                />
+                                                <button
+                                                    onClick={handleUpdateCommission}
+                                                    disabled={isUpdatingCommission || tempCommission === editingSeller.commission}
+                                                    className="px-3 py-1.5 bg-[#8B3D28] text-white rounded text-xs font-bold hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+                                                >
+                                                    {isUpdatingCommission ? 'Saving...' : 'Update'}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1006,17 +1071,35 @@ export default function AdminManageSellerList() {
                                 <div className="bg-neutral-50 rounded-lg px-3 py-2">
                                     <h4 className="text-sm font-semibold text-neutral-700 mb-3">Settings</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
-                                        <div>
-                                            <label className="text-xs text-neutral-500">Require Product Approval</label>
-                                            <p className="text-sm font-medium text-neutral-900">
-                                                {editingSeller.requireProductApproval ? 'Yes' : 'No'}
-                                            </p>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="text-xs text-neutral-500">Require Product Approval</label>
+                                                <p className="text-sm font-medium text-neutral-900">
+                                                    {editingSeller.requireProductApproval ? 'Yes' : 'No'}
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleToggleSetting('requireProductApproval', !editingSeller.requireProductApproval)}
+                                                disabled={isUpdatingSettings}
+                                                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${editingSeller.requireProductApproval ? 'bg-[#8B3D28]' : 'bg-gray-200'}`}
+                                            >
+                                                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${editingSeller.requireProductApproval ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </button>
                                         </div>
-                                        <div>
-                                            <label className="text-xs text-neutral-500">View Customer Details</label>
-                                            <p className="text-sm font-medium text-neutral-900">
-                                                {editingSeller.viewCustomerDetails ? 'Yes' : 'No'}
-                                            </p>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="text-xs text-neutral-500">View Customer Details</label>
+                                                <p className="text-sm font-medium text-neutral-900">
+                                                    {editingSeller.viewCustomerDetails ? 'Yes' : 'No'}
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleToggleSetting('viewCustomerDetails', !editingSeller.viewCustomerDetails)}
+                                                disabled={isUpdatingSettings}
+                                                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${editingSeller.viewCustomerDetails ? 'bg-[#8B3D28]' : 'bg-gray-200'}`}
+                                            >
+                                                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${editingSeller.viewCustomerDetails ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </button>
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Balance</label>

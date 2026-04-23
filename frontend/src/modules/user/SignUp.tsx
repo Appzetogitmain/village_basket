@@ -51,8 +51,16 @@ export default function SignUp() {
     // Convert 'retailer'/'wholesaler' UI terms to 'retail'/'wholesale' for the system
     const systemAccountType = formData.accountType === 'wholesaler' ? 'wholesale' : 'retail';
 
-    // Real flow: Navigate to login (OTP) and pass the intended account type
-    navigate('/user/login', { state: { accountType: systemAccountType } });
+    // Real flow: Navigate to login (OTP) and pass the full registration details
+    navigate('/user/login', { 
+      state: { 
+        accountType: systemAccountType,
+        isSignUp: true,
+        name: formData.name,
+        email: formData.email,
+        mobile: formData.mobile
+      } 
+    });
   };
 
   // Helper to render a row of items

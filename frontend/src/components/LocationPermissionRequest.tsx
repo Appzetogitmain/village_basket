@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from '../hooks/useLocation';
 import GoogleMapsAutocomplete from './GoogleMapsAutocomplete';
 
@@ -49,7 +49,7 @@ export default function LocationPermissionRequest({
     }
   };
 
-  const handleManualLocationSelect = (address: string, lat: number, lng: number, _placeName: string) => {
+  const handleManualLocationSelect = useCallback((address: string, lat: number, lng: number, _placeName: string) => {
     setManualAddress(address);
     // Ignore synthetic zeroes emitted by React when the DOM input value changes automatically
     if (lat !== 0 || lng !== 0) {
@@ -59,9 +59,9 @@ export default function LocationPermissionRequest({
       setManualLat(0);
       setManualLng(0);
     }
-  };
+  }, []);
 
-  const handleSaveManualLocation = async () => {
+  const handleSaveManualLocation = useCallback(async () => {
     if (!manualAddress || manualAddress.length < 3) {
       return;
     }
@@ -103,7 +103,7 @@ export default function LocationPermissionRequest({
     } catch (error) {
       console.error('Failed to save manual location:', error);
     }
-  };
+  }, [manualAddress, manualLat, manualLng, updateLocation, onLocationGranted]);
 
   if (isLocationEnabled) {
     return null;
@@ -218,7 +218,28 @@ export default function LocationPermissionRequest({
               />
             </div>
 
-            <div className="flex gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t border-neutral-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-neutral-500 font-bold">Or</span>
+              </div>
+            </div>
+
+            <button
+              onClick={handleAllowLocation}
+              disabled={isLocationLoading}
+              className="w-full py-2 bg-village-green/10 text-village-green rounded-lg font-bold text-sm hover:bg-village-green/20 transition-all flex items-center justify-center gap-2 border border-village-green/20"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {isLocationLoading ? 'Detecting...' : 'Detect My Location'}
+            </button>
+
+            <div className="flex gap-3 pt-2">
               <button
                 onClick={() => setShowManualInput(false)}
                 className="flex-1 py-2 bg-neutral-100 text-neutral-700 rounded-lg font-semibold hover:bg-neutral-200 transition-colors"
@@ -227,7 +248,7 @@ export default function LocationPermissionRequest({
               </button>
               <button
                 onClick={handleSaveManualLocation}
-                disabled={!manualAddress || manualAddress.length < 3}
+                disabled={!manualAddress || manualAddress.length < 3 || isLocationLoading}
                 className="flex-1 py-2 bg-[#8B3D28] text-white rounded-lg font-semibold hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save Location

@@ -59,9 +59,12 @@ export const getCashCollections = asyncHandler(
             deliveryBoyId: collection.deliveryBoy?._id,
             deliveryBoyName: collection.deliveryBoy?.name || "Unknown",
             orderId: collection.order?._id,
+            orderNumber: collection.order?.orderNumber || "N/A",
             total: collection.order?.total || 0,
             amount: collection.amount,
             remark: collection.remark,
+            status: collection.status || "Completed",
+            initiatedBy: collection.initiatedBy || "Admin",
             collectedAt: collection.collectedAt,
             collectedBy: collection.collectedBy?.name || "Unknown",
         }));
@@ -153,6 +156,13 @@ export const createCashCollection = asyncHandler(
         deliveryBoy.cashCollected = (deliveryBoy.cashCollected || 0) - amount;
         await deliveryBoy.save();
 
+        // Update order payment status
+        order.paymentStatus = 'Paid';
+        if (order.payment) {
+            order.payment.status = 'completed';
+        }
+        await order.save();
+
         const populatedCollection = await CashCollection.findById(collection._id)
             .populate("deliveryBoy", "name mobile")
             .populate("order", "orderNumber total")
@@ -243,6 +253,83 @@ export const deleteCashCollection = asyncHandler(
         return res.status(200).json({
             success: true,
             message: "Cash collection deleted successfully",
+        });
+    }
+);
+/**
+ * Approve a pending cash collection (Manual Payout Verification)
+ */
+export const approveCashCollection = asyncHandler(
+    async (req: Request, res: Response) => {
+        const { id } = req.params;
+
+        const collection = await CashCollection.findById(id);
+
+        if (!collection) {
+            return res.status(404).json({
+                success: false,
+                message: "Cash collection not found",
+            });
+        }
+
+        if (collection.status === "Completed") {
+            return res.status(400).json({
+                success: false,
+                message: "This collection is already approved",
+            });
+        }
+
+        const amount = collection.amount;
+        const deliveryBoyId = collection.deliveryBoy;
+        const orderId = collection.order;
+
+        // 1. Update delivery boy's cash collected in Delivery model
+        const deliveryBoy = await Delivery.findById(deliveryBoyId);
+        if (deliveryBoy) {
+            deliveryBoy.cashCollected = Math.max(0, (deliveryBoy.cashCollected || 0) - amount);
+            await deliveryBoy.save();
+        }
+
+        // 2. Update delivery boy's cash in hand in DeliveryWallet model
+        const DeliveryWallet = (await import('../../../models/DeliveryWallet')).default;
+        await DeliveryWallet.updateOne(
+            { deliveryBoy: deliveryBoyId },
+            { 
+                $inc: { cashInHand: -amount },
+                $push: {
+                    transactions: {
+                        type: 'deposit',
+                        status: 'Completed',
+                        amount: amount,
+                        reference: `manual_settlement_${collection._id}`,
+                        createdAt: new Date(),
+                    },
+                }
+            }
+        );
+
+        // 3. Mark the Order as Paid if orderId exists
+        if (orderId) {
+            const order = await Order.findById(orderId);
+            if (order) {
+                order.paymentStatus = 'Paid';
+                if (order.payment) {
+                    order.payment.status = 'completed';
+                }
+                await order.save();
+            }
+        }
+
+        // 4. Update the collection status
+        collection.status = "Completed";
+        collection.collectedBy = req.user?.userId as any;
+        collection.collectedAt = new Date();
+        await collection.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Cash collection approved and balances updated",
+            data: collection,
         });
     }
 );

@@ -157,10 +157,11 @@ export const getProducts = async (req: Request, res: Response) => {
 
     if (search) {
       // Use case-insensitive fuzzy regex for smoother grocery matching (e.g., 'egg' matches 'eggs')
+      // Removed brand from $or because it's an ObjectId in the model
       query.$or = [
         { productName: { $regex: search, $options: "i" } },
         { description: { $regex: search, $options: "i" } },
-        { brand: { $regex: search, $options: "i" } }
+        { tags: { $regex: search, $options: "i" } }
       ];
     }
 

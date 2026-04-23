@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getProfile, CustomerProfile } from '../../services/api/customerService';
-import { sendTestNotification } from '../../services/pushNotificationService';
+import { getAddresses, Address } from '../../services/api/customerAddressService';
 import { useToast } from '../../context/ToastContext';
 import { useLocation } from 'react-router-dom';
 import DailyServiceList from './components/DailyServiceList';
@@ -12,12 +12,13 @@ export default function Account() {
   const navigate = useNavigate();
   const { user, logout: authLogout } = useAuth();
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showGstModal, setShowGstModal] = useState(false);
   const [gstNumber, setGstNumber] = useState('');
+  const [gstError, setGstError] = useState('');
   const { showToast } = useToast();
-  const [testNotifLoading, setTestNotifLoading] = useState(false);
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<'profile'>('profile');
 
@@ -32,11 +33,19 @@ export default function Account() {
       try {
         setLoading(true);
         setError('');
-        const response = await getProfile();
-        if (response.success) {
-          setProfile(response.data);
+        const [profileRes, addressRes] = await Promise.all([
+          getProfile(),
+          getAddresses()
+        ]);
+
+        if (profileRes.success) {
+          setProfile(profileRes.data);
         } else {
           setError('Failed to load profile');
+        }
+
+        if (addressRes.success && Array.isArray(addressRes.data)) {
+          setAddresses(addressRes.data);
         }
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to load profile');
@@ -69,23 +78,18 @@ export default function Account() {
 
   const handleGstSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setShowGstModal(false);
-  };
-
-  const handleTestNotification = async () => {
-    try {
-      setTestNotifLoading(true);
-      const result = await sendTestNotification();
-      if (result.success) {
-        showToast(result.message, 'success');
-      } else {
-        showToast(result.message, 'error');
-      }
-    } catch (err: any) {
-      showToast('Failed to send test notification', 'error');
-    } finally {
-      setTestNotifLoading(false);
+    
+    // GST Regex: 2 digits, 5 letters, 4 digits, 1 letter, 1 alphanumeric, 'Z', 1 alphanumeric
+    const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/;
+    
+    if (!gstRegex.test(gstNumber.toUpperCase())) {
+      setGstError('Invalid GST Number format');
+      return;
     }
+
+    setGstError('');
+    setShowGstModal(false);
+    showToast('GST details saved successfully', 'success');
   };
 
   // Show login/signup prompt for unregistered users
@@ -213,10 +217,17 @@ export default function Account() {
             <div>
               <h2 className="text-[10px] font-black text-stone-400 mb-3 uppercase tracking-[0.2em] px-1">Your Information</h2>
               <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden divide-y divide-stone-50 shadow-sm">
-                <button onClick={() => navigate('/address-book')} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
+                <button onClick={() => navigate('/user/address-book')} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors">
                   <div className="flex items-center gap-4">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-stone-400"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">Address Book</span>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-black text-village-umber uppercase tracking-widest">Address Book</span>
+                      {addresses.length > 0 && (
+                        <span className="text-[10px] text-neutral-400 font-bold truncate max-w-[180px]">
+                          {addresses.find(a => a.isDefault)?.address || `${addresses.length} saved addresses`}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <span className="text-stone-300">›</span>
                 </button>
@@ -269,22 +280,6 @@ export default function Account() {
                   </div>
                   <span className="text-stone-300">›</span>
                 </button>
-                <button
-                  onClick={handleTestNotification}
-                  disabled={testNotifLoading}
-                  className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors disabled:opacity-50"
-                >
-                  <div className="flex items-center gap-4">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-village-green">
-                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="text-xs font-black text-village-umber uppercase tracking-widest">
-                      {testNotifLoading ? 'Testing...' : 'Test Notifications'}
-                    </span>
-                  </div>
-                  <span className="text-stone-300">›</span>
-                </button>
                 <button onClick={handleLogout} className="w-full flex items-center justify-between px-5 py-4 hover:bg-stone-50 transition-colors text-red-500">
                   <div className="flex items-center gap-4">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-500"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
@@ -319,10 +314,17 @@ export default function Account() {
                   <input
                     type="text"
                     value={gstNumber}
-                    onChange={(e) => setGstNumber(e.target.value)}
-                    placeholder="Enter GST Number"
-                    className="w-full rounded-2xl border-2 border-stone-100 px-6 py-4 text-sm font-bold text-village-umber placeholder:text-stone-300 focus:outline-none focus:border-village-umber/20 transition-all bg-stone-50/30"
+                    onChange={(e) => {
+                      setGstNumber(e.target.value.toUpperCase());
+                      if (gstError) setGstError('');
+                    }}
+                    placeholder="Enter GST Number (e.g. 27ABCDE1234F1Z5)"
+                    maxLength={15}
+                    className={`w-full rounded-2xl border-2 px-6 py-4 text-sm font-bold text-village-umber placeholder:text-stone-300 focus:outline-none transition-all bg-stone-50/30 ${
+                      gstError ? 'border-red-500 ring-1 ring-red-500' : 'border-stone-100 focus:border-village-umber/20'
+                    }`}
                   />
+                  {gstError && <p className="text-[10px] text-red-500 font-bold mt-1 uppercase tracking-wider">{gstError}</p>}
                   <button
                     type="submit"
                     disabled={!gstNumber.trim()}

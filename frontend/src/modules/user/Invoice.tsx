@@ -226,7 +226,7 @@ export default function Invoice() {
                 <p>
                   <span className="font-medium">Status:</span>{" "}
                   <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm font-medium">
-                    {order.status || "Placed"}
+                    {order.status === 'Received' ? 'Order Placed' : (order.status || "Placed")}
                   </span>
                 </p>
                 {order.paymentMethod && (

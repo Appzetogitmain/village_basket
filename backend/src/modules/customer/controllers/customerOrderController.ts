@@ -14,7 +14,14 @@ import Coupon from "../../../models/Coupon";
 import Payment from "../../../models/Payment";
 import Refund from "../../../models/Refund";
 import WalletTransaction from "../../../models/WalletTransaction";
+import Return from "../../../models/Return";
 import { Server as SocketIOServer } from "socket.io";
+import {
+    buildOrderPaymentSnapshot,
+    createBestEffortPaymentRecord,
+    normalizePaymentMethod,
+    toLegacyPaymentMethod,
+} from "../../../services/codService";
 
 // Create a new order
 export const createOrder = async (req: Request, res: Response) => {
@@ -32,6 +39,9 @@ export const createOrder = async (req: Request, res: Response) => {
 
         const { items, address, paymentMethod, fees, deliverySlot, couponCode, tipAmount, gstin, walletAmountUsed, donationAmount } = req.body;
         const userId = req.user!.userId;
+        const normalizedPaymentMethod = normalizePaymentMethod(paymentMethod);
+        const legacyPaymentMethod = toLegacyPaymentMethod(normalizedPaymentMethod);
+        const initialOrderStatus = normalizedPaymentMethod === "cash" ? "Pending" : "Received";
 
         // Log incoming request for debugging
         console.log("DEBUG: Order creation request:", {
@@ -150,9 +160,10 @@ export const createOrder = async (req: Request, res: Response) => {
                     label: deliverySlot.label || deliverySlot.timeRange || '',
                 }
             }),
-            paymentMethod: paymentMethod || 'COD',
+            paymentMethod: legacyPaymentMethod,
             paymentStatus: 'Pending',
-            status: 'Received',
+            payment: buildOrderPaymentSnapshot(normalizedPaymentMethod, "pending"),
+            status: initialOrderStatus,
             subtotal: 0,
             tax: 0,
             shipping: fees?.deliveryFee || 0,
@@ -542,7 +553,7 @@ export const createOrder = async (req: Request, res: Response) => {
         }
 
         // --- Full Wallet Payment Logic (Override/Fallback) ---
-        if (paymentMethod === 'Wallet') {
+        if (normalizedPaymentMethod === 'wallet') {
             const remaining = newOrder.total - totalDebitedFromWallet;
 
             if (remaining > 0) {
@@ -587,6 +598,7 @@ export const createOrder = async (req: Request, res: Response) => {
 
             // Mark order as paid if totally paid by wallet
             newOrder.paymentStatus = 'Paid';
+            newOrder.payment = buildOrderPaymentSnapshot("wallet", "completed");
         }
 
 
@@ -601,6 +613,20 @@ export const createOrder = async (req: Request, res: Response) => {
                 throw validationError;
             }
             await newOrder.save();
+        }
+
+        // Ensure nested payment fields stay aligned for COD and prepaid pending states.
+        if (!newOrder.payment) {
+            const status = newOrder.paymentStatus === "Paid" ? "completed" : "pending";
+            newOrder.payment = buildOrderPaymentSnapshot(normalizedPaymentMethod, status);
+            await newOrder.save();
+        }
+
+        // Best-effort payment tracking record (non-blocking by design).
+        try {
+            await createBestEffortPaymentRecord(newOrder);
+        } catch (paymentTrackingError) {
+            console.error("Best-effort payment tracking failed:", paymentTrackingError);
         }
 
 
@@ -636,6 +662,7 @@ export const createOrder = async (req: Request, res: Response) => {
             success: true,
             message: "Order placed successfully",
             data: newOrder,
+            razorpay: normalizedPaymentMethod === "cash" ? null : undefined,
         });
 
     } catch (error: any) {
@@ -1210,6 +1237,172 @@ export const updateOrderNotes = async (req: Request, res: Response) => {
             success: false,
             message: "Failed to update order notes",
             error: error.message
+        });
+    }
+};
+
+/**
+ * Create return request for an order item
+ */
+export const createReturnRequest = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user!.userId;
+        const { orderItemId, reason, description, quantity, images } = req.body;
+
+        if (!orderItemId) {
+            return res.status(400).json({
+                success: false,
+                message: "Order item is required",
+            });
+        }
+
+        if (!reason || !String(reason).trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Return reason is required",
+            });
+        }
+
+        const order = await Order.findOne({ _id: id, customer: userId }).populate("items");
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found",
+            });
+        }
+
+        if (order.status !== "Delivered") {
+            return res.status(400).json({
+                success: false,
+                message: "Return can only be requested for delivered orders",
+            });
+        }
+
+        const orderItem = await OrderItem.findOne({
+            _id: orderItemId,
+            order: order._id,
+        });
+
+        if (!orderItem) {
+            return res.status(404).json({
+                success: false,
+                message: "Order item not found for this order",
+            });
+        }
+
+        const requestedQty = Math.max(1, Number(quantity) || 1);
+        if (requestedQty > orderItem.quantity) {
+            return res.status(400).json({
+                success: false,
+                message: "Return quantity cannot exceed ordered quantity",
+            });
+        }
+
+        const existingReturn = await Return.findOne({
+            customer: userId,
+            order: order._id,
+            orderItem: orderItem._id,
+            status: { $in: ["Pending", "Approved", "Processing"] },
+        });
+
+        if (existingReturn) {
+            return res.status(400).json({
+                success: false,
+                message: "A return request already exists for this item",
+            });
+        }
+
+        const createdReturn = await Return.create({
+            order: order._id,
+            orderItem: orderItem._id,
+            customer: userId,
+            reason: String(reason).trim(),
+            description: description ? String(description).trim() : undefined,
+            quantity: requestedQty,
+            images: Array.isArray(images) ? images : [],
+            pickupAddress: {
+                address: order.deliveryAddress?.address || "",
+                city: order.deliveryAddress?.city || "",
+                pincode: order.deliveryAddress?.pincode || "",
+            },
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Return request submitted successfully",
+            data: createdReturn,
+        });
+    } catch (error: any) {
+        console.error("Error creating return request:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to create return request",
+            error: error.message,
+        });
+    }
+};
+
+/**
+ * Get authenticated customer's return requests
+ */
+export const getMyReturnRequests = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user!.userId;
+        const { orderId, status } = req.query;
+
+        const query: any = { customer: userId };
+        if (orderId) query.order = orderId;
+        if (status) query.status = status;
+
+        const returnRequests = await Return.find(query)
+            .populate("order", "orderNumber")
+            .populate("orderItem", "productName productImage quantity unitPrice total variation")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            data: returnRequests,
+        });
+    } catch (error: any) {
+        console.error("Error fetching return requests:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch return requests",
+            error: error.message,
+        });
+    }
+};
+
+/**
+ * Get single return request detail for authenticated customer
+ */
+export const getMyReturnRequestById = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user!.userId;
+        const { returnId } = req.params;
+
+        const returnRequest = await Return.findOne({ _id: returnId, customer: userId })
+            .populate("order", "orderNumber status deliveryAddress")
+            .populate("orderItem", "productName productImage quantity unitPrice total variation");
+
+        if (!returnRequest) {
+            return res.status(404).json({
+                success: false,
+                message: "Return request not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: returnRequest,
+        });
+    } catch (error: any) {
+        console.error("Error fetching return request detail:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch return request detail",
+            error: error.message,
         });
     }
 };

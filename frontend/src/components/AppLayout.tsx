@@ -139,11 +139,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const isProductDetailPage = location.pathname.startsWith('/user/product/');
   const isSearchPage = location.pathname === '/user/search';
-  const isCheckoutPage = location.pathname === '/user/checkout' || location.pathname.startsWith('/user/checkout/') || location.pathname === '/user/daily-service/checkout' || location.pathname.startsWith('/user/daily-service/checkout');
+  const isCheckoutPage = location.pathname === '/user/checkout' || location.pathname.startsWith('/user/checkout/') || location.pathname === '/user/daily-service/checkout' || location.pathname.startsWith('/user/daily-service/checkout') || location.pathname === '/user/cart';
   const isOrderDetailPage = location.pathname.startsWith('/user/orders/');
   const showHeader = !isCheckoutPage && !isOrderDetailPage;
   const showSearchBar = isSearchPage;
   const showFooter = !isCheckoutPage && !isProductDetailPage;
+  
+  // Show floating cart on all pages except checkout and order details
+  const showFloatingCart = !isCheckoutPage && !isOrderDetailPage;
 
   return (
     <div className="flex flex-col min-h-screen w-full overflow-x-hidden md:bg-transparent">
@@ -279,7 +282,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   {/* Cart Indicator */}
                   {(cart?.itemCount || 0) > 0 && (
                     <button
-                      onClick={() => navigate('/user/checkout')}
+                      onClick={() => navigate('/user/cart')}
                       className={`ml-2 w-10 h-10 rounded-2xl flex items-center justify-center relative hover:bg-white/30 transition-all font-bold shadow-inner ${isScrolled ? 'bg-white/20 text-white' : 'bg-black/10 text-village-umber'}`}
                     >
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -335,7 +338,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
           {/* Floating Cart Pill - Desktop (hidden on mobile to prevent duplicate keys/animations) */}
           <div className="hidden md:block">
-            {!isOrderDetailPage && <FloatingCartPill />}
+            {showFloatingCart && <FloatingCartPill />}
           </div>
 
           {/* Location Permission Request Modal - Mandatory for all users */}
@@ -358,14 +361,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
             />
           )}
 
-          {/* Fixed Bottom Navigation - Mobile Only, Premium Floating Design */}
-          {showFooter && (
-            <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4 pb-4 flex flex-col gap-2 pointer-events-none">
-              {/* Restore original FloatingCartPill experience */}
+          {/* Floating Cart Section - Mobile Only */}
+          {showFloatingCart && (
+            <div className={`fixed left-0 right-0 z-50 md:hidden px-4 flex flex-col gap-2 pointer-events-none ${isProductDetailPage ? 'bottom-[74px]' : 'bottom-20'}`}>
               <div className="pointer-events-auto">
                 <FloatingCartPill />
               </div>
+            </div>
+          )}
 
+          {/* Fixed Bottom Navigation - Mobile Only */}
+          {showFooter && (
+            <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4 pb-4 flex flex-col gap-2 pointer-events-none">
               <motion.nav
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -395,83 +402,41 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   })}
                 </div>
 
-                {/* Home */}
+                {/* Navigation Links */}
                 <Link to="/user" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div
-                    animate={{
-                      scale: (isActive('/user') || isActive('/user/')) ? 1.05 : 1,
-                    }}
-                    transition={{ duration: 0.2 }}
-                  >
+                  <motion.div animate={{ scale: (isActive('/user') || isActive('/user/')) ? 1.05 : 1 }} transition={{ duration: 0.2 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={(isActive('/user') || isActive('/user/')) ? '#8B3D28' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-300">
-                      <path d="M3 9.5L12 3l9 6.5V20c0 1-1 2-2 2H5c-1 0-2-1-2-2V9.5z" />
-                      <polyline points="9 22 9 12 15 12 15 22" />
+                      <path d="M3 9.5L12 3l9 6.5V20c0 1-1 2-2 2H5c-1 0-2-1-2-2V9.5z" /><polyline points="9 22 9 12 15 12 15 22" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${(isActive('/user') || isActive('/user/')) ? 'text-[#8B3D28]' : 'text-white/40'}`}>
-                    HOME
-                  </span>
+                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${(isActive('/user') || isActive('/user/')) ? 'text-[#8B3D28]' : 'text-white/40'}`}>HOME</span>
                 </Link>
 
-                {/* Orders */}
                 <Link to="/user/order-again" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div
-                    animate={{
-                      scale: isActive('/user/order-again') ? 1.05 : 1,
-                    }}
-                    transition={{ duration: 0.2 }}
-                  >
+                  <motion.div animate={{ scale: isActive('/user/order-again') ? 1.05 : 1 }} transition={{ duration: 0.2 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isActive('/user/order-again') ? '#8B3D28' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-300">
-                      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-                      <line x1="3" y1="6" x2="21" y2="6" />
-                      <path d="M16 10a4 4 0 01-8 0" />
+                      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 01-8 0" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isActive('/user/order-again') ? 'text-[#8B3D28]' : 'text-white/40'}`}>
-                    ORDERS
-                  </span>
+                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isActive('/user/order-again') ? 'text-[#8B3D28]' : 'text-white/40'}`}>ORDERS</span>
                 </Link>
 
-                {/* Categories */}
                 <Link to="/user/categories" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div
-                    animate={{
-                      scale: isCategoriesActive ? 1.05 : 1,
-                      rotate: categoriesRotation
-                    }}
-                    transition={{
-                      rotate: { duration: 0.5, ease: "backOut" },
-                      scale: { duration: 0.2 }
-                    }}
-                  >
+                  <motion.div animate={{ scale: isCategoriesActive ? 1.05 : 1, rotate: categoriesRotation }} transition={{ rotate: { duration: 0.5, ease: "backOut" }, scale: { duration: 0.2 } }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isCategoriesActive ? '#8B3D28' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-300">
-                      <rect x="3" y="3" width="7" height="7" />
-                      <rect x="14" y="3" width="7" height="7" />
-                      <rect x="14" y="14" width="7" height="7" />
-                      <rect x="3" y="14" width="7" height="7" />
+                      <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isCategoriesActive ? 'text-[#8B3D28]' : 'text-white/40'}`}>
-                    CATEGORIES
-                  </span>
+                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isCategoriesActive ? 'text-[#8B3D28]' : 'text-white/40'}`}>CATEGORIES</span>
                 </Link>
 
-                {/* Profile */}
                 <Link to="/user/account" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
-                  <motion.div
-                    animate={{
-                      scale: isActive('/user/account') ? 1.05 : 1,
-                    }}
-                    transition={{ duration: 0.2 }}
-                  >
+                  <motion.div animate={{ scale: isActive('/user/account') ? 1.05 : 1 }} transition={{ duration: 0.2 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isActive('/user/account') ? '#8B3D28' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-300">
-                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-                      <circle cx="12" cy="7" r="4" />
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                     </svg>
                   </motion.div>
-                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isActive('/user/account') ? 'text-[#8B3D28]' : 'text-white/40'}`}>
-                    ACCOUNT
-                  </span>
+                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isActive('/user/account') ? 'text-[#8B3D28]' : 'text-white/40'}`}>ACCOUNT</span>
                 </Link>
               </motion.nav>
             </div>
@@ -481,4 +446,3 @@ export default function AppLayout({ children }: AppLayoutProps) {
     </div>
   );
 }
-

@@ -35,6 +35,7 @@ import LandingPage from "./modules/landing/LandingPage";
 
 // Critical routes - load immediately (Home, Cart, Checkout)
 import Home from "./modules/user/Home";
+import Cart from "./modules/user/Cart";
 import Checkout from "./modules/user/Checkout";
 import Wishlist from './modules/user/Wishlist';
 
@@ -87,6 +88,7 @@ const DeliveryAbout = lazy(() => import("./modules/delivery/pages/DeliveryAbout"
 const DeliverySellersInRange = lazy(() => import("./modules/delivery/pages/DeliverySellersInRange"));
 const DeliveryPrivacy = lazy(() => import("./modules/delivery/pages/DeliveryPrivacy"));
 const DeliveryTerms = lazy(() => import("./modules/delivery/pages/DeliveryTerms"));
+const DeliveryLanguage = lazy(() => import("./modules/delivery/pages/DeliveryLanguage"));
 const DeliveryLogin = lazy(() => import("./modules/delivery/pages/DeliveryLogin"));
 const DeliverySignUp = lazy(() => import("./modules/delivery/pages/DeliverySignUp"));
 
@@ -171,6 +173,7 @@ const AdminRewardOrders = lazy(() => import("./modules/admin/pages/AdminRewardOr
 const UserRewards = lazy(() => import("./modules/user/Rewards"));
 const AdminDeliverySlots = lazy(() => import("./modules/admin/pages/AdminDeliverySlots"));
 const AdminDonations = lazy(() => import("./modules/admin/pages/AdminDonations"));
+const AdminInquiries = lazy(() => import("./modules/admin/pages/AdminInquiries"));
 
 function App() {
   // Initialize push notifications on app load
@@ -208,6 +211,7 @@ function App() {
                           <Route path="/" element={<LandingPage />} />
                           
                           {/* Top-level redirects to nested /user routes */}
+                          <Route path="/cart" element={<Navigate to="/user/cart" replace />} />
                           <Route path="/checkout" element={<Navigate to="/user/checkout" replace />} />
                           <Route path="/checkout/*" element={<Navigate to="/user/checkout" replace />} />
                           <Route path="/product/:id" element={<GlobalRedirect type="product" />} />
@@ -336,6 +340,7 @@ function App() {
                                       <Route path="sellers-in-range" element={<DeliverySellersInRange />} />
                                       <Route path="privacy" element={<DeliveryPrivacy />} />
                                       <Route path="terms" element={<DeliveryTerms />} />
+                                      <Route path="language" element={<DeliveryLanguage />} />
                                     </Routes>
                                   </DeliveryLayout>
                                 </Suspense>
@@ -434,6 +439,7 @@ function App() {
                                         <Route path="orders/cancelled" element={<AdminCancelledOrders />} />
                                         <Route path="orders/:id" element={<AdminOrderDetail />} />
                                         <Route path="donations" element={<AdminDonations />} />
+                                        <Route path="inquiries" element={<AdminInquiries />} />
 
                                         <Route path="withdrawals" element={<AdminWithdrawals />} />
                                         <Route path="payments" element={<AdminPayments />} />
@@ -451,6 +457,7 @@ function App() {
                           />
 
                           {/* Main User App Routes — all nested under /user */}
+                          <Route path="/user" element={<Navigate to="/user/home" replace />} />
                           <Route
                             path="/user/*"
                             element={
@@ -459,6 +466,7 @@ function App() {
                                   <Routes>
                                     <Route path="" element={<Home />} />
                                     <Route path="home" element={<Home />} />
+                                    <Route path="cart" element={<Cart />} />
                                     <Route path="search" element={<Search />} />
                                     <Route path="orders" element={<Orders />} />
                                     <Route path="orders/:id" element={<OrderDetail />} />
@@ -468,7 +476,7 @@ function App() {
                                     <Route path="faq" element={<FAQ />} />
                                     <Route path="privacy-policy" element={<PrivacyPolicy />} />
                                     <Route path="terms-of-service" element={<TermsOfService />} />
-                                    <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+                                    <Route path="wishlist" element={<Wishlist />} />
                                     <Route path="categories" element={<Categories />} />
                                     <Route path="category/:id" element={<Category />} />
                                     <Route path="address-book" element={<AddressBook />} />

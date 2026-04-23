@@ -13,7 +13,7 @@ import { asyncHandler } from "../../../utils/asyncHandler";
 export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
   const { mobile } = req.body;
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  if (!mobile || !/^[0-9]{10,12}$/.test(mobile)) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
@@ -21,7 +21,8 @@ export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Check if seller exists with this mobile
-  const seller = await Seller.findOne({ mobile });
+  const normalizedMobile = mobile.slice(-10);
+  const seller = await Seller.findOne({ mobile: normalizedMobile });
   if (!seller) {
     return res.status(404).json({
       success: false,
@@ -44,31 +45,33 @@ export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   const { mobile, otp } = req.body;
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
-    return res.status(400).json({
-      success: false,
-      message: "Valid 10-digit mobile number is required",
-    });
-  }
+    if (!mobile || !/^[0-9]{10,12}$/.test(mobile)) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid 10-digit mobile number is required",
+      });
+    }
 
-  if (!otp || !/^[0-9]{4}$/.test(otp)) {
-    return res.status(400).json({
-      success: false,
-      message: "Valid 4-digit OTP is required",
-    });
-  }
+    const normalizedMobile = mobile.slice(-10);
 
-  // Verify OTP
-  const isValid = await verifyOTPService(mobile, otp, "Seller");
-  if (!isValid) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired OTP",
-    });
-  }
+    if (!otp || !/^[0-9]{4}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid 4-digit OTP is required",
+      });
+    }
 
-  // Find seller
-  const seller = await Seller.findOne({ mobile }).select("-password");
+    // Verify OTP
+    const isValid = await verifyOTPService(normalizedMobile, otp, "Seller");
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid or expired OTP",
+      });
+    }
+
+    // Find seller
+    const seller = await Seller.findOne({ mobile: normalizedMobile }).select("-password");
   if (!seller) {
     return res.status(404).json({
       success: false,
@@ -123,12 +126,14 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  if (!/^[0-9]{10}$/.test(mobile)) {
+  if (!/^[0-9]{10,12}$/.test(mobile)) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
+
+  const normalizedMobile = mobile.slice(-10);
 
   // Validate location is provided
   const latitude = req.body.latitude ? parseFloat(req.body.latitude) : null;
@@ -175,7 +180,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   // Check if seller already exists
   const existingSeller = await Seller.findOne({
-    $or: [{ mobile }, { email }],
+    $or: [{ mobile: normalizedMobile }, { email }],
   });
 
   if (existingSeller) {
@@ -197,7 +202,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   // Create new seller with GeoJSON location (password not required during signup)
   const seller = await Seller.create({
     sellerName,
-    mobile,
+    mobile: normalizedMobile,
     email,
     // password field removed - sellers don't need password during signup
     storeName,

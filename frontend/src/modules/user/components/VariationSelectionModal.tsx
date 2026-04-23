@@ -137,7 +137,7 @@ export default function VariationSelectionModal({
                 {product.variations.map((v: any, i: number) => {
                   const { displayPrice, mrp, discount, hasDiscount } = calculateProductPrice(product, i);
                   const isSelected = i === selectedIndex;
-                  const isOutOfStock = v.status === 'Sold out' || (v.stock === 0 && v.stock !== undefined);
+                  const isOutOfStock = v.status === 'Sold out' || v.status === 'Out of Stock' || (v.stock === 0 && v.stock !== undefined);
 
                   const vName = (v.name || '').trim();
                   const isGeneric = !vName || ['variation', 'standard'].includes(vName.toLowerCase());
@@ -198,10 +198,10 @@ export default function VariationSelectionModal({
                 <Button
                   ref={addButtonRef}
                   onClick={handleAdd}
-                  disabled={product.variations[selectedIndex]?.status === 'Sold out'}
+                  disabled={product.variations[selectedIndex]?.status === 'Sold out' || product.variations[selectedIndex]?.status === 'Out of Stock' || (product.variations[selectedIndex]?.stock === 0 && product.variations[selectedIndex]?.stock !== undefined)}
                   className="flex-1 py-2.5 h-11 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-bold shadow-lg shadow-green-200/50 transition-all active:scale-95"
                 >
-                  Add to Basket
+                  { (product.variations[selectedIndex]?.status === 'Sold out' || product.variations[selectedIndex]?.status === 'Out of Stock' || (product.variations[selectedIndex]?.stock === 0 && product.variations[selectedIndex]?.stock !== undefined)) ? 'Out of Stock' : 'Add to Basket' }
                 </Button>
               </div>
             </div>

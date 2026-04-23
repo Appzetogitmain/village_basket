@@ -33,7 +33,7 @@ export default function PublicRoute({ children, userType: allowedUserType }: Pub
         }
 
         // Default for Customer
-        return <Navigate to="/user" replace />;
+        return <Navigate to="/user/home" replace />;
     }
 
     return children ? <>{children}</> : <Outlet />;

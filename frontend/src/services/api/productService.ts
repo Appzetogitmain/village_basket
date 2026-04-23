@@ -24,7 +24,7 @@ export interface ProductVariation {
   price?: number; // Resolved price based on user role
   discPrice?: number; // Resolved discount price base on user role
   stock: number;
-  status: "Available" | "Sold out" | "In stock"; // Added In stock
+  status: "Available" | "Out of Stock" | "In stock"; // Added In stock
   sku?: string;
   minWholesaleQuantity?: number;
 }

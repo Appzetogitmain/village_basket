@@ -58,7 +58,9 @@ function generateOTP(length: number = 4): string {
 function normalizeMobileNumber(mobile: string): string {
   let cleanMobile = mobile.replace(/^\+/, '').replace(/\D/g, '');
 
-  if (!cleanMobile.startsWith('91')) {
+  if (cleanMobile.length === 10) {
+    cleanMobile = '91' + cleanMobile;
+  } else if (!cleanMobile.startsWith('91')) {
     cleanMobile = '91' + cleanMobile;
   }
 
@@ -312,7 +314,7 @@ export async function verifySmsOtp(
   // Normalize mobile number
   const normalizedMobile = targetMobile.replace(/\D/g, '');
 
-  if (normalizedMobile.length !== 10) {
+  if (normalizedMobile.length < 10 || normalizedMobile.length > 12) {
     console.error('OTP verification failed - invalid mobile format:', {
       original: targetMobile,
       normalized: normalizedMobile,
@@ -321,7 +323,10 @@ export async function verifySmsOtp(
     return false;
   }
 
-  return verifyOtpFromDb(normalizedMobile, normalizedOtp, userType);
+  // Use last 10 digits for database operations
+  const dbMobile = normalizedMobile.slice(-10);
+
+  return verifyOtpFromDb(dbMobile, normalizedOtp, userType);
 }
 
 // ==========================================
@@ -399,7 +404,7 @@ export async function verifyOTP(
   // Normalize mobile number
   const normalizedMobile = mobile.replace(/\D/g, '');
 
-  if (normalizedMobile.length !== 10) {
+  if (normalizedMobile.length < 10 || normalizedMobile.length > 12) {
     console.error('OTP verification failed - invalid mobile format:', {
       original: mobile,
       normalized: normalizedMobile,
@@ -408,6 +413,9 @@ export async function verifyOTP(
     return false;
   }
 
-  return verifyOtpFromDb(normalizedMobile, normalizedOtp, userType);
+  // Use last 10 digits for database operations
+  const dbMobile = normalizedMobile.slice(-10);
+
+  return verifyOtpFromDb(dbMobile, normalizedOtp, userType);
 }
 

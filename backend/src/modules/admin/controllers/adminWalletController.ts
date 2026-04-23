@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import Commission from '../../../models/Commission';
 import WalletTransaction from '../../../models/WalletTransaction';
 import WithdrawRequest from '../../../models/WithdrawRequest';
+import DeliveryWallet from '../../../models/DeliveryWallet';
+import Delivery from '../../../models/Delivery';
 import { asyncHandler } from '../../../utils/asyncHandler';
 import { approveWithdrawal, rejectWithdrawal, completeWithdrawal } from './adminWithdrawalController';
 
@@ -95,7 +97,9 @@ export const getFinancialDashboard = asyncHandler(async (_req: Request, res: Res
 export const getAdminEarnings = asyncHandler(async (req: Request, res: Response) => {
     const { page = 1, limit = 20, status, dateFrom, dateTo } = req.query;
 
-    const query: any = {};
+    // Admin earnings should only include admin-side commission entries.
+    // In this system that is represented by SELLER commissions.
+    const query: any = { type: 'SELLER' };
     if (status) query.status = status;
     if (dateFrom || dateTo) {
         query.createdAt = {};
@@ -248,4 +252,156 @@ export const processWithdrawalWrapper = asyncHandler(async (req: Request, res: R
             message: 'Invalid action. Must be "Approve", "Reject", or "Complete"'
         });
     }
+});
+
+/**
+ * Create Fund Transfer (Manual adjustment of wallet balance by Admin)
+ */
+export const createFundTransfer = asyncHandler(async (req: Request, res: Response) => {
+    const { userId, userType, amount, type, description } = req.body;
+
+    if (!userId || !userType || !amount || !type || !description) {
+        return res.status(400).json({
+            success: false,
+            message: 'All fields (userId, userType, amount, type, description) are required'
+        });
+    }
+
+    const transferAmount = Number(amount);
+    if (transferAmount <= 0) {
+        return res.status(400).json({
+            success: false,
+            message: 'Amount must be greater than 0'
+        });
+    }
+
+    let userAccount: any;
+    
+    if (userType === 'DELIVERY_BOY') {
+        const Delivery = require('../../../models/Delivery').default;
+        userAccount = await Delivery.findById(userId);
+    } else if (userType === 'SELLER') {
+        const Seller = require('../../../models/Seller').default;
+        userAccount = await Seller.findById(userId);
+    } else if (userType === 'CUSTOMER') {
+        const Customer = require('../../../models/Customer').default;
+        userAccount = await Customer.findById(userId);
+    } else {
+        return res.status(400).json({ success: false, message: 'Invalid userType' });
+    }
+
+    if (!userAccount) {
+         return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Determine the balance field based on userType
+    const balanceField = userType === 'CUSTOMER' ? 'walletAmount' : 'balance';
+    
+    const openingBalance = userAccount[balanceField] || 0;
+    
+    let closingBalance = openingBalance;
+    if (type === 'Credit') {
+        closingBalance = openingBalance + transferAmount;
+    } else if (type === 'Debit') {
+        if (openingBalance < transferAmount) {
+             return res.status(400).json({ success: false, message: 'Insufficient balance for debit' });
+        }
+        closingBalance = openingBalance - transferAmount;
+    } else {
+        return res.status(400).json({ success: false, message: 'Invalid type. Must be Credit or Debit' });
+    }
+
+    // Update user balance
+    userAccount[balanceField] = closingBalance;
+    await userAccount.save();
+
+    // Create WalletTransaction record
+    const transaction = await WalletTransaction.create({
+        userId,
+        userType,
+        amount: transferAmount,
+        type,
+        description,
+        status: 'Completed',
+        reference: `FT-${Date.now()}`,
+        openingBalance,
+        closingBalance
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: 'Fund transfer successful',
+        data: transaction
+    });
+});
+
+/**
+ * COD settlement dashboard (delivery deposits)
+ */
+export const getCodSettlements = asyncHandler(async (req: Request, res: Response) => {
+    const { page = 1, limit = 20, deliveryBoyId } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const matchWallet: any = {};
+    if (deliveryBoyId) {
+        matchWallet.deliveryBoy = new mongoose.Types.ObjectId(String(deliveryBoyId));
+    }
+
+    const pipeline: mongoose.PipelineStage[] = [
+        { $match: matchWallet },
+        { $unwind: "$transactions" },
+        { $match: { "transactions.type": "deposit" } },
+        {
+            $project: {
+                _id: 0,
+                deliveryBoy: 1,
+                amount: "$transactions.amount",
+                status: "$transactions.status",
+                createdAt: "$transactions.createdAt",
+                reference: "$transactions.reference",
+                metadata: "$transactions.metadata",
+            },
+        },
+        { $sort: { createdAt: -1 } },
+        {
+            $facet: {
+                rows: [{ $skip: skip }, { $limit: Number(limit) }],
+                total: [{ $count: "count" }],
+            },
+        },
+    ];
+
+    const result = await DeliveryWallet.aggregate(pipeline);
+    const rows = result?.[0]?.rows || [];
+    const total = Number(result?.[0]?.total?.[0]?.count || 0);
+
+    const deliveryIds = [...new Set(rows.map((row: any) => String(row.deliveryBoy)))];
+    const deliveries = await Delivery.find({ _id: { $in: deliveryIds } }).select("name mobile");
+    const deliveryMap = new Map(deliveries.map((d: any) => [String(d._id), d]));
+
+    const settlements = rows.map((row: any) => {
+        const delivery = deliveryMap.get(String(row.deliveryBoy));
+        return {
+            deliveryBoyId: row.deliveryBoy,
+            deliveryBoyName: delivery?.name || "Unknown",
+            deliveryBoyMobile: delivery?.mobile || "",
+            amount: Number(row.amount || 0),
+            status: row.status,
+            createdAt: row.createdAt,
+            razorpayOrderId: row.metadata?.razorpayOrderId || null,
+            razorpayPaymentId: row.metadata?.razorpayPaymentId || null,
+            reference: row.reference,
+        };
+    });
+
+    return res.status(200).json({
+        success: true,
+        data: settlements,
+        pagination: {
+            page: Number(page),
+            limit: Number(limit),
+            total,
+            pages: Math.ceil(total / Number(limit)),
+        },
+    });
 });

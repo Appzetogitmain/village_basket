@@ -116,6 +116,8 @@ export default function DeliveryOrderDetail() {
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
     const [routeInfo, setRouteInfo] = useState<{ distance: string; duration: string } | null>(null);
     const [locationError, setLocationError] = useState<string | null>(null);
+    const [paymentCollectedBy, setPaymentCollectedBy] = useState<'cash' | 'qr'>('cash');
+    const [customerTip, setCustomerTip] = useState<number>(0);
 
     // New state for seller proximity and pickup tracking
     const [sellerProximity, setSellerProximity] = useState<Record<string, { withinRange: boolean; distance: number }>>({});
@@ -190,7 +192,11 @@ export default function DeliveryOrderDetail() {
         }
         try {
             setOtpVerifying(true);
-            const result = await verifyDeliveryOtp(id, otpValue);
+            const paymentDetails = order.paymentMethod === 'COD' 
+                ? { paymentCollectedBy, customerTip } 
+                : undefined;
+            
+            const result = await verifyDeliveryOtp(id, otpValue, paymentDetails);
             alert(result.message || 'OTP verified successfully. Order marked as delivered.');
             await fetchOrder(); // Refresh order data
             setShowOtpInput(false);
@@ -931,6 +937,71 @@ export default function DeliveryOrderDetail() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Payment Selection for COD */}
+                        {order.paymentMethod === 'COD' && showOtpInput && (
+                            <div className="mb-6 bg-stone-50/80 p-4 rounded-2xl border border-stone-100">
+                                <div className="flex items-center justify-between mb-3">
+                                    <p className="text-[10px] font-black text-village-umber uppercase tracking-wider">How is customer paying?</p>
+                                    <span className="text-[10px] font-black text-[#8B3D28]">₹ {order.totalAmount}</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        onClick={() => setPaymentCollectedBy('cash')}
+                                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                                            paymentCollectedBy === 'cash'
+                                                ? 'bg-white border-[#8B3D28] shadow-sm'
+                                                : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
+                                        }`}
+                                    >
+                                        <Icons.Truck size={20} className={paymentCollectedBy === 'cash' ? 'text-[#8B3D28]' : 'text-stone-300'} />
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'cash' ? 'text-village-umber' : ''}`}>Hard Cash</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setPaymentCollectedBy('qr')}
+                                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                                            paymentCollectedBy === 'qr'
+                                                ? 'bg-white border-[#4A7C59] shadow-sm'
+                                                : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
+                                        }`}
+                                    >
+                                        <Icons.ShieldCheck size={20} className={paymentCollectedBy === 'qr' ? 'text-[#4A7C59]' : 'text-stone-300'} />
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'qr' ? 'text-village-umber' : ''}`}>Online / QR</span>
+                                    </button>
+                                </div>
+
+                                {/* Customer Tip Input */}
+                                <div className="mt-4 pt-4 border-t border-dashed border-stone-200">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest">Customer Tip</p>
+                                        <div className="flex items-center gap-2">
+                                            {[0, 10, 20, 50].map(tip => (
+                                                <button
+                                                    key={tip}
+                                                    onClick={() => setCustomerTip(tip)}
+                                                    className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all ${
+                                                        customerTip === tip 
+                                                            ? 'bg-[#4A7C59] text-white' 
+                                                            : 'bg-stone-200 text-stone-500'
+                                                    }`}
+                                                >
+                                                    {tip === 0 ? 'None' : `₹${tip}`}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {customerTip > 0 && (
+                                        <input
+                                            type="number"
+                                            value={customerTip}
+                                            onChange={(e) => setCustomerTip(Number(e.target.value))}
+                                            className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-[10px] font-black text-village-umber focus:outline-none focus:ring-1 focus:ring-[#4A7C59]"
+                                            placeholder="Enter tip amount"
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         {/* 4-digit OTP Input */}
                         <div className="flex justify-center gap-3 mb-5">

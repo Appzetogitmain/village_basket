@@ -578,22 +578,17 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
       
       {/* Ultra-Slim Header Ribbon */}
       <div className="px-4 md:px-8 mb-3 md:mb-6 flex items-center justify-between relative z-10">
-        <div className="flex items-center gap-2 md:gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
-          <h1 className="text-white font-black md:font-bold text-xs md:text-3xl tracking-wider uppercase font-poppins">
-            {headingText}
-          </h1>
-          <div className="h-3 w-[1px] bg-white/20"></div>
-          <span className="text-[10px] md:text-sm font-bold md:font-semibold text-white/50 uppercase">
-            {saleTextValue}
-          </span>
-        </div>
-        
-        {dateRange && (
-          <div className="px-2 py-0.5 md:px-4 md:py-1 rounded-full bg-white/10 border border-white/10">
-            <span className="text-white/60 text-[8px] md:text-xs font-black md:font-bold uppercase tracking-widest">{dateRange.split('-')[1] || dateRange}</span>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-white/50 animate-pulse" />
+            <span className="text-white text-[10px] font-black uppercase tracking-widest">
+              {headingText}
+            </span>
+            <span className="text-white text-[10px] font-black uppercase tracking-widest ml-2">
+              {saleTextValue}
+            </span>
           </div>
-        )}
+        
+
       </div>
 
       {/* Horizontal Scrolling Deals Ribbon */}

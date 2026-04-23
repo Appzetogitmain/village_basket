@@ -19,7 +19,8 @@ import appTrackingImg from '@assets/landing_page/app_tracking.png';
 import appScrnshot1 from '@assets/landing_page/app_scrnshot.png';
 import appScrnshot2 from '@assets/landing_page/app_category_scrnshot.png';
 import appScrnshot3 from '@assets/landing_page/app_orders_scrnshot.png';
-
+import { submitInquiry } from '../../services/api/contactService';
+import { useToast } from '../../context/ToastContext';
 /* ─── Reveal Component ───────────────────────────── */
 function Reveal({ children, width = "fit-content", delay = 0 }: { children: React.ReactNode, width?: "fit-content" | "100%", delay?: number }) {
   return (
@@ -197,6 +198,7 @@ function AppMockupSlider({
 export default function LandingPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -224,6 +226,29 @@ export default function LandingPage() {
     const timer = setInterval(() => setFeatureIter(i => (i + 1) % 3), 4000);
     return () => clearInterval(timer);
   }, []);
+
+  // Contact Form State
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleInquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) {
+      showToast('Please fill all fields', 'error');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      await submitInquiry(formData);
+      showToast('Inquiry submitted! We will get back to you soon.', 'success');
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error: any) {
+      showToast(error.response?.data?.message || 'Failed to submit inquiry', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const navLinks = [
     { label: 'Categories', href: '#categories' },
@@ -805,21 +830,46 @@ export default function LandingPage() {
             {/* Contact Form Placeholder */}
             <div className="flex-1 bg-white p-6 md:p-8 rounded-[2rem] shadow-xl text-[#3E2723]">
               <h3 className="font-black text-xl mb-6">Send a Message</h3>
-              <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-4" onSubmit={handleInquirySubmit}>
                 <div>
                   <label className="text-xs font-black uppercase tracking-wider text-[#3E2723]/50 ml-1">Your Name</label>
-                  <input type="text" className="w-full mt-1 bg-[#FAF7F2] border border-[#8B3D28]/20 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8B3D28] font-medium" placeholder="John Doe" />
+                  <input 
+                    type="text" 
+                    className="w-full mt-1 bg-[#FAF7F2] border border-[#8B3D28]/20 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8B3D28] font-medium" 
+                    placeholder="John Doe" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                  />
                 </div>
                 <div>
                   <label className="text-xs font-black uppercase tracking-wider text-[#3E2723]/50 ml-1">Email Address</label>
-                  <input type="email" className="w-full mt-1 bg-[#FAF7F2] border border-[#8B3D28]/20 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8B3D28] font-medium" placeholder="john@example.com" />
+                  <input 
+                    type="email" 
+                    className="w-full mt-1 bg-[#FAF7F2] border border-[#8B3D28]/20 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8B3D28] font-medium" 
+                    placeholder="john@example.com" 
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                  />
                 </div>
                 <div>
                   <label className="text-xs font-black uppercase tracking-wider text-[#3E2723]/50 ml-1">Message</label>
-                  <textarea rows={3} className="w-full mt-1 bg-[#FAF7F2] border border-[#8B3D28]/20 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8B3D28] font-medium resize-none" placeholder="How can we help?"></textarea>
+                  <textarea 
+                    rows={3} 
+                    className="w-full mt-1 bg-[#FAF7F2] border border-[#8B3D28]/20 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8B3D28] font-medium resize-none" 
+                    placeholder="How can we help?"
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    required
+                  ></textarea>
                 </div>
-                <button className="w-full bg-[#3E2723] text-white font-black uppercase tracking-widest text-xs py-4 rounded-xl hover:bg-[#8B3D28] transition-colors mt-2">
-                  Submit Inquiry
+                <button 
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#3E2723] text-white font-black uppercase tracking-widest text-xs py-4 rounded-xl hover:bg-[#8B3D28] transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
                 </button>
               </form>
             </div>

@@ -45,6 +45,15 @@ export default function DeliveryWallet() {
     paid: 0,
     pending: 0,
   });
+  const [ledger, setLedger] = useState<any>(null);
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [unpaidOrders, setUnpaidOrders] = useState<any[]>([]);
+  const [selectedOrderId, setSelectedOrderId] = useState("");
+  const [payoutAmount, setPayoutAmount] = useState("");
+  const [payoutRemark, setPayoutRemark] = useState("");
+  const [fetchingUnpaid, setFetchingUnpaid] = useState(false);
+  const [payoutInProgress, setPayoutInProgress] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -68,7 +77,10 @@ export default function DeliveryWallet() {
           getDeliveryCommissions(),
         ]);
 
-      if (balanceRes.success) setBalance(balanceRes.data.balance);
+      if (balanceRes.success) {
+          setBalance(balanceRes.data.balance);
+          setLedger(balanceRes.data);
+      }
       if (transactionsRes.success)
         setTransactions(transactionsRes.data.transactions || []);
       if (withdrawalsRes.success) setWithdrawals(withdrawalsRes.data || []);
@@ -80,6 +92,50 @@ export default function DeliveryWallet() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenPayout = async () => {
+    setShowPayoutModal(true);
+    try {
+        setFetchingUnpaid(true);
+        const { getUnpaidCodOrders } = await import("../../../services/api/delivery/deliveryService");
+        const orders = await getUnpaidCodOrders();
+        setUnpaidOrders(orders || []);
+    } catch (err) {
+        console.error("Error fetching unpaid orders:", err);
+    } finally {
+        setFetchingUnpaid(false);
+    }
+  };
+
+  const handleSubmitPayout = async () => {
+    if (!payoutAmount || Number(payoutAmount) <= 0) {
+        showToast("Please enter a valid amount", "error");
+        return;
+    }
+
+    try {
+        setPayoutInProgress(true);
+        const { submitManualSettlement } = await import("../../../services/api/delivery/deliveryService");
+        const res = await submitManualSettlement({
+            amount: Number(payoutAmount),
+            orderId: selectedOrderId || undefined,
+            remark: payoutRemark
+        });
+
+        if (res.success) {
+            showToast("Payout recorded successfully. Admin will verify it.", "success");
+            setShowPayoutModal(false);
+            setPayoutAmount("");
+            setSelectedOrderId("");
+            setPayoutRemark("");
+            fetchWalletData();
+        }
+    } catch (err: any) {
+        showToast(err.response?.data?.message || "Failed to record payout", "error");
+    } finally {
+        setPayoutInProgress(false);
     }
   };
 
@@ -182,6 +238,42 @@ export default function DeliveryWallet() {
                     <p className={`text-[12px] font-black tracking-tighter truncate ${stat.color}`}>{"\u20B9"}{stat.value?.toFixed(0) || "0"}</p>
                 </div>
             ))}
+        </div>
+
+        {/* Cash in Hand Section */}
+        <div className="mt-6">
+            <div className="village-card paper-texture organic-radius p-5 border-none shadow-sm bg-[#4A7C59]/5 border-l-4 border-l-[#4A7C59]">
+                <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#4A7C59]">Cash in Hand (COD)</span>
+                        <div className="flex items-baseline gap-1.5 mt-1">
+                            <span className="text-sm font-black text-[#4A7C59]/40">{"\u20B9"}</span>
+                            <span className="text-2xl font-black tracking-tighter text-[#4A7C59]">{(ledger?.cashInHand || 0).toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={handleOpenPayout}
+                        className="px-5 py-3 bg-[#8B3D28] text-white rounded-2xl shadow-xl shadow-[#8B3D28]/30 font-black text-[11px] uppercase tracking-[0.2em] active:scale-95 transition-all relative overflow-hidden"
+                    >
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                        <span className="relative z-10">Pay Out</span>
+                    </button>
+                    <div className="hidden w-10 h-10 rounded-xl bg-[#4A7C59]/10 flex items-center justify-center text-[#4A7C59]">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                    </div>
+                </div>
+                <p className="text-[9px] font-bold text-stone-400 uppercase tracking-tight leading-relaxed">
+                    This amount is collected from COD orders. Please deposit it to the Admin to settle your accounts.
+                </p>
+                {ledger?.cashInHand > 0 && (
+                    <div className="mt-4 p-3 bg-white/50 rounded-xl border border-[#4A7C59]/10 text-[9px] font-black text-village-umber uppercase tracking-widest flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#4A7C59] animate-pulse"></span>
+                        Action Required: Settlement Pending
+                    </div>
+                )}
+            </div>
         </div>
 
         {/* Tab System */}
@@ -356,6 +448,95 @@ export default function DeliveryWallet() {
               </motion.div>
             </div>
           )}
+      </AnimatePresence>
+
+      {/* Payout Modal */}
+      <AnimatePresence>
+        {showPayoutModal && (
+            <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 lg:p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowPayoutModal(false)}
+                className="absolute inset-0 bg-village-umber/40 backdrop-blur-sm"
+              />
+              <motion.div
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="relative w-full max-w-md bg-stone-50 rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 shadow-2xl paper-texture overflow-hidden"
+              >
+                <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8B3D28] opacity-50 block mb-1">Financial Reconciliation</span>
+                        <h2 className="text-2xl font-black text-village-umber tracking-tighter">Manual Payout</h2>
+                    </div>
+                    <button onClick={() => setShowPayoutModal(false)} className="w-10 h-10 rounded-2xl bg-stone-200/50 flex items-center justify-center text-stone-400 group active:scale-90 transition-all">
+                        <Icons.X />
+                    </button>
+                </div>
+
+                <div className="space-y-6">
+                    <div>
+                        <label className="block text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3 ml-1">Order Context (Optional)</label>
+                        <select 
+                            value={selectedOrderId}
+                            onChange={(e) => {
+                                const id = e.target.value;
+                                setSelectedOrderId(id);
+                                const order = unpaidOrders.find(o => o.id === id);
+                                if (order) setPayoutAmount(String(order.totalAmount));
+                            }}
+                            disabled={fetchingUnpaid}
+                            className="w-full bg-white border-2 border-stone-100 rounded-[1.5rem] px-6 py-4 text-xs font-black text-village-umber outline-none focus:border-[#8B3D28]/30 transition-all disabled:opacity-50"
+                        >
+                            <option value="">Lump Sum Settlement</option>
+                            {unpaidOrders.map(order => (
+                                <option key={order.id} value={order.id}>{order.orderId} - ₹{order.totalAmount}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3 ml-1">Handed Over Amount</label>
+                        <div className="relative group">
+                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-stone-200 group-focus-within:text-[#8B3D28] transition-colors">{"\u20B9"}</span>
+                            <input
+                                type="number"
+                                value={payoutAmount}
+                                onChange={(e) => setPayoutAmount(e.target.value)}
+                                className="w-full bg-white border-2 border-stone-100 rounded-[1.5rem] pl-12 pr-6 py-5 text-2xl font-black text-village-umber outline-none focus:border-[#8B3D28]/30 focus:ring-8 focus:ring-[#8B3D28]/5 transition-all"
+                                placeholder="0.00"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3 ml-1">Remark / Notes</label>
+                        <textarea
+                            value={payoutRemark}
+                            onChange={(e) => setPayoutRemark(e.target.value)}
+                            className="w-full bg-white border-2 border-stone-100 rounded-[1.5rem] px-6 py-4 text-xs font-black text-village-umber outline-none focus:border-[#8B3D28]/30 transition-all min-h-[100px]"
+                            placeholder="e.g. Handed over cash at office..."
+                        />
+                    </div>
+
+                    <button
+                        onClick={handleSubmitPayout}
+                        disabled={payoutInProgress || !payoutAmount}
+                        className="w-full bg-[#8B3D28] text-white py-5 rounded-3xl font-black text-[11px] uppercase tracking-[0.25em] shadow-2xl shadow-[#8B3D28]/30 transition-all active:scale-[0.98] disabled:opacity-50 relative overflow-hidden group mt-4"
+                    >
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
+                        <span className="relative z-10">{payoutInProgress ? "PROCESSING..." : "SUBMIT PAYOUT"}</span>
+                    </button>
+                </div>
+              </motion.div>
+            </div>
+        )}
       </AnimatePresence>
     </div>
   );

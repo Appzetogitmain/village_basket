@@ -132,7 +132,7 @@ export default function GoogleMapsAutocomplete({
       console.error('Autocomplete initialization error:', err);
       setError(`Failed to initialize autocomplete: ${errorMessage}`);
     }
-  }, [onChange, value]);
+  }, [onChange]);
 
   useEffect(() => {
     if (isLoaded && inputRef.current && !autocompleteRef.current) {

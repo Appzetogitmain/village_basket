@@ -3,6 +3,7 @@ import { authenticate, requireUserType } from '../middleware/auth';
 import { Request, Response } from 'express';
 import { createRazorpayOrder, capturePayment, handleWebhook } from '../services/paymentService';
 import Order from '../models/Order';
+import { isCashOrder } from '../services/codService';
 
 const router = Router();
 
@@ -34,6 +35,13 @@ router.post('/create-order', authenticate, requireUserType('Customer'), async (r
         totalToPay = order.payableAmount;
         customerId = order.customer.toString();
 
+        if (isCashOrder(order as any) || (order.paymentMethod || '').toUpperCase() === 'WALLET' || totalToPay <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Razorpay order is not required for this payment method',
+            });
+        }
+
         // Verify order belongs to customer
         if (customerId !== req.user!.userId) {
             return res.status(403).json({
@@ -46,6 +54,18 @@ router.post('/create-order', authenticate, requireUserType('Customer'), async (r
 
         if (!result.success) {
             return res.status(400).json(result);
+        }
+
+        if (result.data?.razorpayOrderId) {
+            await Order.findByIdAndUpdate(orderId, {
+                $set: {
+                    payment: {
+                        method: 'razorpay',
+                        status: 'pending',
+                        razorpayOrderId: result.data.razorpayOrderId,
+                    },
+                },
+            });
         }
 
         return res.status(200).json(result);

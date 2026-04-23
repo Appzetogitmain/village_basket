@@ -60,7 +60,7 @@ export default function SellerSignUp() {
     if (name === 'mobile') {
       setFormData(prev => ({
         ...prev,
-        [name]: value.replace(/\D/g, '').slice(0, 10),
+        [name]: value.replace(/\D/g, '').slice(0, 12),
       }));
     } else if (name === 'serviceRadiusKm') {
       // Allow only numbers and a single decimal point
@@ -139,8 +139,8 @@ export default function SellerSignUp() {
       setError('Please enter your mobile number');
       return;
     }
-    if (formData.mobile.length !== 10) {
-      setError('Please enter a valid 10-digit mobile number');
+    if (formData.mobile.length < 10 || formData.mobile.length > 12) {
+      setError('Please enter a valid 10-12 digit mobile number');
       return;
     }
 
@@ -364,7 +364,7 @@ export default function SellerSignUp() {
                       onChange={handleInputChange}
                       placeholder="Enter mobile number"
                       required
-                      maxLength={10}
+                      maxLength={12}
                       className="flex-1 px-3 py-2.5 text-sm placeholder:text-neutral-400 focus:outline-none"
                       disabled={loading}
                     />

@@ -10,6 +10,8 @@ export interface IWalletTransaction extends Document {
     reference: string;
     relatedOrder?: mongoose.Types.ObjectId; // Reference to order (for commission credits)
     relatedCommission?: mongoose.Types.ObjectId; // Reference to commission record
+    openingBalance?: number;
+    closingBalance?: number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -59,6 +61,12 @@ const WalletTransactionSchema = new Schema<IWalletTransaction>(
             type: Schema.Types.ObjectId,
             ref: 'Commission',
         },
+        openingBalance: {
+            type: Number
+        },
+        closingBalance: {
+            type: Number
+        }
     },
     {
         timestamps: true,

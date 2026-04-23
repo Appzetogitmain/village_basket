@@ -24,6 +24,7 @@ export interface VerifyOTPResponse {
       email: string;
       city: string;
       status: string;
+      approvalStatus?: "Pending" | "Approved" | "Rejected";
     };
   };
 }
@@ -58,6 +59,7 @@ export interface RegisterResponse {
       email: string;
       city: string;
       status: string;
+      approvalStatus?: "Pending" | "Approved" | "Rejected";
     };
   };
 }
@@ -102,4 +104,3 @@ export const register = async (data: RegisterData): Promise<RegisterResponse> =>
 export const logout = (): void => {
   removeAuthToken('delivery');
 };
-

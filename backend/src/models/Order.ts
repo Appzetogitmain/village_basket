@@ -48,6 +48,15 @@ export interface IOrder extends Document {
   paymentMethod: string;
   paymentStatus: "Pending" | "Paid" | "Failed" | "Refunded";
   paymentId?: string;
+  payment?: {
+    method: "razorpay" | "cash" | "wallet" | "upi" | "card";
+    status: "pending" | "processing" | "completed" | "failed" | "refunded";
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    razorpaySignature?: string;
+    transactionId?: string;
+  };
+  paymentCollectedBy?: "cash" | "qr";
 
   // Order Status
   status:
@@ -263,6 +272,37 @@ const OrderSchema = new Schema<IOrder>(
       type: String,
       trim: true,
     },
+    payment: {
+      method: {
+        type: String,
+        enum: ["razorpay", "cash", "wallet", "upi", "card"],
+      },
+      status: {
+        type: String,
+        enum: ["pending", "processing", "completed", "failed", "refunded"],
+      },
+      razorpayOrderId: {
+        type: String,
+        trim: true,
+      },
+      razorpayPaymentId: {
+        type: String,
+        trim: true,
+      },
+      razorpaySignature: {
+        type: String,
+        trim: true,
+      },
+      transactionId: {
+        type: String,
+        trim: true,
+      },
+    },
+    paymentCollectedBy: {
+      type: String,
+      enum: ["cash", "qr"],
+      default: "cash",
+    },
 
     // Order Status
     status: {
@@ -404,12 +444,68 @@ const OrderSchema = new Schema<IOrder>(
 // Generate order number before validation
 OrderSchema.pre("validate", async function (this: IOrder, next) {
   if (!this.orderNumber) {
-    const timestamp = Date.now().toString();
-    const random = Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, "0");
-    this.orderNumber = `ORD${timestamp}${random}`;
+    let isUnique = false;
+    let newOrderNumber = "";
+    
+    // Try up to 10 times to find a unique 8-digit order number
+    let attempts = 0;
+    while (!isUnique && attempts < 10) {
+      // Generate 8 digit random number
+      newOrderNumber = Math.floor(10000000 + Math.random() * 90000000).toString();
+      
+      // Check if this orderNumber already exists
+      const existingOrder = await mongoose.models.Order.findOne({ orderNumber: newOrderNumber });
+      if (!existingOrder) {
+        isUnique = true;
+      }
+      attempts++;
+    }
+    
+    // Fallback if somehow 10 attempts fail (highly unlikely with 8 digits)
+    if (!isUnique) {
+      const timestamp = Date.now().toString().slice(-5);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
+      newOrderNumber = `${timestamp}${random}`;
+    }
+    
+    this.orderNumber = newOrderNumber;
   }
+  next();
+});
+
+// Keep legacy and nested payment fields synchronized for backward compatibility.
+OrderSchema.pre("save", function (this: IOrder, next) {
+  if (this.payment?.method) {
+    const methodMap: Record<string, string> = {
+      cash: "COD",
+      wallet: "Wallet",
+      razorpay: "Online",
+      upi: "UPI",
+      card: "Card",
+    };
+    const statusMap: Record<string, IOrder["paymentStatus"]> = {
+      pending: "Pending",
+      processing: "Pending",
+      completed: "Paid",
+      failed: "Failed",
+      refunded: "Refunded",
+    };
+
+    this.paymentMethod = methodMap[this.payment.method] || this.paymentMethod;
+    this.paymentStatus = statusMap[this.payment.status] || this.paymentStatus;
+  } else {
+    const normalizedMap: Record<string, IOrder["payment"]> = {
+      COD: { method: "cash", status: "pending" },
+      Wallet: { method: "wallet", status: this.paymentStatus === "Paid" ? "completed" : "pending" },
+      UPI: { method: "upi", status: this.paymentStatus === "Paid" ? "completed" : "pending" },
+      Card: { method: "card", status: this.paymentStatus === "Paid" ? "completed" : "pending" },
+      Online: { method: "razorpay", status: this.paymentStatus === "Paid" ? "completed" : "pending" },
+    };
+    if (this.paymentMethod && normalizedMap[this.paymentMethod]) {
+      this.payment = normalizedMap[this.paymentMethod];
+    }
+  }
+
   next();
 });
 
@@ -418,6 +514,7 @@ OrderSchema.index({ customer: 1, orderDate: -1 });
 OrderSchema.index({ status: 1 });
 OrderSchema.index({ orderDate: -1 });
 OrderSchema.index({ deliveryBoy: 1 });
+OrderSchema.index({ "payment.method": 1, "payment.status": 1 });
 
 const Order = mongoose.models.Order || mongoose.model<IOrder>("Order", OrderSchema);
 

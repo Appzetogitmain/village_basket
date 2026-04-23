@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import HomeHero from './components/HomeHero';
 import { useOrders } from '../../hooks/useOrders';
 import { useCart } from '../../context/CartContext';
 import { getProducts } from '../../services/api/customerProductService';
@@ -97,8 +96,23 @@ export default function OrderAgain() {
   const hasOrders = orders && orders.length > 0;
 
   return (
-    <div className="pb-24">
-      <HomeHero />
+    <div className="pb-24 min-h-screen">
+      {/* Village Themed Header - Compact */}
+      <div className="px-4 py-3 bg-[#8B3D28] border-b border-white/10 mb-4 sticky top-0 z-20 flex items-center gap-2 shadow-lg">
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <button
+          onClick={() => navigate(-1)}
+          className="p-1.5 text-white hover:bg-white/10 rounded-full transition-all active:scale-95 z-10"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <h1 className="text-[12px] font-black text-white uppercase tracking-[0.2em] font-poppins z-10">My Orders</h1>
+        <div className="ml-auto bg-white/20 px-2 py-0.5 rounded-full text-[8px] font-black text-white uppercase tracking-tighter z-10">
+          {orders.length} Orders
+        </div>
+      </div>
 
       {/* Orders Section */}
       {hasOrders && (
@@ -124,7 +138,7 @@ export default function OrderAgain() {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[9px] md:text-[11px] font-black text-village-umber/40 uppercase tracking-tighter">Order ID</span>
                         <div className={`px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-black uppercase tracking-tighter ${getStatusColor(order.status)} shadow-sm`}>
-                          {order.status}
+                          {order.status === 'Received' ? 'Order Placed' : order.status}
                         </div>
                       </div>
                       <h4 className="text-[10px] md:text-sm font-black text-village-umber uppercase truncate max-w-[140px] md:max-w-xs tracking-tight">#{order.orderNumber || order.id}</h4>

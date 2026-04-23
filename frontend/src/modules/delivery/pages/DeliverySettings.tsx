@@ -29,6 +29,12 @@ export default function DeliverySettings() {
   const [locationEnabled, setLocationEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [appLanguage, setAppLanguage] = useState("en-US");
+
+  const languageLabelMap: Record<string, string> = {
+    "en-US": "English (US)",
+    "en-IN": "English (India)",
+  };
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -47,6 +53,15 @@ export default function DeliverySettings() {
       }
     };
     fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem("delivery_app_language") || "en-US";
+    const normalizedLanguage = ["en-US", "en-IN"].includes(storedLanguage) ? storedLanguage : "en-US";
+    if (storedLanguage !== normalizedLanguage) {
+      localStorage.setItem("delivery_app_language", normalizedLanguage);
+    }
+    setAppLanguage(normalizedLanguage);
   }, []);
 
   const handleSettingChange = async (key: string, value: boolean) => {
@@ -139,7 +154,7 @@ export default function DeliverySettings() {
           <h3 className="text-[#8B3D28] text-[9px] font-black uppercase tracking-[0.3em] mb-4 ml-1">Legal & Others</h3>
           <div className="village-card paper-texture organic-radius bg-white divide-y divide-stone-100 overflow-hidden shadow-sm border-none pr-2 pl-2">
             {[
-              { label: 'App Language', sub: 'English (US)', route: null },
+              { label: 'App Language', sub: languageLabelMap[appLanguage] || "English (US)", route: '/delivery/language' },
               { label: 'Privacy Policy', sub: 'Policy Framework', route: '/delivery/privacy' },
               { label: 'Terms of Service', sub: 'Guidelines & Rules', route: '/delivery/terms' }
             ].map((item, idx) => (

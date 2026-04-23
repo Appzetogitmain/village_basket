@@ -26,6 +26,9 @@ export interface DeliveryBoy {
   balance: number;
   cashCollected: number;
   status: "Active" | "Inactive";
+  approvalStatus?: "Pending" | "Approved" | "Rejected";
+  approvalRemark?: string;
+  approvalUpdatedAt?: string;
   available: "Available" | "Not Available";
   currentLocation?: {
     latitude: number;
@@ -85,11 +88,13 @@ export interface CashCollection {
   deliveryBoyId: string;
   deliveryBoyName: string;
   orderId: string;
+  orderNumber?: string;
   total: number;
   amount: number;
   remark?: string;
   collectedAt: string;
   collectedBy: string;
+  status?: "Pending" | "Approved" | "Rejected" | "Completed";
 }
 
 export interface CreateCashCollectionData {
@@ -104,6 +109,7 @@ export interface GetDeliveryParams {
   limit?: number;
   search?: string;
   status?: "Active" | "Inactive";
+  approvalStatus?: "Pending" | "Approved" | "Rejected";
   available?: "Available" | "Not Available";
   city?: string;
   sortBy?: string;
@@ -195,6 +201,18 @@ export const updateDeliveryBoyAvailability = async (
   return response.data;
 };
 
+export const updateDeliveryBoyApproval = async (
+  id: string,
+  approvalStatus: "Pending" | "Approved" | "Rejected",
+  approvalRemark?: string
+): Promise<ApiResponse<DeliveryBoy>> => {
+  const response = await api.patch<ApiResponse<DeliveryBoy>>(
+    `/admin/delivery/${id}/approval`,
+    { approvalStatus, approvalRemark }
+  );
+  return response.data;
+};
+
 /**
  * Cash Collection APIs
  */
@@ -248,6 +266,33 @@ export const getDeliveryBoyCashCollections = async (
   const response = await api.get<ApiResponse<CashCollection[]>>(
     `/admin/delivery/${deliveryBoyId}/cash-collections`,
     { params }
+  );
+  return response.data;
+};
+export const getDeliveryAssignments = async (
+  id: string,
+  params?: { status?: string; page?: number; limit?: number }
+): Promise<ApiResponse<any[]>> => {
+  const response = await api.get<ApiResponse<any[]>>(
+    `/admin/delivery/${id}/assignments`,
+    { params }
+  );
+  return response.data;
+};
+
+export const getUnpaidCodOrders = async (
+  deliveryBoyId: string
+): Promise<ApiResponse<any[]>> => {
+  const response = await api.get<ApiResponse<any[]>>(
+    "/admin/orders",
+    {
+      params: {
+        deliveryBoy: deliveryBoyId,
+        paymentMethod: "COD",
+        paymentStatus: "Pending",
+        status: "Delivered",
+      }
+    }
   );
   return response.data;
 };

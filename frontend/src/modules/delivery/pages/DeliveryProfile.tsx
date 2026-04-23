@@ -70,6 +70,12 @@ export default function DeliveryProfile() {
       try {
         setLoading(true);
         const data = await getDeliveryProfile();
+        const resolvedRating = Number(
+          (data as any)?.rating ??
+          (data as any)?.averageRating ??
+          (data as any)?.deliveryRating ??
+          0
+        );
         const nextProfileData: ProfileData = {
           name: data.name,
           phone: data.mobile,
@@ -79,7 +85,7 @@ export default function DeliveryProfile() {
           vehicleType: data.vehicleType || 'Bike',
           joinDate: new Date(data.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
           totalDeliveries: data.totalDeliveredCount || 0,
-          rating: 4.8, 
+          rating: Number.isFinite(resolvedRating) ? Number(resolvedRating.toFixed(1)) : 0,
           accountName: data.accountName || '',
           bankName: data.bankName || '',
           accountNumber: data.accountNumber || '',

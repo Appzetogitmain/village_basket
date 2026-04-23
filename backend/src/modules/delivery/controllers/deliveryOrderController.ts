@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import Order from "../../../models/Order";
 import { notifySellersOfOrderUpdate } from "../../../services/sellerNotificationService";
-import Delivery from "../../../models/Delivery";
 import OrderItem from "../../../models/OrderItem";
 import Seller from "../../../models/Seller";
 import { generateDeliveryOtp, verifyDeliveryOtp } from "../../../services/deliveryOtpService";
 import { processOrderStatusTransition } from "../../../services/orderService";
+import { completeDeliveryLifecycle } from "../../../services/codService";
 
 /**
  * Helper to map order items for response
@@ -27,17 +27,21 @@ const mapOrderItems = (items: any[]) => {
  */
 export const getAllOrdersHistory = asyncHandler(async (req: Request, res: Response) => {
     const deliveryId = req.user?.userId;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
-    const skip = (page - 1) * limit;
+    const { page = 1, limit = 20, paymentStatus, paymentMethod, status } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
 
-    const orders = await Order.find({ deliveryBoy: deliveryId })
-        .populate("items") // Populate OrderItems
+    const query: any = { deliveryBoy: deliveryId };
+    if (paymentStatus) query.paymentStatus = paymentStatus;
+    if (paymentMethod) query.paymentMethod = paymentMethod;
+    if (status) query.status = status;
+
+    const orders = await Order.find(query)
+        .populate("items")
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit);
+        .limit(Number(limit));
 
-    const total = await Order.countDocuments({ deliveryBoy: deliveryId });
+    const total = await Order.countDocuments(query);
 
     // Batched Commission Fetch for Efficiency
     const { default: Commission } = await import("../../../models/Commission");
@@ -74,7 +78,7 @@ export const getAllOrdersHistory = asyncHandler(async (req: Request, res: Respon
         data: formattedOrders,
         pagination: {
             current: page,
-            pages: Math.ceil(total / limit),
+            pages: Math.ceil(total / Number(limit)),
             total
         }
     });
@@ -207,13 +211,27 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
     const { status } = req.body;
     const deliveryId = req.user?.userId;
 
-    const order = await Order.findById(id);
+    let order = await Order.findById(id);
     if (!order) {
         return res.status(404).json({ success: false, message: "Order not found" });
     }
 
     if (order.deliveryBoy?.toString() != deliveryId) {
         return res.status(403).json({ success: false, message: "This order is not assigned to you" });
+    }
+
+    if (order.status === 'Delivered' && status === 'Delivered') {
+        const completion = await completeDeliveryLifecycle({
+            orderId: id,
+            deliveryBoyId: deliveryId,
+            paymentCollectedBy: req.body?.paymentCollectedBy,
+            customerTip: Number(req.body?.customerTip || 0),
+        });
+        return res.status(200).json({
+            success: true,
+            message: 'Order already delivered',
+            data: completion.order,
+        });
     }
 
     // Save previous status before updating
@@ -225,29 +243,28 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
     if (status === 'Picked up') {
         order.deliveryBoyStatus = 'Picked Up';
     } else if (status === 'Delivered') {
-        order.deliveryBoyStatus = 'Delivered';
-        order.deliveredAt = new Date();
-        order.paymentStatus = 'Paid'; // Assume paid on delivery (or already paid)
+        const completion = await completeDeliveryLifecycle({
+            orderId: id,
+            deliveryBoyId: deliveryId,
+            paymentCollectedBy: req.body?.paymentCollectedBy,
+            customerTip: Number(req.body?.customerTip || 0),
+        });
+        order = completion.order;
 
-        // CASH COLLECTION LOGIC
-        if (order.paymentMethod === 'COD') {
-            await Delivery.findByIdAndUpdate(deliveryId, {
-                $inc: { cashCollected: order.total }
-            });
-        }
-
-        // COMMISSION DISTRIBUTION
-        // Import commission service dynamically
-        const { distributeCommissions } = await import('../../../services/commissionService');
-        try {
-            await distributeCommissions(id);
-        } catch (commError: any) {
-            console.error('Error distributing commissions:', commError);
-            // Continue even if commission distribution fails
+        if (!completion.alreadyDelivered) {
+            // Import commission service dynamically
+            const { distributeCommissions } = await import('../../../services/commissionService');
+            try {
+                await distributeCommissions(id);
+            } catch (commError: any) {
+                console.error('Error distributing commissions:', commError);
+                // Continue even if commission distribution fails
+            }
         }
     }
-
-    await order.save();
+    if (status !== 'Delivered') {
+        await order.save();
+    }
 
     // Emit socket events for status changes
     const io = (req.app as any).get("io");
@@ -449,7 +466,7 @@ export const verifyDeliveryOtpController = asyncHandler(async (req: Request, res
         // Note: verifyDeliveryOtp is from service, not this controller
 
         // Reload order to get updated status
-        const updatedOrder = await Order.findById(id);
+        let updatedOrder = await Order.findById(id);
 
         // Process order status transition for financial transactions
         if (updatedOrder && updatedOrder.status === 'Delivered' && previousStatus !== 'Delivered') {
@@ -463,22 +480,23 @@ export const verifyDeliveryOtpController = asyncHandler(async (req: Request, res
 
         // Update delivery boy balance and cash collected (if COD)
         if (updatedOrder && updatedOrder.status === 'Delivered') {
-            if (updatedOrder.paymentMethod === 'COD') {
-                updatedOrder.paymentStatus = 'Paid';
-                await updatedOrder.save();
-                
-                await Delivery.findByIdAndUpdate(deliveryId, {
-                    $inc: { cashCollected: updatedOrder.total }
-                });
-            }
+            const completion = await completeDeliveryLifecycle({
+                orderId: id,
+                deliveryBoyId: deliveryId,
+                paymentCollectedBy: req.body?.paymentCollectedBy,
+                customerTip: Number(req.body?.customerTip || 0),
+            });
+            updatedOrder = completion.order;
 
-            // COMMISSION DISTRIBUTION
-            const { distributeCommissions } = await import('../../../services/commissionService');
-            try {
-                await distributeCommissions(id);
-            } catch (commError: any) {
-                console.error('Error distributing commissions:', commError);
-                // Continue even if commission distribution fails
+            if (!completion.alreadyDelivered) {
+                // COMMISSION DISTRIBUTION
+                const { distributeCommissions } = await import('../../../services/commissionService');
+                try {
+                    await distributeCommissions(id);
+                } catch (commError: any) {
+                    console.error('Error distributing commissions:', commError);
+                    // Continue even if commission distribution fails
+                }
             }
 
             // Emit socket events for real-time status update
