@@ -287,6 +287,13 @@ export default function Account() {
                   </div>
                   <span className="text-stone-300 opacity-50">›</span>
                 </button>
+                <button onClick={handleLogout} className="w-full flex items-center justify-between px-5 py-4 hover:bg-red-50 transition-colors text-red-600 border-t border-stone-100">
+                  <div className="flex items-center gap-4">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-600"><polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    <span className="text-xs font-black uppercase tracking-widest">Delete Account</span>
+                  </div>
+                  <span className="text-stone-300 opacity-50">›</span>
+                </button>
               </div>
             </div>
             <p className="text-center text-[10px] text-stone-300 font-bold uppercase tracking-widest pb-10">Version 2.4.0 • Village Basket</p>
