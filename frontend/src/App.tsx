@@ -56,6 +56,7 @@ const SignUp = lazy(() => import("./modules/user/SignUp"));
 
 const AboutUs = lazy(() => import("./modules/user/AboutUs"));
 const FAQ = lazy(() => import("./modules/user/FAQ"));
+const ContactUs = lazy(() => import("./modules/user/ContactUs"));
 const PrivacyPolicy = lazy(() => import("./modules/user/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./modules/user/TermsOfService"));
 const Addresses = lazy(() => import("./modules/user/Addresses"));
@@ -474,6 +475,7 @@ function App() {
                                     <Route path="account" element={<Account />} />
                                     <Route path="about-us" element={<AboutUs />} />
                                     <Route path="faq" element={<FAQ />} />
+                                    <Route path="contact" element={<ContactUs />} />
                                     <Route path="privacy-policy" element={<PrivacyPolicy />} />
                                     <Route path="terms-of-service" element={<TermsOfService />} />
                                     <Route path="wishlist" element={<Wishlist />} />
