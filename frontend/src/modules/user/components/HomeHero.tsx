@@ -15,12 +15,14 @@ import homeIcon from '@assets/category/home_v2.png';
 import { useCart } from '../../../context/CartContext';
 import { useAuth } from '../../../context/AuthContext';
 import brandLogo from '@assets/village_basket-removebg-preview.png';
+import FestivalCategoryModule from './FestivalCategoryModule';
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface HomeHeroProps {
   activeTab?: string;
   onTabChange?: (tabId: string) => void;
+  festivalModules?: any[];
 }
 
 interface Tab {
@@ -36,7 +38,7 @@ const HOME_TAB: Tab = {
 };
 
 
-export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroProps) {
+export default function HomeHero({ activeTab = 'all', onTabChange, festivalModules }: HomeHeroProps) {
   const [tabs, setTabs] = useState<Tab[]>([HOME_TAB]);
 
   useEffect(() => {
@@ -454,6 +456,15 @@ export default function HomeHero({ activeTab = 'all', onTabChange }: HomeHeroPro
       </div>
 
       {/* Desktop Header removed - Now handled by AppLayout global header */}
+
+      {/* Festival Modules integrated here - Can now render multiple */}
+      {festivalModules && festivalModules.length > 0 && (
+        <div className="flex flex-col gap-4 relative z-10">
+          {festivalModules.map((module) => (
+            <FestivalCategoryModule key={module.id || module._id} module={module} />
+          ))}
+        </div>
+      )}
 
       {/* Sticky section: Search Bar and Category Tabs - Always sticky */}
       <div

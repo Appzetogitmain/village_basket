@@ -111,6 +111,16 @@ export const menuSections: MenuSection[] = [
         ),
       },
       {
+        label: "Festival Module",
+        path: "/admin/festival-module",
+        icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87l1.18 6.88L12 17.77l-6.18 3.25L7 14.14L2 9.27l6.91-1.01L12 2z" fill="currentColor" fillOpacity="0.2" />
+            <path d="M12 2v20M2 12h20" opacity="0.3" />
+          </svg>
+        ),
+      },
+      {
         label: "Lowest Prices",
         path: "/admin/lowest-prices",
         icon: (

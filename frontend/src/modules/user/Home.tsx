@@ -7,7 +7,9 @@ import LowestPricesEver from "./components/LowestPricesEver";
 import CategoryTileSection from "./components/CategoryTileSection";
 import FeaturedThisWeek from "./components/FeaturedThisWeek";
 import BestsellerCards from "./components/BestsellerCards";
+import FestivalCategoryModule from "./components/FestivalCategoryModule";
 import ProductCard from "./components/ProductCard";
+
 import { getHomeContent } from "../../services/api/customerHomeService";
 import { getHeaderCategoriesPublic } from "../../services/api/headerCategoryService";
 import { useLocation } from "../../hooks/useLocation";
@@ -47,7 +49,9 @@ export default function Home() {
     trending: [],
     cookingIdeas: [],
     bestsellerCards: [],
+    festivalModule: null,
   });
+
 
   const [products, setProducts] = useState<any[]>([]);
 
@@ -266,13 +270,19 @@ export default function Home() {
       {/* Page Texture Overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
 
-      {/* Hero Header with Gradient and Tabs */}
-      <HomeHero activeTab={activeTab} onTabChange={setActiveTab} />
+      {/* Hero Header with Gradient, Tabs, and Festival Module integrated */}
+      <HomeHero 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+        festivalModules={homeData.festivalModules} 
+      />
+
 
       {/* Promo Strip */}
       <div className="relative z-10">
         <PromoStrip activeTab={activeTab} />
       </div>
+
 
       {/* LOWEST PRICES EVER Section */}
       <div className="bg-transparent pt-2 relative z-10">
