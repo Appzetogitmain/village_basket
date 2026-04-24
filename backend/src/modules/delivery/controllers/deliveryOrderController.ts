@@ -194,7 +194,11 @@ export const getOrderDetails = asyncHandler(async (req: Request, res: Response) 
         totalAmount: order.total,
         createdAt: order.createdAt,
         distance: null,
-        deliveryEarning: commission ? commission.commissionAmount : 0
+        deliveryEarning: commission ? commission.commissionAmount : 0,
+        deliverySlot: order.deliverySlot || null,
+        paymentMethod: order.paymentMethod,
+        paymentStatus: order.paymentStatus,
+        sellerPickups: order.sellerPickups || []
     };
 
     return res.status(200).json({
@@ -769,5 +773,107 @@ export const checkCustomerProximity = asyncHandler(async (req: Request, res: Res
             distanceMeters: Math.round(distance * 1000), // in meters
             customerName: order.customerName
         }
+    });
+});
+
+/**
+ * Helper: checks if a deliverySlot qualifies as the 5AM–10AM early morning contactless slot
+ */
+const isEarlyMorningSlot = (slot: any): boolean => {
+    if (!slot) return false;
+    
+    // 1. Check direct HH:MM fields if they exist
+    if (slot.startTime && slot.endTime) {
+        return slot.startTime >= '05:00' && slot.endTime <= '10:00';
+    }
+    
+    // 2. Fallback: Parse timeRange string (e.g. "6 AM - 9 AM")
+    if (slot.timeRange) {
+        const range = slot.timeRange.toLowerCase();
+        // Simple regex to extract numbers before "am"
+        const amMatches = range.match(/(\d+)\s*am/g);
+        if (amMatches && amMatches.length === 2) {
+            const startHour = parseInt(amMatches[0]);
+            const endHour = parseInt(amMatches[1]);
+            // If it's something like 6 AM to 9 AM, it qualifies
+            return startHour >= 5 && endHour <= 10;
+        }
+    }
+    
+    return false;
+};
+
+/**
+ * Mark Contactless Delivery (Early Morning 5AM–10AM Slot)
+ * Skips OTP — directly marks order as Delivered.
+ */
+export const markContactlessDelivered = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const deliveryId = req.user?.userId;
+
+    const order = await Order.findById(id);
+    if (!order) {
+        return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    if (order.deliveryBoy?.toString() !== deliveryId) {
+        return res.status(403).json({ success: false, message: 'This order is not assigned to you' });
+    }
+
+    if (order.status === 'Delivered') {
+        return res.status(400).json({ success: false, message: 'Order is already delivered' });
+    }
+
+    if (order.status !== 'Picked up') {
+        return res.status(400).json({ success: false, message: 'Order must be picked up before marking as delivered' });
+    }
+
+    // Validate this is an early morning slot order
+    if (!isEarlyMorningSlot(order.deliverySlot)) {
+        return res.status(403).json({
+            success: false,
+            message: 'OTP verification is required for this delivery slot. Contactless delivery is only available for the 5AM–10AM slot.'
+        });
+    }
+
+    // Complete delivery lifecycle (updates balance, COD tracking, etc.)
+    const completion = await completeDeliveryLifecycle({
+        orderId: id,
+        deliveryBoyId: deliveryId,
+        paymentCollectedBy: req.body?.paymentCollectedBy,
+        customerTip: Number(req.body?.customerTip || 0),
+    });
+    const updatedOrder = completion.order;
+
+    if (!completion.alreadyDelivered) {
+        // Distribute commissions
+        const { distributeCommissions } = await import('../../../services/commissionService');
+        try {
+            await distributeCommissions(id);
+        } catch (commError: any) {
+            console.error('Error distributing commissions (contactless):', commError);
+        }
+
+        // Emit socket events
+        const io = (req.app as any).get('io');
+        if (io) {
+            io.to(`order-${id}`).emit('order-delivered', {
+                orderId: id,
+                orderNumber: updatedOrder.orderNumber,
+                message: 'Order has been delivered successfully (Contactless)',
+            });
+            io.to(`delivery-${deliveryId}`).emit('order-delivered', {
+                orderId: id,
+                orderNumber: updatedOrder.orderNumber,
+                message: 'Order delivered successfully',
+            });
+            notifySellersOfOrderUpdate(io, updatedOrder, 'STATUS_UPDATE');
+        }
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: 'Order marked as delivered (Contactless — No OTP required)',
+        data: updatedOrder
     });
 });

@@ -34,7 +34,7 @@ interface Tab {
 const HOME_TAB: Tab = {
   id: 'all',
   label: 'Home',
-  icon: <img src={`${homeIcon}?v=${Date.now()}`} alt="Home" className="w-full h-full object-contain" />,
+  icon: <img src={homeIcon} alt="Home" className="w-full h-full object-contain" />,
 };
 
 

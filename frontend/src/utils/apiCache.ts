@@ -20,7 +20,8 @@ class APICache {
   async getOrFetch<T>(
     key: string,
     fetchFn: () => Promise<T>,
-    ttl: number = this.DEFAULT_TTL
+    ttl: number = this.DEFAULT_TTL,
+    persist: boolean = false
   ): Promise<T> {
     // Check if there's a pending request for this key
     const pendingRequest = this.pendingRequests.get(key);
@@ -28,19 +29,49 @@ class APICache {
       return pendingRequest;
     }
 
-    // Check cache
-    const cached = this.cache.get(key);
+    // Check memory cache
+    let cached = this.cache.get(key);
+
+    // If not in memory but persistence is enabled, check sessionStorage
+    if (!cached && persist && typeof window !== 'undefined') {
+      try {
+        const stored = sessionStorage.getItem(`api_cache_${key}`);
+        if (stored) {
+          const entry = JSON.parse(stored);
+          if (Date.now() < entry.expiresAt) {
+            cached = entry;
+            this.cache.set(key, entry); // Hydrate memory cache
+          } else {
+            sessionStorage.removeItem(`api_cache_${key}`);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load from sessionStorage', e);
+      }
+    }
+
     if (cached && Date.now() < cached.expiresAt) {
       return cached.data as T;
     }
 
     // Fetch new data
     const requestPromise = fetchFn().then((data) => {
-      this.cache.set(key, {
+      const entry = {
         data,
         timestamp: Date.now(),
         expiresAt: Date.now() + ttl,
-      });
+      };
+      
+      this.cache.set(key, entry);
+
+      if (persist && typeof window !== 'undefined') {
+        try {
+          sessionStorage.setItem(`api_cache_${key}`, JSON.stringify(entry));
+        } catch (e) {
+          console.error('Failed to save to sessionStorage', e);
+        }
+      }
+
       this.pendingRequests.delete(key);
       return data;
     }).catch((error) => {
@@ -57,6 +88,9 @@ class APICache {
    */
   invalidate(key: string): void {
     this.cache.delete(key);
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem(`api_cache_${key}`);
+    }
   }
 
   /**
@@ -66,7 +100,20 @@ class APICache {
     const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
     for (const key of this.cache.keys()) {
       if (regex.test(key)) {
-        this.cache.delete(key);
+        this.invalidate(key);
+      }
+    }
+    
+    // Also check sessionStorage
+    if (typeof window !== 'undefined') {
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key?.startsWith('api_cache_')) {
+          const cacheKey = key.replace('api_cache_', '');
+          if (regex.test(cacheKey)) {
+            sessionStorage.removeItem(key);
+          }
+        }
       }
     }
   }
@@ -77,6 +124,15 @@ class APICache {
   clear(): void {
     this.cache.clear();
     this.pendingRequests.clear();
+    if (typeof window !== 'undefined') {
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key?.startsWith('api_cache_')) {
+          sessionStorage.removeItem(key!);
+          i--; // Adjust index after removal
+        }
+      }
+    }
   }
 
   /**
@@ -86,7 +142,7 @@ class APICache {
     const now = Date.now();
     for (const [key, entry] of this.cache.entries()) {
       if (now >= entry.expiresAt) {
-        this.cache.delete(key);
+        this.invalidate(key);
       }
     }
   }
@@ -95,18 +151,43 @@ class APICache {
    * Check if data is cached and not expired (synchronous)
    */
   has(key: string): boolean {
-    const cached = this.cache.get(key);
-    return cached !== undefined && Date.now() < cached.expiresAt;
+    if (this.cache.has(key)) {
+      const cached = this.cache.get(key);
+      return cached !== undefined && Date.now() < cached.expiresAt;
+    }
+    
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem(`api_cache_${key}`);
+      if (stored) {
+        const entry = JSON.parse(stored);
+        return Date.now() < entry.expiresAt;
+      }
+    }
+    
+    return false;
   }
 
   /**
    * Get cached data synchronously (returns null if not cached or expired)
    */
   getSync<T>(key: string): T | null {
+    // Check memory first
     const cached = this.cache.get(key);
     if (cached && Date.now() < cached.expiresAt) {
       return cached.data as T;
     }
+
+    // Check storage
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem(`api_cache_${key}`);
+      if (stored) {
+        const entry = JSON.parse(stored);
+        if (Date.now() < entry.expiresAt) {
+          return entry.data as T;
+        }
+      }
+    }
+    
     return null;
   }
 }

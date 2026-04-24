@@ -629,6 +629,29 @@ export default function OrderDetail() {
     }
   }, [orderStatus]);
 
+  // Detect if this order is an early morning contactless slot (5AM–10AM)
+  const isEarlyMorningSlot = (slot: any): boolean => {
+    if (!slot) return false;
+
+    // 1. Check direct HH:MM fields if they exist
+    if (slot.startTime && slot.endTime) {
+      return slot.startTime >= "05:00" && slot.endTime <= "10:00";
+    }
+
+    // 2. Fallback: Parse timeRange string (e.g. "6 AM - 9 AM")
+    if (slot.timeRange) {
+      const range = slot.timeRange.toLowerCase();
+      const amMatches = range.match(/(\d+)\s*am/g);
+      if (amMatches && amMatches.length === 2) {
+        const startHour = parseInt(amMatches[0]);
+        const endHour = parseInt(amMatches[1]);
+        return startHour >= 5 && endHour <= 10;
+      }
+    }
+
+    return false;
+  };
+
   // Handler functions
   const handleRefresh = async () => {
     if (!id) return;
@@ -1038,7 +1061,7 @@ export default function OrderDetail() {
             eta={routeInfo ? Math.ceil(routeInfo.durationValue / 60) : eta}
             distance={routeInfo ? routeInfo.distanceValue : distance}
             isTracking={isConnected && !!deliveryLocation}
-            deliveryOtp={socketDeliveryOtp || order?.deliveryOtp}
+            deliveryOtp={isEarlyMorningSlot(order.deliverySlot) ? undefined : (socketDeliveryOtp || order?.deliveryOtp)}
             onCall={() => {
               const phone = order?.deliveryPartner?.phone || "1234567890";
               window.location.href = `tel:${phone}`;

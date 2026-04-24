@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import { useLoading } from '../context/LoadingContext';
+import { ALLOWED_ANIMATIONS, getAnimationData } from '../utils/animationCache';
 
 interface VillageLoaderProps {
     message?: string;
@@ -37,39 +38,13 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     const currentPath = isRouteLoading ? lockedPath : path;
 
     useEffect(() => {
-        let animationName = 'Basket.json';
+        // Pick one at random for every load
+        const index = Math.floor(Math.random() * ALLOWED_ANIMATIONS.length);
+        const animationName = ALLOWED_ANIMATIONS[index];
 
-        if (currentPath.includes('/login')) {
-            animationName = 'login_animation.json';
-        } else if (
-            currentPath === '/' || 
-            currentPath === '/user/home' || 
-            currentPath.includes('/categories') || 
-            currentPath.includes('/category') || 
-            currentPath.includes('/about-us') || 
-            currentPath.includes('/faq') || 
-            currentPath.includes('/help') ||
-            currentPath.includes('/search')
-        ) {
-            animationName = 'Apple tree.json';
-        } else if (
-            currentPath.includes('/cart') || 
-            currentPath.includes('/checkout') || 
-            currentPath.includes('/wishlist') || 
-            currentPath.includes('/orders') || 
-            currentPath.includes('/order-again') || 
-            currentPath.includes('/wallet') || 
-            currentPath.includes('/rewards')
-        ) {
-            animationName = 'Thanksgiving basket.json';
-        } else {
-            animationName = 'Basket.json'; // Default
-        }
-
-        fetch(`/animations/${animationName}`)
-            .then(res => res.json())
-            .then(data => setAnimationData(data))
-            .catch(err => console.error('Failed to load animation in VillageLoader:', err));
+        getAnimationData(animationName).then(data => {
+            if (data) setAnimationData(data);
+        });
     }, [currentPath]);
 
     // Don't show if global route loading is already active to prevent double animations
@@ -80,21 +55,8 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     const isDelivery = currentPath.includes('/delivery');
 
     const renderAnimation = () => {
-        // LOGIN: LOTTIE ANIMATION
-        if (currentPath.includes('/login')) {
-            return (
-                <div className="w-64 h-64 flex items-center justify-center transform -translate-y-4">
-                    {animationData ? (
-                        <Lottie animationData={animationData} loop={true} />
-                    ) : (
-                        <div className="w-16 h-16 border-4 border-amber-600 border-t-transparent rounded-full animate-spin" />
-                    )}
-                </div>
-            );
-        }
-
         return (
-            <div className="w-48 h-48 flex items-center justify-center">
+            <div className="w-[200px] h-[200px] flex items-center justify-center">
                 {animationData ? (
                     <Lottie animationData={animationData} loop={true} />
                 ) : (

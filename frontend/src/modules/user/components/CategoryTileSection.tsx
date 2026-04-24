@@ -106,7 +106,7 @@ export default function CategoryTileSection({
 
             return (
               <motion.div
-                key={tile.id}
+                key={tile.id || (tile as any)._id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2 }}

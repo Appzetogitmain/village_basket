@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getOrderDetails, updateOrderStatus, getSellerLocationsForOrder, sendDeliveryOtp, verifyDeliveryOtp, updateDeliveryLocation, checkSellerProximity, confirmSellerPickup, checkCustomerProximity } from '../../../services/api/delivery/deliveryService';
+import { getOrderDetails, updateOrderStatus, getSellerLocationsForOrder, sendDeliveryOtp, verifyDeliveryOtp, updateDeliveryLocation, checkSellerProximity, confirmSellerPickup, checkCustomerProximity, markContactlessDelivered } from '../../../services/api/delivery/deliveryService';
 import deliveryIcon from '@assets/deliveryboy/deliveryIcon.png';
 import GoogleMapsTracking from '../../../components/GoogleMapsTracking';
 import VillageLoader from '../../../components/VillageLoader';
@@ -118,6 +118,7 @@ export default function DeliveryOrderDetail() {
     const [locationError, setLocationError] = useState<string | null>(null);
     const [paymentCollectedBy, setPaymentCollectedBy] = useState<'cash' | 'qr'>('cash');
     const [customerTip, setCustomerTip] = useState<number>(0);
+    const [isContactlessDelivering, setIsContactlessDelivering] = useState(false);
 
     // New state for seller proximity and pickup tracking
     const [sellerProximity, setSellerProximity] = useState<Record<string, { withinRange: boolean; distance: number }>>({});
@@ -205,6 +206,48 @@ export default function DeliveryOrderDetail() {
             alert(err.message || 'Failed to verify OTP');
         } finally {
             setOtpVerifying(false);
+        }
+    };
+
+    // Detect if this order is an early morning contactless slot (5AM–10AM)
+    const isEarlyMorningSlot = (slot: any): boolean => {
+        if (!slot) return false;
+        
+        // 1. Check direct HH:MM fields if they exist
+        if (slot.startTime && slot.endTime) {
+            return slot.startTime >= '05:00' && slot.endTime <= '10:00';
+        }
+        
+        // 2. Fallback: Parse timeRange string (e.g. "6 AM - 9 AM" or "5:00 AM - 10:00 AM")
+        if (slot.timeRange) {
+            const range = slot.timeRange.toLowerCase();
+            // Simple check: if it contains "AM" and the hours are between 5 and 10
+            // Most slots are like "6 AM - 9 AM"
+            const amMatches = range.match(/(\d+)\s*am/g);
+            if (amMatches && amMatches.length === 2) {
+                const startHour = parseInt(amMatches[0]);
+                const endHour = parseInt(amMatches[1]);
+                // If it's something like 6 AM to 9 AM, it qualifies
+                return startHour >= 5 && endHour <= 10;
+            }
+        }
+        
+        return false;
+    };
+
+    const handleContactlessDeliver = async () => {
+        if (!id) return;
+        try {
+            setIsContactlessDelivering(true);
+            const paymentDetails = order?.paymentMethod === 'COD'
+                ? { paymentCollectedBy, customerTip }
+                : undefined;
+            await markContactlessDelivered(id, paymentDetails);
+            await fetchOrder();
+        } catch (err: any) {
+            alert(err.message || 'Failed to mark as delivered');
+        } finally {
+            setIsContactlessDelivering(false);
         }
     };
 
@@ -524,17 +567,16 @@ export default function DeliveryOrderDetail() {
     const handleStatusChange = async (newStatus: DeliveryOrderStatus) => {
         if (!id) return;
         try {
-            setLoading(true); // Or use a separate loading state for the action
+            setLoading(true);
             const updatedOrder = await updateOrderStatus(id, newStatus);
-            // Verify the update was successful and update local state
             if (updatedOrder && updatedOrder.data) {
                 setOrder(updatedOrder.data);
             } else {
-                // Fallback - re-fetch everything
                 await fetchOrder();
             }
         } catch (err: any) {
             alert(err.message || "Failed to update status");
+        } finally {
             setLoading(false);
         }
     };
@@ -922,139 +964,213 @@ export default function DeliveryOrderDetail() {
 
             </div>
 
-            {/* Customer Delivery OTP Section (only when order is Out for Delivery) */}
+            {/* Delivery Action Panel (only when Picked up) */}
             {order.status === 'Picked up' && (
                 <div className="fixed bottom-24 left-4 right-4 z-40">
-                    <div className="village-card paper-texture organic-radius p-5 shadow-2xl border-none ring-1 ring-[#8B3D28]/10">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex flex-col">
-                                <p className="text-[#8B3D28] text-[10px] font-black uppercase tracking-[0.2em]">Secure Handover</p>
-                                <p className="text-stone-400 text-[8px] font-bold uppercase tracking-widest mt-1">Confirm OTP with Recipient</p>
+                    {isEarlyMorningSlot(order.deliverySlot) ? (
+                        // ── EARLY MORNING CONTACTLESS PANEL ──
+                        <div className="village-card paper-texture organic-radius p-5 shadow-2xl border-none ring-1 ring-amber-200/60 bg-gradient-to-br from-amber-50/80 to-orange-50/60">
+                            {/* Header label */}
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-lg shrink-0">🌅</div>
+                                <div className="flex flex-col">
+                                    <p className="text-amber-800 text-[10px] font-black uppercase tracking-[0.2em] leading-none">Early Morning Contactless Delivery</p>
+                                    <p className="text-amber-600/70 text-[8px] font-bold uppercase tracking-widest mt-1">OTP Not Required · {order.deliverySlot?.timeRange || '5 AM – 10 AM'}</p>
+                                </div>
                             </div>
-                            {customerProximity && (
-                                <div className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${customerProximity.withinRange ? 'bg-[#4A7C59]/10 text-[#4A7C59]' : 'bg-red-50 text-red-400'}`}>
-                                    {customerProximity.distance < 1000 ? `${customerProximity.distance}M` : `${(customerProximity.distance / 1000).toFixed(1)}KM`}
-                                </div>
-                            )}
-                        </div>
 
-                        {/* Payment Selection for COD */}
-                        {order.paymentMethod === 'COD' && showOtpInput && (
-                            <div className="mb-6 bg-stone-50/80 p-4 rounded-2xl border border-stone-100">
-                                <div className="flex items-center justify-between mb-3">
-                                    <p className="text-[10px] font-black text-village-umber uppercase tracking-wider">How is customer paying?</p>
-                                    <span className="text-[10px] font-black text-[#8B3D28]">₹ {order.totalAmount}</span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <button
-                                        onClick={() => setPaymentCollectedBy('cash')}
-                                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                                            paymentCollectedBy === 'cash'
-                                                ? 'bg-white border-[#8B3D28] shadow-sm'
-                                                : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
-                                        }`}
-                                    >
-                                        <Icons.Truck size={20} className={paymentCollectedBy === 'cash' ? 'text-[#8B3D28]' : 'text-stone-300'} />
-                                        <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'cash' ? 'text-village-umber' : ''}`}>Hard Cash</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setPaymentCollectedBy('qr')}
-                                        className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                                            paymentCollectedBy === 'qr'
-                                                ? 'bg-white border-[#4A7C59] shadow-sm'
-                                                : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
-                                        }`}
-                                    >
-                                        <Icons.ShieldCheck size={20} className={paymentCollectedBy === 'qr' ? 'text-[#4A7C59]' : 'text-stone-300'} />
-                                        <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'qr' ? 'text-village-umber' : ''}`}>Online / QR</span>
-                                    </button>
-                                </div>
-
-                                {/* Customer Tip Input */}
-                                <div className="mt-4 pt-4 border-t border-dashed border-stone-200">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest">Customer Tip</p>
-                                        <div className="flex items-center gap-2">
-                                            {[0, 10, 20, 50].map(tip => (
-                                                <button
-                                                    key={tip}
-                                                    onClick={() => setCustomerTip(tip)}
-                                                    className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all ${
-                                                        customerTip === tip 
-                                                            ? 'bg-[#4A7C59] text-white' 
-                                                            : 'bg-stone-200 text-stone-500'
-                                                    }`}
-                                                >
-                                                    {tip === 0 ? 'None' : `₹${tip}`}
-                                                </button>
-                                            ))}
+                            {/* COD payment selector */}
+                            {order.paymentMethod === 'COD' && (
+                                <div className="mb-4 bg-white/60 p-3.5 rounded-2xl border border-amber-100">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <p className="text-[10px] font-black text-village-umber uppercase tracking-wider">How is customer paying?</p>
+                                        <span className="text-[10px] font-black text-amber-700">₹ {order.totalAmount}</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            onClick={() => setPaymentCollectedBy('cash')}
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                                                paymentCollectedBy === 'cash'
+                                                    ? 'bg-white border-amber-500 shadow-sm'
+                                                    : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
+                                            }`}
+                                        >
+                                            <Icons.Truck size={20} className={paymentCollectedBy === 'cash' ? 'text-amber-600' : 'text-stone-300'} />
+                                            <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'cash' ? 'text-village-umber' : ''}`}>Hard Cash</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setPaymentCollectedBy('qr')}
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                                                paymentCollectedBy === 'qr'
+                                                    ? 'bg-white border-[#4A7C59] shadow-sm'
+                                                    : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
+                                            }`}
+                                        >
+                                            <Icons.ShieldCheck size={20} className={paymentCollectedBy === 'qr' ? 'text-[#4A7C59]' : 'text-stone-300'} />
+                                            <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'qr' ? 'text-village-umber' : ''}`}>Online / QR</span>
+                                        </button>
+                                    </div>
+                                    {/* Tip */}
+                                    <div className="mt-3 pt-3 border-t border-dashed border-amber-100">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest">Customer Tip</p>
+                                            <div className="flex items-center gap-2">
+                                                {[0, 10, 20, 50].map(tip => (
+                                                    <button
+                                                        key={tip}
+                                                        onClick={() => setCustomerTip(tip)}
+                                                        className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all ${
+                                                            customerTip === tip ? 'bg-amber-500 text-white' : 'bg-stone-200 text-stone-500'
+                                                        }`}
+                                                    >
+                                                        {tip === 0 ? 'None' : `₹${tip}`}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                    {customerTip > 0 && (
-                                        <input
-                                            type="number"
-                                            value={customerTip}
-                                            onChange={(e) => setCustomerTip(Number(e.target.value))}
-                                            className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-[10px] font-black text-village-umber focus:outline-none focus:ring-1 focus:ring-[#4A7C59]"
-                                            placeholder="Enter tip amount"
-                                        />
-                                    )}
                                 </div>
-                            </div>
-                        )}
-
-                        {/* 4-digit OTP Input */}
-                        <div className="flex justify-center gap-3 mb-5">
-                            <input
-                                type="text"
-                                value={otpValue}
-                                onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                                placeholder="----"
-                                disabled={!showOtpInput}
-                                className={`w-full max-w-[180px] px-6 py-3.5 rounded-2xl text-[20px] font-black text-center tracking-[0.5em] focus:outline-none transition-all shadow-inner ${showOtpInput
-                                    ? 'bg-stone-50 border-2 border-[#8B3D28]/20 text-village-umber'
-                                    : 'bg-stone-100 border-2 border-stone-200 text-stone-300 shadow-none'
-                                    }`}
-                                maxLength={4}
-                            />
-                        </div>
-
-                        <div className="flex gap-3">
-                            {!showOtpInput ? (
-                                <button
-                                    onClick={handleSendOtp}
-                                    disabled={!getOtpEnabled || otpSending}
-                                    className={`flex-1 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all ${getOtpEnabled && !otpSending
-                                        ? 'bg-[#8B3D28] text-white shadow-lg shadow-[#8B3D28]/20 active:scale-[0.98]'
-                                        : 'bg-stone-200 text-stone-400 cursor-not-allowed'
-                                        }`}
-                                >
-                                    {otpSending ? 'Sending...' : getOtpEnabled ? 'Generate OTP' : 'Arrive at Location'}
-                                </button>
-                            ) : (
-                                <>
-                                    <button
-                                        onClick={() => {
-                                            setShowOtpInput(false);
-                                            setOtpValue('');
-                                        }}
-                                        className="w-14 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center hover:bg-stone-200 transition-all active:scale-95"
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                            <path d="M18 6L6 18M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                    <button
-                                        onClick={handleVerifyOtp}
-                                        className="flex-1 py-3.5 rounded-2xl bg-[#4A7C59] text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-[#4A7C59]/20 hover:bg-[#3D664A] transition-all active:scale-95 disabled:bg-stone-200 disabled:text-stone-400 disabled:shadow-none"
-                                        disabled={otpVerifying || otpValue.length !== 4}
-                                    >
-                                        {otpVerifying ? 'Verifying...' : 'Complete Delivery'}
-                                    </button>
-                                </>
                             )}
+
+                            {/* Mark Delivered button */}
+                            <button
+                                onClick={handleContactlessDeliver}
+                                disabled={isContactlessDelivering}
+                                className="w-full py-4 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-amber-400/30 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {isContactlessDelivering ? (
+                                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
+                                ) : (
+                                    <><span>✓</span> Mark as Delivered</>
+                                )}
+                            </button>
                         </div>
-                    </div>
+                    ) : (
+                        // ── NORMAL OTP PANEL ──
+                        <div className="village-card paper-texture organic-radius p-5 shadow-2xl border-none ring-1 ring-[#8B3D28]/10">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex flex-col">
+                                    <p className="text-[#8B3D28] text-[10px] font-black uppercase tracking-[0.2em]">Secure Handover</p>
+                                    <p className="text-stone-400 text-[8px] font-bold uppercase tracking-widest mt-1">Confirm OTP with Recipient</p>
+                                </div>
+                                {customerProximity && (
+                                    <div className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${customerProximity.withinRange ? 'bg-[#4A7C59]/10 text-[#4A7C59]' : 'bg-red-50 text-red-400'}`}>
+                                        {customerProximity.distance < 1000 ? `${customerProximity.distance}M` : `${(customerProximity.distance / 1000).toFixed(1)}KM`}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Payment Selection for COD */}
+                            {order.paymentMethod === 'COD' && showOtpInput && (
+                                <div className="mb-6 bg-stone-50/80 p-4 rounded-2xl border border-stone-100">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <p className="text-[10px] font-black text-village-umber uppercase tracking-wider">How is customer paying?</p>
+                                        <span className="text-[10px] font-black text-[#8B3D28]">₹ {order.totalAmount}</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            onClick={() => setPaymentCollectedBy('cash')}
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                                                paymentCollectedBy === 'cash'
+                                                    ? 'bg-white border-[#8B3D28] shadow-sm'
+                                                    : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
+                                            }`}
+                                        >
+                                            <Icons.Truck size={20} className={paymentCollectedBy === 'cash' ? 'text-[#8B3D28]' : 'text-stone-300'} />
+                                            <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'cash' ? 'text-village-umber' : ''}`}>Hard Cash</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setPaymentCollectedBy('qr')}
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                                                paymentCollectedBy === 'qr'
+                                                    ? 'bg-white border-[#4A7C59] shadow-sm'
+                                                    : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
+                                            }`}
+                                        >
+                                            <Icons.ShieldCheck size={20} className={paymentCollectedBy === 'qr' ? 'text-[#4A7C59]' : 'text-stone-300'} />
+                                            <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'qr' ? 'text-village-umber' : ''}`}>Online / QR</span>
+                                        </button>
+                                    </div>
+                                    <div className="mt-4 pt-4 border-t border-dashed border-stone-200">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest">Customer Tip</p>
+                                            <div className="flex items-center gap-2">
+                                                {[0, 10, 20, 50].map(tip => (
+                                                    <button
+                                                        key={tip}
+                                                        onClick={() => setCustomerTip(tip)}
+                                                        className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all ${
+                                                            customerTip === tip ? 'bg-[#4A7C59] text-white' : 'bg-stone-200 text-stone-500'
+                                                        }`}
+                                                    >
+                                                        {tip === 0 ? 'None' : `₹${tip}`}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        {customerTip > 0 && (
+                                            <input
+                                                type="number"
+                                                value={customerTip}
+                                                onChange={(e) => setCustomerTip(Number(e.target.value))}
+                                                className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-[10px] font-black text-village-umber focus:outline-none focus:ring-1 focus:ring-[#4A7C59]"
+                                                placeholder="Enter tip amount"
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 4-digit OTP Input */}
+                            <div className="flex justify-center gap-3 mb-5">
+                                <input
+                                    type="text"
+                                    value={otpValue}
+                                    onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                    placeholder="----"
+                                    disabled={!showOtpInput}
+                                    className={`w-full max-w-[180px] px-6 py-3.5 rounded-2xl text-[20px] font-black text-center tracking-[0.5em] focus:outline-none transition-all shadow-inner ${showOtpInput
+                                        ? 'bg-stone-50 border-2 border-[#8B3D28]/20 text-village-umber'
+                                        : 'bg-stone-100 border-2 border-stone-200 text-stone-300 shadow-none'
+                                        }`}
+                                    maxLength={4}
+                                />
+                            </div>
+
+                            <div className="flex gap-3">
+                                {!showOtpInput ? (
+                                    <button
+                                        onClick={handleSendOtp}
+                                        disabled={!getOtpEnabled || otpSending}
+                                        className={`flex-1 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all ${getOtpEnabled && !otpSending
+                                            ? 'bg-[#8B3D28] text-white shadow-lg shadow-[#8B3D28]/20 active:scale-[0.98]'
+                                            : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                                            }`}
+                                    >
+                                        {otpSending ? 'Sending...' : getOtpEnabled ? 'Generate OTP' : 'Arrive at Location'}
+                                    </button>
+                                ) : (
+                                    <>
+                                        <button
+                                            onClick={() => { setShowOtpInput(false); setOtpValue(''); }}
+                                            className="w-14 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center hover:bg-stone-200 transition-all active:scale-95"
+                                        >
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                <path d="M18 6L6 18M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onClick={handleVerifyOtp}
+                                            className="flex-1 py-3.5 rounded-2xl bg-[#4A7C59] text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-[#4A7C59]/20 hover:bg-[#3D664A] transition-all active:scale-95 disabled:bg-stone-200 disabled:text-stone-400 disabled:shadow-none"
+                                            disabled={otpVerifying || otpValue.length !== 4}
+                                        >
+                                            {otpVerifying ? 'Verifying...' : 'Complete Delivery'}
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 

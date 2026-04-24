@@ -26,10 +26,6 @@ export default function Home() {
   const activeTab = activeCategory; // mapping for existing code compatibility
   const setActiveTab = setActiveCategory;
 
-  // Clear cache on component mount to ensure fresh data for all tabs
-  useEffect(() => {
-    import("../../utils/apiCache").then(m => m.apiCache.clear());
-  }, []);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollHandledRef = useRef(false);
@@ -78,7 +74,11 @@ export default function Home() {
         const response = await getHomeContent(
           activeTab,
           location?.latitude,
-          location?.longitude
+          location?.longitude,
+          true,            // useCache
+          5 * 60 * 1000,   // TTL
+          false,           // skipLoader
+          true             // persist: Keep in sessionStorage
         );
         if (response.success && response.data) {
           setHomeData(response.data);
@@ -123,7 +123,8 @@ export default function Home() {
                 location?.longitude,
                 true,
                 5 * 60 * 1000,
-                true
+                true,
+                true // PERSIST: Keep in sessionStorage
               ).catch(err => {
                 // Silently fail - this is just preloading
                 console.debug(`Failed to preload data for ${slug}:`, err);

@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import { createServer } from "http";
 import cors from "cors";
+import compression from "compression";
 import dotenv from "dotenv";
 import dns from "dns";
 
@@ -20,6 +21,9 @@ dotenv.config();
 
 const app: Application = express();
 const httpServer = createServer(app);
+
+// Use compression to reduce payload size
+app.use(compression());
 
 // Simplified CORS for Production Debugging (Allow All)
 app.use(cors({

@@ -134,6 +134,8 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
             slotId: order.deliverySlot.slotId,
             label: order.deliverySlot.label,
             timeRange: order.deliverySlot.timeRange,
+            startTime: order.deliverySlot.startTime,
+            endTime: order.deliverySlot.endTime,
             date: new Date().toISOString(),
           }
         }),

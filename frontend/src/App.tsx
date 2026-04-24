@@ -23,6 +23,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import RouteTransition from "./components/RouteTransition";
 import { useEffect } from "react";
 import { initializePushNotifications, setupForegroundNotificationHandler } from "./services/pushNotificationService";
+import { preloadAnimations } from "./utils/animationCache";
 
 const GlobalRedirect = ({ type }: { type: 'product' | 'category' | 'order' }) => {
   const { id } = useParams();
@@ -180,6 +181,9 @@ function App() {
   // Initialize push notifications on app load
   useEffect(() => {
     initializePushNotifications();
+
+    // Preload loader animations
+    preloadAnimations();
 
     // Setup foreground notification handler
     setupForegroundNotificationHandler((payload) => {

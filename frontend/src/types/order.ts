@@ -31,6 +31,8 @@ export interface DeliverySlotSelection {
   label: string;        // e.g., "7 AM - 10 AM"
   timeRange: string;    // same as label for backend
   name: string;         // e.g., "Morning Slot"
+  startTime?: string;   // e.g., "05:00"
+  endTime?: string;     // e.g., "10:00"
 }
 
 export interface Order {

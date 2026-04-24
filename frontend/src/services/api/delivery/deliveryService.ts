@@ -128,6 +128,24 @@ export const verifyDeliveryOtp = async (
   }
 };
 
+/**
+ * Mark an early morning (5AM–10AM) order as delivered without OTP.
+ */
+export const markContactlessDelivered = async (
+  id: string,
+  paymentDetails?: { paymentCollectedBy?: "cash" | "qr"; customerTip?: number },
+) => {
+  try {
+    const response = await api.post(
+      `${BASE_URL}/orders/${id}/contactless-deliver`,
+      { ...paymentDetails },
+    );
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
 export const checkSellerProximity = async (
   orderId: string,
   sellerId: string,

@@ -29,7 +29,8 @@ export const getHomeContent = async (
   longitude?: number,
   useCache: boolean = true,
   cacheTTL: number = 5 * 60 * 1000, // 5 minutes
-  skipLoader: boolean = false
+  skipLoader: boolean = false,
+  persist: boolean = false
 ): Promise<HomeContentResponse> => {
   const cacheKey = `home-content-${headerCategorySlug || 'all'}-${latitude || 0}-${longitude || 0}`;
 
@@ -47,7 +48,7 @@ export const getHomeContent = async (
   };
 
   if (useCache) {
-    return apiCache.getOrFetch(cacheKey, fetchFn, cacheTTL);
+    return apiCache.getOrFetch(cacheKey, fetchFn, cacheTTL, persist);
   }
 
   return fetchFn();

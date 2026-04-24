@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
 import { useLoading } from '../../context/LoadingContext';
+import { ALLOWED_ANIMATIONS, getAnimationData } from '../../utils/animationCache';
 import './iconLoader.css';
-
-// Module-level cache: animation JSON is fetched once and reused across all navigations
-const animationDataCache = new Map<string, any>();
 
 interface IconLoaderProps {
   forceShow?: boolean;
@@ -16,7 +14,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const path = typeof window !== 'undefined' ? window.location.pathname : '';
   const [animationData, setAnimationData] = useState<any>(null);
   const [lockedPath, setLockedPath] = useState<string>(path);
-  const [currentAnimationName, setCurrentAnimationName] = useState<string>('bullock_cart.json');
+  const [currentAnimationName, setCurrentAnimationName] = useState<string>('Grocery-animation.json');
 
   useEffect(() => {
     if (!isRouteLoading && !forceShow) {
@@ -30,40 +28,15 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const currentPath = (isRouteLoading || forceShow) ? lockedPath : path;
 
   useEffect(() => {
-    // List of rotating Indian Village animations provided by the user
-    const ROTATING_ANIMATIONS = [
-      'Basket.json',
-      'india_man_mango_plucking.json',
-      'indian_man_choose_fruits.json',
-      'indian_man_spices.json'
-    ];
-
-    let animationName = 'bullock_cart.json'; // Default to the iconic bullock cart
-
-    // Home & Root page always use the Bullock Cart as the primary "Load" experience
-    // Added /user and /user/ to ensure the redirect after login defaults to bullock cart
-    // Added /login check per user request
-    if (currentPath === '/' || currentPath === '/user' || currentPath === '/user/' || currentPath === '/user/home' || currentPath.includes('/login')) {
-      animationName = 'bullock_cart.json';
-    } else {
-      // For all other route transitions, pick one of the other 4 "village life" scenes at random
-      const index = Math.floor(Math.random() * ROTATING_ANIMATIONS.length);
-      animationName = ROTATING_ANIMATIONS[index];
-    }
+    // Pick one at random for every load
+    const index = Math.floor(Math.random() * ALLOWED_ANIMATIONS.length);
+    const animationName = ALLOWED_ANIMATIONS[index];
 
     setCurrentAnimationName(animationName);
-    // Use cached data if available — avoids re-fetching on repeat visits to same route type
-    if (animationDataCache.has(animationName)) {
-      setAnimationData(animationDataCache.get(animationName));
-    } else {
-      fetch(`/animations/${animationName}`)
-        .then(res => res.json())
-        .then(data => {
-          animationDataCache.set(animationName, data);
-          setAnimationData(data);
-        })
-        .catch(err => console.error('Failed to load animation:', err));
-    }
+    
+    getAnimationData(animationName).then(data => {
+      if (data) setAnimationData(data);
+    });
   }, [currentPath]);
 
   // Detect excluded paths (No loaders for Delivery, Admin, or Seller portals)
@@ -78,7 +51,6 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const isAdmin = currentPath.includes('/admin');
   const isSeller = currentPath.includes('/seller');
 
-  // Animation variants for consistency
   const containerVariants = {
     initial: { opacity: 0, scale: 0.9 },
     animate: { opacity: 1, scale: 1 },
@@ -86,20 +58,10 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   };
 
   const currentAnimation = currentAnimationName;
-  const isExtraLarge = currentAnimation === 'indian_man_spices.json' ||
-    currentAnimation === 'bullock_cart.json';
 
   const renderAnimation = () => {
-    const isRotatingVariant = currentAnimation !== 'bullock_cart.json';
-
-    // Tailored sizes for different animation types
-    let sizeClasses = "w-[600px] h-[600px]"; // Primary animations scale (Bullock Cart, Spices, Vegetables)
-
-    if (currentAnimation === 'Basket.json') {
-      sizeClasses = "w-[180px] h-[180px]"; // Basket is specifically much smaller
-    } else if (isRotatingVariant && !isExtraLarge) {
-      sizeClasses = "w-[300px] h-[300px]"; // Further reduced scale for mango and fruit scenes for more compactness
-    }
+    // Standardized compact size for all 3 allowed animations
+    const sizeClasses = "w-[200px] h-[200px]";
 
     return (
       <div className={`${sizeClasses} flex items-center justify-center`}>
@@ -160,10 +122,10 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
               initial="initial"
               animate="animate"
               exit="exit"
-              className={`flex flex-col items-center justify-center ${isExtraLarge ? 'space-y-0' : 'space-y-2'} translate-y-12`} // Repositioned for larger scale
+              className="flex flex-col items-center justify-center space-y-4"
             >
               {/* Animation Container */}
-              <div className={`relative ${isExtraLarge ? 'min-h-[600px]' : 'min-h-[480px]'} flex items-center justify-center`}>
+              <div className="relative min-h-[200px] flex items-center justify-center">
                 {/* Speed Lines Effects */}
                 <div className="absolute inset-0 pointer-events-none">
                   {[...Array(4)].map((_, i) => (
@@ -199,16 +161,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
               </div>
 
               {/* Status Text (Single Line) */}
-              <div className={`text-center ${(() => {
-                const marginMap: Record<string, string> = {
-                  'bullock_cart.json': '-mt-24',
-                  'Basket.json': 'mt-0',
-                  'indian_man_spices.json': '-mt-72',
-                  'india_man_mango_plucking.json': 'mt-0', // Default for small ones
-                  'indian_man_choose_fruits.json': 'mt-0', // Default for small ones
-                };
-                return marginMap[currentAnimation] || '';
-              })()}`}>
+              <div className="text-center mt-4">
                 <p className="text-village-green font-bold text-[10px] uppercase tracking-[0.2em] leading-none opacity-60">
                   {text.p}
                 </p>

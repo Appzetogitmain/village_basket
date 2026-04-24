@@ -132,7 +132,12 @@ export default function CategoryPage() {
         const response = await getProducts(params);
         if (response.success) {
           // Ensure products have default tags/name array for filtering logic if missing
-          const safeProducts = response.data.map((p: any) => ({
+          // De-duplicate products by ID just in case
+          const uniqueProducts = Array.from(
+            new Map(response.data.map((p: any) => [p._id || p.id, p])).values()
+          );
+          
+          const safeProducts = uniqueProducts.map((p: any) => ({
             ...p,
             tags: Array.isArray(p.tags) ? p.tags : [],
             nameParts: p.name ? p.name.toLowerCase().split(" ") : [],
@@ -617,7 +622,7 @@ export default function CategoryPage() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
                 {categoryProducts.map((product) => (
                   <ProductCard
-                    key={product.id}
+                    key={product._id || product.id}
                     product={product}
                     showHeartIcon={false}
                     showStockInfo={false}

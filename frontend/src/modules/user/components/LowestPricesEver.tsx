@@ -67,6 +67,7 @@ const ProductCard = memo(({
               src={product.imageUrl}
               alt={product.name}
               className="w-full h-full object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-neutral-50 text-neutral-300 text-3xl font-black">

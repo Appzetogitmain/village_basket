@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import Lottie from 'lottie-react';
 import { useLoading } from '../../context/LoadingContext';
+import { ALLOWED_ANIMATIONS, getAnimationData } from '../../utils/animationCache';
 
 const ContentLoader: React.FC = () => {
   const { isRouteLoading } = useLoading();
   const [animationData, setAnimationData] = useState<any>(null);
 
   useEffect(() => {
-    fetch('/animations/Basket.json')
-      .then(res => res.json())
-      .then(data => setAnimationData(data))
-      .catch(err => console.error('Failed to load animation:', err));
+    const index = Math.floor(Math.random() * ALLOWED_ANIMATIONS.length);
+    const animationName = ALLOWED_ANIMATIONS[index];
+
+    getAnimationData(animationName).then(data => {
+      if (data) setAnimationData(data);
+    });
   }, []);
 
   if (isRouteLoading) return null;
 
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20">
-      <div className="w-48 h-48 flex items-center justify-center">
+      <div className="w-[200px] h-[200px] flex items-center justify-center">
         {animationData ? (
           <Lottie
             animationData={animationData}

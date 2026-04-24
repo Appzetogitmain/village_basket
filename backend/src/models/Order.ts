@@ -6,12 +6,14 @@ export interface IOrder extends Document {
   orderNumber: string;
   orderDate: Date;
   orderType: "INSTANT";
-  deliverySlot?: {
-    slotId?: string;
-    date: Date;
-    timeRange: string;
-    label?: string;
-  };
+    deliverySlot?: {
+      slotId?: string;
+      date: Date;
+      timeRange: string;
+      label?: string;
+      startTime?: string;
+      endTime?: string;
+    };
 
   // Customer Info
   customer: mongoose.Types.ObjectId;
