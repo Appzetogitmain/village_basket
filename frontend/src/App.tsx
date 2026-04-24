@@ -321,6 +321,10 @@ function App() {
                             }
                           />
 
+                          {/* Delivery Public Routes (no login required) */}
+                          <Route path="/delivery/privacy" element={<Suspense fallback={null}><DeliveryPrivacy /></Suspense>} />
+                          <Route path="/delivery/contact" element={<Suspense fallback={null}><DeliveryContact /></Suspense>} />
+
                           {/* Delivery App Routes */}
                           <Route
                             path="/delivery/*"
