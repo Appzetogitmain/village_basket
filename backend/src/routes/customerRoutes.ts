@@ -22,4 +22,7 @@ router.get("/location", authenticate, customerController.getLocation);
 // Get delivery configuration (public route for checkout)
 router.get("/delivery-config", customerController.getDeliveryConfig);
 
+// Self-delete account (protected route)
+router.delete("/account", authenticate, customerController.selfDeleteAccount);
+
 export default router;

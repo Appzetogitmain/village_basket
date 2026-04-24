@@ -90,6 +90,7 @@ const DeliveryAbout = lazy(() => import("./modules/delivery/pages/DeliveryAbout"
 const DeliverySellersInRange = lazy(() => import("./modules/delivery/pages/DeliverySellersInRange"));
 const DeliveryPrivacy = lazy(() => import("./modules/delivery/pages/DeliveryPrivacy"));
 const DeliveryTerms = lazy(() => import("./modules/delivery/pages/DeliveryTerms"));
+const DeliveryContact = lazy(() => import("./modules/delivery/pages/DeliveryContact"));
 const DeliveryLanguage = lazy(() => import("./modules/delivery/pages/DeliveryLanguage"));
 const DeliveryLogin = lazy(() => import("./modules/delivery/pages/DeliveryLogin"));
 const DeliverySignUp = lazy(() => import("./modules/delivery/pages/DeliverySignUp"));
@@ -345,6 +346,7 @@ function App() {
                                       <Route path="sellers-in-range" element={<DeliverySellersInRange />} />
                                       <Route path="privacy" element={<DeliveryPrivacy />} />
                                       <Route path="terms" element={<DeliveryTerms />} />
+                                      <Route path="contact" element={<DeliveryContact />} />
                                       <Route path="language" element={<DeliveryLanguage />} />
                                     </Routes>
                                   </DeliveryLayout>

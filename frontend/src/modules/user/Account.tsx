@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getProfile, CustomerProfile } from '../../services/api/customerService';
+import { getProfile, CustomerProfile, selfDeleteCustomerAccount } from '../../services/api/customerService';
 import { getAddresses, Address } from '../../services/api/customerAddressService';
 import { useToast } from '../../context/ToastContext';
 import { useLocation } from 'react-router-dom';
@@ -21,6 +21,8 @@ export default function Account() {
   const { showToast } = useToast();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<'profile'>('profile');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (location.state && (location.state as any).activeTab) {
@@ -74,6 +76,23 @@ export default function Account() {
   const handleLogout = () => {
     authLogout();
     navigate('/user/login');
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setIsDeleting(true);
+      await selfDeleteCustomerAccount();
+      showToast('Account deleted successfully', 'success');
+      setTimeout(() => {
+        authLogout();
+        navigate('/user/login', { replace: true });
+      }, 1500);
+    } catch (err: any) {
+      showToast(err.response?.data?.message || 'Failed to delete account', 'error');
+      setShowDeleteModal(false);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleGstSubmit = (e: React.FormEvent) => {
@@ -287,7 +306,7 @@ export default function Account() {
                   </div>
                   <span className="text-stone-300 opacity-50">›</span>
                 </button>
-                <button onClick={handleLogout} className="w-full flex items-center justify-between px-5 py-4 hover:bg-red-50 transition-colors text-red-600 border-t border-stone-100">
+                <button onClick={() => setShowDeleteModal(true)} className="w-full flex items-center justify-between px-5 py-4 hover:bg-red-50 transition-colors text-red-600 border-t border-stone-100">
                   <div className="flex items-center gap-4">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-red-600"><polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     <span className="text-xs font-black uppercase tracking-widest">Delete Account</span>
@@ -299,6 +318,44 @@ export default function Account() {
             <p className="text-center text-[10px] text-stone-300 font-bold uppercase tracking-widest pb-10">Version 2.4.0 • Village Basket</p>
           </div>
           </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !isDeleting && setShowDeleteModal(false)} />
+          <div className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden p-6 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-red-600">
+                <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-black text-neutral-900 uppercase tracking-tight mb-2">Delete Account?</h3>
+            <p className="text-xs text-neutral-500 font-medium leading-relaxed mb-6">
+              Are you sure you want to delete your account?<br />
+              <span className="text-red-500 font-bold">This action cannot be undone.</span>
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+                className="w-full bg-red-600 text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-red-200 active:scale-[0.98] transition-all disabled:opacity-50"
+              >
+                {isDeleting ? 'Deleting...' : 'Yes, Delete Account'}
+              </button>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                className="w-full bg-stone-100 text-stone-600 py-3 rounded-2xl text-xs font-black uppercase tracking-widest active:scale-[0.98] transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showGstModal && (
         <>
