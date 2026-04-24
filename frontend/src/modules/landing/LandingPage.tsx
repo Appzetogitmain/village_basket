@@ -255,7 +255,7 @@ export default function LandingPage() {
     { label: 'Why Us', href: '#why-us' },
     { label: 'App', href: '#download-app' },
     { label: 'Our Story', href: '#our-story' },
-    { label: 'Contact', href: '#contact' }
+    { label: 'Contact', href: '/user/contact' }
   ];
 
   return (
