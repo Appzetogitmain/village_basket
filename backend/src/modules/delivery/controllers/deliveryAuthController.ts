@@ -31,6 +31,13 @@ export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
+  if (delivery.status === "Deleted") {
+    return res.status(403).json({
+      success: false,
+      message: "This account has been deleted and cannot log in.",
+    });
+  }
+
   const approvalStatus =
     delivery.approvalStatus || (delivery.status === "Active" ? "Approved" : "Pending");
 
@@ -118,6 +125,13 @@ export const verifySmsOtp = asyncHandler(
       });
     }
 
+    if (delivery.status === "Deleted") {
+      return res.status(403).json({
+        success: false,
+        message: "This account has been deleted and cannot log in.",
+      });
+    }
+
     const approvalStatus =
       delivery.approvalStatus || (delivery.status === "Active" ? "Approved" : "Pending");
 
@@ -187,10 +201,10 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   } = req.body;
 
   // Validation
-  if (!name || !mobile || !email || !password) {
+  if (!name || !mobile || !email) {
     return res.status(400).json({
       success: false,
-      message: "Name, mobile, email, and password are required",
+      message: "Name, mobile, and email are required",
     });
   }
 
@@ -209,7 +223,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   if (existingDelivery) {
     return res.status(409).json({
       success: false,
-      message: "Delivery partner already exists with this mobile or email",
+      message: "This mobile number or email is already registered.",
     });
   }
 
@@ -271,5 +285,40 @@ export const getProfile = asyncHandler(async (req: Request, res: Response) => {
   return res.status(200).json({
     success: true,
     data: delivery,
+  });
+});
+
+/**
+ * Delete current delivery partner account (soft delete)
+ */
+export const selfDeleteAccount = asyncHandler(async (req: Request, res: Response) => {
+  // @ts-ignore - req.user is added by middleware
+  const userId = (req.user as any).userId;
+
+  if (!userId) {
+    return res
+      .status(401)
+      .json({ success: false, message: "User not authenticated" });
+  }
+
+  const delivery = await Delivery.findById(userId);
+
+  if (!delivery) {
+    return res.status(404).json({
+      success: false,
+      message: "Delivery partner not found",
+    });
+  }
+
+  // Soft delete: update status to Deleted
+  delivery.status = "Deleted";
+  delivery.isOnline = false;
+  delivery.approvalStatus = "Rejected"; // Also reject to ensure standard checks fail
+  
+  await delivery.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Your account has been successfully deleted.",
   });
 });

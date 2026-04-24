@@ -5,6 +5,7 @@ export interface IFestivalModule extends Document {
     festivalTitle: string;
     festivalSubtitle?: string;
     headerGraphic?: string;
+    desktopHeaderGraphic?: string;
     layoutStyle: "grid" | "horizontal";
     backgroundColor?: string;
     backgroundImage?: string;
@@ -44,7 +45,10 @@ const FestivalModuleSchema = new Schema<IFestivalModule>(
             maxlength: [200, "Subtitle cannot exceed 200 characters"],
         },
         headerGraphic: {
-            type: String, // URL to image
+            type: String, // URL to image (Mobile)
+        },
+        desktopHeaderGraphic: {
+            type: String, // URL to image (Desktop/Landscape)
         },
         layoutStyle: {
             type: String,

@@ -94,8 +94,12 @@ export const verifyOTP = async (
  * Register new delivery partner
  */
 export const register = async (data: RegisterData): Promise<RegisterResponse> => {
-  const response = await api.post<RegisterResponse>('/auth/delivery/register', data);
-  return response.data;
+  try {
+    const response = await api.post<RegisterResponse>('/auth/delivery/register', data);
+    return response.data;
+  } catch (error: any) {
+    return handleApiError(error);
+  }
 };
 
 /**

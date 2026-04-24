@@ -352,6 +352,7 @@ export default function AdminManageDeliveryBoy() {
                                     <option value="All">All Status</option>
                                     <option value="Active">Active</option>
                                     <option value="Inactive">Inactive</option>
+                                    <option value="Deleted">Deleted</option>
                                 </select>
                             </div>
 
@@ -571,7 +572,9 @@ export default function AdminManageDeliveryBoy() {
                                             <td className="px-3 py-2 align-middle">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${deliveryBoy.status === 'Active'
                                                     ? 'bg-green-100 text-green-800'
-                                                    : 'bg-red-100 text-red-800'
+                                                    : deliveryBoy.status === 'Deleted'
+                                                        ? 'bg-gray-100 text-gray-800'
+                                                        : 'bg-red-100 text-red-800'
                                                     }`}>
                                                     {deliveryBoy.status}
                                                 </span>
@@ -619,7 +622,7 @@ export default function AdminManageDeliveryBoy() {
                                                     </button>
                                                     <button
                                                         onClick={() => handleStatusChange(deliveryBoy._id, deliveryBoy.status === 'Active' ? 'Inactive' : 'Active')}
-                                                        disabled={processing === deliveryBoy._id || (deliveryBoy.approvalStatus || 'Pending') !== 'Approved'}
+                                                        disabled={processing === deliveryBoy._id || (deliveryBoy.approvalStatus || 'Pending') !== 'Approved' || deliveryBoy.status === 'Deleted'}
                                                         className={`p-1.5 rounded transition-colors ${deliveryBoy.status === 'Active'
                                                             ? 'text-red-600 hover:bg-red-50'
                                                             : 'text-[#8B3D28] hover:bg-[#FAF7F2]'

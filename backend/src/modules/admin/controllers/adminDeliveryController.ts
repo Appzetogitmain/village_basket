@@ -27,11 +27,11 @@ export const createDeliveryBoy = asyncHandler(
       bonusType,
     } = req.body;
 
-    if (!name || !mobile || !email || !password || !address || !city) {
+    if (!name || !mobile || !email || !address || !city) {
       return res.status(400).json({
         success: false,
         message:
-          "Name, mobile, email, password, address, and city are required",
+          "Name, mobile, email, address, and city are required",
       });
     }
 

@@ -25,7 +25,7 @@ export interface DeliveryBoy {
   maxAmount?: number;
   balance: number;
   cashCollected: number;
-  status: "Active" | "Inactive";
+  status: "Active" | "Inactive" | "Deleted";
   approvalStatus?: "Pending" | "Approved" | "Rejected";
   approvalRemark?: string;
   approvalUpdatedAt?: string;
@@ -79,7 +79,7 @@ export interface UpdateDeliveryBoyData {
   commission?: number;
   minAmount?: number;
   maxAmount?: number;
-  status?: "Active" | "Inactive";
+  status?: "Active" | "Inactive" | "Deleted";
   available?: "Available" | "Not Available";
 }
 
@@ -108,7 +108,7 @@ export interface GetDeliveryParams {
   page?: number;
   limit?: number;
   search?: string;
-  status?: "Active" | "Inactive";
+  status?: "Active" | "Inactive" | "Deleted";
   approvalStatus?: "Pending" | "Approved" | "Rejected";
   available?: "Available" | "Not Available";
   city?: string;

@@ -483,8 +483,8 @@ export default function DeliverySignUp() {
                   </div>
                 </div>
 
-                {error && <div className="text-[9px] font-black uppercase tracking-widest text-[#8B3D28] bg-red-50 py-3 px-4 rounded-xl text-center border border-red-100">{error}</div>}
-                {successMessage && <div className="text-[9px] font-black uppercase tracking-widest text-green-700 bg-green-50 py-3 px-4 rounded-xl text-center border border-green-100">{successMessage}</div>}
+                {error && <div className="text-[10px] font-bold tracking-wide text-[#8B3D28] bg-red-50 py-3 px-4 rounded-xl text-center border border-red-100">{error}</div>}
+                {successMessage && <div className="text-[10px] font-bold tracking-wide text-green-700 bg-green-50 py-3 px-4 rounded-xl text-center border border-green-100">{successMessage}</div>}
 
                 <button
                   type="submit" disabled={loading || uploadingDocs}
@@ -513,7 +513,7 @@ export default function DeliverySignUp() {
                   <OTPInput onComplete={handleOTPComplete} disabled={loading} />
                 </div>
 
-                {error && <div className="text-[9px] font-black uppercase tracking-widest text-[#8B3D28] bg-red-50 py-3 px-4 rounded-xl text-center border border-red-100">{error}</div>}
+                {error && <div className="text-[10px] font-bold tracking-wide text-[#8B3D28] bg-red-50 py-3 px-4 rounded-xl text-center border border-red-100">{error}</div>}
 
                 <div className="flex gap-4">
                   <button

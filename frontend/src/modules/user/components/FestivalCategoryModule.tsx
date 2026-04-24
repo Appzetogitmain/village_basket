@@ -14,6 +14,7 @@ interface FestivalModuleProps {
         festivalTitle: string;
         festivalSubtitle?: string;
         headerGraphic?: string;
+        desktopHeaderGraphic?: string;
         backgroundColor?: string;
         backgroundImage?: string;
         textColor?: string;
@@ -37,7 +38,7 @@ export default function FestivalCategoryModule({ module }: FestivalModuleProps) 
     };
 
     return (
-        <div className="md:px-6 lg:px-8 py-4 md:py-8 mb-6 relative overflow-hidden">
+        <div className="md:px-4 lg:px-6 py-4 md:py-8 mb-6 relative overflow-hidden">
             {/* Background Festive Decoration - Subtle */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-[0.03] z-0">
                 <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-yellow-500 blur-3xl"></div>
@@ -46,7 +47,7 @@ export default function FestivalCategoryModule({ module }: FestivalModuleProps) 
 
             {/* Main Container with Festive Card Style - Edge to edge on mobile */}
             <div 
-                className={`relative z-10 md:organic-radius md:shadow-xl md:border md:border-orange-100/50 pt-0 pb-6 md:p-8 overflow-hidden ${!module.backgroundImage ? 'paper-texture' : ''}`}
+                className={`relative z-10 md:organic-radius md:shadow-xl md:border md:border-orange-100/50 pt-0 pb-6 md:p-0 md:max-w-4xl mx-auto overflow-hidden ${!module.backgroundImage ? 'paper-texture' : ''}`}
                 style={{ 
                     backgroundColor: module.backgroundColor || '#FFF9F0',
                     backgroundImage: module.backgroundImage ? `url(${module.backgroundImage})` : undefined,
@@ -55,10 +56,19 @@ export default function FestivalCategoryModule({ module }: FestivalModuleProps) 
                 }}
             >
                 {/* Header Section */}
-                <div className="flex flex-col items-center text-center mb-8">
+                <div className="flex flex-col items-center text-center mb-4 md:mb-6">
                     {module.headerGraphic ? (
-                        <div className="w-full md:max-w-md mb-6 md:mb-4">
-                            <img src={module.headerGraphic} alt={module.festivalTitle} className="w-full h-auto md:drop-shadow-lg" />
+                        <div className="w-full mb-4 md:mb-3">
+                            <picture>
+                                {module.desktopHeaderGraphic && (
+                                    <source media="(min-width: 768px)" srcSet={module.desktopHeaderGraphic} />
+                                )}
+                                <img 
+                                    src={module.headerGraphic} 
+                                    alt={module.festivalTitle} 
+                                    className="w-full h-auto md:drop-shadow-lg" 
+                                />
+                            </picture>
                         </div>
                     ) : (
                         <div className="mb-4">
@@ -75,7 +85,7 @@ export default function FestivalCategoryModule({ module }: FestivalModuleProps) 
                     
                     {module.festivalSubtitle && (
                         <p 
-                            className="text-sm md:text-lg font-medium max-w-lg italic font-poppins"
+                            className="text-sm md:text-lg lg:text-xl font-medium max-w-xs md:max-w-2xl italic font-poppins px-4"
                             style={{ color: module.textColor || '#8B3D28' }}
                         >
                             {module.festivalSubtitle}
@@ -90,9 +100,9 @@ export default function FestivalCategoryModule({ module }: FestivalModuleProps) 
                     </div>
                 </div>
 
-                {/* Categories Layout - 4 in a row on mobile */}
+                {/* Categories Layout - 4 in a row on mobile, spacious horizontal row on desktop */}
                 {module.layoutStyle === "grid" ? (
-                    <div className="grid grid-cols-4 lg:grid-cols-4 gap-2 md:gap-6 px-2 md:px-0">
+                    <div className="grid grid-cols-4 gap-2 md:gap-5 lg:gap-6 px-2 md:px-8 md:max-w-2xl mx-auto pb-8">
                         {module.categoryTiles.slice(0, 4).map((tile, idx) => (
                             <div 
                                 key={idx} 
@@ -103,10 +113,10 @@ export default function FestivalCategoryModule({ module }: FestivalModuleProps) 
                                 }}
                                 onClick={() => handleTileClick(tile)}
                             >
-                                <div className="relative aspect-square w-full bg-white rounded-2xl md:rounded-3xl overflow-hidden shadow-sm border border-orange-50/50 p-1 md:p-3 hover:shadow-md transition-all duration-500">
+                                <div className="relative aspect-square w-full md:max-w-[130px] bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-sm border border-orange-50/50 p-1 md:p-2 hover:shadow-xl hover:-translate-y-2 transition-all duration-500">
                                     {/* Arch Overlay for Festive Look */}
                                     <div 
-                                        className="absolute inset-0 border-[4px] md:border-[10px] rounded-2xl md:rounded-3xl pointer-events-none z-10"
+                                        className="absolute inset-0 border-[4px] md:border-[8px] rounded-2xl md:rounded-3xl pointer-events-none z-10"
                                         style={{ borderColor: module.backgroundColor || '#FFF9F0' }}
                                     ></div>
                                     <div className="absolute inset-0 bg-gradient-to-b from-orange-50/20 to-transparent pointer-events-none z-0"></div>
@@ -119,7 +129,7 @@ export default function FestivalCategoryModule({ module }: FestivalModuleProps) 
                                 </div>
                                 {tile.label && (
                                     <span 
-                                        className="mt-1 text-[11px] md:text-base font-bold group-hover:text-village-red transition-colors text-center px-0.5 line-clamp-1"
+                                        className="mt-2 text-[11px] md:text-sm font-bold group-hover:text-village-red transition-colors text-center px-0.5 line-clamp-1 uppercase tracking-tight"
                                         style={{ color: module.labelColor || '#8B3D28' }}
                                     >
                                         {tile.label}
@@ -134,10 +144,10 @@ export default function FestivalCategoryModule({ module }: FestivalModuleProps) 
                             <div 
                                 key={idx}
                                 onClick={() => handleTileClick(tile)}
-                                className="flex-shrink-0 w-36 md:w-48 group cursor-pointer snap-start"
+                                className="flex-shrink-0 w-36 md:w-36 group cursor-pointer snap-start"
                             >
-                                <div className="relative aspect-square bg-white rounded-3xl overflow-hidden shadow-sm border border-orange-50/50 p-2 md:p-3 hover:shadow-md transition-all duration-500 hover:-translate-y-1">
-                                    <div className="absolute inset-0 border-[6px] md:border-[10px] border-[#FFF9F0] rounded-3xl pointer-events-none z-10"></div>
+                                <div className="relative aspect-square bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-sm border border-orange-50/50 p-1 md:p-2 hover:shadow-xl transition-all duration-500 hover:-translate-y-2">
+                                    <div className="absolute inset-0 border-[6px] md:border-[8px] border-[#FFF9F0] rounded-2xl md:rounded-3xl pointer-events-none z-10"></div>
                                     <img 
                                         src={tile.image} 
                                         alt={tile.label || "Category"} 

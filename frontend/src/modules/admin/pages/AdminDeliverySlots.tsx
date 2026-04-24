@@ -39,7 +39,6 @@ const emptyForm = {
   name: '',
   startTime: '07:00',
   endTime: '10:00',
-  maxOrders: 50,
 };
 
 export default function AdminDeliverySlots() {
@@ -84,7 +83,6 @@ export default function AdminDeliverySlots() {
       name: slot.name,
       startTime: slot.startTime,
       endTime: slot.endTime,
-      maxOrders: slot.maxOrders,
     });
     setShowModal(true);
   };
@@ -301,15 +299,6 @@ export default function AdminDeliverySlots() {
                     </p>
                   </div>
 
-                  {/* Max Orders */}
-                  <div className="flex items-center gap-2 mb-4 text-xs text-neutral-500">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                    <span>Max <strong>{slot.maxOrders}</strong> orders/day</span>
-                  </div>
 
                   {/* Actions */}
                   <div className="flex items-center gap-2">
@@ -505,23 +494,6 @@ export default function AdminDeliverySlots() {
                   </motion.div>
                 )}
 
-                {/* Max Orders */}
-                <div>
-                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                    Max Orders Per Day
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={999}
-                    value={form.maxOrders}
-                    onChange={e => setForm(f => ({ ...f, maxOrders: parseInt(e.target.value) || 1 }))}
-                    className="w-full px-3 py-2.5 border border-neutral-300 rounded-xl text-sm focus:outline-none focus:border-[#8B3D28] focus:ring-2 focus:ring-[#8B3D28]/10 transition-all"
-                  />
-                  <p className="text-[10px] text-neutral-400 mt-1">
-                    Maximum number of orders that can be placed in this time slot per day
-                  </p>
-                </div>
 
                 {/* Save Button */}
                 <motion.button

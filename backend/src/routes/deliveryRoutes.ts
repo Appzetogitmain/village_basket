@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as deliveryDashboardController from "../modules/delivery/controllers/deliveryDashboardController";
 import * as deliveryOrderController from "../modules/delivery/controllers/deliveryOrderController";
 import * as deliveryEarningController from "../modules/delivery/controllers/deliveryEarningController";
-import { getProfile } from "../modules/delivery/controllers/deliveryAuthController";
+import { getProfile, selfDeleteAccount } from "../modules/delivery/controllers/deliveryAuthController";
 
 import * as deliveryProfileController from "../modules/delivery/controllers/deliveryProfileController";
 import * as deliveryNotificationController from "../modules/delivery/controllers/deliveryNotificationController";
@@ -14,6 +14,7 @@ router.get("/profile", getProfile);
 router.put("/profile", deliveryProfileController.updateProfile);
 router.put("/status", deliveryProfileController.updateStatus);
 router.put("/settings", deliveryProfileController.updateSettings);
+router.delete("/account", selfDeleteAccount);
 
 // Notifications
 router.get("/notifications", deliveryNotificationController.getNotifications);

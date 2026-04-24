@@ -6,6 +6,7 @@ export interface FestivalModule {
     festivalTitle: string;
     festivalSubtitle?: string;
     headerGraphic?: string;
+    desktopHeaderGraphic?: string;
     backgroundColor?: string;
     backgroundImage?: string;
     textColor?: string;
@@ -31,6 +32,7 @@ export interface FestivalModuleFormData {
     festivalTitle: string;
     festivalSubtitle?: string;
     headerGraphic?: string;
+    desktopHeaderGraphic?: string;
     backgroundColor?: string;
     backgroundImage?: string;
     textColor?: string;

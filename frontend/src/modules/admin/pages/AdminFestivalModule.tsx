@@ -19,6 +19,7 @@ export default function AdminFestivalModule() {
     const [festivalTitle, setFestivalTitle] = useState("");
     const [festivalSubtitle, setFestivalSubtitle] = useState("");
     const [headerGraphic, setHeaderGraphic] = useState("");
+    const [desktopHeaderGraphic, setDesktopHeaderGraphic] = useState("");
     const [backgroundColor, setBackgroundColor] = useState("#FFF9F0");
     const [backgroundImage, setBackgroundImage] = useState("");
     const [textColor, setTextColor] = useState("#8B3D28");
@@ -50,7 +51,9 @@ export default function AdminFestivalModule() {
     const [success, setSuccess] = useState("");
     const [uploading, setUploading] = useState<number | null>(null);
     const [uploadingHeader, setUploadingHeader] = useState(false);
+    const [uploadingDesktopHeader, setUploadingDesktopHeader] = useState(false);
     const [uploadingBg, setUploadingBg] = useState(false);
+    const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
     // Fetch initial data
     useEffect(() => {
@@ -138,13 +141,14 @@ export default function AdminFestivalModule() {
         });
     };
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number | 'header' | 'background') => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number | 'header' | 'desktopHeader' | 'background') => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         // Show local preview immediately
         const localUrl = URL.createObjectURL(file);
         if (index === 'header') setHeaderGraphic(localUrl);
+        else if (index === 'desktopHeader') setDesktopHeaderGraphic(localUrl);
         else if (index === 'background') setBackgroundImage(localUrl);
         else {
             setTiles(prev => {
@@ -157,6 +161,7 @@ export default function AdminFestivalModule() {
         try {
             setError("");
             if (index === 'header') setUploadingHeader(true);
+            else if (index === 'desktopHeader') setUploadingDesktopHeader(true);
             else if (index === 'background') setUploadingBg(true);
             else setUploading(index as number);
 
@@ -166,6 +171,7 @@ export default function AdminFestivalModule() {
 
             if (response && response.url) {
                 if (index === 'header') setHeaderGraphic(response.url);
+                else if (index === 'desktopHeader') setDesktopHeaderGraphic(response.url);
                 else if (index === 'background') setBackgroundImage(response.url);
                 else {
                     setTiles(prev => {
@@ -182,6 +188,7 @@ export default function AdminFestivalModule() {
             setError(`Failed to sync image: ${err.message || "Network error"}`);
             // REVERT on failure so we don't have a stuck blob
             if (index === 'header') setHeaderGraphic("");
+            else if (index === 'desktopHeader') setDesktopHeaderGraphic("");
             else if (index === 'background') setBackgroundImage("");
             else {
                 setTiles(prev => {
@@ -193,6 +200,7 @@ export default function AdminFestivalModule() {
         } finally {
             setUploading(null);
             setUploadingHeader(false);
+            setUploadingDesktopHeader(false);
             setUploadingBg(false);
         }
     };
@@ -214,7 +222,7 @@ export default function AdminFestivalModule() {
         }
 
         // Check for temporary blob URLs that haven't finished uploading
-        const hasBlob = tiles.some(t => t.image.startsWith('blob:')) || headerGraphic.startsWith('blob:') || backgroundImage.startsWith('blob:');
+        const hasBlob = tiles.some(t => t.image.startsWith('blob:')) || headerGraphic.startsWith('blob:') || desktopHeaderGraphic.startsWith('blob:') || backgroundImage.startsWith('blob:');
         if (hasBlob) {
             setError("Please wait for all images to finish uploading before saving.");
             return;
@@ -225,6 +233,7 @@ export default function AdminFestivalModule() {
             festivalTitle: festivalTitle.trim(),
             festivalSubtitle: festivalSubtitle.trim(),
             headerGraphic,
+            desktopHeaderGraphic,
             backgroundColor,
             backgroundImage,
             textColor,
@@ -272,6 +281,7 @@ export default function AdminFestivalModule() {
         setFestivalTitle(module.festivalTitle);
         setFestivalSubtitle(module.festivalSubtitle || "");
         setHeaderGraphic(module.headerGraphic || "");
+        setDesktopHeaderGraphic(module.desktopHeaderGraphic || "");
         setBackgroundColor(module.backgroundColor || "#FFF9F0");
         setBackgroundImage(module.backgroundImage || "");
         setTextColor(module.textColor || "#8B3D28");
@@ -309,6 +319,7 @@ export default function AdminFestivalModule() {
         setFestivalTitle("");
         setFestivalSubtitle("");
         setHeaderGraphic("");
+        setDesktopHeaderGraphic("");
         setBackgroundColor("#FFF9F0");
         setBackgroundImage("");
         setTextColor("#8B3D28");
@@ -348,24 +359,38 @@ export default function AdminFestivalModule() {
                     <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">Internal Name *</label>
+                                <label className="block text-xs font-bold text-neutral-500 mb-2">Internal name *</label>
                                 <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Diwali 2025" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B3D28] outline-none" />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">Festival Title *</label>
+                            <label className="block text-xs font-bold text-neutral-500 mb-2">Festival title *</label>
                             <input type="text" value={festivalTitle} onChange={e => setFestivalTitle(e.target.value)} placeholder="e.g., Happy Diwali Specials" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B3D28] outline-none" />
                         </div>
 
                         <div>
-                            <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">Festival Subtitle</label>
+                            <label className="block text-xs font-bold text-neutral-500 mb-2">Festival subtitle</label>
                             <input type="text" value={festivalSubtitle} onChange={e => setFestivalSubtitle(e.target.value)} placeholder="e.g., Light up your home with essentials" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#8B3D28] outline-none" />
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">Header Graphic</label>
+                                <label className="block text-xs font-bold text-neutral-500 mb-2 flex items-center gap-2">
+                                    <span>Header (mobile)</span>
+                                    <div className="relative">
+                                        <button 
+                                            onClick={() => setActiveTooltip(activeTooltip === 'mobileHeader' ? null : 'mobileHeader')}
+                                            className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center text-[8px] font-bold transition-colors ${activeTooltip === 'mobileHeader' ? 'border-orange-500 text-orange-500 bg-orange-50' : 'border-neutral-300 text-neutral-400'}`}
+                                        >i</button>
+                                        {activeTooltip === 'mobileHeader' && (
+                                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-32 p-2 bg-neutral-800 text-white text-[9px] font-medium rounded-lg shadow-xl z-50 text-center animate-in fade-in slide-in-from-bottom-1">
+                                                Ideal choice: 800x800 (1:1 aspect ratio)
+                                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-800"></div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </label>
                                 <div className="flex items-center gap-3 p-2 bg-neutral-50 rounded-xl border border-dashed border-neutral-200">
                                     <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center overflow-hidden border shadow-sm flex-shrink-0">
                                         {headerGraphic ? <img src={headerGraphic} className="w-full h-full object-contain" /> : <div className="text-[10px] text-neutral-300">NO IMG</div>}
@@ -380,7 +405,38 @@ export default function AdminFestivalModule() {
                             </div>
 
                             <div className="space-y-1">
-                                <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">BG Color</label>
+                                <label className="block text-xs font-bold text-neutral-500 mb-2 flex items-center gap-2">
+                                    <span>Header (desktop)</span>
+                                    <div className="relative">
+                                        <button 
+                                            onClick={() => setActiveTooltip(activeTooltip === 'desktopHeader' ? null : 'desktopHeader')}
+                                            className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center text-[8px] font-bold transition-colors ${activeTooltip === 'desktopHeader' ? 'border-orange-500 text-orange-500 bg-orange-50' : 'border-neutral-300 text-neutral-400'}`}
+                                        >i</button>
+                                        {activeTooltip === 'desktopHeader' && (
+                                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-32 p-2 bg-neutral-800 text-white text-[9px] font-medium rounded-lg shadow-xl z-50 text-center animate-in fade-in slide-in-from-bottom-1">
+                                                Ideal choice: 2048x700 (Cinema aspect)
+                                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-800"></div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </label>
+                                <div className="flex items-center gap-3 p-2 bg-neutral-50 rounded-xl border border-dashed border-neutral-200">
+                                    <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center overflow-hidden border shadow-sm flex-shrink-0">
+                                        {desktopHeaderGraphic ? <img src={desktopHeaderGraphic} className="w-full h-full object-contain" /> : <div className="text-[10px] text-neutral-300 font-bold">WIDE</div>}
+                                    </div>
+                                    <div className="flex-1">
+                                        <input type="file" id="desktop-header-upload" onChange={e => handleImageUpload(e, 'desktopHeader')} className="hidden" />
+                                        <label htmlFor="desktop-header-upload" className="cursor-pointer text-[10px] font-bold text-orange-600 hover:text-orange-700">
+                                            {uploadingDesktopHeader ? 'Uploading...' : desktopHeaderGraphic ? 'Change' : 'Upload'}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <label className="block text-xs font-bold text-neutral-500 mb-2">Bg color</label>
                                 <div className="flex items-center gap-3 p-2 bg-neutral-50 rounded-xl border border-dashed border-neutral-200">
                                     <input type="color" value={backgroundColor} onChange={e => setBackgroundColor(e.target.value)} className="w-10 h-10 rounded cursor-pointer border-0 bg-transparent" />
                                     <div className="flex-1">
@@ -390,7 +446,21 @@ export default function AdminFestivalModule() {
                             </div>
 
                             <div className="space-y-1">
-                                <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">BG Image</label>
+                                <label className="block text-xs font-bold text-neutral-500 mb-2 flex items-center gap-2">
+                                    <span>Bg image</span>
+                                    <div className="relative">
+                                        <button 
+                                            onClick={() => setActiveTooltip(activeTooltip === 'bgImage' ? null : 'bgImage')}
+                                            className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center text-[8px] font-bold transition-colors ${activeTooltip === 'bgImage' ? 'border-orange-500 text-orange-500 bg-orange-50' : 'border-neutral-300 text-neutral-400'}`}
+                                        >i</button>
+                                        {activeTooltip === 'bgImage' && (
+                                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-32 p-2 bg-neutral-800 text-white text-[9px] font-medium rounded-lg shadow-xl z-50 text-center animate-in fade-in slide-in-from-bottom-1">
+                                                Ideal choice: 1920x1080 (Full bleed)
+                                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-800"></div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </label>
                                 <div className="flex items-center gap-3 p-2 bg-neutral-50 rounded-xl border border-dashed border-neutral-200">
                                     <div className="relative w-12 h-12 bg-white rounded-lg flex items-center justify-center overflow-hidden border shadow-sm flex-shrink-0">
                                         {backgroundImage ? (
@@ -424,7 +494,7 @@ export default function AdminFestivalModule() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">Subtitle Color</label>
+                                <label className="block text-xs font-bold text-neutral-500 mb-2">Subtitle color</label>
                                 <div className="flex items-center gap-3 p-2 bg-neutral-50 rounded-xl border border-dashed border-neutral-200">
                                     <input type="color" value={textColor} onChange={e => setTextColor(e.target.value)} className="w-10 h-10 rounded cursor-pointer border-0 bg-transparent" />
                                     <div className="flex-1">
@@ -433,7 +503,7 @@ export default function AdminFestivalModule() {
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">Category Label Color</label>
+                                <label className="block text-xs font-bold text-neutral-500 mb-2">Category label color</label>
                                 <div className="flex items-center gap-3 p-2 bg-neutral-50 rounded-xl border border-dashed border-neutral-200">
                                     <input type="color" value={labelColor} onChange={e => setLabelColor(e.target.value)} className="w-10 h-10 rounded cursor-pointer border-0 bg-transparent" />
                                     <div className="flex-1">
@@ -445,23 +515,37 @@ export default function AdminFestivalModule() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">Start Date *</label>
+                                <label className="block text-xs font-bold text-neutral-500 mb-2">Start date *</label>
                                 <input type="datetime-local" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full px-3 py-2 border rounded-lg outline-none" />
                             </div>
                             <div>
-                                <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-2">End Date *</label>
+                                <label className="block text-xs font-bold text-neutral-500 mb-2">End date *</label>
                                 <input type="datetime-local" value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full px-3 py-2 border rounded-lg outline-none" />
                             </div>
                         </div>
 
                         {/* Category Tiles Grid */}
                         <div>
-                            <label className="block text-[11px] font-black text-neutral-500 uppercase tracking-widest mb-4">Category Tiles (Exactly 4)</label>
+                            <label className="block text-xs font-bold text-neutral-500 mb-4">Category tiles (exactly 4)</label>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {tiles.map((tile, idx) => (
                                     <div key={idx} className={`p-4 rounded-xl border transition-all ${(!tile.image || !tile.categoryId) && error ? 'bg-red-50 border-red-300' : 'bg-neutral-50 border-neutral-200'} space-y-3`}>
                                         <div className="flex justify-between items-center">
-                                            <div className="text-[10px] font-bold text-neutral-400">TILE {idx + 1}</div>
+                                            <div className="text-[10px] font-bold text-neutral-400 flex items-center gap-2">
+                                                TILE {idx + 1}
+                                                <div className="relative">
+                                                    <button 
+                                                        onClick={() => setActiveTooltip(activeTooltip === `tile-${idx}` ? null : `tile-${idx}`)}
+                                                        className={`w-3 h-3 rounded-full border flex items-center justify-center text-[7px] font-bold transition-colors ${activeTooltip === `tile-${idx}` ? 'border-orange-400 text-orange-400 bg-orange-50' : 'border-neutral-200 text-neutral-300'}`}
+                                                    >i</button>
+                                                    {activeTooltip === `tile-${idx}` && (
+                                                        <div className="absolute left-0 bottom-full mb-2 w-24 p-1.5 bg-neutral-800 text-white text-[8px] font-medium rounded shadow-xl z-50 text-center animate-in fade-in slide-in-from-bottom-1">
+                                                            Ideal choice: 400x400
+                                                            <div className="absolute top-full left-2 border-4 border-transparent border-t-neutral-800"></div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                             {(!tile.image || !tile.categoryId) && error && <span className="text-[10px] font-bold text-red-500">MISSING INFO</span>}
                                         </div>
                                         <div className="flex items-center gap-3">
@@ -526,10 +610,10 @@ export default function AdminFestivalModule() {
                         <div className="flex gap-3 pt-4 border-t">
                             <button 
                                 onClick={handleSubmit} 
-                                disabled={loading || uploading !== null || uploadingHeader || uploadingBg} 
+                                disabled={loading || uploading !== null || uploadingHeader || uploadingDesktopHeader || uploadingBg} 
                                 className="flex-1 bg-[#8B3D28] text-white py-2 rounded-lg font-bold hover:bg-orange-900 transition-colors disabled:bg-neutral-300"
                             >
-                                {loading ? 'Saving...' : (uploading !== null || uploadingHeader || uploadingBg) ? 'Uploading Images...' : editingId ? 'Update Module' : 'Create Module'}
+                                {loading ? 'Saving...' : (uploading !== null || uploadingHeader || uploadingDesktopHeader || uploadingBg) ? 'Uploading Images...' : editingId ? 'Update Module' : 'Create Module'}
                             </button>
                             {editingId && <button onClick={resetForm} className="px-6 py-2 bg-neutral-200 rounded-lg font-bold">Cancel</button>}
                         </div>

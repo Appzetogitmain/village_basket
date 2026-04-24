@@ -7,7 +7,7 @@ export interface IDelivery extends Document {
   mobile: string;
   email: string;
   dateOfBirth?: Date;
-  password: string;
+  password?: string;
   address: string;
   city: string;
   pincode?: string;
@@ -30,7 +30,7 @@ export interface IDelivery extends Document {
   // Commission & Payment
   bonusType?: string; // 'Fixed' | 'Salaried' | 'Commission Based'
   commissionRate?: number; // Individual commission rate (overrides global setting)
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Deleted';
   approvalStatus: 'Pending' | 'Approved' | 'Rejected';
   approvalRemark?: string;
   approvalUpdatedAt?: Date;
@@ -93,8 +93,7 @@ const DeliverySchema = new Schema<IDelivery>(
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
-      minlength: [6, 'Password must be at least 6 characters'],
+      required: false,
       select: false, // Don't return password by default
     },
     address: {
@@ -166,7 +165,7 @@ const DeliverySchema = new Schema<IDelivery>(
     },
     status: {
       type: String,
-      enum: ['Active', 'Inactive'],
+      enum: ['Active', 'Inactive', 'Deleted'],
       default: 'Inactive', // New delivery partners start as Inactive until approved
     },
     approvalStatus: {
@@ -229,7 +228,7 @@ const DeliverySchema = new Schema<IDelivery>(
 
 // Hash password before saving
 DeliverySchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+  if (!this.isModified('password') || !this.password) {
     return next();
   }
 
