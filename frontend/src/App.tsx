@@ -21,6 +21,7 @@ import PublicRoute from "./components/PublicRoute";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorBoundary from "./components/ErrorBoundary";
 import RouteTransition from "./components/RouteTransition";
+import SplashScreen from "./components/SplashScreen";
 import { useEffect } from "react";
 import { initializePushNotifications, setupForegroundNotificationHandler } from "./services/pushNotificationService";
 import { preloadAnimations } from "./utils/animationCache";
@@ -195,6 +196,7 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <SplashScreen />
       <LoadingProvider>
         <AxiosLoadingInterceptor>
           <SubscriptionProvider>

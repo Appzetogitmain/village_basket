@@ -1,9 +1,10 @@
 const cache = new Map<string, any>();
 
 export const ALLOWED_ANIMATIONS = [
-  'Thanksgiving basket.json',
+  'bullock_cart.json',
   'Basket.json',
-  'Grocery-animation.json'
+  'Grocery-animation.json',
+  'Thanksgiving basket.json',
 ];
 
 export const getAnimationData = async (name: string): Promise<any> => {
