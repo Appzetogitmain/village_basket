@@ -53,7 +53,7 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
 
     const renderAnimation = () => {
         return (
-            <div className="w-[80vw] h-[50vh] max-w-2xl flex items-center justify-center">
+        <div className="w-[80vw] h-[50vh] max-w-2xl flex items-center justify-center">
                 {animationData ? (
                     <Lottie animationData={animationData} loop={true} className="w-full h-full" />
                 ) : (
@@ -92,27 +92,21 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     const text = getLoadingText();
 
     return (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-stone-50/98 backdrop-blur-md px-6 text-center">
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-stone-50/98 backdrop-blur-md text-center">
             {/* Texture Overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('/assets/natural-paper.png')] z-0"></div>
+
+            {/* Full screen animation */}
+            <div className="absolute inset-0 z-0">
+                {renderAnimation()}
+            </div>
 
             <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="relative z-10 space-y-8"
+                className="relative z-10 space-y-4 mt-auto mb-16 px-6"
             >
-                <div className="relative flex items-center justify-center">
-                    {renderAnimation()}
-                    
-                    {/* Shadow */}
-                    <motion.div
-                        className="absolute bottom-0 w-16 h-1.5 bg-black/5 rounded-[50%] blur-[1px]"
-                        animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                    />
-                </div>
-
                 {/* Loading State Text */}
                 <div className="space-y-4">
                     <h2 className="text-village-umber font-black text-sm uppercase tracking-[0.4em] italic leading-none animate-pulse">

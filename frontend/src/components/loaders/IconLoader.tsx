@@ -56,10 +56,8 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const currentAnimation = currentAnimationName;
 
   const renderAnimation = () => {
-    const sizeClasses = "w-[80vw] h-[50vh] max-w-2xl";
-
     return (
-      <div className={`${sizeClasses} flex items-center justify-center`}>
+      <div className="absolute inset-0 flex items-center justify-center">
         {animationData ? (
           <Lottie animationData={animationData} loop={true} className="w-full h-full" />
         ) : (
@@ -120,7 +118,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
               className="flex flex-col items-center justify-center space-y-4"
             >
               {/* Animation Container */}
-              <div className="relative min-h-[200px] flex items-center justify-center">
+              <div className="fixed inset-0 pointer-events-none">
                 {/* Speed Lines Effects */}
                 <div className="absolute inset-0 pointer-events-none">
                   {[...Array(4)].map((_, i) => (
@@ -146,13 +144,6 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
                 </div>
 
                 {renderAnimation()}
-
-                {/* Ground Shadow */}
-                <motion.div
-                  className="absolute bottom-4 w-28 h-2 bg-black/5 rounded-[50%] blur-[2px]"
-                  animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
               </div>
 
               {/* Status Text (Single Line) */}
