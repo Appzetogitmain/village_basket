@@ -474,7 +474,7 @@ export default function AdminManageCustomer() {
             {/* Header */}
             <div className="bg-gradient-to-br from-[#A54B31] to-[#8B3D28] p-8 pb-10 relative overflow-hidden">
                {/* Warli Art Style Decoration */}
-              <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+              <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
               
               <div className="flex justify-between items-start relative z-10">
                 <div className="space-y-1">

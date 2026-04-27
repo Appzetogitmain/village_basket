@@ -42,9 +42,10 @@ const getCategoryIcons = (categoryId: string) => {
 
 interface PromoStripProps {
   activeTab?: string;
+  homeData?: any; // Accept pre-fetched home data to avoid duplicate API call
 }
 
-export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
+export default function PromoStrip({ activeTab = "all", homeData: externalHomeData }: PromoStripProps) {
   const { location } = useLocation();
   const { currentTheme } = useThemeContext();
   const theme = currentTheme;
@@ -114,27 +115,20 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Check cache first before showing loading state
+      // If parent already fetched homeData, use it directly — no extra API call
       const cacheKey = `home-content-${activeTab || 'all'}`;
-      const cachedData = apiCache.getSync(cacheKey);
+      const cachedData = externalHomeData || apiCache.getSync(cacheKey);
 
-      // Only show loading if data is not cached
       if (!cachedData) {
         setLoading(true);
       }
 
       try {
-        // Pass activeTab (header category slug) and location to filter categories
-        // Use cache with 5 minute TTL for faster loading
-        const response = await getHomeContent(
-          activeTab,
-          location?.latitude,
-          location?.longitude,
-          true,
-          5 * 60 * 1000
-        );
+        // Use external data if provided, otherwise fetch (with cache)
+        const response = externalHomeData
+          ? { success: true, data: externalHomeData }
+          : await getHomeContent(activeTab, location?.latitude, location?.longitude, true, 5 * 60 * 1000);
 
-        // Reset current product index when fetching new data
         setCurrentProductIndex(0);
 
         let fetchedCards: PromoCard[] = [];
@@ -314,7 +308,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
     // For now, data will only refresh when activeTab changes
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, theme.bannerText, theme.saleText]);
+  }, [activeTab, externalHomeData, theme.bannerText, theme.saleText]);
 
   // Reset product index when activeTab changes or featuredProducts change
   useEffect(() => {
@@ -574,7 +568,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
         marginBottom: 0
       }}>
       {/* Subtle Texture Overlay */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+      <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
       
       {/* Ultra-Slim Header Ribbon */}
       <div className="px-4 md:px-8 mb-3 md:mb-6 flex items-center justify-between relative z-10">

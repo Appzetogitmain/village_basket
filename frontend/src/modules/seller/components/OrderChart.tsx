@@ -335,7 +335,7 @@ export default function OrderChart({ title, data, maxValue, height = 400 }: Orde
 
   return (
     <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white p-3 sm:p-4 hover:shadow-lg transition-all overflow-hidden relative">
-      <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')]"></div>
       
       {/* Chart Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-4 gap-2 sm:gap-0 relative z-10">

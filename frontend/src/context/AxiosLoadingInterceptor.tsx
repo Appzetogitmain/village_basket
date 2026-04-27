@@ -2,14 +2,26 @@ import React, { useEffect } from 'react';
 import api from '../services/api/config';
 import { useLoading } from './LoadingContext';
 
+// Routes that should NOT show the global loader (background/silent requests)
+const SILENT_ROUTES = [
+  '/customer/location',
+  '/fcm-tokens',
+  '/customer/wishlist',
+];
+
+const isSilentRequest = (url?: string): boolean => {
+  if (!url) return false;
+  return SILENT_ROUTES.some(route => url.includes(route));
+};
+
 export const AxiosLoadingInterceptor: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { startLoading, stopLoading } = useLoading();
 
   useEffect(() => {
     const requestInterceptor = api.interceptors.request.use(
       (config) => {
-        // Skip loader for specific requests if needed
-        if (!(config as any).skipLoader) {
+        const skip = (config as any).skipLoader || isSilentRequest(config.url);
+        if (!skip) {
           (config as any)._hasStartedLoading = true;
           startLoading();
         }

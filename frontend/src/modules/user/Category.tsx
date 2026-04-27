@@ -32,6 +32,42 @@ export default function CategoryPage() {
   const [categoryLoading, setCategoryLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import ProductCard from "./components/ProductCard";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  getProducts,
+  getCategoryById,
+  Category as ApiCategory,
+} from "../../services/api/customerProductService";
+import { useLocation as useLocationContext } from "../../hooks/useLocation";
+
+export default function CategoryPage() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { location: userLocation } = useLocationContext();
+  const locationRef = useRef(userLocation);
+  useEffect(() => { locationRef.current = userLocation; }, [userLocation]);
+
+  const [category, setCategory] = useState<ApiCategory | null>(null);
+  const [subcategories, setSubcategories] = useState<ApiCategory[]>([]);
+  const hasRealSubcategories = useMemo(() => {
+    return subcategories.filter(s => s._id !== 'all' && s.id !== 'all').length > 0;
+  }, [subcategories]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState("all");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [selectedSort, setSelectedSort] = useState("relevance");
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [filterSearchQuery, setFilterSearchQuery] = useState("");
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState("Type");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [categoryLoading, setCategoryLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const sortOptions = [
     { id: "relevance", label: "Relevance" },
     { id: "price-low", label: "Price: Low to High" },
@@ -40,124 +76,119 @@ export default function CategoryPage() {
     { id: "newest", label: "Newest First" },
   ];
 
-  // Fetch Category Details
+  // Combined fetch: category details + products in parallel
   useEffect(() => {
-    const fetchCategoryDetails = async () => {
+    if (!id) return;
+
+    const fetchAll = async () => {
       setCategoryLoading(true);
+      setLoading(true);
       setError(null);
+
       try {
-        const response = await getCategoryById(id!);
-        if (response.success && response.data) {
-          const {
-            category: cat,
-            subcategories: subs,
-            currentSubcategory,
-          } = response.data;
-
-          // If no subcategories returned, try to fetch from all categories as fallback
-          let finalSubcategories = subs || [];
-
-          if (!finalSubcategories.length) {
-            try {
-              const { getCategories } = await import("../../services/api/customerProductService");
-              const allCatsResponse = await getCategories();
-              if (allCatsResponse.success && allCatsResponse.data) {
-                finalSubcategories = allCatsResponse.data.filter((c: any) =>
-                  c.parent === cat._id || (c.parent && c.parent._id === cat._id)
-                );
-              }
-            } catch (err) {
-              console.error("Error fetching fallback subcategories", err);
-            }
-          }
-
-          setCategory(cat);
-          setSubcategories([
-            {
-              _id: "all",
-              id: "all",
-              name: "All",
-              icon: "📦",
-              isActive: true,
-            } as any,
-            ...finalSubcategories,
-          ]);
-
-          // Check URL query params first, then API response
-          const subcategoryFromUrl = searchParams.get("subcategory");
-          if (subcategoryFromUrl) {
-            setSelectedSubcategory(subcategoryFromUrl);
-          } else if (currentSubcategory) {
-            setSelectedSubcategory(
-              currentSubcategory._id || currentSubcategory.id
-            );
-          }
-        } else {
+        // Fetch category details first to get the real category ID
+        const catResponse = await getCategoryById(id);
+        if (!catResponse.success || !catResponse.data) {
           setError("Category not found or failed to load details.");
+          return;
         }
-      } catch (error) {
-        console.error("Error fetching category details:", error);
-        setError("Failed to load category information.");
+
+        const { category: cat, subcategories: subs, currentSubcategory } = catResponse.data;
+        let finalSubcategories = subs || [];
+
+        if (!finalSubcategories.length) {
+          try {
+            const { getCategories } = await import("../../services/api/customerProductService");
+            const allCatsResponse = await getCategories();
+            if (allCatsResponse.success && allCatsResponse.data) {
+              finalSubcategories = allCatsResponse.data.filter((c: any) =>
+                c.parent === cat._id || (c.parent && c.parent._id === cat._id)
+              );
+            }
+          } catch (_) {}
+        }
+
+        setCategory(cat);
+        setSubcategories([
+          { _id: "all", id: "all", name: "All", icon: "📦", isActive: true } as any,
+          ...finalSubcategories,
+        ]);
+
+        const subcategoryFromUrl = searchParams.get("subcategory");
+        const resolvedSubcat = subcategoryFromUrl || (currentSubcategory ? (currentSubcategory._id || currentSubcategory.id) : "all");
+        if (subcategoryFromUrl) setSelectedSubcategory(subcategoryFromUrl);
+        else if (currentSubcategory) setSelectedSubcategory(currentSubcategory._id || currentSubcategory.id);
+
+        setCategoryLoading(false);
+
+        // Now fetch products using resolved category ID
+        const loc = locationRef.current;
+        const params: any = { category: cat._id || id };
+        if (resolvedSubcat !== "all") params.subcategory = resolvedSubcat;
+        if (loc?.latitude && loc?.longitude) {
+          params.latitude = loc.latitude;
+          params.longitude = loc.longitude;
+        }
+
+        const prodResponse = await getProducts(params);
+        if (prodResponse.success) {
+          const uniqueProducts = Array.from(
+            new Map(prodResponse.data.map((p: any) => [p._id || p.id, p])).values()
+          );
+          setProducts(uniqueProducts.map((p: any) => ({
+            ...p,
+            tags: Array.isArray(p.tags) ? p.tags : [],
+            nameParts: p.name ? p.name.toLowerCase().split(" ") : [],
+          })));
+        } else {
+          setError("Failed to fetch products for this category.");
+        }
+      } catch (err) {
+        setError("Network error while loading category.");
       } finally {
+        setLoading(false);
         setCategoryLoading(false);
       }
     };
 
-    if (id) {
-      fetchCategoryDetails();
-    }
+    fetchAll();
   }, [id, searchParams]);
 
-  // Fetch Products when category or subcategory changes
+  // Refetch products when subcategory filter changes (not on initial load)
+  const isFirstSubcatChange = useRef(true);
   useEffect(() => {
+    if (isFirstSubcatChange.current) { isFirstSubcatChange.current = false; return; }
+    if (!id || !category) return;
+
     const fetchProducts = async () => {
       setLoading(true);
-      setError(null);
       try {
-        // If the ID in the URL is actually for a subcategory, we should use the parent category ID
-        // which we fetch in the other useEffect and store in 'category'.
-        // However, for fetching products, the backend getProducts handles 'category' (parent)
-        // and 'subcategory' separately.
-
-        const params: any = { category: category?._id || id };
-        if (selectedSubcategory !== "all") {
-          params.subcategory = selectedSubcategory;
+        const loc = locationRef.current;
+        const params: any = { category: category._id || id };
+        if (selectedSubcategory !== "all") params.subcategory = selectedSubcategory;
+        if (loc?.latitude && loc?.longitude) {
+          params.latitude = loc.latitude;
+          params.longitude = loc.longitude;
         }
-        // Include user location for seller service radius filtering
-        if (userLocation?.latitude && userLocation?.longitude) {
-          params.latitude = userLocation.latitude;
-          params.longitude = userLocation.longitude;
-        }
-
         const response = await getProducts(params);
         if (response.success) {
-          // Ensure products have default tags/name array for filtering logic if missing
-          // De-duplicate products by ID just in case
           const uniqueProducts = Array.from(
             new Map(response.data.map((p: any) => [p._id || p.id, p])).values()
           );
-          
-          const safeProducts = uniqueProducts.map((p: any) => ({
+          setProducts(uniqueProducts.map((p: any) => ({
             ...p,
             tags: Array.isArray(p.tags) ? p.tags : [],
             nameParts: p.name ? p.name.toLowerCase().split(" ") : [],
-          }));
-          setProducts(safeProducts);
-        } else {
-          setError("Failed to fetch products for this category.");
+          })));
         }
-      } catch (error) {
-        console.error("Error fetching products:", error);
+      } catch (_) {
         setError("Network error while loading products.");
       } finally {
         setLoading(false);
       }
     };
-
-    if (id) {
-      fetchProducts();
-    }
-  }, [id, selectedSubcategory, category?._id, userLocation]);
+    fetchProducts();
+  }, [selectedSubcategory]);
 
   // Apply sorting and filtering to products
   const categoryProducts = useMemo(() => {
@@ -389,7 +420,7 @@ export default function CategoryPage() {
     return iconMap[name] || "🥬";
   };
 
-  const filterOptions = getFilterOptions();
+  const filterOptions = useMemo(() => getFilterOptions(), [products, selectedFilterCategory]);
   const filteredOptions = filterOptions.filter((option) =>
     option.name.toLowerCase().includes(filterSearchQuery.toLowerCase())
   );

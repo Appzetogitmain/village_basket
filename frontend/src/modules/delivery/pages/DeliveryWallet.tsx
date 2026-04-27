@@ -176,11 +176,11 @@ export default function DeliveryWallet() {
 
   return (
     <div className="min-h-screen bg-transparent pb-24 font-poppins relative">
-      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Local Header */}
       <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <button
               onClick={() => navigate(-1)}
               className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
@@ -200,7 +200,7 @@ export default function DeliveryWallet() {
             animate={{ opacity: 1, scale: 1 }}
             className="village-card paper-texture organic-radius bg-gradient-to-br from-[#8B3D28] to-[#3D2B1F] p-7 text-white border-none shadow-2xl shadow-[#8B3D28]/20 relative overflow-hidden"
         >
-            <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+            <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
             <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-3xl pointer-events-none font-black italic text-8xl flex items-center justify-center select-none">{"\u20B9"}</div>
             
             <div className="relative z-10">
@@ -255,7 +255,7 @@ export default function DeliveryWallet() {
                         onClick={handleOpenPayout}
                         className="px-5 py-3 bg-[#8B3D28] text-white rounded-2xl shadow-xl shadow-[#8B3D28]/30 font-black text-[11px] uppercase tracking-[0.2em] active:scale-95 transition-all relative overflow-hidden"
                     >
-                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
                         <span className="relative z-10">Pay Out</span>
                     </button>
                     <div className="hidden w-10 h-10 rounded-xl bg-[#4A7C59]/10 flex items-center justify-center text-[#4A7C59]">
@@ -384,7 +384,7 @@ export default function DeliveryWallet() {
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
                 className="relative w-full max-w-md bg-stone-50 rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 shadow-2xl paper-texture overflow-hidden"
               >
-                <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
                 
                 <div className="flex items-center justify-between mb-8">
                     <div>
@@ -439,7 +439,7 @@ export default function DeliveryWallet() {
                         disabled={isSubmitting || !withdrawAmount}
                         className="w-full bg-[#8B3D28] text-white py-5 rounded-3xl font-black text-[11px] uppercase tracking-[0.25em] shadow-2xl shadow-[#8B3D28]/30 transition-all active:scale-[0.98] disabled:opacity-50 relative overflow-hidden group mt-4"
                     >
-                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
                         <span className="relative z-10">{isSubmitting ? "TRANSMITTING..." : "INITIATE TRANSFER"}</span>
                     </button>
                     
@@ -468,7 +468,7 @@ export default function DeliveryWallet() {
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
                 className="relative w-full max-w-md bg-stone-50 rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 shadow-2xl paper-texture overflow-hidden"
               >
-                <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
                 
                 <div className="flex items-center justify-between mb-8">
                     <div>
@@ -530,7 +530,7 @@ export default function DeliveryWallet() {
                         disabled={payoutInProgress || !payoutAmount}
                         className="w-full bg-[#8B3D28] text-white py-5 rounded-3xl font-black text-[11px] uppercase tracking-[0.25em] shadow-2xl shadow-[#8B3D28]/30 transition-all active:scale-[0.98] disabled:opacity-50 relative overflow-hidden group mt-4"
                     >
-                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
                         <span className="relative z-10">{payoutInProgress ? "PROCESSING..." : "SUBMIT PAYOUT"}</span>
                     </button>
                 </div>

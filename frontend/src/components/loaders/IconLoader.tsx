@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
 import { useLoading } from '../../context/LoadingContext';
-import { ALLOWED_ANIMATIONS, getAnimationData } from '../../utils/animationCache';
+import { getAnimationData, getNextAnimationName } from '../../utils/animationCache';
 import './iconLoader.css';
 
 interface IconLoaderProps {
@@ -28,12 +28,8 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const currentPath = (isRouteLoading || forceShow) ? lockedPath : path;
 
   useEffect(() => {
-    // Pick one at random for every load
-    const index = Math.floor(Math.random() * ALLOWED_ANIMATIONS.length);
-    const animationName = ALLOWED_ANIMATIONS[index];
-
+    const animationName = getNextAnimationName();
     setCurrentAnimationName(animationName);
-    
     getAnimationData(animationName).then(data => {
       if (data) setAnimationData(data);
     });
@@ -60,8 +56,7 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const currentAnimation = currentAnimationName;
 
   const renderAnimation = () => {
-    // Standardized compact size for all 3 allowed animations
-    const sizeClasses = "w-[200px] h-[200px]";
+    const sizeClasses = "w-[80vw] h-[50vh] max-w-2xl";
 
     return (
       <div className={`${sizeClasses} flex items-center justify-center`}>

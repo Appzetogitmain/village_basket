@@ -74,7 +74,7 @@ export default function Rewards() {
     <div className="pb-24">
       {/* Premium Village Header - Compact */}
       <div className="px-4 py-4 bg-[#8B3D28] border-b border-white/10 mb-4 sticky top-0 z-20 flex items-center gap-3 shadow-lg">
-        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
         <button onClick={() => navigate(-1)} className="p-1.5 text-white hover:bg-white/10 rounded-full transition-all active:scale-95 z-10">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
         </button>

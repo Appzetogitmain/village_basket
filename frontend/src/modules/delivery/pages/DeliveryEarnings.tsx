@@ -101,11 +101,11 @@ export default function DeliveryEarnings() {
 
   return (
     <div className="min-h-screen bg-transparent pb-20 font-poppins relative">
-      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Local Header */}
       <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <button
               onClick={() => navigate(-1)}
               className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
@@ -121,7 +121,7 @@ export default function DeliveryEarnings() {
       <div className="px-6 py-6 relative z-10">
         {/* Current Wallet Balance Card */}
         <div className="relative overflow-hidden bg-gradient-to-br from-[#8B3D28] to-[#3D2B1F] organic-radius p-6 text-white mb-6 shadow-2xl shadow-[#8B3D28]/30 group">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
           
           <div className="flex items-center justify-between mb-4">
@@ -182,7 +182,7 @@ export default function DeliveryEarnings() {
             disabled={isWithdrawing || !withdrawAmount}
             className="w-full bg-[#8B3D28] text-white rounded-2xl py-4 font-black text-[11px] uppercase tracking-[0.25em] shadow-lg shadow-[#8B3D28]/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 disabled:scale-100 disabled:shadow-none relative overflow-hidden group"
           >
-             <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
+             <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
             <span className="relative z-10">{isWithdrawing ? "Securing Transaction..." : "Process Transfer"}</span>
           </button>
         </div>

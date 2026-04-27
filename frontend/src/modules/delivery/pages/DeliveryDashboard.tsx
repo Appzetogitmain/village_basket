@@ -288,7 +288,7 @@ export default function DeliveryDashboard() {
         <div
           onClick={() => navigate("/delivery/wallet")}
           className="bg-gradient-to-br from-[#8B3D28] to-[#3D2B1F] organic-radius p-4 text-white shadow-lg shadow-[#8B3D28]/20 cursor-pointer active:scale-[0.98] transition-all relative overflow-hidden group">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all"></div>
           
           <div className="flex items-center justify-between mb-2 relative z-10">

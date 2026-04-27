@@ -18,8 +18,8 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const routeLoadingStartTime = useRef<number | null>(Date.now()); // Start timing immediately
   const activeRequests = useRef(0);
   const activeRouteRequests = useRef(1); // Start with 1 to represent initial page load
-  const MINIMUM_LOADING_TIME = 200; // 0.2 seconds — much snappier feel
-  const ROUTE_SAFETY_LIMIT = 15000; // 15 seconds safety mirror for routes
+  const MINIMUM_LOADING_TIME = 200;
+  const ROUTE_SAFETY_LIMIT = 5000; // 5s safety limit
 
   const safetyTimer = useRef<NodeJS.Timeout | null>(null);
   const routeSafetyTimer = useRef<NodeJS.Timeout | null>(null);
@@ -36,7 +36,7 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           activeRequests.current = 0;
           setIsLoading(false);
         }
-      }, 15000);
+      }, 5000);
     }
   }, []);
 

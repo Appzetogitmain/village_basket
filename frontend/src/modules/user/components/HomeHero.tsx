@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useLayoutEffect, useRef, useState, useEffect, useMemo } from 'react';
+import { useLayoutEffect, useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLoading } from '../../../context/LoadingContext';
@@ -11,6 +11,7 @@ import { Category } from '../../../types/domain';
 import { getHeaderCategoriesPublic } from '../../../services/api/headerCategoryService';
 import { getHomeContent } from '../../../services/api/customerHomeService';
 import { getIconByName } from '../../../utils/iconLibrary';
+import { apiCache } from '../../../utils/apiCache';
 import homeIcon from '@assets/category/home_v2.png';
 import { useCart } from '../../../context/CartContext';
 import { useAuth } from '../../../context/AuthContext';
@@ -44,21 +45,22 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
   useEffect(() => {
     const fetchHeaderCategories = async () => {
       try {
-        const cats = await getHeaderCategoriesPublic();
+        // Cache header categories for 10 minutes
+        const cats = await apiCache.getOrFetch(
+          'header-categories',
+          () => getHeaderCategoriesPublic(),
+          10 * 60 * 1000
+        );
         if (cats && cats.length > 0) {
-          const mapped = cats.map(c => {
+          const mapped = cats.map((c: any) => {
             if (c.slug === 'all' && !c.image) {
-              return {
-                id: c.slug,
-                label: c.name,
-                icon: HOME_TAB.icon
-              };
+              return { id: c.slug, label: c.name, icon: HOME_TAB.icon };
             }
             return {
               id: c.slug,
               label: c.name,
               icon: c.image ? (
-                <img src={c.image} alt={c.name} className="w-full h-full object-contain" />
+                <img src={c.image} alt={c.name} className="w-full h-full object-contain" loading="lazy" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center p-2">
                   {getIconByName(c.iconName || '')}
@@ -69,7 +71,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
           setTabs(mapped);
         }
       } catch (error) {
-        console.error('Failed to fetch header categories', error);
+        // silently fail — HOME_TAB fallback remains
       }
     };
     fetchHeaderCategories();
@@ -106,19 +108,20 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
 
   const [categories, setCategories] = useState<Category[]>([]);
 
-  // Fetch categories for search suggestions
+  // Fetch categories for search suggestions — cached
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await getCategories();
+        const response = await apiCache.getOrFetch(
+          'categories-list',
+          () => getCategories(),
+          10 * 60 * 1000
+        );
         if (response.success && response.data) {
-          setCategories(response.data.map((c: any) => ({
-            ...c,
-            id: c._id || c.id
-          })));
+          setCategories(response.data.map((c: any) => ({ ...c, id: c._id || c.id })));
         }
       } catch (error) {
-        console.error("Error fetching categories for suggestions:", error);
+        // silently fail
       }
     };
     fetchCategories();
@@ -181,102 +184,60 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
     return () => clearInterval(interval);
   }, [searchSuggestions.length, activeTab]);
 
-  // Handle scroll to detect when "LOWEST PRICES EVER" section is out of view
-  useEffect(() => {
-    const handleScroll = () => {
-      if (topSectionRef.current && stickyRef.current) {
-        // Find the "LOWEST PRICES EVER" section
-        const lowestPricesSection = document.querySelector('[data-section="lowest-prices"]');
-
-        if (lowestPricesSection) {
-          const sectionBottom = lowestPricesSection.getBoundingClientRect().bottom;
-          // When the section has scrolled up past the viewport, transition to white
-          const progress = Math.min(Math.max(1 - (sectionBottom / 200), 0), 1);
-          setScrollProgress(progress);
-          setIsSticky(sectionBottom <= 100);
-        } else {
-          // Fallback to original logic if section not found
-          const topSectionBottom = topSectionRef.current.getBoundingClientRect().bottom;
-          const topSectionHeight = topSectionRef.current.offsetHeight;
-          const progress = Math.min(Math.max(1 - (topSectionBottom / topSectionHeight), 0), 1);
-          setScrollProgress(progress);
-          setIsSticky(topSectionBottom <= 0);
-        }
+  // Handle scroll — memoized to avoid re-registration on every render
+  const handleScroll = useCallback(() => {
+    if (topSectionRef.current && stickyRef.current) {
+      const lowestPricesSection = document.querySelector('[data-section="lowest-prices"]');
+      if (lowestPricesSection) {
+        const sectionBottom = lowestPricesSection.getBoundingClientRect().bottom;
+        const progress = Math.min(Math.max(1 - (sectionBottom / 200), 0), 1);
+        setScrollProgress(progress);
+        setIsSticky(sectionBottom <= 100);
+      } else {
+        const topSectionBottom = topSectionRef.current.getBoundingClientRect().bottom;
+        const topSectionHeight = topSectionRef.current.offsetHeight;
+        const progress = Math.min(Math.max(1 - (topSectionBottom / topSectionHeight), 0), 1);
+        setScrollProgress(progress);
+        setIsSticky(topSectionBottom <= 0);
       }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Check initial state
-
-    return () => window.removeEventListener('scroll', handleScroll);
+    }
   }, []);
 
-  // Update sliding indicator position when activeTab changes and scroll to active tab
   useEffect(() => {
-    const updateIndicator = (shouldScroll = true) => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  // Update tab indicator — single RAF instead of 3 timeouts
+  useEffect(() => {
+    const updateIndicator = () => {
       const activeTabButton = tabRefs.current.get(activeTab);
       const container = tabsContainerRef.current;
+      if (!activeTabButton || !container) return;
 
-      if (activeTabButton && container) {
-        try {
-          // Use offsetLeft for position relative to container (not affected by scroll)
-          // This ensures the indicator stays aligned even when container scrolls
-          const left = activeTabButton.offsetLeft;
-          const width = activeTabButton.offsetWidth;
+      const left = activeTabButton.offsetLeft;
+      const width = activeTabButton.offsetWidth;
+      if (width > 0) setIndicatorStyle({ left, width });
 
-          // Ensure valid values
-          if (width > 0) {
-            setIndicatorStyle({ left, width });
-          }
+      const containerScrollLeft = container.scrollLeft;
+      const containerWidth = container.offsetWidth;
+      const scrollPadding = 20;
+      let targetScrollLeft = containerScrollLeft;
 
-          // Scroll the container to bring the active tab into view (only when tab changes)
-          if (shouldScroll) {
-            const containerScrollLeft = container.scrollLeft;
-            const containerWidth = container.offsetWidth;
-            const buttonLeft = left;
-            const buttonWidth = width;
-            const buttonRight = buttonLeft + buttonWidth;
+      if (left < containerScrollLeft + scrollPadding) {
+        targetScrollLeft = left - scrollPadding;
+      } else if (left + width > containerScrollLeft + containerWidth - scrollPadding) {
+        targetScrollLeft = left + width - containerWidth + scrollPadding;
+      }
 
-            // Calculate scroll position to center the button or keep it visible
-            const scrollPadding = 20; // Padding from edges
-            let targetScrollLeft = containerScrollLeft;
-
-            // If button is on the left side and partially or fully hidden
-            if (buttonLeft < containerScrollLeft + scrollPadding) {
-              targetScrollLeft = buttonLeft - scrollPadding;
-            }
-            // If button is on the right side and partially or fully hidden
-            else if (buttonRight > containerScrollLeft + containerWidth - scrollPadding) {
-              targetScrollLeft = buttonRight - containerWidth + scrollPadding;
-            }
-
-            // Smooth scroll to the target position
-            if (targetScrollLeft !== containerScrollLeft) {
-              container.scrollTo({
-                left: Math.max(0, targetScrollLeft),
-                behavior: 'smooth'
-              });
-            }
-          }
-        } catch (error) {
-          console.warn('Error updating indicator:', error);
-        }
+      if (targetScrollLeft !== containerScrollLeft) {
+        container.scrollTo({ left: Math.max(0, targetScrollLeft), behavior: 'smooth' });
       }
     };
 
-    // Update immediately with scroll
-    updateIndicator(true);
-
-    // Also update after delays to handle any layout shifts and ensure smooth animation
-    const timeout1 = setTimeout(() => updateIndicator(true), 50);
-    const timeout2 = setTimeout(() => updateIndicator(true), 150);
-    const timeout3 = setTimeout(() => updateIndicator(false), 300); // Last update without scroll to avoid conflicts
-
-    return () => {
-      clearTimeout(timeout1);
-      clearTimeout(timeout2);
-      clearTimeout(timeout3);
-    };
+    const rafId = requestAnimationFrame(updateIndicator);
+    return () => cancelAnimationFrame(rafId);
   }, [activeTab]);
 
   const { startRouteLoading } = useLoading();
@@ -348,7 +309,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
         }}
       >
         {/* Decorative Warli Pattern Overlay */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
 
         {/* Top Row: Logo, Notifications & Cart */}
         <div className="flex items-center justify-between mb-2.5 relative z-20">

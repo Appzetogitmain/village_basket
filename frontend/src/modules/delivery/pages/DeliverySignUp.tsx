@@ -290,11 +290,11 @@ export default function DeliverySignUp() {
       }}
     >
       {loading && <VillageLoader />}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Hero Branding Header */}
       <div className="w-full bg-[#8B3D28] pt-16 pb-16 px-6 relative overflow-hidden shrink-0">
-        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
 
         <button
           onClick={() => navigate(-1)}
@@ -490,7 +490,7 @@ export default function DeliverySignUp() {
                   type="submit" disabled={loading || uploadingDocs}
                   className="w-full bg-gradient-to-br from-[#8B3D28] to-[#3D2B1F] text-white py-5 rounded-[2rem] font-black text-[11px] uppercase tracking-[0.25em] shadow-2xl shadow-[#8B3D28]/30 transition-all active:scale-[0.98] relative overflow-hidden group border-none"
                 >
-                  <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
+                  <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
                   <span className="relative z-10">{uploadingDocs ? "UPLOADING ASSETS..." : loading ? "INITIATING ACCOUNT..." : "REQUEST REGISTRATION"}</span>
                 </button>
 

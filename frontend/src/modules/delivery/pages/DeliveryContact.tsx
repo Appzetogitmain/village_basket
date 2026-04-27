@@ -42,11 +42,11 @@ export default function DeliveryContact() {
 
     return (
         <div className="min-h-screen bg-transparent pb-24 font-poppins relative">
-            <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0" />
+            <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0" />
 
             {/* Header */}
             <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
-                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
+                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]" />
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90">
                     <Icons.ChevronLeft size={20} />
                 </button>

@@ -56,7 +56,7 @@ export default function SplashScreen() {
 
           {/* Bullock Cart Animation */}
           <motion.div
-            className="w-96 h-96"
+            className="w-[90vw] h-[50vh] max-w-3xl"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}

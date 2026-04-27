@@ -116,7 +116,7 @@ export default function Account() {
     return (
       <div className="pb-24 md:pb-8 bg-transparent min-h-screen">
         <div className="bg-gradient-to-b from-[#8B3D28]/10 via-[#8B3D28]/5 to-transparent pb-6 md:pb-8 pt-12 md:pt-16 relative">
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <div className="px-4 md:px-6 lg:px-8 relative z-10">
             <button onClick={() => navigate(-1)} className="mb-4 text-[#8B3D28] hover:bg-[#8B3D28]/10 p-2 rounded-full transition-colors" aria-label="Back">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>

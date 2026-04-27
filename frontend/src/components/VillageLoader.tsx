@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import { useLoading } from '../context/LoadingContext';
-import { ALLOWED_ANIMATIONS, getAnimationData } from '../utils/animationCache';
+import { getAnimationData, getNextAnimationName } from '../utils/animationCache';
 
 interface VillageLoaderProps {
     message?: string;
@@ -38,10 +38,7 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     const currentPath = isRouteLoading ? lockedPath : path;
 
     useEffect(() => {
-        // Pick one at random for every load
-        const index = Math.floor(Math.random() * ALLOWED_ANIMATIONS.length);
-        const animationName = ALLOWED_ANIMATIONS[index];
-
+        const animationName = getNextAnimationName();
         getAnimationData(animationName).then(data => {
             if (data) setAnimationData(data);
         });
@@ -56,9 +53,9 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
 
     const renderAnimation = () => {
         return (
-            <div className="w-[200px] h-[200px] flex items-center justify-center">
+            <div className="w-[80vw] h-[50vh] max-w-2xl flex items-center justify-center">
                 {animationData ? (
-                    <Lottie animationData={animationData} loop={true} />
+                    <Lottie animationData={animationData} loop={true} className="w-full h-full" />
                 ) : (
                     <div className="w-12 h-12 border-4 border-amber-600 border-t-transparent rounded-full animate-spin" />
                 )}
@@ -97,7 +94,7 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     return (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-stone-50/98 backdrop-blur-md px-6 text-center">
             {/* Texture Overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
             <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -105,7 +102,7 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="relative z-10 space-y-8"
             >
-                <div className="relative h-32 flex items-center justify-center">
+                <div className="relative flex items-center justify-center">
                     {renderAnimation()}
                     
                     {/* Shadow */}

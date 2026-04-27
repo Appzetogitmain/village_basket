@@ -23,35 +23,34 @@ class APICache {
     ttl: number = this.DEFAULT_TTL,
     persist: boolean = false
   ): Promise<T> {
-    // Check if there's a pending request for this key
+    // Check if there's a pending request for this key (deduplication)
     const pendingRequest = this.pendingRequests.get(key);
     if (pendingRequest) {
       return pendingRequest;
     }
 
-    // Check memory cache
-    let cached = this.cache.get(key);
+    // Check memory cache first (fast path)
+    const cached = this.cache.get(key);
+    if (cached && Date.now() < cached.expiresAt) {
+      return cached.data as T;
+    }
 
-    // If not in memory but persistence is enabled, check sessionStorage
-    if (!cached && persist && typeof window !== 'undefined') {
+    // Only check sessionStorage if persist is enabled AND memory cache missed
+    if (persist && typeof window !== 'undefined') {
       try {
         const stored = sessionStorage.getItem(`api_cache_${key}`);
         if (stored) {
           const entry = JSON.parse(stored);
           if (Date.now() < entry.expiresAt) {
-            cached = entry;
             this.cache.set(key, entry); // Hydrate memory cache
+            return entry.data as T;
           } else {
             sessionStorage.removeItem(`api_cache_${key}`);
           }
         }
       } catch (e) {
-        console.error('Failed to load from sessionStorage', e);
+        // Ignore storage errors
       }
-    }
-
-    if (cached && Date.now() < cached.expiresAt) {
-      return cached.data as T;
     }
 
     // Fetch new data

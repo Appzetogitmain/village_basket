@@ -336,7 +336,7 @@ export default function LowestPricesEver({ activeTab = 'all', products: adminPro
       }}
     >
       {/* Paper Texture Overlay */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
 
       {/* Decorative Wavy Border at Top */}
       <div className="absolute top-0 left-0 right-0 h-4 bg-white/40 md:hidden">

@@ -39,11 +39,11 @@ export default function DeliveryAbout() {
 
   return (
     <div className="min-h-screen bg-transparent pb-24 font-poppins relative">
-      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Local Header */}
       <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <button
               onClick={() => navigate(-1)}
               className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
@@ -67,7 +67,7 @@ export default function DeliveryAbout() {
           ) : profile ? (
             <>
               <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-[#8B3D28] to-[#3D2B1F] flex items-center justify-center mx-auto mb-6 text-white font-black text-4xl shadow-2xl ring-4 ring-stone-50 ring-offset-2 ring-offset-stone-100/50 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
                 {profile.name?.charAt(0).toUpperCase()}
               </div>
               <h3 className="text-village-umber text-xl font-black tracking-tighter mb-1 uppercase">{profile.name}</h3>

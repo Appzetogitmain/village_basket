@@ -72,7 +72,7 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
           style={{ backgroundImage: `url(${panchayatArt})`, backgroundSize: '240px auto' }}
         ></div>
         
-        <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('/assets/natural-paper.png')] z-0"></div>
 
         {/* Search */}
         <div className="p-3 border-b border-white/10 relative z-10">

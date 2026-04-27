@@ -909,7 +909,7 @@ export default function OrderDetail() {
         className={`${currentStatus.color} text-white sticky top-0 z-40 shadow-sm`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}>
-        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
         
         {/* Navigation bar - Desktop Optimized */}
         <div className="max-w-6xl mx-auto px-4 py-3 md:py-2.5 flex items-center justify-between relative z-10">

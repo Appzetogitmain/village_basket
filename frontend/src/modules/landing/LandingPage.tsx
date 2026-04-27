@@ -21,18 +21,25 @@ import appScrnshot2 from '@assets/landing_page/app_category_scrnshot.png';
 import appScrnshot3 from '@assets/landing_page/app_orders_scrnshot.png';
 import { submitInquiry } from '../../services/api/contactService';
 import { useToast } from '../../context/ToastContext';
-/* ─── Reveal Component ───────────────────────────── */
+/* ─── Reveal Component (Optimized) ───────────────────────────── */
 function Reveal({ children, width = "fit-content", delay = 0 }: { children: React.ReactNode, width?: "fit-content" | "100%", delay?: number }) {
+  // Disable animations on mobile for better performance
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  
+  if (isMobile) {
+    return <div style={{ width }}>{children}</div>;
+  }
+
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 75 },
+        hidden: { opacity: 0, y: 30 },
         visible: { opacity: 1, y: 0 },
       }}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8, ease: "easeOut", delay }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.4, ease: "easeOut", delay }}
       style={{ width }}
     >
       {children}
@@ -97,7 +104,8 @@ function ImageSlider({ images }: { images: string[] }) {
           key={idx}
           src={src}
           alt="Slider"
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+          loading="lazy"
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
         />
       ))}
     </div>
@@ -804,7 +812,7 @@ export default function LandingPage() {
       {/* ── 9. Contact Us ───────────────────────────────── */}
       <section id="contact" className="py-24 px-4 sm:px-6 max-w-7xl mx-auto">
         <div className="bg-[#8B3D28] rounded-[3rem] p-8 md:p-16 relative overflow-hidden shadow-2xl">
-          <div className="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-[0.05] bg-[url('/assets/natural-paper.png')]"></div>
           <div className="relative z-10 flex flex-col lg:flex-row gap-10 lg:gap-12 text-white">
             <div className="flex-1">
               <h2 className="text-3xl sm:text-5xl font-black mb-4">Get in Touch</h2>
