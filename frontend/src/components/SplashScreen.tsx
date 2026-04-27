@@ -38,7 +38,7 @@ export default function SplashScreen() {
           <motion.img
             src={logo}
             alt="Village Basket"
-            className="w-20 h-20 object-contain mb-2"
+            className="w-16 h-16 object-contain mb-1 relative z-10"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -46,7 +46,7 @@ export default function SplashScreen() {
 
           {/* Brand name */}
           <motion.p
-            className="text-[#8B3D28] text-xs font-black uppercase tracking-[0.3em] mb-4"
+            className="text-[#8B3D28] text-xs font-black uppercase tracking-[0.3em] mb-2 relative z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -54,10 +54,10 @@ export default function SplashScreen() {
             Village Basket
           </motion.p>
 
-          {/* Bullock Cart Animation */}
+          {/* Bullock Cart Animation — full screen */}
           <motion.div
-            className="w-[90vw] h-[50vh] max-w-3xl"
-            initial={{ opacity: 0, scale: 0.8 }}
+            className="absolute inset-0 flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
@@ -66,7 +66,7 @@ export default function SplashScreen() {
 
           {/* Tagline */}
           <motion.p
-            className="text-[#3E2723]/50 text-[11px] font-bold uppercase tracking-widest mt-2"
+            className="text-[#3E2723]/60 text-[11px] font-bold uppercase tracking-widest relative z-10 mt-auto mb-20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
@@ -76,7 +76,7 @@ export default function SplashScreen() {
 
           {/* Progress bar */}
           <motion.div
-            className="absolute bottom-12 w-32 h-1 bg-[#8B3D28]/10 rounded-full overflow-hidden"
+            className="absolute bottom-12 w-40 h-1 bg-[#8B3D28]/10 rounded-full overflow-hidden z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}

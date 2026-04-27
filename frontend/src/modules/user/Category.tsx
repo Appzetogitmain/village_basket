@@ -227,8 +227,83 @@ export default function Category() {
     return result;
   }, [products, selectedSort, selectedFilters]);
 
+  // getIconForFilter — defined before early returns so filterOptions useMemo can use it
+  const getIconForFilter = (name: string): string => {
+    const iconMap: Record<string, string> = {
+      Tomato: "🍅", Potato: "🥔", Chilli: "🌶️", Spinach: "🥬", Brinjal: "🍆",
+      Onion: "🧅", Peanuts: "🥜", Lemon: "🍋", Mushroom: "🍄", Capsicum: "🫑",
+      Ginger: "🫚", Carrot: "🥕", Fenugreek: "🌿", Broccoli: "🥦", Cucumber: "🥒",
+      Cabbage: "🥬", Cauliflower: "🥦", Apple: "🍎", Banana: "🍌", Orange: "🍊",
+      Mango: "🥭", Organic: "🍃", Discounted: "🏷️", "In Stock": "📦", Premium: "⭐",
+    };
+    return iconMap[name] || "🥬";
+  };
+
+  // filterOptions — must be before early returns (Rules of Hooks)
+  const filterOptions = useMemo(() => {
+    const filterMap = new Map<string, number>();
+    if (selectedFilterCategory === "Type") {
+      products.forEach((product) => {
+        const name = (product.name || product.productName || "").toLowerCase();
+        const cleanName = name.replace(/^(fresh|organic|premium|best|new)\s+/i, "").trim();
+        const commonTypes = [
+          { keywords: ["tomato", "tomatoes"], display: "Tomato" },
+          { keywords: ["potato", "potatoes"], display: "Potato" },
+          { keywords: ["chilli", "chili", "chilies"], display: "Chilli" },
+          { keywords: ["spinach", "palak"], display: "Spinach" },
+          { keywords: ["brinjal", "eggplant"], display: "Brinjal" },
+          { keywords: ["onion", "onions"], display: "Onion" },
+          { keywords: ["peanut", "peanuts"], display: "Peanuts" },
+          { keywords: ["lemon", "lemons"], display: "Lemon" },
+          { keywords: ["mushroom", "mushrooms"], display: "Mushroom" },
+          { keywords: ["capsicum", "bell pepper", "pepper"], display: "Capsicum" },
+          { keywords: ["ginger"], display: "Ginger" },
+          { keywords: ["carrot", "carrots"], display: "Carrot" },
+          { keywords: ["fenugreek", "methi"], display: "Fenugreek" },
+          { keywords: ["broccoli"], display: "Broccoli" },
+          { keywords: ["cucumber", "cucumbers"], display: "Cucumber" },
+          { keywords: ["cabbage"], display: "Cabbage" },
+          { keywords: ["cauliflower"], display: "Cauliflower" },
+          { keywords: ["ladyfinger", "okra", "bhindi"], display: "Ladyfinger" },
+          { keywords: ["beans"], display: "Beans" },
+          { keywords: ["peas", "matar"], display: "Peas" },
+          { keywords: ["garlic", "lehsun"], display: "Garlic" },
+          { keywords: ["apple", "apples"], display: "Apple" },
+          { keywords: ["banana", "bananas"], display: "Banana" },
+          { keywords: ["orange", "oranges"], display: "Orange" },
+          { keywords: ["mango", "mangoes"], display: "Mango" },
+        ];
+        for (const type of commonTypes) {
+          if (type.keywords.some((keyword) => cleanName.includes(keyword))) {
+            filterMap.set(type.display, (filterMap.get(type.display) || 0) + 1);
+            break;
+          }
+        }
+      });
+    } else if (selectedFilterCategory === "Properties") {
+      const properties = [
+        { name: "Organic", check: (p: any) => (p.name || p.productName || "").toLowerCase().includes("organic") || (p.tags || []).some((t: string) => t.toLowerCase().includes("organic")) },
+        { name: "Discounted", check: (p: any) => p.discount > 0 || (p.mrp > p.price) },
+        { name: "In Stock", check: (p: any) => p.stock > 0 || p.variations?.some((v: any) => v.stock > 0) },
+        { name: "Premium", check: (p: any) => (p.name || p.productName || "").toLowerCase().includes("premium") },
+      ];
+      properties.forEach(prop => {
+        const count = products.filter(prop.check).length;
+        if (count > 0) filterMap.set(prop.name, count);
+      });
+    }
+    return Array.from(filterMap.entries())
+      .map(([name, count]) => ({ name, count, icon: getIconForFilter(name) }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [products, selectedFilterCategory]);
+
+  const filteredOptions = useMemo(
+    () => filterOptions.filter(o => o.name.toLowerCase().includes(filterSearchQuery.toLowerCase())),
+    [filterOptions, filterSearchQuery]
+  );
+
   if ((categoryLoading || loading) && !products.length && !category) {
-    return null; // Let global IconLoader handle it
+    return null;
   }
 
   if (error && !products.length && !category) {
@@ -263,133 +338,6 @@ export default function Category() {
       </div>
     );
   }
-
-  // Extract filter options from products
-  const getFilterOptions = () => {
-    const filterMap = new Map<string, number>();
-
-    if (selectedFilterCategory === "Type") {
-      products.forEach((product) => {
-        // Extract main ingredient/type from product name
-        const name = (product.name || product.productName || "").toLowerCase();
-        // Remove common prefixes like "fresh", "organic", etc.
-        const cleanName = name
-          .replace(/^(fresh|organic|premium|best|new)\s+/i, "")
-          .trim();
-
-        const commonTypes = [
-          { keywords: ["tomato", "tomatoes"], display: "Tomato" },
-          { keywords: ["potato", "potatoes"], display: "Potato" },
-          { keywords: ["chilli", "chili", "chilies"], display: "Chilli" },
-          { keywords: ["spinach", "palak"], display: "Spinach" },
-          { keywords: ["brinjal", "eggplant"], display: "Brinjal" },
-          { keywords: ["onion", "onions"], display: "Onion" },
-          { keywords: ["peanut", "peanuts"], display: "Peanuts" },
-          { keywords: ["lemon", "lemons"], display: "Lemon" },
-          { keywords: ["mushroom", "mushrooms"], display: "Mushroom" },
-          {
-            keywords: ["capsicum", "bell pepper", "pepper"],
-            display: "Capsicum",
-          },
-          { keywords: ["ginger"], display: "Ginger" },
-          { keywords: ["carrot", "carrots"], display: "Carrot" },
-          { keywords: ["fenugreek", "methi"], display: "Fenugreek" },
-          { keywords: ["broccoli"], display: "Broccoli" },
-          { keywords: ["cucumber", "cucumbers"], display: "Cucumber" },
-          { keywords: ["cabbage"], display: "Cabbage" },
-          { keywords: ["cauliflower"], display: "Cauliflower" },
-          { keywords: ["ladyfinger", "okra", "bhindi"], display: "Ladyfinger" },
-          { keywords: ["beans"], display: "Beans" },
-          { keywords: ["peas", "matar"], display: "Peas" },
-          { keywords: ["garlic", "lehsun"], display: "Garlic" },
-          { keywords: ["apple", "apples"], display: "Apple" },
-          { keywords: ["banana", "bananas"], display: "Banana" },
-          { keywords: ["orange", "oranges"], display: "Orange" },
-          { keywords: ["mango", "mangoes"], display: "Mango" },
-        ];
-
-        for (const type of commonTypes) {
-          if (type.keywords.some((keyword) => cleanName.includes(keyword))) {
-            filterMap.set(type.display, (filterMap.get(type.display) || 0) + 1);
-            break;
-          }
-        }
-      });
-    } else if (selectedFilterCategory === "Properties") {
-      // Add Property filters
-      const properties = [
-        { 
-          name: "Organic", 
-          icon: "🍃", 
-          check: (p: any) => 
-            (p.name || p.productName || "").toLowerCase().includes("organic") || 
-            (p.tags || []).some((t: string) => t.toLowerCase().includes("organic"))
-        },
-        { 
-          name: "Discounted", 
-          icon: "🏷️", 
-          check: (p: any) => p.discount > 0 || (p.mrp > p.price)
-        },
-        { 
-          name: "In Stock", 
-          icon: "📦", 
-          check: (p: any) => p.stock > 0 || p.variations?.some((v: any) => v.stock > 0)
-        },
-        {
-          name: "Premium",
-          icon: "⭐",
-          check: (p: any) => (p.name || p.productName || "").toLowerCase().includes("premium")
-        }
-      ];
-
-      properties.forEach(prop => {
-        const count = products.filter(prop.check).length;
-        if (count > 0) {
-          filterMap.set(prop.name, count);
-        }
-      });
-    }
-
-    return Array.from(filterMap.entries())
-      .map(([name, count]) => ({ name, count, icon: getIconForFilter(name) }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  };
-
-  const getIconForFilter = (name: string): string => {
-    const iconMap: Record<string, string> = {
-      Tomato: "🍅",
-      Potato: "🥔",
-      Chilli: "🌶️",
-      Spinach: "🥬",
-      Brinjal: "🍆",
-      Onion: "🧅",
-      Peanuts: "🥜",
-      Lemon: "🍋",
-      Mushroom: "🍄",
-      Capsicum: "🫑",
-      Ginger: "🫚",
-      Carrot: "🥕",
-      Fenugreek: "🌿",
-      Broccoli: "🥦",
-      Cucumber: "🥒",
-      Cabbage: "🥬",
-      Cauliflower: "🥦",
-      Apple: "🍎",
-      Banana: "🍌",
-      Orange: "🍊",
-      Mango: "🥭",
-      Organic: "🍃",
-      Discounted: "🏷️",
-      "In Stock": "📦",
-      Premium: "⭐",
-    };
-    return iconMap[name] || "🥬";
-  };
-
-  const filterOptions = useMemo(() => getFilterOptions(), [products, selectedFilterCategory]);
-  const filteredOptions = filterOptions.filter((option) =>
-    option.name.toLowerCase().includes(filterSearchQuery.toLowerCase())
-  );
 
   const handleFilterToggle = (filterName: string) => {
     setSelectedFilters((prev) =>
