@@ -56,8 +56,22 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const currentAnimation = currentAnimationName;
 
   const renderAnimation = () => {
+    const isFullScreen = currentAnimationName === 'bullock_cart.json';
+
+    if (isFullScreen) {
+      return (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {animationData ? (
+            <Lottie animationData={animationData} loop={true} className="w-full h-full" />
+          ) : (
+            <div className="w-12 h-12 border-4 border-village-green border-t-transparent rounded-full animate-spin" />
+          )}
+        </div>
+      );
+    }
+
     return (
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="w-[200px] h-[200px] flex items-center justify-center">
         {animationData ? (
           <Lottie animationData={animationData} loop={true} className="w-full h-full" />
         ) : (
@@ -118,32 +132,34 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
               className="flex flex-col items-center justify-center space-y-4"
             >
               {/* Animation Container */}
-              <div className="fixed inset-0 pointer-events-none">
-                {/* Speed Lines Effects */}
-                <div className="absolute inset-0 pointer-events-none">
-                  {[...Array(4)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute h-[1px] bg-village-green/10"
-                      style={{
-                        width: 40 + Math.random() * 40,
-                        top: 20 + i * 20 + '%',
-                        left: -40
-                      }}
-                      animate={{
-                        x: [0, 300],
-                        opacity: [0, 0.5, 0]
-                      }}
-                      transition={{
-                        duration: 1 + Math.random(),
-                        repeat: Infinity,
-                        delay: i * 0.2
-                      }}
-                    />
-                  ))}
-                </div>
+              <div className="relative min-h-[200px] flex items-center justify-center">
+                {currentAnimationName !== 'bullock_cart.json' && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    {[...Array(4)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute h-[1px] bg-village-green/10"
+                        style={{
+                          width: 40 + Math.random() * 40,
+                          top: 20 + i * 20 + '%',
+                          left: -40
+                        }}
+                        animate={{ x: [0, 300], opacity: [0, 0.5, 0] }}
+                        transition={{ duration: 1 + Math.random(), repeat: Infinity, delay: i * 0.2 }}
+                      />
+                    ))}
+                  </div>
+                )}
 
                 {renderAnimation()}
+
+                {currentAnimationName !== 'bullock_cart.json' && (
+                  <motion.div
+                    className="absolute bottom-4 w-28 h-2 bg-black/5 rounded-[50%] blur-[2px]"
+                    animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                )}
               </div>
 
               {/* Status Text (Single Line) */}
