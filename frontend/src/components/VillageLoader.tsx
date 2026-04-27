@@ -109,54 +109,46 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
 
     return (
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-stone-50/98 backdrop-blur-md text-center">
-            {/* Texture Overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
-            {/* Animation — full screen for bullock_cart, centered box for others */}
+            {/* Animation */}
             {animationName === 'bullock_cart.json' ? (
-                renderAnimation()
+                <div className="absolute inset-0 z-0">{renderAnimation()}</div>
             ) : (
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="relative z-10 space-y-8"
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="relative z-10 flex items-center justify-center min-h-[200px]"
                 >
-                    <div className="relative flex items-center justify-center">
-                        {renderAnimation()}
-                        <motion.div
-                            className="absolute bottom-0 w-16 h-1.5 bg-black/5 rounded-[50%] blur-[1px]"
-                            animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        />
-                    </div>
+                    {renderAnimation()}
+                    <motion.div
+                        className="absolute bottom-0 w-16 h-1.5 bg-black/5 rounded-[50%] blur-[1px]"
+                        animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                    />
                 </motion.div>
             )}
 
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="relative z-10 space-y-4 mt-auto mb-16 px-6"
+            {/* Text — below animation */}
+            <div
+                className="relative z-10 flex flex-col items-center gap-2"
+                style={{ marginTop: animationName === 'bullock_cart.json' ? '60vh' : '16px' }}
             >
-                <div className="space-y-4">
-                    <h2 className="text-village-umber font-black text-sm uppercase tracking-[0.4em] italic leading-none animate-pulse">
-                        {text.h2}
-                    </h2>
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="h-[2px] w-12 bg-stone-200 relative overflow-hidden rounded-full">
-                            <motion.div
-                                animate={{ left: ["-100%", "100%"] }}
-                                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute top-0 bottom-0 w-1/2 bg-village-green"
-                            />
-                        </div>
-                        <p className="text-stone-400 text-[8px] font-black uppercase tracking-[0.2em] leading-none mt-1">
-                            {text.p}
-                        </p>
-                    </div>
+                <h2 className="text-village-umber font-black text-sm uppercase tracking-[0.4em] italic leading-none animate-pulse">
+                    {text.h2}
+                </h2>
+                <div className="h-[2px] w-12 bg-stone-200 relative overflow-hidden rounded-full">
+                    <motion.div
+                        animate={{ left: ["-100%", "100%"] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute top-0 bottom-0 w-1/2 bg-village-green"
+                    />
                 </div>
-            </motion.div>
+                <p className="text-stone-400 text-[8px] font-black uppercase tracking-[0.2em] leading-none">
+                    {text.p}
+                </p>
+            </div>
         </div>
     );
 };
