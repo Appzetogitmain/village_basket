@@ -1,38 +1,4 @@
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { useState, useMemo, useEffect } from "react";
-import ProductCard from "./components/ProductCard";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  getProducts,
-  getCategoryById,
-  Category as ApiCategory,
-} from "../../services/api/customerProductService";
-import { useLocation as useLocationContext } from "../../hooks/useLocation";
-
-export default function Category() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { location: userLocation } = useLocationContext();
-
-  const [category, setCategory] = useState<ApiCategory | null>(null);
-  const [subcategories, setSubcategories] = useState<ApiCategory[]>([]);
-  const hasRealSubcategories = useMemo(() => {
-    return subcategories.filter(s => s._id !== 'all' && s.id !== 'all').length > 0;
-  }, [subcategories]);
-  const [selectedSubcategory, setSelectedSubcategory] = useState("all");
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState("relevance");
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  const [filterSearchQuery, setFilterSearchQuery] = useState("");
-  const [selectedFilterCategory, setSelectedFilterCategory] = useState("Type");
-  const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [categoryLoading, setCategoryLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import ProductCard from "./components/ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,7 +9,7 @@ import {
 } from "../../services/api/customerProductService";
 import { useLocation as useLocationContext } from "../../hooks/useLocation";
 
-export default function CategoryPage() {
+export default function Category() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
