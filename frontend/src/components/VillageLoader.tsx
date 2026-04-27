@@ -54,7 +54,6 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     const isDelivery = currentPath.includes('/delivery');
 
     const renderAnimation = () => {
-        const renderAnimation = () => {
         const isFullScreen = animationName === 'bullock_cart.json';
 
         if (isFullScreen) {
@@ -78,7 +77,6 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
                 )}
             </div>
         );
-    };
     };
 
     const getLoadingText = () => {
