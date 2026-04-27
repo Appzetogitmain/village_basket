@@ -110,7 +110,9 @@ export default function Login() {
           accountType: response.data.user.customerType,
           userType: 'Customer',
         });
-        navigate('/user');
+        // Redirect to the page they were trying to access, or home
+        const from = (location.state as any)?.from?.pathname || '/user/home';
+        navigate(from, { replace: true });
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid OTP. Please try again.');
