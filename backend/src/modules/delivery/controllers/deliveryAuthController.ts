@@ -1,12 +1,18 @@
 import { Request, Response } from "express";
 import Delivery from "../../../models/Delivery";
+import DeliveryAssignment from "../../../models/DeliveryAssignment";
+import Order from "../../../models/Order";
+import DeliveryWallet from "../../../models/DeliveryWallet";
+import DeliveryTracking from "../../../models/DeliveryTracking";
+import WithdrawRequest from "../../../models/WithdrawRequest";
+import Notification from "../../../models/Notification";
 import {
   sendSmsOtp as sendSmsOtpService,
   verifySmsOtp as verifySmsOtpService,
 } from "../../../services/otpService";
 import { generateToken } from "../../../services/jwtService";
 import { asyncHandler } from "../../../utils/asyncHandler";
-// import { uploadDocument } from "../../../services/uploadService"; // File does not exist
+import { sendNotification } from "../../../services/notificationService";
 
 /**
  * Send SMS OTP to delivery mobile number
@@ -310,15 +316,71 @@ export const selfDeleteAccount = asyncHandler(async (req: Request, res: Response
     });
   }
 
-  // Soft delete: update status to Deleted
-  delivery.status = "Deleted";
-  delivery.isOnline = false;
-  delivery.approvalStatus = "Rejected"; // Also reject to ensure standard checks fail
-  
-  await delivery.save();
+  // 1. Find active assignments (status not in "Delivered", "Failed", "Cancelled")
+  const activeAssignments = await DeliveryAssignment.find({
+    deliveryBoy: userId,
+    status: { $nin: ["Delivered", "Failed", "Cancelled"] }
+  });
+
+  // 2. Notify sellers and unassign rider from active orders
+  for (const assignment of activeAssignments) {
+    const order = await Order.findById(assignment.order);
+    if (order) {
+      // Find unique sellers involved in this order
+      const sellers = new Set<string>();
+      if (order.sellerPickups && order.sellerPickups.length > 0) {
+        order.sellerPickups.forEach((p: any) => {
+          if (p.seller) sellers.add(p.seller.toString());
+        });
+      }
+      
+      // Notify each seller
+      for (const sellerId of sellers) {
+        try {
+          await sendNotification(
+            "Seller",
+            sellerId,
+            "🚨 Delivery Partner Left",
+            `Delivery partner ${delivery.name} has deleted their account. Please assign a new rider for Order #${order.orderNumber} to ensure timely delivery.`,
+            { 
+              type: "Warning", 
+              priority: "High",
+              link: `/orders/${order._id}`,
+              data: { orderId: order._id.toString(), type: "RIDER_DELETED" }
+            }
+          );
+        } catch (notifError) {
+          console.error(`Failed to notify seller ${sellerId}:`, notifError);
+        }
+      }
+
+      // Unassign the delivery boy from the order record
+      order.deliveryBoy = undefined;
+      order.deliveryBoyStatus = undefined;
+      order.assignedAt = undefined;
+      await order.save();
+    }
+  }
+
+  // 3. Perform hard delete on all related data
+  await Promise.all([
+    // Delete financial data
+    DeliveryWallet.findOneAndDelete({ deliveryBoy: userId }),
+    WithdrawRequest.deleteMany({ userId, userType: "DELIVERY_BOY" }),
+    
+    // Delete communication/tracking data
+    Notification.deleteMany({ recipientId: userId, recipientType: "Delivery" }),
+    DeliveryTracking.deleteMany({ deliveryBoy: userId }),
+    
+    // Delete all assignments (past and present)
+    DeliveryAssignment.deleteMany({ deliveryBoy: userId }),
+    
+    // Finally delete the delivery boy profile itself
+    Delivery.findByIdAndDelete(userId)
+  ]);
 
   return res.status(200).json({
     success: true,
-    message: "Your account has been successfully deleted.",
+    message: "Your account and all associated data have been permanently deleted.",
   });
 });
