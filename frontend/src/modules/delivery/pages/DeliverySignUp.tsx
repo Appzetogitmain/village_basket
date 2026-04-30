@@ -437,12 +437,12 @@ export default function DeliverySignUp() {
                 <div className="space-y-6 pt-4 border-t border-stone-100">
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-[1px] bg-[#8B3D28]/30"></div>
-                    <h3 className="text-[#8B3D28] text-[10px] font-black uppercase tracking-[0.3em]">Financial Ledger</h3>
+                    <h3 className="text-[#8B3D28] text-[10px] font-black uppercase tracking-[0.3em]">Financial Ledger <span className="opacity-40 normal-case font-bold">(Optional)</span></h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="relative group">
-                      <label className="text-village-umber text-[9px] font-black uppercase tracking-widest mb-1.5 ml-1 block opacity-60">Account Holder</label>
+                      <label className="text-village-umber text-[9px] font-black uppercase tracking-widest mb-1.5 ml-1 block opacity-60">Account Holder <span className="opacity-60 normal-case">(optional)</span></label>
                       <input
                         type="text" name="accountName" value={formData.accountName} onChange={handleInputChange}
                         placeholder="NAME ON ACCOUNT"
@@ -451,7 +451,7 @@ export default function DeliverySignUp() {
                       />
                     </div>
                     <div className="relative group">
-                      <label className="text-village-umber text-[9px] font-black uppercase tracking-widest mb-1.5 ml-1 block opacity-60">Bank Name</label>
+                      <label className="text-village-umber text-[9px] font-black uppercase tracking-widest mb-1.5 ml-1 block opacity-60">Bank Name <span className="opacity-60 normal-case">(optional)</span></label>
                       <input
                         type="text" name="bankName" value={formData.bankName} onChange={handleInputChange}
                         placeholder="INSTITUTION NAME"
@@ -460,7 +460,7 @@ export default function DeliverySignUp() {
                       />
                     </div>
                     <div className="relative group">
-                      <label className="text-village-umber text-[9px] font-black uppercase tracking-widest mb-1.5 ml-1 block opacity-60">Account Number</label>
+                      <label className="text-village-umber text-[9px] font-black uppercase tracking-widest mb-1.5 ml-1 block opacity-60">Account Number <span className="opacity-60 normal-case">(optional)</span></label>
                       <input
                         type="text" name="accountNumber" value={formData.accountNumber} onChange={handleInputChange}
                         placeholder="ACCOUNT NUMBER"
@@ -469,11 +469,11 @@ export default function DeliverySignUp() {
                       />
                     </div>
                     <div className="relative group">
-                      <label className="text-village-umber text-[9px] font-black uppercase tracking-widest mb-1.5 ml-1 block opacity-60">IFSC Code</label>
+                      <label className="text-village-umber text-[9px] font-black uppercase tracking-widest mb-1.5 ml-1 block opacity-60">IFSC Code <span className="opacity-60 normal-case">(optional)</span></label>
                       <input
                         type="text" name="ifscCode" value={formData.ifscCode}
                         onChange={handleInputChange}
-                        onBlur={(e) => validateIFSC(e.target.value)}
+                        onBlur={(e) => { if (e.target.value) validateIFSC(e.target.value); else setIfscError(""); }}
                         placeholder="EG., SBIN0001234"
                         className={`w-full px-5 py-4 bg-stone-50/50 border-none rounded-2xl text-[11px] font-black uppercase tracking-tight focus:ring-2 focus:ring-[#8B3D28]/20 transition-all placeholder:text-stone-300 ${ifscError ? 'ring-1 ring-red-500/50' : ''}`}
                         disabled={loading}
@@ -499,6 +499,14 @@ export default function DeliverySignUp() {
                     ALREADY REGISTERED?{" "}
                     <button type="button" onClick={() => navigate("/delivery/login")} className="text-[#8B3D28] hover:opacity-70 ml-2"> LOGIN HERE</button>
                   </p>
+                  {/* Skip button */}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/delivery')}
+                    className="mt-4 w-full py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest text-stone-400 bg-stone-50 hover:bg-stone-100 border border-stone-200 transition-all active:scale-95"
+                  >
+                    Skip for now →
+                  </button>
                 </div>
               </form>
             ) : (

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { updateStatus, getDeliveryProfile, updateGeneralLocation, getSellersInRadius } from '../../../services/api/delivery/deliveryService';
+import { useAuth } from '../../../context/AuthContext';
 
 interface SellerInRange {
   _id: string;
@@ -23,6 +24,9 @@ interface DeliveryStatusContextType {
 const DeliveryStatusContext = createContext<DeliveryStatusContextType | undefined>(undefined);
 
 export function DeliveryStatusProvider({ children }: { children: ReactNode }) {
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
+
   const [isOnline, setIsOnlineLocal] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [sellersInRangeCount, setSellersInRangeCount] = useState(0);
@@ -32,18 +36,19 @@ export function DeliveryStatusProvider({ children }: { children: ReactNode }) {
   const watchIdRef = useRef<number | null>(null);
   const lastUpdateTimeRef = useRef<number>(0);
 
-  // Fetch initial status
+  // Fetch initial status — only if authenticated delivery user
   useEffect(() => {
+    if (!isDeliveryUser) return;
     const fetchStatus = async () => {
       try {
         const profile = await getDeliveryProfile();
         setIsOnlineLocal(profile.isOnline || false);
       } catch (error) {
-        console.error("Failed to fetch initial status", error);
+        // silently fail for guest users
       }
     };
     fetchStatus();
-  }, []);
+  }, [isDeliveryUser]);
 
   // Location Tracking Logic
   useEffect(() => {
@@ -124,22 +129,20 @@ export function DeliveryStatusProvider({ children }: { children: ReactNode }) {
   };
 
   const toggleStatus = async () => {
+    if (!isDeliveryUser) return; // guest — no-op
     const newStatus = !isOnline;
-    // Optimistic update
     setIsOnlineLocal(newStatus);
     try {
       await updateStatus(newStatus);
     } catch (error) {
-      console.error("Failed to update status", error);
-      // Revert on failure
       setIsOnlineLocal(!newStatus);
     }
   };
 
   const setIsOnline = (status: boolean) => {
-    // Direct setting if needed, but prefer toggleStatus for API sync
+    if (!isDeliveryUser) return; // guest — no-op
     setIsOnlineLocal(status);
-    updateStatus(status).catch(err => console.error(err));
+    updateStatus(status).catch(() => {});
   };
 
   return (

@@ -7,6 +7,7 @@ interface ProtectedRouteProps {
   requiredRole?: string;
   requiredUserType?: "Admin" | "Seller" | "Customer" | "Delivery";
   redirectTo?: string;
+  allowGuest?: boolean; // allow unauthenticated access
 }
 
 export default function ProtectedRoute({
@@ -14,12 +15,14 @@ export default function ProtectedRoute({
   requiredRole,
   requiredUserType,
   redirectTo = "/user/login",
+  allowGuest = false,
 }: ProtectedRouteProps) {
   const { isAuthenticated, user, token } = useAuth();
   const location = useLocation();
 
-  // Not authenticated — redirect to login, saving the intended URL
+  // Not authenticated — allow guest if flag set, otherwise redirect to login
   if (!isAuthenticated || !token) {
+    if (allowGuest) return <>{children}</>;
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 

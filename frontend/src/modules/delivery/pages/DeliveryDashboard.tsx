@@ -7,15 +7,24 @@ import DeliveryBottomNav from "../components/DeliveryBottomNav";
 import { getDashboardStats } from "../../../services/api/delivery/deliveryService";
 import { useDeliveryStatus } from "../context/DeliveryStatusContext";
 import VillageLoader from "../../../components/VillageLoader";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function DeliveryDashboard() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
   const { isOnline, sellersInRangeCount, locationError } = useDeliveryStatus();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Guest user — skip API call, show empty state
+    if (!isDeliveryUser) {
+      setLoading(false);
+      return;
+    }
+
     const fetchStats = async () => {
       try {
         const data = await getDashboardStats();
@@ -28,7 +37,7 @@ export default function DeliveryDashboard() {
     };
 
     fetchStats();
-  }, []);
+  }, [isDeliveryUser]);
 
   // Icons for dashboard cards (Keep existing SVGs)
   const pendingOrderIcon = (
@@ -260,8 +269,20 @@ export default function DeliveryDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-neutral-100 flex items-center justify-center pb-20">
-        <p className="text-red-500">{error}</p>
+      <div className="min-h-screen bg-neutral-100 flex flex-col items-center justify-center pb-20 gap-4 px-6 text-center">
+        {!isDeliveryUser ? (
+          <>
+            <p className="text-village-umber font-black text-sm uppercase tracking-widest">Login to access your dashboard</p>
+            <button
+              onClick={() => navigate('/delivery/login')}
+              className="px-8 py-3 bg-[#8B3D28] text-white rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all"
+            >
+              Login / Sign Up
+            </button>
+          </>
+        ) : (
+          <p className="text-red-500 text-sm">{error}</p>
+        )}
         <DeliveryBottomNav />
       </div>
     );
