@@ -250,7 +250,7 @@ export default function SellerDashboard() {
     <div className="space-y-4 sm:space-y-6">
       {/* Header with Shop Status Toggle */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/80 backdrop-blur-md p-3 sm:p-4 rounded-2xl shadow-sm border border-white gap-4 sm:gap-0 overflow-hidden relative">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')]"></div>
         <div className="relative z-10">
           <h1 className="text-xl font-bold text-gray-800">Dashboard</h1>
           <p className="text-sm text-gray-500">Overview of your store performance</p>
@@ -361,7 +361,7 @@ export default function SellerDashboard() {
 
       {/* Recent Orders Section */}
       <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white p-3 sm:p-4 md:p-5 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')]"></div>
         <div className="relative z-10">
           <h2 className="text-base sm:text-lg md:text-xl font-bold text-neutral-900 mb-3 sm:mb-4">New Orders</h2>
         </div>

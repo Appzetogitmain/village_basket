@@ -7,15 +7,24 @@ import DeliveryBottomNav from "../components/DeliveryBottomNav";
 import { getDashboardStats } from "../../../services/api/delivery/deliveryService";
 import { useDeliveryStatus } from "../context/DeliveryStatusContext";
 import VillageLoader from "../../../components/VillageLoader";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function DeliveryDashboard() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
   const { isOnline, sellersInRangeCount, locationError } = useDeliveryStatus();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Guest user — skip API call, show empty state
+    if (!isDeliveryUser) {
+      setLoading(false);
+      return;
+    }
+
     const fetchStats = async () => {
       try {
         const data = await getDashboardStats();
@@ -28,7 +37,7 @@ export default function DeliveryDashboard() {
     };
 
     fetchStats();
-  }, []);
+  }, [isDeliveryUser]);
 
   // Icons for dashboard cards (Keep existing SVGs)
   const pendingOrderIcon = (
@@ -260,8 +269,20 @@ export default function DeliveryDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-neutral-100 flex items-center justify-center pb-20">
-        <p className="text-red-500">{error}</p>
+      <div className="min-h-screen bg-neutral-100 flex flex-col items-center justify-center pb-20 gap-4 px-6 text-center">
+        {!isDeliveryUser ? (
+          <>
+            <p className="text-village-umber font-black text-sm uppercase tracking-widest">Login to access your dashboard</p>
+            <button
+              onClick={() => navigate('/delivery/login')}
+              className="px-8 py-3 bg-[#8B3D28] text-white rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all"
+            >
+              Login / Sign Up
+            </button>
+          </>
+        ) : (
+          <p className="text-red-500 text-sm">{error}</p>
+        )}
         <DeliveryBottomNav />
       </div>
     );
@@ -288,7 +309,7 @@ export default function DeliveryDashboard() {
         <div
           onClick={() => navigate("/delivery/wallet")}
           className="bg-gradient-to-br from-[#8B3D28] to-[#3D2B1F] organic-radius p-4 text-white shadow-lg shadow-[#8B3D28]/20 cursor-pointer active:scale-[0.98] transition-all relative overflow-hidden group">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-all"></div>
           
           <div className="flex items-center justify-between mb-2 relative z-10">

@@ -233,11 +233,11 @@ export default function DeliveryProfile() {
 
   return (
     <div className="min-h-screen bg-transparent pb-20 font-poppins relative">
-      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Local Header */}
       <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <button
               onClick={() => navigate(-1)}
               className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
@@ -269,7 +269,7 @@ export default function DeliveryProfile() {
                   aria-label="Upload profile photo"
                   title="Tap to change profile photo"
                 >
-                    <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                    <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
                     {profileData.profileImage ? (
                       <img
                         src={profileData.profileImage}
@@ -455,7 +455,7 @@ export default function DeliveryProfile() {
                 onClick={handleEdit}
                 className="w-full bg-[#8B3D28] text-white rounded-2xl py-4 font-black text-[11px] uppercase tracking-[0.25em] transition-all active:scale-[0.98] shadow-2xl shadow-[#8B3D28]/20 relative overflow-hidden group"
               >
-                  <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
+                  <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
                   <span className="relative z-10">Modify Profile</span>
               </button>
             )}

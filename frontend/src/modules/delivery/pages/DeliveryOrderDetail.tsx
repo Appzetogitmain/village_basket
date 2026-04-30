@@ -601,11 +601,11 @@ export default function DeliveryOrderDetail() {
     return (
         <div className="min-h-screen bg-transparent pb-32 relative font-poppins">
             {/* Texture Overlay */}
-            <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+            <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
             {/* Top Bar with Back Button */}
             <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden">
-                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
                 <button
                     onClick={() => navigate(-1)}
                     className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
@@ -850,7 +850,7 @@ export default function DeliveryOrderDetail() {
                 {/* Delivery Earning Card - Show only if delivered or has earning */}
                 {(order.status === 'Delivered' || (order.deliveryEarning ? order.deliveryEarning > 0 : false)) && (
                     <div className="bg-gradient-to-br from-[#4A7C59] to-[#3D664A] organic-radius p-4 shadow-lg shadow-[#4A7C59]/20 text-white relative overflow-hidden group">
-                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
                         <div className="flex justify-between items-center relative z-10">
                             <div className="flex flex-col">
                                 <p className="text-white/60 text-[8px] font-black uppercase tracking-[0.2em] mb-1">Your payout</p>
@@ -1182,7 +1182,7 @@ export default function DeliveryOrderDetail() {
                         className="w-full py-4 rounded-2xl bg-[#8B3D28] shadow-2xl shadow-[#8B3D28]/30 text-white font-black text-[11px] uppercase tracking-[0.25em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden relative group"
                         disabled={loading}
                     >
-                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
                         <span className="relative z-10">
                             {loading ? 'Processing...' : nextStatus === 'Picked up' ? 'Mark Package Taken' : `Proceed to ${nextStatus}`}
                         </span>

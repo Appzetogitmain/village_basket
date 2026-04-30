@@ -97,3 +97,8 @@ export const getDeliveryConfig = async (): Promise<{ success: boolean; data: App
   return response.data;
 };
 
+
+export const selfDeleteCustomerAccount = async () => {
+  const response = await api.delete("/customers/account");
+  return response.data;
+};

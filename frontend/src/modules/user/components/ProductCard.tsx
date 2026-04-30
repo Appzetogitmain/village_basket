@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, memo } from 'react';
 import { Product } from '../../../types/domain';
 import { useCart } from '../../../context/CartContext';
 import { useAuth } from '../../../context/AuthContext';
@@ -486,3 +486,7 @@ export default function ProductCard({
     </motion.div>
   );
 }
+
+// Memoize to prevent re-renders when parent re-renders with same props
+const MemoizedProductCard = memo(ProductCard);
+export { MemoizedProductCard as ProductCard };

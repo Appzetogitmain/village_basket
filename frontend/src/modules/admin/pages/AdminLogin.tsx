@@ -55,7 +55,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-[#FAF7F2] font-poppins relative flex flex-col items-center justify-center px-4 py-4 overflow-hidden">
       {/* Background texture overlay */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('/assets/natural-paper.png')] z-0"></div>
       
       {/* Decorative Brand Accents */}
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#8B3D28]/5 rounded-full blur-3xl pointer-events-none"></div>

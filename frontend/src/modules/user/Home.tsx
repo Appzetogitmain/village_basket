@@ -11,7 +11,6 @@ import FestivalCategoryModule from "./components/FestivalCategoryModule";
 import ProductCard from "./components/ProductCard";
 
 import { getHomeContent } from "../../services/api/customerHomeService";
-import { getHeaderCategoriesPublic } from "../../services/api/headerCategoryService";
 import { useLocation } from "../../hooks/useLocation";
 import { useLoading } from "../../context/LoadingContext";
 import PageLoader from "../../components/PageLoader";
@@ -99,119 +98,39 @@ export default function Home() {
     };
 
     fetchData();
-
-    // Preload PromoStrip data for all header categories in the background
-    // This ensures instant loading when users switch tabs
-    const preloadHeaderCategories = async () => {
-      try {
-        // Wait a bit after initial load to not interfere with main content
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const headerCategories = await getHeaderCategoriesPublic(true);
-        // Preload data for each header category (including 'all')
-        const slugsToPreload = ['all', ...headerCategories.map(cat => cat.slug)];
-
-        // Preload in batches to avoid overwhelming the network
-        const batchSize = 2;
-        for (let i = 0; i < slugsToPreload.length; i += batchSize) {
-          const batch = slugsToPreload.slice(i, i + batchSize);
-          await Promise.all(
-            batch.map(slug =>
-              getHomeContent(
-                slug,
-                location?.latitude,
-                location?.longitude,
-                true,
-                5 * 60 * 1000,
-                true,
-                true // PERSIST: Keep in sessionStorage
-              ).catch(err => {
-                // Silently fail - this is just preloading
-                console.debug(`Failed to preload data for ${slug}:`, err);
-              })
-            )
-          );
-          // Small delay between batches
-          if (i + batchSize < slugsToPreload.length) {
-            await new Promise(resolve => setTimeout(resolve, 200));
-          }
-        }
-      } catch (error) {
-        // Silently fail - preloading is optional
-        console.debug("Failed to preload header categories:", error);
-      }
-    };
-
-    preloadHeaderCategories();
   }, [location?.latitude, location?.longitude, activeTab]);
 
-  // Restore scroll position when returning to this page
+  // Restore scroll position when returning to this page — single attempt
   useEffect(() => {
-    // Only restore scroll after data has loaded
     if (!loading && homeData.shops) {
-      // Use a ref to ensure we only handle initial scroll once per mount
       if (scrollHandledRef.current) return;
       scrollHandledRef.current = true;
 
       const savedScrollPosition = sessionStorage.getItem(SCROLL_POSITION_KEY);
       if (savedScrollPosition) {
         const scrollY = parseInt(savedScrollPosition, 10);
-
-        const performScroll = () => {
-          const mainElement = document.querySelector('main');
-          if (mainElement) {
-            mainElement.scrollTop = scrollY;
-          }
-          window.scrollTo(0, scrollY);
-        };
-
-        // Try multiple times to ensure scroll is applied even if content is still rendering
         requestAnimationFrame(() => {
-          performScroll();
-          requestAnimationFrame(() => {
-            performScroll();
-            // Final fallback after a small delay for any late-rendering content
-            setTimeout(performScroll, 100);
-            setTimeout(performScroll, 300);
-          });
-        });
-
-        // Clear the saved position after some time to ensure AppLayout can also see it if needed
-        // but Home.tsx is the primary restorer now.
-        setTimeout(() => {
-          sessionStorage.removeItem(SCROLL_POSITION_KEY);
-        }, 1000);
-      } else {
-        // No saved position, ensure we start at the top
-        const performReset = () => {
           const mainElement = document.querySelector('main');
-          if (mainElement) {
-            mainElement.scrollTop = 0;
-          }
-          window.scrollTo(0, 0);
-        };
-        requestAnimationFrame(performReset);
-        setTimeout(performReset, 100);
+          if (mainElement) mainElement.scrollTop = scrollY;
+          window.scrollTo(0, scrollY);
+        });
+        setTimeout(() => sessionStorage.removeItem(SCROLL_POSITION_KEY), 500);
+      } else {
+        window.scrollTo(0, 0);
       }
     }
   }, [loading, homeData.shops]);
 
-  // Global click/touch listener to save scroll position before any navigation
+  // Save scroll position on navigation — use capture on document, not window
   useEffect(() => {
-    const handleNavigationEvent = (e: MouseEvent | TouchEvent) => {
+    const handleClick = (e: MouseEvent | TouchEvent) => {
       const target = e.target as HTMLElement;
-      // If clicking a link, button, or any element with cursor-pointer (like product cards/store tiles)
-      if (target.closest('a') || target.closest('button') || target.closest('[role="button"]') || target.closest('.cursor-pointer')) {
+      if (target.closest('a') || target.closest('button') || target.closest('[role="button"]')) {
         saveScrollPosition();
       }
     };
-
-    window.addEventListener('click', handleNavigationEvent, { capture: true });
-    window.addEventListener('touchstart', handleNavigationEvent, { capture: true, passive: true });
-    return () => {
-      window.removeEventListener('click', handleNavigationEvent, { capture: true });
-      window.removeEventListener('touchstart', handleNavigationEvent, { capture: true });
-    };
+    document.addEventListener('click', handleClick, { capture: true });
+    return () => document.removeEventListener('click', handleClick, { capture: true });
   }, []);
 
   // Removed duplicate saveScrollPosition
@@ -269,7 +188,7 @@ export default function Home() {
   return (
     <div className="bg-transparent min-h-screen pb-32 md:pb-8 font-poppins relative" ref={contentRef}>
       {/* Page Texture Overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Hero Header with Gradient, Tabs, and Festival Module integrated */}
       <HomeHero 
@@ -281,7 +200,7 @@ export default function Home() {
 
       {/* Promo Strip */}
       <div className="relative z-10">
-        <PromoStrip activeTab={activeTab} />
+        <PromoStrip activeTab={activeTab} homeData={homeData} />
       </div>
 
 

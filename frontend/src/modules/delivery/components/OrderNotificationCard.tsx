@@ -243,7 +243,7 @@ export default function OrderNotificationCard({
             onTouchStart={handleUserInteraction}
         >
             <div className="village-card paper-texture organic-radius bg-white p-5 border-2 border-[#8B3D28]/30 shadow-2xl relative overflow-hidden ring-4 ring-[#8B3D28]/5">
-                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
                 
                 {/* Header with pulsing indicator */}
                 <div className="flex items-center justify-between mb-5 flex-wrap gap-2 relative z-10">
@@ -302,7 +302,7 @@ export default function OrderNotificationCard({
                         disabled={isProcessing}
                         className="flex-1 px-4 py-3 bg-[#8B3D28] hover:bg-[#3D2B1F] text-white font-black text-[10px] uppercase tracking-[0.25em] rounded-2xl transition-all disabled:opacity-50 active:scale-95 shadow-xl shadow-[#8B3D28]/30 border-none outline-none relative overflow-hidden group"
                     >
-                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
+                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
                         <span className="relative z-10">{isProcessing ? 'RESERVING...' : 'ACCEPT'}</span>
                     </button>
                 </div>

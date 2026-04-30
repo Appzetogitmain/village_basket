@@ -34,7 +34,7 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
       }}
     >
       {/* Texture Overlay Only */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Real-time Notification Alert */}
       <SellerNotificationAlert

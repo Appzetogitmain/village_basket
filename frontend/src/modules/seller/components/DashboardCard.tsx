@@ -14,7 +14,7 @@ export default function DashboardCard({ icon, title, value, accentColor, onClick
       onClick={onClick}
       className={`bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white p-2.5 sm:p-3 md:p-4 hover:shadow-md transition-all overflow-hidden relative ${onClick ? 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]' : ''}`}
     >
-      <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')]"></div>
       <div className="flex flex-col relative z-10">
         <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
           <div className="p-1.5 sm:p-2 rounded-xl" style={{ backgroundColor: `${accentColor}15` }}>

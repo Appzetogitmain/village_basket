@@ -138,9 +138,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       abortControllerRef.current.abort();
     }
 
-    // Clear any cached geocode results to ensure fresh reverse geocoding
-    geocodeCache.clear();
-
     isRequestingRef.current = true;
     setIsLocationLoading(true);
     setLocationError(null);
@@ -364,7 +361,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     }
 
     // Retry logic for robustness
-    const maxRetries = 2;
+    const maxRetries = 1;
     let lastError: Error | null = null;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {

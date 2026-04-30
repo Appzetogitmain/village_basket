@@ -91,13 +91,13 @@ export default function DeliveryLogin() {
 
 
       {/* Texture Overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Login Card */}
       <div className="w-full max-w-[340px] village-card paper-texture organic-radius shadow-2xl shadow-stone-200/50 p-0 overflow-hidden relative z-10 animate-in fade-in zoom-in-95 duration-500">
         {/* Header Section */}
         <div className="relative pt-12 pb-10 px-8 text-center bg-[#8B3D28] overflow-hidden">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <div className="absolute -top-10 -left-10 w-24 h-24 bg-white/5 rounded-full blur-2xl"></div>
 
           <div className="relative z-10 flex flex-col items-center">
@@ -224,6 +224,13 @@ export default function DeliveryLogin() {
                 Join Now
               </button>
             </p>
+            {/* Skip button */}
+            <button
+              onClick={() => navigate('/delivery')}
+              className="mt-4 w-full py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest text-stone-400 bg-stone-50 hover:bg-stone-100 border border-stone-200 transition-all active:scale-95"
+            >
+              Skip for now →
+            </button>
           </div>
         </div>
       </div>

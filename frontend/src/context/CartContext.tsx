@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useMemo, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, ReactNode, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
 import { useLocation } from '../hooks/useLocation';
@@ -59,6 +59,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const pendingOperationsRef = useRef<Set<string>>(new Set());
   const fetchIdRef = useRef(0);
+  const locationDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastFetchedLocationRef = useRef<{ lat?: number; lng?: number }>({});
 
   const { isAuthenticated, user } = useAuth();
   const isWholesale = user?.customerType === 'wholesale';
@@ -90,9 +92,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }));
   };
 
-  // Sync to localStorage whenever items change
+  // Sync to localStorage — debounced to avoid blocking main thread
+  const localStorageDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    if (localStorageDebounceRef.current) clearTimeout(localStorageDebounceRef.current);
+    localStorageDebounceRef.current = setTimeout(() => {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    }, 300);
   }, [items]);
 
   // Helper to sync cart from API
@@ -142,15 +148,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Load cart on auth change
+  // Load cart on auth change — debounce location changes to avoid excessive fetches
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchCart();
-    } else {
-      // Guest cart is already in 'items' from localStorage if it existed
+    if (!isAuthenticated) {
       setLoading(false);
       setIsInitialized(true);
+      return;
     }
+
+    const lat = location?.latitude;
+    const lng = location?.longitude;
+
+    // If only location changed, check if it moved significantly (>0.01 deg ≈ 1km)
+    const lastLat = lastFetchedLocationRef.current.lat;
+    const lastLng = lastFetchedLocationRef.current.lng;
+    const locationChangedSignificantly =
+      lastLat === undefined ||
+      lastLng === undefined ||
+      Math.abs((lat ?? 0) - lastLat) > 0.01 ||
+      Math.abs((lng ?? 0) - lastLng) > 0.01;
+
+    if (!locationChangedSignificantly && isInitialized) return;
+
+    // Debounce location-triggered fetches by 500ms
+    if (locationDebounceRef.current) clearTimeout(locationDebounceRef.current);
+    locationDebounceRef.current = setTimeout(() => {
+      lastFetchedLocationRef.current = { lat, lng };
+      fetchCart();
+    }, 500);
+
+    return () => {
+      if (locationDebounceRef.current) clearTimeout(locationDebounceRef.current);
+    };
   }, [isAuthenticated, user?.userType, location?.latitude, location?.longitude]);
 
   // State for estimate delivery fee

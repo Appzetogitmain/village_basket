@@ -107,7 +107,7 @@ export default function SellerLogin() {
       }}
     >
       {/* Texture Overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('/assets/natural-paper.png')]"></div>
 
 
       {/* Back Button */}

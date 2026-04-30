@@ -1,8 +1,9 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ProductCard from './components/ProductCard';
 import { getProducts } from '../../services/api/customerProductService';
 import { getHomeContent } from '../../services/api/customerHomeService';
+import { apiCache } from '../../utils/apiCache';
 import { Product } from '../../types/domain';
 import { useLocation } from '../../hooks/useLocation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,6 +14,9 @@ export default function Search() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { location } = useLocation();
+  const locationRef = useRef(location);
+  useEffect(() => { locationRef.current = location; }, [location]);
+
   const searchQuery = searchParams.get('q') || '';
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [trendingItems, setTrendingItems] = useState<any[]>([]);
@@ -95,28 +99,31 @@ export default function Search() {
     }
   };
 
-  // Fetch products based on search query
+  // Fetch products based on search query — with caching + min length check
   useEffect(() => {
     const fetchProducts = async () => {
-      if (!searchQuery.trim()) {
+      if (!searchQuery.trim() || searchQuery.trim().length < 2) {
         setSearchResults([]);
         return;
       }
 
-      if (searchQuery.trim()) {
-        startRouteLoading();
-      }
+      const cacheKey = `search-${searchQuery.trim().toLowerCase()}`;
+      const cached = apiCache.getSync<Product[]>(cacheKey);
+      if (cached) { setSearchResults(cached); return; }
+
+      startRouteLoading();
       try {
+        const loc = locationRef.current;
         const params: any = { search: searchQuery };
-        // Include user location for seller service radius filtering
-        if (location?.latitude && location?.longitude) {
-          params.latitude = location.latitude;
-          params.longitude = location.longitude;
+        if (loc?.latitude && loc?.longitude) {
+          params.latitude = loc.latitude;
+          params.longitude = loc.longitude;
         }
         const response = await getProducts(params);
-        setSearchResults(response.data as unknown as Product[]);
+        const results = response.data as unknown as Product[];
+        apiCache.getOrFetch(cacheKey, async () => results, 2 * 60 * 1000); // cache 2 min
+        setSearchResults(results);
       } catch (error) {
-        console.error('Error searching products:', error);
         setSearchResults([]);
       } finally {
         stopRouteLoading();
@@ -124,32 +131,35 @@ export default function Search() {
     };
 
     fetchProducts();
-  }, [searchQuery, location]);
+  }, [searchQuery]);
 
-  // Fetch trending/home content for initial view
+  // Fetch trending/home content — cached, only when no search query
   useEffect(() => {
+    if (searchQuery.trim()) return;
+
     const fetchInitialContent = async () => {
       try {
+        const loc = locationRef.current;
         const response = await getHomeContent(
           undefined,
-          location?.latitude,
-          location?.longitude
+          loc?.latitude,
+          loc?.longitude,
+          true,        // useCache
+          5 * 60 * 1000 // 5 min TTL
         );
         if (response.success && response.data) {
           setTrendingItems(response.data.trending || []);
           setCookingIdeas(response.data.cookingIdeas || []);
         }
       } catch (error) {
-        console.error("Error fetching search initial content", error);
+        // silently fail
       } finally {
         setContentLoading(false);
       }
     };
 
-    if (!searchQuery.trim()) {
-      fetchInitialContent();
-    }
-  }, [searchQuery, location?.latitude, location?.longitude]);
+    fetchInitialContent();
+  }, [searchQuery]);
 
   return (
     <div className="pb-24 md:pb-8 bg-transparent min-h-screen">

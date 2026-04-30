@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Lottie from 'lottie-react';
 import { useLoading } from '../../context/LoadingContext';
-import { ALLOWED_ANIMATIONS, getAnimationData } from '../../utils/animationCache';
+import { getAnimationData, getNextAnimationName } from '../../utils/animationCache';
 
 const ContentLoader: React.FC = () => {
   const { isRouteLoading } = useLoading();
   const [animationData, setAnimationData] = useState<any>(null);
 
   useEffect(() => {
-    const index = Math.floor(Math.random() * ALLOWED_ANIMATIONS.length);
-    const animationName = ALLOWED_ANIMATIONS[index];
-
+    const animationName = getNextAnimationName();
     getAnimationData(animationName).then(data => {
       if (data) setAnimationData(data);
     });
@@ -20,7 +18,7 @@ const ContentLoader: React.FC = () => {
 
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-20">
-      <div className="w-[200px] h-[200px] flex items-center justify-center">
+      <div className="w-[80vw] h-[50vh] max-w-2xl flex items-center justify-center">
         {animationData ? (
           <Lottie
             animationData={animationData}

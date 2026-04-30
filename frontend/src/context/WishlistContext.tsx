@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { useLocation } from '../hooks/useLocation';
 import { getWishlist, addToWishlist as apiAddToWishlist, removeFromWishlist as apiRemoveFromWishlist } from '../services/api/customerWishlistService';
@@ -23,6 +23,12 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [wishlistProductIds, setWishlistProductIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
+  const locationRef = useRef(location);
+
+  // Keep locationRef in sync without triggering re-fetches
+  useEffect(() => {
+    locationRef.current = location;
+  }, [location]);
 
   const fetchWishlist = useCallback(async () => {
     if (!isAuthenticated) {
@@ -34,16 +40,17 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     try {
       setLoading(true);
+      const loc = locationRef.current;
       const res = await getWishlist({
-        latitude: location?.latitude,
-        longitude: location?.longitude
+        latitude: loc?.latitude,
+        longitude: loc?.longitude
       });
       if (res.success && res.data) {
         const products = (res.data.products || []).map(p => ({
           ...p,
           id: p._id || (p as any).id,
           name: p.productName || (p as any).name,
-          pack: (p as any).pack || 'Standard', // Default value to satisfy type
+          pack: (p as any).pack || 'Standard',
         })) as any as Product[];
         setWishlistItems(products);
         setWishlistProductIds(new Set(products.map(p => String(p.id || (p as any)._id))));
@@ -54,7 +61,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, location?.latitude, location?.longitude]);
+  }, [isAuthenticated]); // No location dependency — uses ref instead
 
   useEffect(() => {
     if (isAuthenticated && !hasFetched) {
@@ -64,7 +71,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setWishlistProductIds(new Set());
       setHasFetched(false);
     }
-  }, [isAuthenticated, fetchWishlist, hasFetched]);
+  }, [isAuthenticated, hasFetched, fetchWishlist]);
 
   const addToWishlist = async (productId: string) => {
     if (!location?.latitude || !location?.longitude) {

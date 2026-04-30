@@ -12,7 +12,7 @@ export default function DeliveryHeader({ userName }: DeliveryHeaderProps) {
 
   return (
     <div className={`relative ${isOnline ? 'bg-[#8B3D28]' : 'bg-stone-500'} transition-colors shadow-md overflow-hidden pt-env-top`}>
-      <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+      <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
 
       <div className="px-4 py-3 relative z-10">
         <div className="flex items-center justify-between mb-2">

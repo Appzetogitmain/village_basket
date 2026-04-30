@@ -61,7 +61,7 @@ function DeliveryLayoutContent({ children }: DeliveryLayoutContentProps) {
       }}
     >
       {/* Texture Overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('/assets/natural-paper.png')] z-0"></div>
       
       <main
         ref={mainScrollRef}

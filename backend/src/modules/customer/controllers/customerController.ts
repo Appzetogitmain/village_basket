@@ -266,3 +266,28 @@ export const getDeliveryConfig = asyncHandler(async (_req: Request, res: Respons
     data: settings,
   });
 });
+
+/**
+ * Self-delete customer account (soft delete)
+ */
+export const selfDeleteAccount = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+
+  if (!userId || (req as any).user?.userType !== "Customer") {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  const customer = await Customer.findById(userId);
+
+  if (!customer) {
+    return res.status(404).json({ success: false, message: "Customer not found" });
+  }
+
+  customer.status = "Deleted" as any;
+  await customer.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Your account has been successfully deleted.",
+  });
+});

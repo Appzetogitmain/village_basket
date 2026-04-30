@@ -59,12 +59,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(true);
       }
 
-      // Register FCM token on app load for already authenticated users
-      import("../services/pushNotificationService").then(({ registerFCMToken }) => {
-        registerFCMToken().catch(error => {
-          console.error("Failed to register FCM token on mount:", error);
+      // Register FCM token only if not already registered
+      const existingToken = localStorage.getItem('fcm_token_web');
+      if (!existingToken) {
+        import("../services/pushNotificationService").then(({ registerFCMToken }) => {
+          registerFCMToken().catch(error => {
+            console.error("Failed to register FCM token on mount:", error);
+          });
         });
-      });
+      }
     } else if (isAuthenticated) {
       setToken(null);
       setUser(null);

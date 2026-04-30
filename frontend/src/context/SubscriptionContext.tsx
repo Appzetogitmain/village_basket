@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { LocalSubscription, SubscriptionPlanId, SUBSCRIPTION_PLANS, SubscriptionItem } from '../types/subscription';
 
 interface SubscriptionContextType {
@@ -48,13 +48,22 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   }, []);
 
-  // Sync back to LocalStorage
+  const subDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cartDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounced sync to localStorage
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(subscriptions));
+    if (subDebounceRef.current) clearTimeout(subDebounceRef.current);
+    subDebounceRef.current = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(subscriptions));
+    }, 300);
   }, [subscriptions]);
 
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(dailyServiceCart));
+    if (cartDebounceRef.current) clearTimeout(cartDebounceRef.current);
+    cartDebounceRef.current = setTimeout(() => {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(dailyServiceCart));
+    }, 300);
   }, [dailyServiceCart]);
 
   const calculateTotalPrice = (items: SubscriptionItem[], planId: SubscriptionPlanId) => {

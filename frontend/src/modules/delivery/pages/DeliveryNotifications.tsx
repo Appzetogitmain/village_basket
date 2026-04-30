@@ -65,11 +65,11 @@ export default function DeliveryNotifications() {
 
   return (
     <div className="min-h-screen bg-transparent pb-20 font-poppins relative">
-      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Local Header */}
       <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <div className="ml-2 flex flex-col">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">Intelligence</span>
               <span className="font-black text-[12px] text-white tracking-wide mt-1">Operational Briefings</span>

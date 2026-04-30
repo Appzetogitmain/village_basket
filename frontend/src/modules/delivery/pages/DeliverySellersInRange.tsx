@@ -47,7 +47,7 @@ export default function DeliverySellersInRange() {
   if (!isOnline) {
     return (
       <div className="min-h-screen bg-transparent flex flex-col items-center justify-center pb-24 px-6 font-poppins relative">
-        <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+        <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
         
         <div className="village-card paper-texture organic-radius p-8 bg-white shadow-2xl border-none flex flex-col items-center text-center max-w-xs relative z-10 scale-95 opacity-90 animate-in fade-in zoom-in duration-300">
           <div className="w-16 h-16 bg-stone-50 rounded-3xl flex items-center justify-center mb-6 text-stone-200">
@@ -68,11 +68,11 @@ export default function DeliverySellersInRange() {
 
   return (
     <div className="min-h-screen bg-transparent pb-24 font-poppins relative">
-      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
       {/* Local Header */}
       <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
           <button
               onClick={() => navigate(-1)}
               className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"

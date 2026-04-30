@@ -21,6 +21,7 @@ import PublicRoute from "./components/PublicRoute";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorBoundary from "./components/ErrorBoundary";
 import RouteTransition from "./components/RouteTransition";
+import SplashScreen from "./components/SplashScreen";
 import { useEffect } from "react";
 import { initializePushNotifications, setupForegroundNotificationHandler } from "./services/pushNotificationService";
 import { preloadAnimations } from "./utils/animationCache";
@@ -90,6 +91,7 @@ const DeliveryAbout = lazy(() => import("./modules/delivery/pages/DeliveryAbout"
 const DeliverySellersInRange = lazy(() => import("./modules/delivery/pages/DeliverySellersInRange"));
 const DeliveryPrivacy = lazy(() => import("./modules/delivery/pages/DeliveryPrivacy"));
 const DeliveryTerms = lazy(() => import("./modules/delivery/pages/DeliveryTerms"));
+const DeliveryContact = lazy(() => import("./modules/delivery/pages/DeliveryContact"));
 const DeliveryLanguage = lazy(() => import("./modules/delivery/pages/DeliveryLanguage"));
 const DeliveryLogin = lazy(() => import("./modules/delivery/pages/DeliveryLogin"));
 const DeliverySignUp = lazy(() => import("./modules/delivery/pages/DeliverySignUp"));
@@ -194,6 +196,7 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <SplashScreen />
       <LoadingProvider>
         <AxiosLoadingInterceptor>
           <SubscriptionProvider>
@@ -231,27 +234,7 @@ function App() {
                           <Route path="/addresses" element={<Navigate to="/user/addresses" replace />} />
                           <Route path="/rewards" element={<Navigate to="/user/rewards" replace />} />
 
-                          {/* Public Routes */}
-                          <Route
-                            path="/user/login"
-                            element={
-                              <PublicRoute>
-                                <Suspense fallback={null}>
-                                  <Login />
-                                </Suspense>
-                              </PublicRoute>
-                            }
-                          />
-                          <Route
-                            path="/user/signup"
-                            element={
-                              <PublicRoute>
-                                <Suspense fallback={null}>
-                                  <SignUp />
-                                </Suspense>
-                              </PublicRoute>
-                            }
-                          />
+                          {/* Public Routes — Seller, Delivery, Admin login */}
 
                           <Route
                             path="/seller/login"
@@ -320,11 +303,15 @@ function App() {
                             }
                           />
 
+                          {/* Delivery Public Routes (no login required) */}
+                          <Route path="/delivery/privacy" element={<Suspense fallback={null}><DeliveryPrivacy /></Suspense>} />
+                          <Route path="/delivery/contact" element={<Suspense fallback={null}><DeliveryContact /></Suspense>} />
+
                           {/* Delivery App Routes */}
                           <Route
                             path="/delivery/*"
                             element={
-                              <ProtectedRoute requiredUserType="Delivery" redirectTo="/delivery/login">
+                              <ProtectedRoute requiredUserType="Delivery" redirectTo="/delivery/login" allowGuest={true}>
                                 <Suspense fallback={null}>
                                   <DeliveryLayout>
                                     <Routes>
@@ -345,6 +332,7 @@ function App() {
                                       <Route path="sellers-in-range" element={<DeliverySellersInRange />} />
                                       <Route path="privacy" element={<DeliveryPrivacy />} />
                                       <Route path="terms" element={<DeliveryTerms />} />
+                                      <Route path="contact" element={<DeliveryContact />} />
                                       <Route path="language" element={<DeliveryLanguage />} />
                                     </Routes>
                                   </DeliveryLayout>
@@ -463,48 +451,70 @@ function App() {
 
                           {/* Main User App Routes — all nested under /user */}
                           <Route path="/user" element={<Navigate to="/user/home" replace />} />
+
+                          {/* Public user pages — accessible without login */}
+                          <Route
+                            path="/user/login"
+                            element={
+                              <PublicRoute>
+                                <Suspense fallback={null}><Login /></Suspense>
+                              </PublicRoute>
+                            }
+                          />
+                          <Route
+                            path="/user/signup"
+                            element={
+                              <PublicRoute>
+                                <Suspense fallback={null}><SignUp /></Suspense>
+                              </PublicRoute>
+                            }
+                          />
+                          <Route path="/user/about-us" element={<AppLayout><Suspense fallback={null}><AboutUs /></Suspense></AppLayout>} />
+                          <Route path="/user/faq" element={<AppLayout><Suspense fallback={null}><FAQ /></Suspense></AppLayout>} />
+                          <Route path="/user/contact" element={<AppLayout><Suspense fallback={null}><ContactUs /></Suspense></AppLayout>} />
+                          <Route path="/user/privacy-policy" element={<AppLayout><Suspense fallback={null}><PrivacyPolicy /></Suspense></AppLayout>} />
+                          <Route path="/user/terms-of-service" element={<AppLayout><Suspense fallback={null}><TermsOfService /></Suspense></AppLayout>} />
+
+                          {/* Protected user routes — login required */}
                           <Route
                             path="/user/*"
                             element={
-                              <AppLayout>
-                                <Suspense fallback={null}>
-                                  <Routes>
-                                    <Route path="" element={<Home />} />
-                                    <Route path="home" element={<Home />} />
-                                    <Route path="cart" element={<Cart />} />
-                                    <Route path="search" element={<Search />} />
-                                    <Route path="orders" element={<Orders />} />
-                                    <Route path="orders/:id" element={<OrderDetail />} />
-                                    <Route path="order-again" element={<OrderAgain />} />
-                                    <Route path="account" element={<Account />} />
-                                    <Route path="about-us" element={<AboutUs />} />
-                                    <Route path="faq" element={<FAQ />} />
-                                    <Route path="contact" element={<ContactUs />} />
-                                    <Route path="privacy-policy" element={<PrivacyPolicy />} />
-                                    <Route path="terms-of-service" element={<TermsOfService />} />
-                                    <Route path="wishlist" element={<Wishlist />} />
-                                    <Route path="categories" element={<Categories />} />
-                                    <Route path="category/:id" element={<Category />} />
-                                    <Route path="address-book" element={<AddressBook />} />
-                                    <Route path="checkout" element={<Checkout />} />
-                                    <Route path="checkout/address" element={<CheckoutAddress />} />
-                                    <Route path="product/:id" element={<ProductDetail />} />
-                                    <Route path="invoice/:id" element={<Invoice />} />
-                                    <Route path="addresses" element={<Addresses />} />
-                                    <Route path="store/:slug" element={<StorePage />} />
-                                    <Route path="store/spiritual" element={<SpiritualStore />} />
-                                    <Route path="store/pharma" element={<PharmaStore />} />
-                                    <Route path="store/e-gifts" element={<EGiftStore />} />
-                                    <Route path="store/pet" element={<PetStore />} />
-                                    <Route path="store/sports" element={<SportsStore />} />
-                                    <Route path="store/fashion-basics" element={<FashionStore />} />
-                                    <Route path="store/toy" element={<ToyStore />} />
-                                    <Route path="store/hobby" element={<HobbyStore />} />
-                                    <Route path="location" element={<Suspense fallback={null}><Addresses /></Suspense>} />
-                                    <Route path="rewards" element={<UserRewards />} />
-                                  </Routes>
-                                </Suspense>
-                              </AppLayout>
+                              <ProtectedRoute requiredUserType="Customer" redirectTo="/user/login">
+                                <AppLayout>
+                                  <Suspense fallback={null}>
+                                    <Routes>
+                                      <Route path="" element={<Home />} />
+                                      <Route path="home" element={<Home />} />
+                                      <Route path="cart" element={<Cart />} />
+                                      <Route path="search" element={<Search />} />
+                                      <Route path="orders" element={<Orders />} />
+                                      <Route path="orders/:id" element={<OrderDetail />} />
+                                      <Route path="order-again" element={<OrderAgain />} />
+                                      <Route path="account" element={<Account />} />
+                                      <Route path="wishlist" element={<Wishlist />} />
+                                      <Route path="categories" element={<Categories />} />
+                                      <Route path="category/:id" element={<Category />} />
+                                      <Route path="address-book" element={<AddressBook />} />
+                                      <Route path="checkout" element={<Checkout />} />
+                                      <Route path="checkout/address" element={<CheckoutAddress />} />
+                                      <Route path="product/:id" element={<ProductDetail />} />
+                                      <Route path="invoice/:id" element={<Invoice />} />
+                                      <Route path="addresses" element={<Addresses />} />
+                                      <Route path="store/:slug" element={<StorePage />} />
+                                      <Route path="store/spiritual" element={<SpiritualStore />} />
+                                      <Route path="store/pharma" element={<PharmaStore />} />
+                                      <Route path="store/e-gifts" element={<EGiftStore />} />
+                                      <Route path="store/pet" element={<PetStore />} />
+                                      <Route path="store/sports" element={<SportsStore />} />
+                                      <Route path="store/fashion-basics" element={<FashionStore />} />
+                                      <Route path="store/toy" element={<ToyStore />} />
+                                      <Route path="store/hobby" element={<HobbyStore />} />
+                                      <Route path="location" element={<Suspense fallback={null}><Addresses /></Suspense>} />
+                                      <Route path="rewards" element={<UserRewards />} />
+                                    </Routes>
+                                  </Suspense>
+                                </AppLayout>
+                              </ProtectedRoute>
                             }
                           />
                         </Routes>

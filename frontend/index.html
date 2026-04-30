@@ -5,13 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <link rel="manifest" href="/manifest.json" />
+    <!-- Preconnect to external domains for faster resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://maps.googleapis.com">
+    <link rel="preconnect" href="https://maps.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://res.cloudinary.com">
+    <link rel="dns-prefetch" href="https://fcm.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <title>Village Basket - Fast Grocery Delivery</title>
 
-    <!-- Preload critical assets for route changes -->
-    <link rel="preload" href="/animations/loading.json" as="fetch" crossorigin="anonymous">
+    <!-- Preload critical animations -->
+    <link rel="preload" href="/animations/bullock_cart.json" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="/animations/Grocery-animation.json" as="fetch" crossorigin="anonymous">
   </head>
   <body>
     <div id="root"></div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import { useLoading } from '../context/LoadingContext';
-import { ALLOWED_ANIMATIONS, getAnimationData } from '../utils/animationCache';
+import { getAnimationData, getNextAnimationName } from '../utils/animationCache';
 
 interface VillageLoaderProps {
     message?: string;
@@ -25,6 +25,7 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     const path = typeof window !== 'undefined' ? window.location.pathname : '';
     const [animationData, setAnimationData] = useState<any>(null);
     const [lockedPath, setLockedPath] = useState<string>(path);
+    const [animationName, setAnimationName] = useState<string>('bullock_cart.json');
 
     useEffect(() => {
         if (!isRouteLoading) {
@@ -38,11 +39,9 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     const currentPath = isRouteLoading ? lockedPath : path;
 
     useEffect(() => {
-        // Pick one at random for every load
-        const index = Math.floor(Math.random() * ALLOWED_ANIMATIONS.length);
-        const animationName = ALLOWED_ANIMATIONS[index];
-
-        getAnimationData(animationName).then(data => {
+        const name = getNextAnimationName();
+        setAnimationName(name);
+        getAnimationData(name).then(data => {
             if (data) setAnimationData(data);
         });
     }, [currentPath]);
@@ -55,10 +54,24 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     const isDelivery = currentPath.includes('/delivery');
 
     const renderAnimation = () => {
+        const isFullScreen = animationName === 'bullock_cart.json';
+
+        if (isFullScreen) {
+            return (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                    {animationData ? (
+                        <Lottie animationData={animationData} loop={true} className="w-full h-full" />
+                    ) : (
+                        <div className="w-12 h-12 border-4 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                    )}
+                </div>
+            );
+        }
+
         return (
             <div className="w-[200px] h-[200px] flex items-center justify-center">
                 {animationData ? (
-                    <Lottie animationData={animationData} loop={true} />
+                    <Lottie animationData={animationData} loop={true} className="w-full h-full" />
                 ) : (
                     <div className="w-12 h-12 border-4 border-amber-600 border-t-transparent rounded-full animate-spin" />
                 )}
@@ -95,46 +108,47 @@ const VillageLoader: React.FC<VillageLoaderProps> = ({
     const text = getLoadingText();
 
     return (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-stone-50/98 backdrop-blur-md px-6 text-center">
-            {/* Texture Overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] z-0"></div>
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-stone-50/98 backdrop-blur-md text-center">
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('/assets/natural-paper.png')] z-0"></div>
 
-            <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="relative z-10 space-y-8"
-            >
-                <div className="relative h-32 flex items-center justify-center">
+            {/* Animation */}
+            {animationName === 'bullock_cart.json' ? (
+                <div className="absolute inset-0 z-0">{renderAnimation()}</div>
+            ) : (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="relative z-10 flex items-center justify-center min-h-[200px]"
+                >
                     {renderAnimation()}
-                    
-                    {/* Shadow */}
                     <motion.div
                         className="absolute bottom-0 w-16 h-1.5 bg-black/5 rounded-[50%] blur-[1px]"
                         animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
                         transition={{ duration: 2, repeat: Infinity }}
                     />
-                </div>
+                </motion.div>
+            )}
 
-                {/* Loading State Text */}
-                <div className="space-y-4">
-                    <h2 className="text-village-umber font-black text-sm uppercase tracking-[0.4em] italic leading-none animate-pulse">
-                        {text.h2}
-                    </h2>
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="h-[2px] w-12 bg-stone-200 relative overflow-hidden rounded-full">
-                            <motion.div 
-                                animate={{ left: ["-100%", "100%"] }}
-                                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute top-0 bottom-0 w-1/2 bg-village-green"
-                            />
-                        </div>
-                        <p className="text-stone-400 text-[8px] font-black uppercase tracking-[0.2em] leading-none mt-1">
-                            {text.p}
-                        </p>
-                    </div>
+            {/* Text — below animation */}
+            <div
+                className="relative z-10 flex flex-col items-center gap-2"
+                style={{ marginTop: animationName === 'bullock_cart.json' ? '60vh' : '16px' }}
+            >
+                <h2 className="text-village-umber font-black text-sm uppercase tracking-[0.4em] italic leading-none animate-pulse">
+                    {text.h2}
+                </h2>
+                <div className="h-[2px] w-12 bg-stone-200 relative overflow-hidden rounded-full">
+                    <motion.div
+                        animate={{ left: ["-100%", "100%"] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute top-0 bottom-0 w-1/2 bg-village-green"
+                    />
                 </div>
-            </motion.div>
+                <p className="text-stone-400 text-[8px] font-black uppercase tracking-[0.2em] leading-none">
+                    {text.p}
+                </p>
+            </div>
         </div>
     );
 };

@@ -1,5 +1,5 @@
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import ProductCard from "./components/ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -9,11 +9,13 @@ import {
 } from "../../services/api/customerProductService";
 import { useLocation as useLocationContext } from "../../hooks/useLocation";
 
-export default function CategoryPage() {
+export default function Category() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { location: userLocation } = useLocationContext();
+  const locationRef = useRef(userLocation);
+  useEffect(() => { locationRef.current = userLocation; }, [userLocation]);
 
   const [category, setCategory] = useState<ApiCategory | null>(null);
   const [subcategories, setSubcategories] = useState<ApiCategory[]>([]);
@@ -40,124 +42,119 @@ export default function CategoryPage() {
     { id: "newest", label: "Newest First" },
   ];
 
-  // Fetch Category Details
+  // Combined fetch: category details + products in parallel
   useEffect(() => {
-    const fetchCategoryDetails = async () => {
+    if (!id) return;
+
+    const fetchAll = async () => {
       setCategoryLoading(true);
+      setLoading(true);
       setError(null);
+
       try {
-        const response = await getCategoryById(id!);
-        if (response.success && response.data) {
-          const {
-            category: cat,
-            subcategories: subs,
-            currentSubcategory,
-          } = response.data;
-
-          // If no subcategories returned, try to fetch from all categories as fallback
-          let finalSubcategories = subs || [];
-
-          if (!finalSubcategories.length) {
-            try {
-              const { getCategories } = await import("../../services/api/customerProductService");
-              const allCatsResponse = await getCategories();
-              if (allCatsResponse.success && allCatsResponse.data) {
-                finalSubcategories = allCatsResponse.data.filter((c: any) =>
-                  c.parent === cat._id || (c.parent && c.parent._id === cat._id)
-                );
-              }
-            } catch (err) {
-              console.error("Error fetching fallback subcategories", err);
-            }
-          }
-
-          setCategory(cat);
-          setSubcategories([
-            {
-              _id: "all",
-              id: "all",
-              name: "All",
-              icon: "📦",
-              isActive: true,
-            } as any,
-            ...finalSubcategories,
-          ]);
-
-          // Check URL query params first, then API response
-          const subcategoryFromUrl = searchParams.get("subcategory");
-          if (subcategoryFromUrl) {
-            setSelectedSubcategory(subcategoryFromUrl);
-          } else if (currentSubcategory) {
-            setSelectedSubcategory(
-              currentSubcategory._id || currentSubcategory.id
-            );
-          }
-        } else {
+        // Fetch category details first to get the real category ID
+        const catResponse = await getCategoryById(id);
+        if (!catResponse.success || !catResponse.data) {
           setError("Category not found or failed to load details.");
+          return;
         }
-      } catch (error) {
-        console.error("Error fetching category details:", error);
-        setError("Failed to load category information.");
+
+        const { category: cat, subcategories: subs, currentSubcategory } = catResponse.data;
+        let finalSubcategories = subs || [];
+
+        if (!finalSubcategories.length) {
+          try {
+            const { getCategories } = await import("../../services/api/customerProductService");
+            const allCatsResponse = await getCategories();
+            if (allCatsResponse.success && allCatsResponse.data) {
+              finalSubcategories = allCatsResponse.data.filter((c: any) =>
+                c.parent === cat._id || (c.parent && c.parent._id === cat._id)
+              );
+            }
+          } catch (_) {}
+        }
+
+        setCategory(cat);
+        setSubcategories([
+          { _id: "all", id: "all", name: "All", icon: "📦", isActive: true } as any,
+          ...finalSubcategories,
+        ]);
+
+        const subcategoryFromUrl = searchParams.get("subcategory");
+        const resolvedSubcat = subcategoryFromUrl || (currentSubcategory ? (currentSubcategory._id || currentSubcategory.id) : "all");
+        if (subcategoryFromUrl) setSelectedSubcategory(subcategoryFromUrl);
+        else if (currentSubcategory) setSelectedSubcategory(currentSubcategory._id || currentSubcategory.id);
+
+        setCategoryLoading(false);
+
+        // Now fetch products using resolved category ID
+        const loc = locationRef.current;
+        const params: any = { category: cat._id || id };
+        if (resolvedSubcat !== "all") params.subcategory = resolvedSubcat;
+        if (loc?.latitude && loc?.longitude) {
+          params.latitude = loc.latitude;
+          params.longitude = loc.longitude;
+        }
+
+        const prodResponse = await getProducts(params);
+        if (prodResponse.success) {
+          const uniqueProducts = Array.from(
+            new Map(prodResponse.data.map((p: any) => [p._id || p.id, p])).values()
+          );
+          setProducts(uniqueProducts.map((p: any) => ({
+            ...p,
+            tags: Array.isArray(p.tags) ? p.tags : [],
+            nameParts: p.name ? p.name.toLowerCase().split(" ") : [],
+          })));
+        } else {
+          setError("Failed to fetch products for this category.");
+        }
+      } catch (err) {
+        setError("Network error while loading category.");
       } finally {
+        setLoading(false);
         setCategoryLoading(false);
       }
     };
 
-    if (id) {
-      fetchCategoryDetails();
-    }
+    fetchAll();
   }, [id, searchParams]);
 
-  // Fetch Products when category or subcategory changes
+  // Refetch products when subcategory filter changes (not on initial load)
+  const isFirstSubcatChange = useRef(true);
   useEffect(() => {
+    if (isFirstSubcatChange.current) { isFirstSubcatChange.current = false; return; }
+    if (!id || !category) return;
+
     const fetchProducts = async () => {
       setLoading(true);
-      setError(null);
       try {
-        // If the ID in the URL is actually for a subcategory, we should use the parent category ID
-        // which we fetch in the other useEffect and store in 'category'.
-        // However, for fetching products, the backend getProducts handles 'category' (parent)
-        // and 'subcategory' separately.
-
-        const params: any = { category: category?._id || id };
-        if (selectedSubcategory !== "all") {
-          params.subcategory = selectedSubcategory;
+        const loc = locationRef.current;
+        const params: any = { category: category._id || id };
+        if (selectedSubcategory !== "all") params.subcategory = selectedSubcategory;
+        if (loc?.latitude && loc?.longitude) {
+          params.latitude = loc.latitude;
+          params.longitude = loc.longitude;
         }
-        // Include user location for seller service radius filtering
-        if (userLocation?.latitude && userLocation?.longitude) {
-          params.latitude = userLocation.latitude;
-          params.longitude = userLocation.longitude;
-        }
-
         const response = await getProducts(params);
         if (response.success) {
-          // Ensure products have default tags/name array for filtering logic if missing
-          // De-duplicate products by ID just in case
           const uniqueProducts = Array.from(
             new Map(response.data.map((p: any) => [p._id || p.id, p])).values()
           );
-          
-          const safeProducts = uniqueProducts.map((p: any) => ({
+          setProducts(uniqueProducts.map((p: any) => ({
             ...p,
             tags: Array.isArray(p.tags) ? p.tags : [],
             nameParts: p.name ? p.name.toLowerCase().split(" ") : [],
-          }));
-          setProducts(safeProducts);
-        } else {
-          setError("Failed to fetch products for this category.");
+          })));
         }
-      } catch (error) {
-        console.error("Error fetching products:", error);
+      } catch (_) {
         setError("Network error while loading products.");
       } finally {
         setLoading(false);
       }
     };
-
-    if (id) {
-      fetchProducts();
-    }
-  }, [id, selectedSubcategory, category?._id, userLocation]);
+    fetchProducts();
+  }, [selectedSubcategory]);
 
   // Apply sorting and filtering to products
   const categoryProducts = useMemo(() => {
@@ -230,8 +227,83 @@ export default function CategoryPage() {
     return result;
   }, [products, selectedSort, selectedFilters]);
 
+  // getIconForFilter — defined before early returns so filterOptions useMemo can use it
+  const getIconForFilter = (name: string): string => {
+    const iconMap: Record<string, string> = {
+      Tomato: "🍅", Potato: "🥔", Chilli: "🌶️", Spinach: "🥬", Brinjal: "🍆",
+      Onion: "🧅", Peanuts: "🥜", Lemon: "🍋", Mushroom: "🍄", Capsicum: "🫑",
+      Ginger: "🫚", Carrot: "🥕", Fenugreek: "🌿", Broccoli: "🥦", Cucumber: "🥒",
+      Cabbage: "🥬", Cauliflower: "🥦", Apple: "🍎", Banana: "🍌", Orange: "🍊",
+      Mango: "🥭", Organic: "🍃", Discounted: "🏷️", "In Stock": "📦", Premium: "⭐",
+    };
+    return iconMap[name] || "🥬";
+  };
+
+  // filterOptions — must be before early returns (Rules of Hooks)
+  const filterOptions = useMemo(() => {
+    const filterMap = new Map<string, number>();
+    if (selectedFilterCategory === "Type") {
+      products.forEach((product) => {
+        const name = (product.name || product.productName || "").toLowerCase();
+        const cleanName = name.replace(/^(fresh|organic|premium|best|new)\s+/i, "").trim();
+        const commonTypes = [
+          { keywords: ["tomato", "tomatoes"], display: "Tomato" },
+          { keywords: ["potato", "potatoes"], display: "Potato" },
+          { keywords: ["chilli", "chili", "chilies"], display: "Chilli" },
+          { keywords: ["spinach", "palak"], display: "Spinach" },
+          { keywords: ["brinjal", "eggplant"], display: "Brinjal" },
+          { keywords: ["onion", "onions"], display: "Onion" },
+          { keywords: ["peanut", "peanuts"], display: "Peanuts" },
+          { keywords: ["lemon", "lemons"], display: "Lemon" },
+          { keywords: ["mushroom", "mushrooms"], display: "Mushroom" },
+          { keywords: ["capsicum", "bell pepper", "pepper"], display: "Capsicum" },
+          { keywords: ["ginger"], display: "Ginger" },
+          { keywords: ["carrot", "carrots"], display: "Carrot" },
+          { keywords: ["fenugreek", "methi"], display: "Fenugreek" },
+          { keywords: ["broccoli"], display: "Broccoli" },
+          { keywords: ["cucumber", "cucumbers"], display: "Cucumber" },
+          { keywords: ["cabbage"], display: "Cabbage" },
+          { keywords: ["cauliflower"], display: "Cauliflower" },
+          { keywords: ["ladyfinger", "okra", "bhindi"], display: "Ladyfinger" },
+          { keywords: ["beans"], display: "Beans" },
+          { keywords: ["peas", "matar"], display: "Peas" },
+          { keywords: ["garlic", "lehsun"], display: "Garlic" },
+          { keywords: ["apple", "apples"], display: "Apple" },
+          { keywords: ["banana", "bananas"], display: "Banana" },
+          { keywords: ["orange", "oranges"], display: "Orange" },
+          { keywords: ["mango", "mangoes"], display: "Mango" },
+        ];
+        for (const type of commonTypes) {
+          if (type.keywords.some((keyword) => cleanName.includes(keyword))) {
+            filterMap.set(type.display, (filterMap.get(type.display) || 0) + 1);
+            break;
+          }
+        }
+      });
+    } else if (selectedFilterCategory === "Properties") {
+      const properties = [
+        { name: "Organic", check: (p: any) => (p.name || p.productName || "").toLowerCase().includes("organic") || (p.tags || []).some((t: string) => t.toLowerCase().includes("organic")) },
+        { name: "Discounted", check: (p: any) => p.discount > 0 || (p.mrp > p.price) },
+        { name: "In Stock", check: (p: any) => p.stock > 0 || p.variations?.some((v: any) => v.stock > 0) },
+        { name: "Premium", check: (p: any) => (p.name || p.productName || "").toLowerCase().includes("premium") },
+      ];
+      properties.forEach(prop => {
+        const count = products.filter(prop.check).length;
+        if (count > 0) filterMap.set(prop.name, count);
+      });
+    }
+    return Array.from(filterMap.entries())
+      .map(([name, count]) => ({ name, count, icon: getIconForFilter(name) }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [products, selectedFilterCategory]);
+
+  const filteredOptions = useMemo(
+    () => filterOptions.filter(o => o.name.toLowerCase().includes(filterSearchQuery.toLowerCase())),
+    [filterOptions, filterSearchQuery]
+  );
+
   if ((categoryLoading || loading) && !products.length && !category) {
-    return null; // Let global IconLoader handle it
+    return null;
   }
 
   if (error && !products.length && !category) {
@@ -266,133 +338,6 @@ export default function CategoryPage() {
       </div>
     );
   }
-
-  // Extract filter options from products
-  const getFilterOptions = () => {
-    const filterMap = new Map<string, number>();
-
-    if (selectedFilterCategory === "Type") {
-      products.forEach((product) => {
-        // Extract main ingredient/type from product name
-        const name = (product.name || product.productName || "").toLowerCase();
-        // Remove common prefixes like "fresh", "organic", etc.
-        const cleanName = name
-          .replace(/^(fresh|organic|premium|best|new)\s+/i, "")
-          .trim();
-
-        const commonTypes = [
-          { keywords: ["tomato", "tomatoes"], display: "Tomato" },
-          { keywords: ["potato", "potatoes"], display: "Potato" },
-          { keywords: ["chilli", "chili", "chilies"], display: "Chilli" },
-          { keywords: ["spinach", "palak"], display: "Spinach" },
-          { keywords: ["brinjal", "eggplant"], display: "Brinjal" },
-          { keywords: ["onion", "onions"], display: "Onion" },
-          { keywords: ["peanut", "peanuts"], display: "Peanuts" },
-          { keywords: ["lemon", "lemons"], display: "Lemon" },
-          { keywords: ["mushroom", "mushrooms"], display: "Mushroom" },
-          {
-            keywords: ["capsicum", "bell pepper", "pepper"],
-            display: "Capsicum",
-          },
-          { keywords: ["ginger"], display: "Ginger" },
-          { keywords: ["carrot", "carrots"], display: "Carrot" },
-          { keywords: ["fenugreek", "methi"], display: "Fenugreek" },
-          { keywords: ["broccoli"], display: "Broccoli" },
-          { keywords: ["cucumber", "cucumbers"], display: "Cucumber" },
-          { keywords: ["cabbage"], display: "Cabbage" },
-          { keywords: ["cauliflower"], display: "Cauliflower" },
-          { keywords: ["ladyfinger", "okra", "bhindi"], display: "Ladyfinger" },
-          { keywords: ["beans"], display: "Beans" },
-          { keywords: ["peas", "matar"], display: "Peas" },
-          { keywords: ["garlic", "lehsun"], display: "Garlic" },
-          { keywords: ["apple", "apples"], display: "Apple" },
-          { keywords: ["banana", "bananas"], display: "Banana" },
-          { keywords: ["orange", "oranges"], display: "Orange" },
-          { keywords: ["mango", "mangoes"], display: "Mango" },
-        ];
-
-        for (const type of commonTypes) {
-          if (type.keywords.some((keyword) => cleanName.includes(keyword))) {
-            filterMap.set(type.display, (filterMap.get(type.display) || 0) + 1);
-            break;
-          }
-        }
-      });
-    } else if (selectedFilterCategory === "Properties") {
-      // Add Property filters
-      const properties = [
-        { 
-          name: "Organic", 
-          icon: "🍃", 
-          check: (p: any) => 
-            (p.name || p.productName || "").toLowerCase().includes("organic") || 
-            (p.tags || []).some((t: string) => t.toLowerCase().includes("organic"))
-        },
-        { 
-          name: "Discounted", 
-          icon: "🏷️", 
-          check: (p: any) => p.discount > 0 || (p.mrp > p.price)
-        },
-        { 
-          name: "In Stock", 
-          icon: "📦", 
-          check: (p: any) => p.stock > 0 || p.variations?.some((v: any) => v.stock > 0)
-        },
-        {
-          name: "Premium",
-          icon: "⭐",
-          check: (p: any) => (p.name || p.productName || "").toLowerCase().includes("premium")
-        }
-      ];
-
-      properties.forEach(prop => {
-        const count = products.filter(prop.check).length;
-        if (count > 0) {
-          filterMap.set(prop.name, count);
-        }
-      });
-    }
-
-    return Array.from(filterMap.entries())
-      .map(([name, count]) => ({ name, count, icon: getIconForFilter(name) }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  };
-
-  const getIconForFilter = (name: string): string => {
-    const iconMap: Record<string, string> = {
-      Tomato: "🍅",
-      Potato: "🥔",
-      Chilli: "🌶️",
-      Spinach: "🥬",
-      Brinjal: "🍆",
-      Onion: "🧅",
-      Peanuts: "🥜",
-      Lemon: "🍋",
-      Mushroom: "🍄",
-      Capsicum: "🫑",
-      Ginger: "🫚",
-      Carrot: "🥕",
-      Fenugreek: "🌿",
-      Broccoli: "🥦",
-      Cucumber: "🥒",
-      Cabbage: "🥬",
-      Cauliflower: "🥦",
-      Apple: "🍎",
-      Banana: "🍌",
-      Orange: "🍊",
-      Mango: "🥭",
-      Organic: "🍃",
-      Discounted: "🏷️",
-      "In Stock": "📦",
-      Premium: "⭐",
-    };
-    return iconMap[name] || "🥬";
-  };
-
-  const filterOptions = getFilterOptions();
-  const filteredOptions = filterOptions.filter((option) =>
-    option.name.toLowerCase().includes(filterSearchQuery.toLowerCase())
-  );
 
   const handleFilterToggle = (filterName: string) => {
     setSelectedFilters((prev) =>

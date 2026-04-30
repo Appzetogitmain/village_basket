@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lottie from 'lottie-react';
 import { useLoading } from '../../context/LoadingContext';
-import { ALLOWED_ANIMATIONS, getAnimationData } from '../../utils/animationCache';
+import { getAnimationData, getNextAnimationName } from '../../utils/animationCache';
 import './iconLoader.css';
 
 interface IconLoaderProps {
@@ -28,12 +28,8 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const currentPath = (isRouteLoading || forceShow) ? lockedPath : path;
 
   useEffect(() => {
-    // Pick one at random for every load
-    const index = Math.floor(Math.random() * ALLOWED_ANIMATIONS.length);
-    const animationName = ALLOWED_ANIMATIONS[index];
-
+    const animationName = getNextAnimationName();
     setCurrentAnimationName(animationName);
-    
     getAnimationData(animationName).then(data => {
       if (data) setAnimationData(data);
     });
@@ -60,11 +56,22 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
   const currentAnimation = currentAnimationName;
 
   const renderAnimation = () => {
-    // Standardized compact size for all 3 allowed animations
-    const sizeClasses = "w-[200px] h-[200px]";
+    const isFullScreen = currentAnimationName === 'bullock_cart.json';
+
+    if (isFullScreen) {
+      return (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {animationData ? (
+            <Lottie animationData={animationData} loop={true} className="w-full h-full" />
+          ) : (
+            <div className="w-12 h-12 border-4 border-village-green border-t-transparent rounded-full animate-spin" />
+          )}
+        </div>
+      );
+    }
 
     return (
-      <div className={`${sizeClasses} flex items-center justify-center`}>
+      <div className="w-[200px] h-[200px] flex items-center justify-center">
         {animationData ? (
           <Lottie animationData={animationData} loop={true} className="w-full h-full" />
         ) : (
@@ -109,64 +116,41 @@ const IconLoader: React.FC<IconLoaderProps> = ({ forceShow = false }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.1, max: 1, ease: "easeOut" }}
-          style={{
-            background: 'rgba(255, 255, 255, 1)',
-            backdropFilter: 'blur(10px)',
-            zIndex: 10000
-          }}
+          transition={{ duration: 0.1, ease: "easeOut" }}
+          style={{ background: 'rgba(255,255,255,1)', backdropFilter: 'blur(10px)', zIndex: 10000 }}
         >
-          <div className="flex flex-col items-center justify-center p-4 max-w-2xl w-full">
-            <motion.div
-              variants={containerVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="flex flex-col items-center justify-center space-y-4"
-            >
-              {/* Animation Container */}
-              <div className="relative min-h-[200px] flex items-center justify-center">
-                {/* Speed Lines Effects */}
-                <div className="absolute inset-0 pointer-events-none">
-                  {[...Array(4)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute h-[1px] bg-village-green/10"
-                      style={{
-                        width: 40 + Math.random() * 40,
-                        top: 20 + i * 20 + '%',
-                        left: -40
-                      }}
-                      animate={{
-                        x: [0, 300],
-                        opacity: [0, 0.5, 0]
-                      }}
-                      transition={{
-                        duration: 1 + Math.random(),
-                        repeat: Infinity,
-                        delay: i * 0.2
-                      }}
-                    />
-                  ))}
-                </div>
+          <div className="fixed inset-0 flex flex-col items-center justify-center">
 
+            {/* Animation */}
+            {currentAnimationName === 'bullock_cart.json' ? (
+              <div className="absolute inset-0">{renderAnimation()}</div>
+            ) : (
+              <motion.div
+                variants={containerVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="relative flex items-center justify-center min-h-[200px]"
+              >
                 {renderAnimation()}
-
-                {/* Ground Shadow */}
                 <motion.div
-                  className="absolute bottom-4 w-28 h-2 bg-black/5 rounded-[50%] blur-[2px]"
+                  className="absolute bottom-0 w-28 h-2 bg-black/5 rounded-[50%] blur-[2px]"
                   animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-              </div>
+              </motion.div>
+            )}
 
-              {/* Status Text (Single Line) */}
-              <div className="text-center mt-4">
-                <p className="text-village-green font-bold text-[10px] uppercase tracking-[0.2em] leading-none opacity-60">
-                  {text.p}
-                </p>
-              </div>
-            </motion.div>
+            {/* Text — always below animation */}
+            <div
+              className="relative z-10 flex flex-col items-center gap-2 text-center"
+              style={{ marginTop: currentAnimationName === 'bullock_cart.json' ? '60vh' : '16px' }}
+            >
+              <p className="text-[#8B3D28] font-black text-[11px] uppercase tracking-[0.3em] leading-none">
+                {text.p}
+              </p>
+            </div>
+
           </div>
         </motion.div>
       )}

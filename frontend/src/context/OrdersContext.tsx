@@ -2,6 +2,7 @@ import {
   useState,
   ReactNode,
   useEffect,
+  useRef,
 } from "react";
 import { useAuth } from "./AuthContext";
 import { Order } from "../types/order";
@@ -80,6 +81,8 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const prevAuthRef = useRef(false);
+
   useEffect(() => {
     // Ensure userType is set in user object if missing (for backward compatibility)
     if (isAuthenticated && user && !user.userType) {
@@ -87,14 +90,16 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
       updateUser(updatedUser);
     }
 
-    if (isAuthenticated) {
+    // Only fetch when transitioning from unauthenticated → authenticated
+    if (isAuthenticated && !prevAuthRef.current) {
       fetchOrders();
-    } else {
+    } else if (!isAuthenticated) {
       setOrders([]);
       setLoading(false);
     }
+    prevAuthRef.current = isAuthenticated;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user?.userType, user?.id]);
+  }, [isAuthenticated, user?.id]);
 
   const addOrder = async (order: Order): Promise<{ id: string; orderNumber: string } | undefined> => {
     try {
