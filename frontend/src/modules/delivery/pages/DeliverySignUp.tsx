@@ -433,8 +433,8 @@ export default function DeliverySignUp() {
                   </div>
                 </div>
 
-                {/* Bank Information */}
-                <div className="space-y-6 pt-4 border-t border-stone-100">
+                {/* Bank Information — commented out, can be enabled later */}
+                {/* <div className="space-y-6 pt-4 border-t border-stone-100">
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-[1px] bg-[#8B3D28]/30"></div>
                     <h3 className="text-[#8B3D28] text-[10px] font-black uppercase tracking-[0.3em]">Financial Ledger <span className="opacity-40 normal-case font-bold">(Optional)</span></h3>
@@ -481,7 +481,7 @@ export default function DeliverySignUp() {
                       {ifscError && <p className="text-[10px] text-red-500 font-medium mt-1.5 ml-1 leading-none">{ifscError}</p>}
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {error && <div className="text-[10px] font-bold tracking-wide text-[#8B3D28] bg-red-50 py-3 px-4 rounded-xl text-center border border-red-100">{error}</div>}
                 {successMessage && <div className="text-[10px] font-bold tracking-wide text-green-700 bg-green-50 py-3 px-4 rounded-xl text-center border border-green-100">{successMessage}</div>}
