@@ -227,7 +227,7 @@ export default function DeliveryLogin() {
             {/* Skip button */}
             <button
               onClick={() => navigate('/delivery')}
-              className="mt-4 w-full py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest text-stone-400 bg-stone-50 hover:bg-stone-100 border border-stone-200 transition-all active:scale-95"
+              className="mt-4 w-full py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest text-white bg-neutral-900 hover:bg-black border border-neutral-800 transition-all active:scale-95"
             >
               Skip for now →
             </button>

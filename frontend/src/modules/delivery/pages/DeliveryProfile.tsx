@@ -5,6 +5,7 @@ import { getDeliveryProfile, updateProfile } from '../../../services/api/deliver
 import { uploadImage } from '../../../services/api/uploadService';
 import { useToast } from '../../../context/ToastContext';
 import VillageLoader from '../../../components/VillageLoader';
+import { useAuth } from '../../../context/AuthContext';
 
 // Icons
 const Icons = {
@@ -22,6 +23,9 @@ const Icons = {
 
 export default function DeliveryProfile() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
+
   const [isEditing, setIsEditing] = useState(false);
   const { setUserName, setProfileImage } = useDeliveryUser();
   const { showToast } = useToast();
@@ -64,8 +68,12 @@ export default function DeliveryProfile() {
   });
   const [originalProfileData, setOriginalProfileData] = useState<ProfileData | null>(null);
 
-  // Fetch profile data on mount
+  // Fetch profile data on mount — only for authenticated delivery users
   useEffect(() => {
+    if (!isDeliveryUser) {
+      setLoading(false);
+      return;
+    }
     const fetchProfile = async () => {
       try {
         setLoading(true);
@@ -229,6 +237,41 @@ export default function DeliveryProfile() {
 
   if (loading) {
     return <VillageLoader message="Verifying Identity" />;
+  }
+
+  // Guest — show login prompt
+  if (!isDeliveryUser) {
+    return (
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center pb-20 px-6 text-center font-poppins">
+        <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
+        <div className="relative z-10 flex flex-col items-center gap-6">
+          <div className="w-20 h-20 rounded-3xl bg-[#8B3D28]/10 flex items-center justify-center">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#8B3D28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-[#8B3D28] font-black text-sm uppercase tracking-[0.2em] mb-2">Login Required</h2>
+            <p className="text-stone-400 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+              Please login to view your<br />personal details
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/delivery/login')}
+            className="px-10 py-3.5 bg-[#8B3D28] text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-[#8B3D28]/20 active:scale-95 transition-all"
+          >
+            Login / Sign Up
+          </button>
+          <button
+            onClick={() => navigate(-1)}
+            className="text-stone-400 font-bold text-[9px] uppercase tracking-widest"
+          >
+            ← Go Back
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
