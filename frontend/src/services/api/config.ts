@@ -58,17 +58,17 @@ const getRole = (url?: string): string => {
   if (currentPath.startsWith("/delivery")) return "delivery";
 
   // Fallback to targetUrl matching carefully
-  if (targetUrl.startsWith("/admin/") || targetUrl.match(/^\/api\/v\d+\/admin/)) return "admin";
+  if (targetUrl.startsWith("/admin") || targetUrl.match(/^\/api\/v\d+\/admin/)) return "admin";
   
   if (
-      targetUrl.startsWith("/seller/") || 
+      targetUrl.startsWith("/seller") || 
       targetUrl.match(/^\/api\/v\d+\/seller/) ||
       // Need a stricter check for /sellers endpoint, ensure it's at the boundary
       targetUrl.match(/^\/sellers\b/) || 
       targetUrl.match(/^\/api\/v\d+\/sellers\b/)
   ) return "seller";
 
-  if (targetUrl.startsWith("/delivery/") || targetUrl.match(/^\/api\/v\d+\/delivery/)) return "delivery";
+  if (targetUrl.startsWith("/delivery") || targetUrl.match(/^\/api\/v\d+\/delivery/)) return "delivery";
 
   return "customer";
 };

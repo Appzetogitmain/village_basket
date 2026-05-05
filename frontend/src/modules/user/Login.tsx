@@ -80,7 +80,7 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      const response = await sendOTP(mobileNumber, isSignUpMode);
+      const response = await sendOTP(mobileNumber, isSignUpMode, signUpDetails?.email);
       if (response.sessionId) setSessionId(response.sessionId);
       setShowOTP(true);
       setTimer(120); // Reset timer on resend

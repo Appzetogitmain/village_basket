@@ -311,7 +311,7 @@ function App() {
                           <Route
                             path="/delivery/*"
                             element={
-                              <ProtectedRoute requiredUserType="Delivery" redirectTo="/delivery/login" allowGuest={true}>
+                              <ProtectedRoute requiredUserType="Delivery" redirectTo="/delivery/login">
                                 <Suspense fallback={null}>
                                   <DeliveryLayout>
                                     <Routes>

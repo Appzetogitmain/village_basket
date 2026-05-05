@@ -12,7 +12,7 @@ import { asyncHandler } from "../../../utils/asyncHandler";
  * Returns session_id for verification
  */
 export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
-  const { mobile, isSignUp } = req.body;
+  const { mobile, isSignUp, email } = req.body;
 
   if (!mobile || !/^[0-9]{10,12}$/.test(mobile)) {
     return res.status(400).json({
@@ -23,21 +23,32 @@ export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
 
   // Check if customer exists
   const normalizedMobile = mobile.slice(-10);
-  const customer = await Customer.findOne({ phone: normalizedMobile });
+  const customerByPhone = await Customer.findOne({ phone: normalizedMobile });
   const isSignUpRequest = isSignUp === true || isSignUp === 'true';
 
-  if (!customer && !isSignUpRequest) {
+  if (!customerByPhone && !isSignUpRequest) {
     return res.status(404).json({
       success: false,
       message: "Mobile number is not registered. Please sign up first.",
     });
   }
 
-  if (customer && isSignUpRequest) {
+  if (customerByPhone && isSignUpRequest) {
     return res.status(400).json({
       success: false,
       message: "Mobile number is already registered. Please login.",
     });
+  }
+
+  // If signing up, also check if email is already in use
+  if (isSignUpRequest && email) {
+    const customerByEmail = await Customer.findOne({ email: email.toLowerCase().trim() });
+    if (customerByEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Email address is already registered. Please use a different email or login.",
+      });
+    }
   }
 
   // Send SMS OTP
@@ -103,6 +114,18 @@ export const verifySmsOtp = asyncHandler(
     if (!customer) {
       // Use provided name and email or placeholders
       const { name, email } = req.body;
+
+      if (email) {
+        const emailExists = await Customer.findOne({
+          email: email.toLowerCase().trim(),
+        });
+        if (emailExists) {
+          return res.status(400).json({
+            success: false,
+            message: "Email address is already registered. Please use a different email or login.",
+          });
+        }
+      }
       
       customer = await Customer.create({
         phone: normalizedMobile,

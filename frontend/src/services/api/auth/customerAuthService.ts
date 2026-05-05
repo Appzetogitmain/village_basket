@@ -29,8 +29,8 @@ export interface VerifyOTPResponse {
 /**
  * Send SMS OTP to customer mobile number
  */
-export const sendOTP = async (mobile: string, isSignUp: boolean = false): Promise<SendOTPResponse> => {
-  const response = await api.post<SendOTPResponse>('/auth/customer/send-sms-otp', { mobile, isSignUp });
+export const sendOTP = async (mobile: string, isSignUp: boolean = false, email?: string): Promise<SendOTPResponse> => {
+  const response = await api.post<SendOTPResponse>('/auth/customer/send-sms-otp', { mobile, isSignUp, email });
   return response.data;
 };
 
