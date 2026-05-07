@@ -1,12 +1,38 @@
-import { Server as SocketIOServer } from 'socket.io';
+import { getIO } from '../socket/socketService';
+import { sendNewOrderNotification } from './notificationService';
 import OrderItem from '../models/OrderItem';
 import mongoose from 'mongoose';
+
+/**
+ * High-level helper to notify sellers about a new order via all channels (Socket + Push)
+ */
+export async function notifySellersOfNewOrder(order: any): Promise<void> {
+    try {
+        const io = getIO();
+        
+        // 1. Send Socket Notification
+        await notifySellersOfOrderUpdate(io, order, 'NEW_ORDER');
+
+        // 2. Send Push Notification
+        const sellerIdsInOrder = [...new Set(order.items.map((i: any) => i.seller?.toString()).filter((id: any) => id))];
+        for (const sellerId of sellerIdsInOrder) {
+            await sendNewOrderNotification(
+                sellerId as string, 
+                order._id.toString(), 
+                order.orderNumber, 
+                order.total
+            );
+        }
+    } catch (error) {
+        console.error('Error in notifySellersOfNewOrder:', error);
+    }
+}
 
 /**
  * Notify all sellers involved in an order about a new order or status change
  */
 export async function notifySellersOfOrderUpdate(
-    io: SocketIOServer,
+    io: any,
     order: any,
     type: 'NEW_ORDER' | 'STATUS_UPDATE' | 'ORDER_CANCELLED'
 ): Promise<void> {
@@ -54,6 +80,11 @@ export async function notifySellersOfOrderUpdate(
                     variation: item.variation
                 })),
                 totalAmount: sellerSpecificItems.reduce((acc: number, item: any) => acc + item.total, 0),
+                deliverySlot: order.deliverySlot ? {
+                    date: order.deliverySlot.date,
+                    timeRange: order.deliverySlot.timeRange,
+                    label: order.deliverySlot.label
+                } : undefined,
                 timestamp: new Date()
             };
 

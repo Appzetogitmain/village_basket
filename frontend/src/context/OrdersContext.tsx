@@ -141,7 +141,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
             timeRange: order.deliverySlot.timeRange,
             startTime: order.deliverySlot.startTime,
             endTime: order.deliverySlot.endTime,
-            date: new Date().toISOString(),
+            date: order.deliverySlot.date,
           }
         }),
       };

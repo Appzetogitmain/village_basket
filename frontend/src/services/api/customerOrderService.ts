@@ -136,3 +136,14 @@ export const getMyReturnRequestById = async (returnId: string): Promise<any> => 
     const response = await api.get(`/customer/returns/${returnId}`);
     return response.data;
 };
+
+/**
+ * Get orders by date range for calendar strip
+ */
+export const getOrdersByDateRange = async (startDate: string, endDate: string): Promise<OrderResponse> => {
+    const response = await api.get<OrderResponse>('/customer/orders/by-date-range', {
+        params: { startDate, endDate }
+    });
+    return response.data;
+};
+

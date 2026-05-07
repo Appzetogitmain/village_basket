@@ -7,6 +7,7 @@ import { getDeliveryProfile } from '../../../services/api/delivery/deliveryServi
 import { useDeliveryOrderNotifications } from '../../../hooks/useDeliveryOrderNotifications';
 import OrderNotificationCard from './OrderNotificationCard';
 import { AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../../context/AuthContext';
 
 interface DeliveryLayoutContentProps {
   children: ReactNode;
@@ -18,6 +19,8 @@ function DeliveryLayoutContent({ children }: DeliveryLayoutContentProps) {
   const mainScrollRef = useRef<HTMLElement>(null);
   const { isOnline } = useDeliveryStatus();
   const { setUserName, setProfileImage } = useDeliveryUser();
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
   const {
     currentNotification,
     acceptOrder,
@@ -25,6 +28,8 @@ function DeliveryLayoutContent({ children }: DeliveryLayoutContentProps) {
   } = useDeliveryOrderNotifications();
 
   useEffect(() => {
+    if (!isDeliveryUser) return;
+
     const fetchProfile = async () => {
       try {
         const profile = await getDeliveryProfile();

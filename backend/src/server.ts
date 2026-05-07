@@ -83,6 +83,14 @@ async function startServer() {
       `   \x1b[36mEnvironment:\x1b[0m ${process.env.NODE_ENV || "development"}`
     );
     console.log(`   \x1b[36mSocket.IO:\x1b[0m ✓ Ready for connections\n`);
+
+    // Initialize background services
+    import("./services/scheduledReminderService").then(({ sendScheduledReminders }) => {
+      // Run once on startup
+      sendScheduledReminders();
+      // Then run every 4 hours
+      setInterval(sendScheduledReminders, 4 * 60 * 60 * 1000);
+    });
   });
 }
 

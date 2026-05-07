@@ -7,6 +7,7 @@ import {
   createReturnRequest,
   getMyReturnRequests,
   getMyReturnRequestById,
+  getOrdersByDateRange,
 } from "../modules/customer/controllers/customerOrderController";
 import { authenticate } from "../middleware/auth";
 
@@ -19,6 +20,7 @@ router.use(authenticate);
 
 router.post("/", createOrder);
 router.get("/", getMyOrders);
+router.get("/by-date-range", getOrdersByDateRange);
 router.get("/returns", getMyReturnRequests);
 router.get("/returns/:returnId", getMyReturnRequestById);
 router.get("/:id", getOrderById);

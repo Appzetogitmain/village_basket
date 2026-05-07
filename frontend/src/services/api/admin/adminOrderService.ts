@@ -32,6 +32,15 @@ export interface Order {
   _id: string;
   orderNumber: string;
   orderDate: string;
+  orderType?: "INSTANT" | "SCHEDULED";
+  deliverySlot?: {
+    slotId?: string;
+    date: string;
+    timeRange: string;
+    label?: string;
+    startTime?: string;
+    endTime?: string;
+  };
   customer: string | { name: string; email: string; phone: string };
   customerName: string;
   customerEmail: string;
@@ -86,6 +95,8 @@ export interface GetOrdersParams {
   seller?: string;
   dateFrom?: string;
   dateTo?: string;
+  deliveryDateFrom?: string;
+  deliveryDateTo?: string;
   search?: string;
 }
 

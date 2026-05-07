@@ -5,7 +5,7 @@ export interface IOrder extends Document {
   // Order Info
   orderNumber: string;
   orderDate: Date;
-  orderType: "INSTANT";
+  orderType: "INSTANT" | "SCHEDULED";
     deliverySlot?: {
       slotId?: string;
       date: Date;
@@ -140,7 +140,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     orderType: {
       type: String,
-      enum: ["INSTANT"],
+      enum: ["INSTANT", "SCHEDULED"],
       default: "INSTANT",
     },
     deliverySlot: {

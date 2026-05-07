@@ -286,6 +286,29 @@ export default function OrderNotificationCard({
                             <p className="text-[10px] font-bold text-stone-400 leading-relaxed uppercase tracking-tight line-clamp-2">{formatAddress()}</p>
                          </div>
                     </div>
+
+                    {/* Scheduled Delivery Info */}
+                    {notification.deliverySlot && (
+                        <div className="pt-3 border-t border-[#8B3D28]/10 bg-[#8B3D28]/5 -mx-5 px-5 py-3 border-b border-[#8B3D28]/10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-sm border border-[#8B3D28]/10 text-lg">
+                                    📅
+                                </div>
+                                <div>
+                                    <p className="text-[8px] font-black text-[#8B3D28]/50 uppercase tracking-[0.2em] mb-0.5">Scheduled Delivery</p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-[11px] font-black text-[#8B3D28] uppercase">
+                                            {new Date(notification.deliverySlot.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </p>
+                                        <span className="w-1 h-1 rounded-full bg-[#8B3D28]/30"></span>
+                                        <p className="text-[9px] font-bold text-[#8B3D28]/70 italic">
+                                            {notification.deliverySlot.label || notification.deliverySlot.timeRange}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Action Buttons */}

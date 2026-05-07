@@ -339,6 +339,11 @@ export async function notifyDeliveryBoysOfNewOrder(
             subtotal: order.subtotal,
             shipping: order.shipping,
             createdAt: order.createdAt,
+            deliverySlot: order.deliverySlot ? {
+                date: order.deliverySlot.date,
+                label: order.deliverySlot.label || order.deliverySlot.timeRange || '',
+                timeRange: order.deliverySlot.timeRange || order.deliverySlot.label || '',
+            } : undefined,
         };
 
         // Initialize notification state
@@ -448,6 +453,28 @@ export async function handleOrderAcceptance(
         order.status = 'Ready for pickup'; // Mark as ready for pickup when assigned
 
         await order.save();
+
+        // If it's a future scheduled order, send a special confirmation notification as a reminder
+        const isFuture = order.deliverySlot?.date && new Date(order.deliverySlot.date).setHours(0,0,0,0) > new Date().setHours(0,0,0,0);
+        if (isFuture) {
+            try {
+                const { sendNotification } = await import('./notificationService');
+                await sendNotification(
+                    "Delivery",
+                    normalizedDeliveryBoyId,
+                    "📅 Future Task Confirmed",
+                    `Task #${order.orderNumber} confirmed for ${new Date(order.deliverySlot.date).toLocaleDateString('en-IN')}. It's now in your Schedule tab.`,
+                    {
+                        type: "Order",
+                        link: `/delivery/orders/scheduled`,
+                        priority: "High"
+                    }
+                );
+            } catch (notifyErr) {
+                console.error("Error sending future task confirmation:", notifyErr);
+            }
+        }
+
 
         // Emit order-accepted event to stop notifications for all delivery boys
         io.to('delivery-notifications').emit('order-accepted', {

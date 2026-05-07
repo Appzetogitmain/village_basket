@@ -93,7 +93,15 @@ export default function Orders() {
               </div>
 
               <div className="flex justify-between items-center mt-1 border-t border-village-umber/5 pt-2">
-                <div className="text-[9px] font-bold text-neutral-500">{formatDate(order.createdAt)}</div>
+                <div className="flex flex-col gap-0.5">
+                  <div className="text-[9px] font-bold text-neutral-500">{formatDate(order.createdAt)}</div>
+                  {order.deliverySlot?.date && (
+                    <div className="flex items-center gap-1">
+                      <span className="text-[8px] font-black text-village-umber uppercase tracking-tight">Scheduled:</span>
+                      <span className="text-[8px] font-bold text-[#8B3D28] uppercase">{new Date(order.deliverySlot.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-center gap-1">
                   <div className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center text-[7px] font-black text-neutral-400 border border-neutral-200 uppercase">
                     {order.status.charAt(0)}

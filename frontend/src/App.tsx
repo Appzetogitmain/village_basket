@@ -10,6 +10,7 @@ import { ToastProvider } from "./context/ToastContext";
 import { LoadingProvider } from "./context/LoadingContext";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { WishlistProvider } from "./context/WishlistContext";
+import { DateTrackerProvider } from "./context/DateTrackerContext";
 
 import { AxiosLoadingInterceptor } from "./context/AxiosLoadingInterceptor";
 import IconLoader from "./components/loaders/IconLoader";
@@ -95,6 +96,7 @@ const DeliveryContact = lazy(() => import("./modules/delivery/pages/DeliveryCont
 const DeliveryLanguage = lazy(() => import("./modules/delivery/pages/DeliveryLanguage"));
 const DeliveryLogin = lazy(() => import("./modules/delivery/pages/DeliveryLogin"));
 const DeliverySignUp = lazy(() => import("./modules/delivery/pages/DeliverySignUp"));
+const DeliveryScheduledOrders = lazy(() => import("./modules/delivery/pages/DeliveryScheduledOrders"));
 
 // Lazy load seller routes
 const SellerLayout = lazy(() => import("./modules/seller/components/SellerLayout"));
@@ -207,6 +209,7 @@ function App() {
                 <ToastProvider>
                   <CartProvider>
                     <OrdersProvider>
+                      <DateTrackerProvider>
                       <BrowserRouter
                         future={{
                           v7_startTransition: true,
@@ -311,7 +314,7 @@ function App() {
                           <Route
                             path="/delivery/*"
                             element={
-                              <ProtectedRoute requiredUserType="Delivery" redirectTo="/delivery/login">
+                              <ProtectedRoute requiredUserType="Delivery" redirectTo="/delivery/login" allowGuest={true}>
                                 <Suspense fallback={null}>
                                   <DeliveryLayout>
                                     <Routes>
@@ -321,6 +324,7 @@ function App() {
                                       <Route path="orders/pending" element={<DeliveryPendingOrders />} />
                                       <Route path="orders/all" element={<DeliveryAllOrders />} />
                                       <Route path="orders/return" element={<DeliveryReturnOrders />} />
+                                      <Route path="orders/scheduled" element={<DeliveryScheduledOrders />} />
                                       <Route path="notifications" element={<DeliveryNotifications />} />
                                       <Route path="menu" element={<DeliveryMenu />} />
                                       <Route path="profile" element={<DeliveryProfile />} />
@@ -519,6 +523,7 @@ function App() {
                           />
                         </Routes>
                       </BrowserRouter>
+                      </DateTrackerProvider>
                     </OrdersProvider>
                   </CartProvider>
                 </ToastProvider>

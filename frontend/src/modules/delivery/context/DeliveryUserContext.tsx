@@ -12,7 +12,7 @@ const DeliveryUserContext = createContext<DeliveryUserContextType | undefined>(u
 export function DeliveryUserProvider({ children }: { children: ReactNode }) {
   const [userName, setUserName] = useState(() => {
     const savedName = localStorage.getItem('delivery_user_name');
-    return savedName || '';
+    return savedName || 'Guest Partner';
   });
   const [profileImage, setProfileImage] = useState(() => {
     const savedImage = localStorage.getItem('delivery_user_profile_image');

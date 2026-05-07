@@ -36,6 +36,21 @@ export default function DeliveryBottomNav() {
       ),
     },
     {
+      path: '/delivery/orders/scheduled',
+      label: 'Schedule',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M8 2V5M16 2V5M3.5 9.09H20.5M4.5 4H19.5C20.3284 4 21 4.67157 21 5.5V19.5C21 20.3284 20.3284 21 19.5 21H4.5C3.67157 21 3 20.3284 3 19.5V5.5C3 4.67157 3.67157 4 4.5 4Z"
+            stroke={isActive('/delivery/orders/scheduled') ? activeColor : inactiveColor}
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+    },
+    {
       path: '/delivery/notifications',
       label: 'Notice',
       icon: (

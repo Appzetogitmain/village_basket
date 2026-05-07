@@ -16,6 +16,11 @@ export interface OrderNotificationData {
     subtotal: number;
     shipping: number;
     createdAt: string;
+    deliverySlot?: {
+        date: string;
+        label: string;
+        timeRange: string;
+    };
 }
 
 export interface AcceptOrderResponse {

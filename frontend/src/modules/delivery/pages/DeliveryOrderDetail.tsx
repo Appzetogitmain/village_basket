@@ -960,6 +960,20 @@ export default function DeliveryOrderDetail() {
                             </p>
                         </div>
                     </div>
+                    {order.deliverySlot?.date && (
+                        <div className="mt-3 p-3 bg-indigo-50 rounded-2xl border border-indigo-100 flex items-center justify-between">
+                            <div className="flex flex-col">
+                                <p className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">Scheduled For</p>
+                                <p className="text-[10px] font-black text-indigo-900 uppercase">
+                                    {new Date(order.deliverySlot.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
+                                </p>
+                            </div>
+                            <div className="text-right flex flex-col">
+                                <p className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">Time Slot</p>
+                                <p className="text-[10px] font-black text-indigo-900 uppercase">{order.deliverySlot.label || order.deliverySlot.timeRange}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
             </div>

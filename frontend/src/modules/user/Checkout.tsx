@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
@@ -6,6 +7,7 @@ import { useOrders } from '../../hooks/useOrders';
 import { useLocation as useLocationContext } from '../../hooks/useLocation';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
+import { useDateTracker } from '../../context/DateTrackerContext';
 
 // import { products } from '../../data/products'; // Removed
 import { OrderAddress, Order, DeliveryShift } from '../../types/order';
@@ -39,6 +41,7 @@ export default function Checkout() {
   const { showToast: showGlobalToast } = useToast();
   const { user, updateUser } = useAuth();
   const { addToWishlist: contextAddToWishlist } = useWishlist();
+  const { selectedDeliveryDate } = useDateTracker();
   const navigate = useNavigate();
 
   const [savedAddress, setSavedAddress] = useState<OrderAddress | null>(null);
@@ -440,7 +443,10 @@ export default function Checkout() {
       createdAt: new Date().toISOString(),
       gstin: gstin || undefined,
       couponCode: selectedCoupon?.code || undefined,
-      deliverySlot: selectedSlot || undefined,
+      deliverySlot: selectedSlot ? { 
+        ...selectedSlot, 
+        date: selectedDeliveryDate ? selectedDeliveryDate.toISOString() : (() => { const d = new Date(); d.setHours(12,0,0,0); return d.toISOString(); })() 
+      } : undefined,
       walletAmountUsed: walletAmountToUse,
       donationAmount: donationAmount,
     };
@@ -1392,6 +1398,22 @@ export default function Checkout() {
 
 
 
+          {/* Delivery Date */}
+          {selectedDeliveryDate && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M19 4H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" />
+                  <path d="M16 2v4M8 2v4M3 10h18" />
+                </svg>
+                <span className="text-xs text-neutral-700">Delivery Date</span>
+              </div>
+              <span className="text-xs font-bold text-[#8B3D28] font-poppins uppercase">
+                {format(selectedDeliveryDate, 'PPP')}
+              </span>
+            </div>
+          )}
+
           {/* Delivery Shift */}
           {selectedSlot && (
             <div className="flex items-center justify-between">
@@ -1430,7 +1452,7 @@ export default function Checkout() {
           {/* Donation detail in bill */}
           {donationAmount > 0 && (
             <div className="pt-1 flex items-center justify-between">
-              <span className="text-[10px] text-neutral-500 font-medium italic">Includes ₹{donationAmount} donation for Village Trust</span>
+              <span className="text-[10px] text-neutral-500 font-medium italic">Includes ₹{donationAmount} donation for Trust</span>
             </div>
           )}
         </div>
@@ -1471,7 +1493,7 @@ export default function Checkout() {
             </svg>
           </div>
           <div className="flex-1">
-            <h3 className="text-xs font-black text-neutral-900 font-poppins uppercase tracking-wide">Donation for Village Trust</h3>
+            <h3 className="text-xs font-black text-neutral-900 font-poppins uppercase tracking-wide">Donation for Trust</h3>
             <p className="text-[10px] text-neutral-500">Support our community with a small contribution</p>
           </div>
           {donationAmount > 0 && (

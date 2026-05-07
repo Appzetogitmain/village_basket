@@ -1125,6 +1125,32 @@ export default function OrderDetail() {
         {/* Promo Carousel */}
         {/* <PromoCarousel /> */}
 
+        {/* Scheduled Delivery Info */}
+        {order?.deliverySlot?.date && (
+          <motion.div
+            className="village-card paper-texture organic-radius p-4 bg-village-umber/5 border border-dashed border-village-umber/20 shadow-sm"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}>
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                <span className="text-xl">📅</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-black text-village-umber/40 uppercase tracking-[0.2em] leading-none mb-1.5">Scheduled Delivery</p>
+                <div className="flex items-baseline gap-2">
+                  <h3 className="text-sm font-black text-village-umber uppercase tracking-tight">
+                    {new Date(order.deliverySlot.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </h3>
+                  <span className="text-[10px] font-bold text-village-umber/60 italic">
+                    ({order.deliverySlot.label || order.deliverySlot.timeRange || 'Anytime'})
+                  </span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Assignment Status - Hide if cancelled */}
         {!order?.deliveryPartner && !['Delivered', 'Cancelled', 'Returned', 'Rejected'].includes(orderStatus) && (
           <motion.div

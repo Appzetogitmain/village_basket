@@ -29,6 +29,11 @@ export interface SellerNotification {
         total: number;
         variation?: string;
     }>;
+    deliverySlot?: {
+        date: string;
+        timeRange: string;
+        label: string;
+    };
     totalAmount: number;
     timestamp: Date;
 }

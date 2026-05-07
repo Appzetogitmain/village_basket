@@ -99,6 +99,7 @@ export const getTodayOrders = asyncHandler(async (req: Request, res: Response) =
     const orders = await Order.find({
         deliveryBoy: deliveryId,
         $or: [
+            { "deliverySlot.date": { $gte: todayStart, $lte: todayEnd } }, // Scheduled for today
             { createdAt: { $gte: todayStart, $lte: todayEnd } }, // Created today
             { updatedAt: { $gte: todayStart, $lte: todayEnd } }  // OR Updated today
         ]
@@ -334,6 +335,45 @@ export const getReturnOrders = asyncHandler(async (req: Request, res: Response) 
         totalAmount: order.total,
         createdAt: order.createdAt,
         distance: null
+    }));
+
+    return res.status(200).json({
+        success: true,
+        data: formattedOrders
+    });
+});
+
+/**
+ * Get Future Scheduled Orders
+ */
+export const getScheduledOrders = asyncHandler(async (req: Request, res: Response) => {
+    const deliveryId = req.user?.userId;
+
+    const tomorrowStart = new Date();
+    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+    tomorrowStart.setHours(0, 0, 0, 0);
+
+    const orders = await Order.find({
+        deliveryBoy: deliveryId,
+        "deliverySlot.date": { $gte: tomorrowStart },
+        status: { $nin: ["Delivered", "Cancelled", "Rejected", "Returned"] }
+    })
+        .populate("items")
+        .sort({ "deliverySlot.date": 1 });
+
+    const formattedOrders = orders.map(order => ({
+        id: order._id,
+        orderId: order.orderNumber,
+        customerName: order.customerName,
+        customerPhone: order.customerPhone,
+        status: order.status,
+        address: `${order.deliveryAddress?.address || ''}, ${order.deliveryAddress?.city || ''}`,
+        deliveryAddress: order.deliveryAddress,
+        items: mapOrderItems(order.items),
+        totalAmount: order.total,
+        scheduledDate: order.deliverySlot?.date ? new Date(order.deliverySlot.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A',
+        timeSlot: order.deliverySlot?.label || order.deliverySlot?.timeRange || 'Anytime',
+        createdAt: order.createdAt
     }));
 
     return res.status(200).json({

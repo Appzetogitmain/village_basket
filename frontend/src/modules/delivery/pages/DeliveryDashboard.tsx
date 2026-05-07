@@ -293,6 +293,28 @@ export default function DeliveryDashboard() {
       {/* Header */}
       <DeliveryHeader />
 
+      {!isDeliveryUser && (
+        <div className="mx-4 mt-4 p-4 bg-[#8B3D28]/10 rounded-2xl border border-[#8B3D28]/20 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-[#8B3D28] rounded-full flex items-center justify-center shrink-0">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-[11px] font-black text-[#8B3D28] uppercase tracking-tight mb-1">Guest Mode Active</p>
+              <p className="text-[9px] text-[#8B3D28]/70 font-bold leading-tight mb-2">Login to receive real-time orders, manage deliveries, and track your earnings.</p>
+              <button 
+                onClick={() => navigate('/delivery/login')}
+                className="text-[9px] font-black text-[#8B3D28] underline uppercase tracking-widest"
+              >
+                Login Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="px-4 py-5 space-y-5 relative z-10">
         {/* Daily Collection & Cash Balance Bar */}
         <SummaryBar
@@ -469,19 +491,20 @@ export default function DeliveryDashboard() {
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <p className="text-village-umber font-black text-sm tracking-tight pt-1">
-                      {"\u20B9"} {order.totalAmount}
-                    </p>
-                    {order.estimatedDeliveryTime && (
+                    <div className="flex items-center justify-between">
+                      <p className="text-village-umber font-black text-sm tracking-tight pt-1">
+                        {"\u20B9"} {order.totalAmount}
+                      </p>
                       <div className="flex items-center gap-1.5 bg-stone-50 px-2 py-1 rounded-lg">
-                        <span className="text-[8px] font-black text-stone-400 uppercase tracking-tighter">ETA</span>
+                        <span className="text-[8px] font-black text-stone-400 uppercase tracking-tighter">
+                          {order.deliveryDate}
+                        </span>
+                        <span className="w-1 h-1 rounded-full bg-stone-200"></span>
                         <p className="text-village-umber text-[9px] font-black tracking-tight">
-                          {order.estimatedDeliveryTime}
+                          {order.deliverySlot}
                         </p>
                       </div>
-                    )}
-                  </div>
+                    </div>
                 </div>
               ))}
             </div>

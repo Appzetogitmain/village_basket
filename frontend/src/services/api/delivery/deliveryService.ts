@@ -67,6 +67,11 @@ export const getPendingOrders = async () => {
   return response.data.data;
 };
 
+export const getScheduledOrders = async () => {
+  const response = await api.get("/delivery/orders/scheduled");
+  return response.data.data;
+};
+
 export const getOrderDetails = async (id: string) => {
   try {
     const response = await api.get(`${BASE_URL}/orders/${id}`);

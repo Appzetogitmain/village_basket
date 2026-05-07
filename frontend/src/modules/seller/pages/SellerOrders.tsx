@@ -484,8 +484,15 @@ export default function SellerOrders() {
                   ) : (
                     paginatedOrders.map((order) => (
                       <tr key={order.id} className="hover:bg-white/40 transition-colors">
-                        <td className="px-3 sm:px-4 md:px-6 py-3 text-xs sm:text-sm text-neutral-900">
-                          {order.orderId}
+                        <td className="px-3 sm:px-4 md:px-6 py-3 text-xs sm:text-sm text-neutral-900 font-medium">
+                          <div className="flex flex-col gap-1">
+                            {order.orderId}
+                            {order.orderType === "SCHEDULED" && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#8B3D28] text-white uppercase w-fit">
+                                Scheduled
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-3 sm:px-4 md:px-6 py-3 text-xs sm:text-sm text-neutral-700">
                           {order.deliveryDate}

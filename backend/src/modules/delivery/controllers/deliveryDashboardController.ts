@@ -210,7 +210,7 @@ export const getDashboardStats = asyncHandler(
       },
     })
       .select(
-        "orderNumber customerName deliveryAddress status total estimatedDeliveryDate",
+        "orderNumber customerName deliveryAddress status total deliverySlot",
       ) // Select necessary fields
       .sort({ createdAt: -1 })
       .limit(5);
@@ -223,12 +223,10 @@ export const getDashboardStats = asyncHandler(
       status: order.status, // Map backend status to frontend status if needed
       address: `${order.deliveryAddress.address}, ${order.deliveryAddress.city}`, // Simplify address
       totalAmount: order.total,
-      estimatedDeliveryTime: order.estimatedDeliveryDate
-        ? new Date(order.estimatedDeliveryDate).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-        : "N/A",
+      deliveryDate: order.deliverySlot?.date
+        ? new Date(order.deliverySlot.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+        : "Today",
+      deliverySlot: order.deliverySlot?.label || order.deliverySlot?.timeRange || "N/A",
     }));
 
     // Fetch Wallet Balance

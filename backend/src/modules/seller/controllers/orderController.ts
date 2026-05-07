@@ -16,6 +16,8 @@ export const getOrders = asyncHandler(
     const {
       dateFrom,
       dateTo,
+      deliveryDateFrom,
+      deliveryDateTo,
       status,
       search,
       page = "1",
@@ -33,12 +35,15 @@ export const getOrders = asyncHandler(
     // Date range filter
     if (dateFrom || dateTo) {
       query.orderDate = {};
-      if (dateFrom) {
-        query.orderDate.$gte = new Date(dateFrom as string);
-      }
-      if (dateTo) {
-        query.orderDate.$lte = new Date(dateTo as string);
-      }
+      if (dateFrom) query.orderDate.$gte = new Date(dateFrom as string);
+      if (dateTo) query.orderDate.$lte = new Date(dateTo as string);
+    }
+
+    // Delivery date range filter
+    if (deliveryDateFrom || deliveryDateTo) {
+      query["deliverySlot.date"] = {};
+      if (deliveryDateFrom) query["deliverySlot.date"].$gte = new Date(deliveryDateFrom as string);
+      if (deliveryDateTo) query["deliverySlot.date"].$lte = new Date(deliveryDateTo as string);
     }
 
     // Status filter
@@ -93,10 +98,11 @@ export const getOrders = asyncHandler(
     const formattedOrders = orders.map(order => ({
       id: order._id,
       orderId: order.orderNumber,
-      deliveryDate: order.estimatedDeliveryDate
-        ? order.estimatedDeliveryDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
-        : order.orderDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
-      orderDate: order.orderDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }),
+      deliveryDate: order.deliverySlot?.date
+        ? order.deliverySlot.date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })
+        : order.orderDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' }),
+      orderDate: order.orderDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' }),
+      orderType: order.orderType,
       status: order.status === 'On the way' ? 'On the way' : order.status,
       amount: order.total,
       customerName: (order.customer as any)?.name || order.customerName || '',
@@ -211,8 +217,11 @@ export const getOrderById = asyncHandler(
     const orderDetail = {
       id: order._id,
       invoiceNumber: order.invoiceNumber || order.orderNumber || 'N/A',
-      orderDate: order.orderDate ? order.orderDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-      deliveryDate: order.estimatedDeliveryDate ? order.estimatedDeliveryDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      orderDate: order.orderDate ? order.orderDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }) : new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }),
+      deliveryDate: order.deliverySlot?.date 
+        ? order.deliverySlot.date.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }) 
+        : (order.orderDate ? order.orderDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }) : new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })),
+      orderType: order.orderType,
       timeSlot: order.deliverySlot?.label || order.timeSlot || 'N/A',
       status: order.status === 'On the way' ? 'Out For Delivery' : order.status,
       customerName: (order.customer as any)?.name || order.customerName || '',

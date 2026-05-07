@@ -33,6 +33,7 @@ export interface DeliverySlotSelection {
   name: string;         // e.g., "Morning Slot"
   startTime?: string;   // e.g., "05:00"
   endTime?: string;     // e.g., "10:00"
+  date?: string;        // selected delivery date
 }
 
 export interface Order {

@@ -123,6 +123,26 @@ const SellerNotificationAlert: React.FC<SellerNotificationAlertProps> = ({ notif
             />
           </div>
 
+          {/* Scheduled Delivery Info */}
+          {notification.deliverySlot && (
+            <section className="mb-6">
+              <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-3">Scheduled Delivery</h3>
+              <div className="bg-[#8B3D28]/5 border border-dashed border-[#8B3D28]/30 rounded-lg p-4 flex items-center gap-4">
+                <div className="bg-white p-2 rounded-lg shadow-sm">
+                   <span className="text-2xl">📅</span>
+                </div>
+                <div>
+                  <p className="font-bold text-[#8B3D28] text-lg">
+                    {new Date(notification.deliverySlot.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                  <p className="text-neutral-600 font-medium">
+                    {notification.deliverySlot.label || notification.deliverySlot.timeRange}
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* Customer Info */}
           <section className="mb-6">
             <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-3">Customer Information</h3>

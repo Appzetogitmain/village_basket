@@ -22,6 +22,8 @@ export const getAllOrders = asyncHandler(
       seller,
       dateFrom,
       dateTo,
+      deliveryDateFrom,
+      deliveryDateTo,
       search,
       deliveryBoy,
       paymentMethod,
@@ -37,6 +39,11 @@ export const getAllOrders = asyncHandler(
       query.orderDate = {};
       if (dateFrom) query.orderDate.$gte = new Date(dateFrom as string);
       if (dateTo) query.orderDate.$lte = new Date(dateTo as string);
+    }
+    if (deliveryDateFrom || deliveryDateTo) {
+      query["deliverySlot.date"] = {};
+      if (deliveryDateFrom) query["deliverySlot.date"].$gte = new Date(deliveryDateFrom as string);
+      if (deliveryDateTo) query["deliverySlot.date"].$lte = new Date(deliveryDateTo as string);
     }
     if (search) {
       query.$or = [

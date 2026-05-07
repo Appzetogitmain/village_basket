@@ -159,6 +159,18 @@ export const capturePayment = async (
         await order.save({ session });
 
         await session.commitTransaction();
+        
+        // Notify sellers of the new order now that payment is confirmed
+        try {
+            const { notifySellersOfNewOrder } = await import('./sellerNotificationService');
+            // Fetch the full order with items for notification
+            const fullOrder = await Order.findById(orderId).populate('items').lean();
+            if (fullOrder) {
+                await notifySellersOfNewOrder(fullOrder);
+            }
+        } catch (notifErr) {
+            console.error("Failed to notify sellers after payment capture:", notifErr);
+        }
 
         // Create Pending Commissions (Outside transaction as it has its own logic/logging and failure shouldn't rollback payment)
         try {
@@ -331,6 +343,17 @@ const handlePaymentCaptured = async (payload: any) => {
                     transactionId: razorpayPaymentId,
                 }
             });
+
+            // Notify sellers of the new order now that payment is confirmed via webhook
+            try {
+                const { notifySellersOfNewOrder } = await import('./sellerNotificationService');
+                const fullOrder = await Order.findById(payment.order).populate('items').lean();
+                if (fullOrder) {
+                    await notifySellersOfNewOrder(fullOrder);
+                }
+            } catch (notifErr) {
+                console.error("Failed to notify sellers after webhook payment capture:", notifErr);
+            }
         }
     } catch (error) {
         console.error('Error handling payment captured:', error);

@@ -136,9 +136,11 @@ export default function AdminPendingOrders() {
           order.orderNumber || "",
           order.customerName || "",
           order.deliveryAddress?.address || "",
-          order.estimatedDeliveryDate
-            ? new Date(order.estimatedDeliveryDate).toLocaleDateString()
-            : "",
+          order.deliverySlot?.date
+            ? new Date(order.deliverySlot.date).toLocaleDateString()
+            : order.estimatedDeliveryDate
+              ? new Date(order.estimatedDeliveryDate).toLocaleDateString()
+              : "",
           order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "",
           order.status || "",
           order.deliveryBoyStatus || "Not Assigned",
@@ -184,8 +186,8 @@ export default function AdminPendingOrders() {
             bValue = b.deliveryAddress?.address || "";
             break;
           case "deliveryDate":
-            aValue = a.estimatedDeliveryDate || "";
-            bValue = b.estimatedDeliveryDate || "";
+            aValue = a.deliverySlot?.date || a.estimatedDeliveryDate || "";
+            bValue = b.deliverySlot?.date || b.estimatedDeliveryDate || "";
             break;
           case "orderDate":
             aValue = a.orderDate || "";
@@ -766,7 +768,14 @@ export default function AdminPendingOrders() {
                   paginatedOrders.map((order) => (
                     <tr key={order._id} className="hover:bg-neutral-50">
                       <td className="px-3 py-2 text-[12px] font-black text-neutral-900">
-                        {order.orderNumber}
+                        <div className="flex flex-col gap-1">
+                          {order.orderNumber}
+                          {order.orderType === "SCHEDULED" && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#8B3D28] text-white uppercase w-fit">
+                              Scheduled
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                         {order.customerName ||
@@ -778,11 +787,13 @@ export default function AdminPendingOrders() {
                         {order.deliveryAddress?.address || "-"}
                       </td>
                       <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
-                        {order.estimatedDeliveryDate
-                          ? new Date(
-                            order.estimatedDeliveryDate
-                          ).toLocaleDateString()
-                          : "-"}
+                        {order.deliverySlot?.date
+                          ? new Date(order.deliverySlot.date).toLocaleDateString()
+                          : order.estimatedDeliveryDate
+                            ? new Date(
+                              order.estimatedDeliveryDate
+                            ).toLocaleDateString()
+                            : "-"}
                       </td>
                       <td className="px-3 py-2 text-[12px] font-bold text-neutral-500">
                         {order.orderDate

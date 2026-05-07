@@ -11,6 +11,7 @@ export interface Order {
   orderId: string;
   deliveryDate: string;
   orderDate: string;
+  orderType?: "INSTANT" | "SCHEDULED";
   status: string;
   amount: number;
   customerName?: string;
@@ -46,6 +47,7 @@ export interface OrderDetail {
   invoiceNumber: string;
   orderDate: string;
   deliveryDate: string;
+  orderType?: "INSTANT" | "SCHEDULED";
   timeSlot: string;
   status: 'Out For Delivery' | 'Received' | 'Payment Pending' | 'Cancelled' | 'Rejected';
   customerName: string;
@@ -70,6 +72,8 @@ export interface UpdateOrderStatusData {
 export interface GetOrdersParams {
   dateFrom?: string;
   dateTo?: string;
+  deliveryDateFrom?: string;
+  deliveryDateTo?: string;
   status?: string;
   search?: string;
   page?: number;

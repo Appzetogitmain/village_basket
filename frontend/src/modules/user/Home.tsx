@@ -9,6 +9,7 @@ import FeaturedThisWeek from "./components/FeaturedThisWeek";
 import BestsellerCards from "./components/BestsellerCards";
 import FestivalCategoryModule from "./components/FestivalCategoryModule";
 import ProductCard from "./components/ProductCard";
+import DateTrackerStrip from "./components/DateTrackerStrip";
 
 import { getHomeContent } from "../../services/api/customerHomeService";
 import { useLocation } from "../../hooks/useLocation";
@@ -197,6 +198,8 @@ export default function Home() {
         festivalModules={homeData.festivalModules} 
       />
 
+      {/* Date Tracker Strip for Future Orders */}
+      <DateTrackerStrip />
 
       {/* Promo Strip */}
       <div className="relative z-10">
