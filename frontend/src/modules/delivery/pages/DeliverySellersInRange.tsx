@@ -7,32 +7,32 @@ import { useDeliveryStatus } from '../context/DeliveryStatusContext';
 
 // Icons
 const Icons = {
-    ChevronLeft: ({ size = 20 }) => (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 18l-6-6 6-6" />
-        </svg>
-    ),
-    Location: ({ size = 18 }) => (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-            <circle cx="12" cy="10" r="3" />
-        </svg>
-    ),
-    Store: ({ size = 18 }) => (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-        </svg>
-    ),
-    Signal: ({ size = 16 }) => (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M2 20h.01" />
-            <path d="M7 20v-4" />
-            <path d="M12 20v-8" />
-            <path d="M17 20v-12" />
-            <path d="M22 20v-16" />
-        </svg>
-    )
+  ChevronLeft: ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  ),
+  Location: ({ size = 18 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  ),
+  Store: ({ size = 18 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+  Signal: ({ size = 16 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 20h.01" />
+      <path d="M7 20v-4" />
+      <path d="M12 20v-8" />
+      <path d="M17 20v-12" />
+      <path d="M22 20v-16" />
+    </svg>
+  )
 };
 
 export default function DeliverySellersInRange() {
@@ -57,7 +57,7 @@ export default function DeliverySellersInRange() {
     return (
       <div className="min-h-screen bg-transparent flex flex-col items-center justify-center pb-24 px-6 font-poppins relative">
         <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
-        
+
         <div className="village-card paper-texture organic-radius p-8 bg-white shadow-2xl border-none flex flex-col items-center text-center max-w-xs relative z-10 scale-95 opacity-90 animate-in fade-in zoom-in duration-300">
           <div className="w-16 h-16 bg-stone-50 rounded-3xl flex items-center justify-center mb-6 text-stone-200">
             <Icons.Signal size={32} />
@@ -81,24 +81,24 @@ export default function DeliverySellersInRange() {
 
       {/* Local Header */}
       <div className="sticky top-0 z-30 bg-[#8B3D28] px-4 py-3 flex items-center shadow-md overflow-hidden shrink-0">
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
-          <button
-              onClick={() => navigate(-1)}
-              className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
-          >
-              <Icons.ChevronLeft size={20} />
-          </button>
-          <div className="ml-2 flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">Operational Map</span>
-              <span className="font-black text-[12px] text-white tracking-wide mt-1">Sellers in Range</span>
-          </div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 -ml-2 text-white/80 hover:bg-white/10 rounded-xl transition-all active:scale-90"
+        >
+          <Icons.ChevronLeft size={20} />
+        </button>
+        <div className="ml-2 flex flex-col">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">Operational Map</span>
+          <span className="font-black text-[12px] text-white tracking-wide mt-1">Sellers in Range</span>
+        </div>
       </div>
 
       <div className="px-6 py-6 relative z-10">
         <div className="flex items-center justify-between mb-8">
-            <div className="h-[2px] w-8 bg-stone-200 rounded-full"></div>
-            <p className="text-stone-300 text-[9px] font-black uppercase tracking-[0.3em]">PROXIMITY MANIFEST</p>
-            <div className="h-[2px] w-8 bg-stone-200 rounded-full"></div>
+          <div className="h-[2px] w-8 bg-stone-200 rounded-full"></div>
+          <p className="text-stone-300 text-[9px] font-black uppercase tracking-[0.3em]">PROXIMITY MANIFEST</p>
+          <div className="h-[2px] w-8 bg-stone-200 rounded-full"></div>
         </div>
 
         {isLoadingSellers ? (
@@ -157,7 +157,7 @@ export default function DeliverySellersInRange() {
         ) : (
           <div className="village-card paper-texture organic-radius p-16 bg-white flex flex-col items-center justify-center border-none shadow-sm opacity-60 grayscale scale-95 min-h-[50vh]">
             <div className="w-16 h-16 rounded-3xl bg-stone-50 flex items-center justify-center text-stone-200 mb-6">
-                <Icons.Store size={32} />
+              <Icons.Store size={32} />
             </div>
             <p className="text-stone-300 text-[10px] font-black uppercase tracking-[0.3em] text-center">No Active Beacons</p>
             <p className="text-stone-200 text-[8px] font-bold uppercase tracking-widest mt-2">SECTOR IS CURRENTLY SILENT</p>

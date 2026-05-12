@@ -25,9 +25,9 @@ async function seed() {
             {
                 orderNumber: genOrderNum(),
                 customer: new mongoose.Types.ObjectId(CUSTOMER_ID),
-                customerName: 'Test Customer',
-                customerEmail: 'test@example.com',
-                customerPhone: '9999999999',
+                customerName: 'Anita Gupta',
+                customerEmail: 'anita@example.com',
+                customerPhone: '9876543210',
                 deliveryBoy: new mongoose.Types.ObjectId(BOY_ID),
                 status: 'Ready for pickup',
                 deliveryAddress: { address: '123 Village St', city: 'Village City', pincode: '110001' },
@@ -43,9 +43,9 @@ async function seed() {
             {
                 orderNumber: genOrderNum(),
                 customer: new mongoose.Types.ObjectId(CUSTOMER_ID),
-                customerName: 'Test Customer 2',
-                customerEmail: 'test2@example.com',
-                customerPhone: '9999999998',
+                customerName: 'Rahul Kumar',
+                customerEmail: 'rahul@example.com',
+                customerPhone: '9876543211',
                 deliveryBoy: new mongoose.Types.ObjectId(BOY_ID),
                 status: 'Ready for pickup',
                 deliveryAddress: { address: '456 Farm Rd', city: 'Village City', pincode: '110001' },
@@ -63,9 +63,9 @@ async function seed() {
             {
                 orderNumber: genOrderNum(),
                 customer: new mongoose.Types.ObjectId(CUSTOMER_ID),
-                customerName: 'Test Customer 3',
-                customerEmail: 'test3@example.com',
-                customerPhone: '9999999997',
+                customerName: 'Sunita Devi',
+                customerEmail: 'sunita@example.com',
+                customerPhone: '9876543212',
                 deliveryBoy: new mongoose.Types.ObjectId(BOY_ID),
                 status: 'Picked up',
                 deliveryAddress: { address: '789 Market Lane', city: 'Village City', pincode: '110001' },
@@ -81,9 +81,9 @@ async function seed() {
             {
                 orderNumber: genOrderNum(),
                 customer: new mongoose.Types.ObjectId(CUSTOMER_ID),
-                customerName: 'Test Customer 4',
-                customerEmail: 'test4@example.com',
-                customerPhone: '9999999996',
+                customerName: 'Pooja Sharma',
+                customerEmail: 'pooja@example.com',
+                customerPhone: '9876543213',
                 deliveryBoy: new mongoose.Types.ObjectId(BOY_ID),
                 status: 'Out for Delivery',
                 deliveryAddress: { address: '101 Pine Dr', city: 'Village City', pincode: '110001' },
@@ -101,9 +101,9 @@ async function seed() {
             {
                 orderNumber: genOrderNum(),
                 customer: new mongoose.Types.ObjectId(CUSTOMER_ID),
-                customerName: 'Old Customer 1',
-                customerEmail: 'old1@example.com',
-                customerPhone: '9999999995',
+                customerName: 'Ramesh Singh',
+                customerEmail: 'ramesh@example.com',
+                customerPhone: '9876543214',
                 deliveryBoy: new mongoose.Types.ObjectId(BOY_ID),
                 status: 'Delivered',
                 deliveryAddress: { address: 'Past St 1', city: 'Village City', pincode: '110001' },
@@ -122,9 +122,9 @@ async function seed() {
             {
                 orderNumber: genOrderNum(),
                 customer: new mongoose.Types.ObjectId(CUSTOMER_ID),
-                customerName: 'Return Customer 1',
-                customerEmail: 'ret1@example.com',
-                customerPhone: '9999999993',
+                customerName: 'Priya Verma',
+                customerEmail: 'priya@example.com',
+                customerPhone: '9876543215',
                 deliveryBoy: new mongoose.Types.ObjectId(BOY_ID),
                 status: 'Returned',
                 deliveryAddress: { address: 'Return Rd 1', city: 'Village City', pincode: '110001' },
@@ -136,8 +136,62 @@ async function seed() {
                 createdAt: today,
                 updatedAt: today,
                 sellerPickups: [{ seller: new mongoose.Types.ObjectId(SELLER_ID) }]
+            },
+
+            // Scheduled Orders
+            {
+                orderNumber: genOrderNum(),
+                customer: new mongoose.Types.ObjectId(CUSTOMER_ID),
+                customerName: 'Vikram Singh',
+                customerEmail: 'vikram@example.com',
+                customerPhone: '9876543216',
+                deliveryBoy: new mongoose.Types.ObjectId(BOY_ID),
+                status: 'Accepted',
+                orderType: 'SCHEDULED',
+                deliverySlot: {
+                    date: new Date(new Date().setDate(new Date().getDate() + 1)),
+                    timeRange: '10:00 AM - 01:00 PM',
+                    label: 'Morning Slot'
+                },
+                deliveryAddress: { address: 'Vikram House, Block A', city: 'Village City', pincode: '110005' },
+                total: 800,
+                payableAmount: 800,
+                paymentMethod: 'Online',
+                paymentStatus: 'Paid',
+                orderDate: today,
+                createdAt: today,
+                updatedAt: today,
+                sellerPickups: [{ seller: new mongoose.Types.ObjectId(SELLER_ID) }]
+            },
+            {
+                orderNumber: genOrderNum(),
+                customer: new mongoose.Types.ObjectId(CUSTOMER_ID),
+                customerName: 'Neha Kapur',
+                customerEmail: 'neha@example.com',
+                customerPhone: '9876543217',
+                deliveryBoy: new mongoose.Types.ObjectId(BOY_ID),
+                status: 'Ready for pickup',
+                orderType: 'SCHEDULED',
+                deliverySlot: {
+                    date: new Date(new Date().setDate(new Date().getDate() + 2)),
+                    timeRange: '04:00 PM - 07:00 PM',
+                    label: 'Evening Slot'
+                },
+                deliveryAddress: { address: 'Neha Villa, Sector 4', city: 'Village City', pincode: '110005' },
+                total: 450,
+                payableAmount: 450,
+                paymentMethod: 'COD',
+                paymentStatus: 'Pending',
+                orderDate: today,
+                createdAt: today,
+                updatedAt: today,
+                sellerPickups: [{ seller: new mongoose.Types.ObjectId(SELLER_ID) }]
             }
         ];
+
+        console.log('Cleaning up existing data...');
+        await Order.deleteMany({ deliveryBoy: new mongoose.Types.ObjectId(BOY_ID) });
+        await Notification.deleteMany({ recipientId: new mongoose.Types.ObjectId(BOY_ID) });
 
         console.log('Inserting orders...');
         await Order.insertMany(ordersToCreate);
@@ -148,7 +202,7 @@ async function seed() {
                 recipientType: 'Delivery',
                 recipientId: new mongoose.Types.ObjectId(BOY_ID),
                 title: 'New Assignment',
-                message: 'You have been assigned 2 new orders for today.',
+                message: 'You have been assigned new orders for today.',
                 type: 'Order',
                 priority: 'High',
                 isRead: false,

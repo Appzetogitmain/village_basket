@@ -202,10 +202,10 @@ export default function DeliveryOrderDetail() {
         }
         try {
             setOtpVerifying(true);
-            const paymentDetails = order.paymentMethod === 'COD' 
-                ? { paymentCollectedBy, customerTip } 
+            const paymentDetails = order.paymentMethod === 'COD'
+                ? { paymentCollectedBy, customerTip }
                 : undefined;
-            
+
             const result = await verifyDeliveryOtp(id, otpValue, paymentDetails);
             alert(result.message || 'OTP verified successfully. Order marked as delivered.');
             await fetchOrder(); // Refresh order data
@@ -221,12 +221,12 @@ export default function DeliveryOrderDetail() {
     // Detect if this order is an early morning contactless slot (5AM–10AM)
     const isEarlyMorningSlot = (slot: any): boolean => {
         if (!slot) return false;
-        
+
         // 1. Check direct HH:MM fields if they exist
         if (slot.startTime && slot.endTime) {
             return slot.startTime >= '05:00' && slot.endTime <= '10:00';
         }
-        
+
         // 2. Fallback: Parse timeRange string (e.g. "6 AM - 9 AM" or "5:00 AM - 10:00 AM")
         if (slot.timeRange) {
             const range = slot.timeRange.toLowerCase();
@@ -240,7 +240,7 @@ export default function DeliveryOrderDetail() {
                 return startHour >= 5 && endHour <= 10;
             }
         }
-        
+
         return false;
     };
 
@@ -677,9 +677,9 @@ export default function DeliveryOrderDetail() {
                         routeOrigin={deliveryBoyLocation || undefined}
                         routeDestination={
                             order.status === 'Picked up' ? (hasValidCustomerLocation ? {
-                                    lat: customerLat!,
-                                    lng: customerLng!
-                                } : undefined)
+                                lat: customerLat!,
+                                lng: customerLng!
+                            } : undefined)
                                 : sellerLocations.length > 0
                                     ? { lat: sellerLocations[sellerLocations.length - 1].latitude, lng: sellerLocations[sellerLocations.length - 1].longitude }
                                     : undefined
@@ -892,20 +892,18 @@ export default function DeliveryOrderDetail() {
 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${
-                                order.paymentMethod === 'COD' 
-                                    ? 'bg-amber-50 text-amber-600' 
+                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${order.paymentMethod === 'COD'
+                                    ? 'bg-amber-50 text-amber-600'
                                     : 'bg-green-50 text-green-600'
-                            }`}>
+                                }`}>
                                 {order.paymentMethod === 'COD' ? <Icons.Truck size={18} /> : <Icons.ShieldCheck size={18} />}
                             </div>
                             <div className="flex flex-col">
                                 <p className="text-[11px] font-black text-village-umber uppercase tracking-tight leading-none">
                                     {order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online / Paid'}
                                 </p>
-                                <span className={`text-[8px] font-bold uppercase tracking-widest mt-1.5 ${
-                                    order.paymentStatus === 'Paid' ? 'text-green-500' : 'text-amber-500'
-                                }`}>
+                                <span className={`text-[8px] font-bold uppercase tracking-widest mt-1.5 ${order.paymentStatus === 'Paid' ? 'text-green-500' : 'text-amber-500'
+                                    }`}>
                                     {order.paymentStatus === 'Paid' ? 'Verified Paid' : 'Collect from Customer'}
                                 </span>
                             </div>
@@ -919,10 +917,10 @@ export default function DeliveryOrderDetail() {
 
                     {order.paymentMethod === 'COD' && order.status !== 'Delivered' && (
                         <div className="mt-4 p-2.5 bg-amber-50/50 border border-amber-100 rounded-xl flex items-center gap-2">
-                             <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                             <p className="text-[9px] font-black text-amber-700 uppercase tracking-tighter">
+                            <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
+                            <p className="text-[9px] font-black text-amber-700 uppercase tracking-tighter">
                                 Action Required: Collect Cash before Delivery
-                             </p>
+                            </p>
                         </div>
                     )}
                 </div>
@@ -1015,22 +1013,20 @@ export default function DeliveryOrderDetail() {
                                     <div className="grid grid-cols-2 gap-3">
                                         <button
                                             onClick={() => setPaymentCollectedBy('cash')}
-                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                                                paymentCollectedBy === 'cash'
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${paymentCollectedBy === 'cash'
                                                     ? 'bg-white border-amber-500 shadow-sm'
                                                     : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
-                                            }`}
+                                                }`}
                                         >
                                             <Icons.Truck size={20} className={paymentCollectedBy === 'cash' ? 'text-amber-600' : 'text-stone-300'} />
                                             <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'cash' ? 'text-village-umber' : ''}`}>Hard Cash</span>
                                         </button>
                                         <button
                                             onClick={() => setPaymentCollectedBy('qr')}
-                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                                                paymentCollectedBy === 'qr'
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${paymentCollectedBy === 'qr'
                                                     ? 'bg-white border-[#4A7C59] shadow-sm'
                                                     : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
-                                            }`}
+                                                }`}
                                         >
                                             <Icons.ShieldCheck size={20} className={paymentCollectedBy === 'qr' ? 'text-[#4A7C59]' : 'text-stone-300'} />
                                             <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'qr' ? 'text-village-umber' : ''}`}>Online / QR</span>
@@ -1045,9 +1041,8 @@ export default function DeliveryOrderDetail() {
                                                     <button
                                                         key={tip}
                                                         onClick={() => setCustomerTip(tip)}
-                                                        className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all ${
-                                                            customerTip === tip ? 'bg-amber-500 text-white' : 'bg-stone-200 text-stone-500'
-                                                        }`}
+                                                        className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all ${customerTip === tip ? 'bg-amber-500 text-white' : 'bg-stone-200 text-stone-500'
+                                                            }`}
                                                     >
                                                         {tip === 0 ? 'None' : `₹${tip}`}
                                                     </button>
@@ -1096,22 +1091,20 @@ export default function DeliveryOrderDetail() {
                                     <div className="grid grid-cols-2 gap-3">
                                         <button
                                             onClick={() => setPaymentCollectedBy('cash')}
-                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                                                paymentCollectedBy === 'cash'
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${paymentCollectedBy === 'cash'
                                                     ? 'bg-white border-[#8B3D28] shadow-sm'
                                                     : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
-                                            }`}
+                                                }`}
                                         >
                                             <Icons.Truck size={20} className={paymentCollectedBy === 'cash' ? 'text-[#8B3D28]' : 'text-stone-300'} />
                                             <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'cash' ? 'text-village-umber' : ''}`}>Hard Cash</span>
                                         </button>
                                         <button
                                             onClick={() => setPaymentCollectedBy('qr')}
-                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                                                paymentCollectedBy === 'qr'
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${paymentCollectedBy === 'qr'
                                                     ? 'bg-white border-[#4A7C59] shadow-sm'
                                                     : 'bg-stone-100/50 border-transparent text-stone-400 opacity-60'
-                                            }`}
+                                                }`}
                                         >
                                             <Icons.ShieldCheck size={20} className={paymentCollectedBy === 'qr' ? 'text-[#4A7C59]' : 'text-stone-300'} />
                                             <span className={`text-[10px] font-black uppercase tracking-widest ${paymentCollectedBy === 'qr' ? 'text-village-umber' : ''}`}>Online / QR</span>
@@ -1125,9 +1118,8 @@ export default function DeliveryOrderDetail() {
                                                     <button
                                                         key={tip}
                                                         onClick={() => setCustomerTip(tip)}
-                                                        className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all ${
-                                                            customerTip === tip ? 'bg-[#4A7C59] text-white' : 'bg-stone-200 text-stone-500'
-                                                        }`}
+                                                        className={`px-2 py-1 rounded-lg text-[8px] font-black transition-all ${customerTip === tip ? 'bg-[#4A7C59] text-white' : 'bg-stone-200 text-stone-500'
+                                                            }`}
                                                     >
                                                         {tip === 0 ? 'None' : `₹${tip}`}
                                                     </button>
