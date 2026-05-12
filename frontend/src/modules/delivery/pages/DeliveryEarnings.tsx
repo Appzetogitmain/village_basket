@@ -8,6 +8,8 @@ import {
   DeliveryDashboardStats,
 } from "../../../services/api/delivery/deliveryService";
 import VillageLoader from "../../../components/VillageLoader";
+import { useAuth } from "../../../context/AuthContext";
+import DeliveryGuestState from "../components/DeliveryGuestState";
 
 // Icons
 const Icons = {
@@ -32,6 +34,9 @@ const Icons = {
 
 export default function DeliveryEarnings() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
+  
   const { showToast } = useToast();
   const [stats, setStats] = useState<DeliveryDashboardStats | null>(null);
   const [earningsHistory, setEarningsHistory] = useState<any[]>([]);
@@ -41,6 +46,10 @@ export default function DeliveryEarnings() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!isDeliveryUser) {
+      setLoading(false);
+      return;
+    }
     const fetchData = async () => {
       try {
         const [statsData, historyData] = await Promise.all([
@@ -61,6 +70,10 @@ export default function DeliveryEarnings() {
 
   if (loading) {
     return <VillageLoader message="Calculating Your Revenue" />;
+  }
+
+  if (!isDeliveryUser) {
+    return <DeliveryGuestState message="Please login as a delivery partner to track your earnings and payouts" />;
   }
 
   const totalDeliveries = earningsHistory.reduce(

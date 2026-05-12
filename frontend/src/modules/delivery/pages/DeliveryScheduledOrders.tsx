@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getScheduledOrders } from '../../../services/api/delivery/deliveryService';
 import VillageLoader from '../../../components/VillageLoader';
+import { useAuth } from '../../../context/AuthContext';
+import DeliveryGuestState from '../components/DeliveryGuestState';
 
 // Icons
 const Icons = {
@@ -35,11 +37,18 @@ const Icons = {
 
 export default function DeliveryScheduledOrders() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
+
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (!isDeliveryUser) {
+      setLoading(false);
+      return;
+    }
     const fetchOrders = async () => {
       try {
         const data = await getScheduledOrders();
@@ -55,7 +64,11 @@ export default function DeliveryScheduledOrders() {
   }, []);
 
   if (loading) {
-    return <VillageLoader />;
+    return <VillageLoader message="Syncing Scheduled Manifests" />;
+  }
+
+  if (!isDeliveryUser) {
+    return <DeliveryGuestState message="Please login as a delivery partner to view and plan your upcoming schedules" />;
   }
 
   return (

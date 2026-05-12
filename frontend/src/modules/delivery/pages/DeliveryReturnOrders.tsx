@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getReturnOrders } from '../../../services/api/delivery/deliveryService';
 import VillageLoader from '../../../components/VillageLoader';
+import { useAuth } from '../../../context/AuthContext';
+import DeliveryGuestState from '../components/DeliveryGuestState';
 
 // Icons
 const Icons = {
@@ -33,11 +35,18 @@ const Icons = {
 
 export default function DeliveryReturnOrders() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
+
   const [returnOrders, setReturnOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (!isDeliveryUser) {
+      setLoading(false);
+      return;
+    }
     const fetchOrders = async () => {
       try {
         const data = await getReturnOrders();
@@ -57,6 +66,10 @@ export default function DeliveryReturnOrders() {
 
   if (loading) {
     return <VillageLoader message="Processing Return Requests" />;
+  }
+
+  if (!isDeliveryUser) {
+    return <DeliveryGuestState message="Please login as a delivery partner to access your return assignments" />;
   }
 
   return (

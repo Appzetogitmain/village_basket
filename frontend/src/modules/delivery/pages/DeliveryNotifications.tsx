@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { getNotifications, markNotificationRead } from '../../../services/api/delivery/deliveryService';
 import VillageLoader from '../../../components/VillageLoader';
+import { useAuth } from '../../../context/AuthContext';
+import DeliveryGuestState from '../components/DeliveryGuestState';
 
 // Icons
 const Icons = {
@@ -25,12 +27,19 @@ const Icons = {
 };
 
 export default function DeliveryNotifications() {
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
+
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isDeliveryUser) {
+      setLoading(false);
+      return;
+    }
     fetchNotifications();
-  }, []);
+  }, [isDeliveryUser]);
 
   const fetchNotifications = async () => {
     try {
@@ -63,6 +72,14 @@ export default function DeliveryNotifications() {
     return `${Math.floor(diffInMinutes / 1440)}D AGO`;
   };
 
+  if (loading) {
+    return <VillageLoader message="Updating Notices" />;
+  }
+
+  if (!isDeliveryUser) {
+    return <DeliveryGuestState message="Please login as a delivery partner to view your real-time operational alerts" />;
+  }
+
   return (
     <div className="min-h-screen bg-transparent pb-20 font-poppins relative">
       <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[url('/assets/natural-paper.png')] z-0"></div>
@@ -77,9 +94,7 @@ export default function DeliveryNotifications() {
       </div>
 
       <div className="px-6 py-6 relative z-10">
-        {loading ? (
-          <VillageLoader message="Updating Notices" />
-        ) : notifications.length > 0 ? (
+        {notifications.length > 0 ? (
           <div className="space-y-4">
             {notifications.map((notification) => (
               <div key={notification._id}
@@ -125,7 +140,3 @@ export default function DeliveryNotifications() {
     </div>
   );
 }
-
-
-
-

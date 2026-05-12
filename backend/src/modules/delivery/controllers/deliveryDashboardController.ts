@@ -61,7 +61,7 @@ export const getDashboardStats = asyncHandler(
                     [
                       "Ready for pickup",
                       "Out for Delivery",
-                      "Picked Up",
+                      "Picked up",
                       "Assigned",
                       "In Transit",
                     ],
@@ -72,21 +72,8 @@ export const getDashboardStats = asyncHandler(
               ],
             },
           },
-          // All Orders Today: Created today OR Updated today
-          allOrdersToday: {
-            $sum: {
-              $cond: [
-                {
-                  $and: [
-                    { $gte: ["$updatedAt", todayStart] },
-                    { $lte: ["$updatedAt", todayEnd] },
-                  ],
-                },
-                1,
-                0,
-              ],
-            },
-          },
+          // Total Orders (Lifetime)
+          totalOrders: { $sum: 1 },
           // Return Orders Today
           returnOrdersToday: {
             $sum: {
@@ -102,6 +89,21 @@ export const getDashboardStats = asyncHandler(
                 0,
               ],
             },
+          },
+          // In Possession: Orders currently with the delivery boy
+          inPossession: {
+            $sum: {
+              $cond: [
+                {
+                  $in: [
+                    "$status",
+                    ["Picked up", "Out for Delivery", "Shipped"]
+                  ]
+                },
+                1,
+                0
+              ]
+            }
           },
           // Daily Collection: Cash collected from COD orders delivered TODAY
           dailyCollection: {
@@ -149,8 +151,9 @@ export const getDashboardStats = asyncHandler(
 
     const result = stats[0] || {
       pendingOrders: 0,
-      allOrdersToday: 0,
+      totalOrders: 0,
       returnOrdersToday: 0,
+      inPossession: 0,
       dailyCollection: 0,
       todayDeliveredCount: 0,
       totalDeliveredCount: 0,
@@ -203,7 +206,7 @@ export const getDashboardStats = asyncHandler(
         $in: [
           "Ready for pickup",
           "Out for Delivery",
-          "Picked Up",
+          "Picked up",
           "Assigned",
           "In Transit",
         ],
@@ -246,9 +249,9 @@ export const getDashboardStats = asyncHandler(
         dailyCollection: result.dailyCollection,
         cashBalance: deliveryPartner.cashCollected, // This field stores total cash holding
         pendingOrders: result.pendingOrders,
-        allOrders: result.allOrdersToday,
+        allOrders: result.totalOrders,
         returnOrders: result.returnOrdersToday,
-        returnItems: 0, // Need 'OrderItem' logic for this, keeping 0 for now
+        returnItems: result.inPossession, // Showing orders currently in possession
         todayEarning: todayEarning,
         totalEarning: totalEarning,
         walletBalance: walletBalance,

@@ -4,6 +4,8 @@ import { getOrderDetails, updateOrderStatus, getSellerLocationsForOrder, sendDel
 import deliveryIcon from '@assets/deliveryboy/deliveryIcon.png';
 import GoogleMapsTracking from '../../../components/GoogleMapsTracking';
 import VillageLoader from '../../../components/VillageLoader';
+import { useAuth } from '../../../context/AuthContext';
+import DeliveryGuestState from '../components/DeliveryGuestState';
 
 // Helper to get delivery icon URL (works in both dev and production)
 const getDeliveryIconUrl = () => {
@@ -103,6 +105,9 @@ type DeliveryOrderStatus = 'Pending' | 'Ready for pickup' | 'Picked up' | 'Out f
 export default function DeliveryOrderDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { isAuthenticated, user } = useAuth();
+    const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
+
     const [order, setOrder] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -130,6 +135,10 @@ export default function DeliveryOrderDetail() {
 
     const fetchOrder = async () => {
         if (!id) return;
+        if (!isDeliveryUser) {
+            setLoading(false);
+            return;
+        }
         try {
             setLoading(true);
             const data = await getOrderDetails(id);
@@ -542,6 +551,9 @@ export default function DeliveryOrderDetail() {
     }
 
     if (error || !order) {
+        if (!isDeliveryUser) {
+            return <DeliveryGuestState message="Please login as a delivery partner to view order details and manage transit" />;
+        }
         return (
             <div className="min-h-screen bg-neutral-100 flex items-center justify-center flex-col">
                 <p className="text-red-500 mb-4">{error || 'Order not found'}</p>

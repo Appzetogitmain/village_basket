@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getPendingOrders } from '../../../services/api/delivery/deliveryService';
 import VillageLoader from '../../../components/VillageLoader';
+import { useAuth } from '../../../context/AuthContext';
+import DeliveryGuestState from '../components/DeliveryGuestState';
 
 // Icons
 const Icons = {
@@ -33,11 +35,19 @@ const Icons = {
 
 export default function DeliveryPendingOrders() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
+
   const [pendingOrders, setPendingOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (!isDeliveryUser) {
+      setLoading(false);
+      return;
+    }
+
     const fetchOrders = async () => {
       try {
         const data = await getPendingOrders();
@@ -60,6 +70,10 @@ export default function DeliveryPendingOrders() {
 
   if (loading) {
     return <VillageLoader message="Reviewing New Assignments" />;
+  }
+
+  if (!isDeliveryUser) {
+    return <DeliveryGuestState message="Please login as a delivery partner to access your pending assignments" />;
   }
 
   return (

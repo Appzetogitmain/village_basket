@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useDeliveryStatus } from '../context/DeliveryStatusContext';
 import VillageLoader from '../../../components/VillageLoader';
+import { useAuth } from '../../../context/AuthContext';
+import DeliveryGuestState from '../components/DeliveryGuestState';
+import { useDeliveryStatus } from '../context/DeliveryStatusContext';
 
 // Icons
 const Icons = {
@@ -35,6 +37,9 @@ const Icons = {
 
 export default function DeliverySellersInRange() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const isDeliveryUser = isAuthenticated && user?.userType === 'Delivery';
+
   const { isOnline, sellersInRange, isLoadingSellers, locationError } = useDeliveryStatus();
   const [error, setError] = useState('');
 
@@ -43,6 +48,10 @@ export default function DeliverySellersInRange() {
       setError(locationError);
     }
   }, [locationError]);
+
+  if (!isDeliveryUser) {
+    return <DeliveryGuestState message="Please login as a delivery partner to view nearby seller hubs and active coverage areas" />;
+  }
 
   if (!isOnline) {
     return (
