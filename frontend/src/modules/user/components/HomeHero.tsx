@@ -17,6 +17,8 @@ import { useCart } from '../../../context/CartContext';
 import { useAuth } from '../../../context/AuthContext';
 import brandLogo from '@assets/village_basket-removebg-preview.png';
 import FestivalCategoryModule from './FestivalCategoryModule';
+import DateTrackerStrip from './DateTrackerStrip';
+
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -442,8 +444,16 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
       >
         {/* Sticky Search Bar - Removed for mobile to reduce clutter */}
 
+        {/* Date Tracker Strip for Future Orders */}
+        <div className="pt-4">
+          <DateTrackerStrip hideLegend={true} />
+        </div>
+
+
+
         {/* Category Tabs Section */}
-        <div className="w-full relative" style={{ paddingTop: '12px', paddingBottom: '24px' }}>
+        <div className="w-full relative" style={{ paddingTop: '12px', paddingBottom: '0px' }}>
+
           <div className="px-4 md:px-6 lg:px-8 mb-4">
             <h2 className={`text-lg md:text-xl font-bold tracking-tight font-poppins transition-colors ${scrollProgress > 0.5 ? 'text-white' : 'text-village-umber'}`}>
               Popular Categories
