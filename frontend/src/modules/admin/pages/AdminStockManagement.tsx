@@ -10,6 +10,7 @@ import {
   type SubCategory,
 } from "../../../services/api/admin/adminProductService";
 import { useAuth } from "../../../context/AuthContext";
+import { apiCache } from "../../../utils/apiCache";
 
 // Icons
 const SearchIcon = () => (
@@ -189,6 +190,8 @@ export default function AdminStockManagement() {
       try {
         const response = await deleteProduct(id);
         if (response.success || response.message === "Product deleted successfully") {
+          // Clear cache to keep user views synchronized
+          apiCache.clear();
           // Optimistic update
           setProducts(prev => prev.filter(p => p._id !== id));
         } else {

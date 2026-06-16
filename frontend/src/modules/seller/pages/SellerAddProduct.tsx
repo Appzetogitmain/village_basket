@@ -25,6 +25,7 @@ import {
   getHeaderCategoriesPublic,
   HeaderCategory,
 } from "../../../services/api/headerCategoryService";
+import { apiCache } from "../../../utils/apiCache";
 
 export default function SellerAddProduct() {
   const navigate = useNavigate();
@@ -512,6 +513,7 @@ export default function SellerAddProduct() {
       }
 
       if (response.success) {
+        apiCache.clear();
         setSuccessMessage(
           id ? "Product updated successfully!" : "Product added successfully!"
         );

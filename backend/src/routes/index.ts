@@ -38,6 +38,7 @@ import adminWithdrawalRoutes from "./adminWithdrawalRoutes";
 import adminRewardRoutes from "./adminRewardRoutes";
 import customerRewardRoutes from "./customerRewardRoutes";
 import inquiryRoutes from "./inquiryRoutes";
+import translationRoutes from "./translationRoutes";
 // import pageConfigRoutes from "./pageConfig.routes";
 import {
   createOrder,
@@ -67,6 +68,9 @@ router.use("/auth/admin", adminAuthRoutes);
 router.use("/auth/seller", sellerAuthRoutes);
 router.use("/auth/customer", customerAuthRoutes);
 router.use("/auth/delivery", deliveryAuthRoutes);
+
+// Translation routes (public)
+router.use("/translate", translationRoutes);
 
 // FCM Token routes (protected - requires authentication)
 router.use("/fcm-tokens", authenticate, fcmTokenRoutes);

@@ -5,7 +5,7 @@ import { serveAssetsPlugin } from './vite-plugin-serve-assets'
 
 export default defineConfig({
   plugins: [
-    react({ fastRefresh: true }),
+    react(),
     serveAssetsPlugin(),
   ],
   assetsInclude: ['**/*.jpg', '**/*.jpeg', '**/*.png', '**/*.webp'],
@@ -21,8 +21,14 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
   },
   optimizeDeps: {
-    include: ['react', 'react-dom'],
-    exclude: ['apexcharts', 'react-apexcharts', 'recharts'], // not used in customer app
+    include: [
+      'react', 
+      'react-dom', 
+      'prop-types', 
+      'apexcharts', 
+      'react-apexcharts', 
+      'recharts'
+    ],
   },
   build: {
     commonjsOptions: {

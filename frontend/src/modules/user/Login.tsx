@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { sendOTP, verifyOTP } from '../../services/api/auth/customerAuthService';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { usePageTranslation } from '../../hooks/usePageTranslation';
 import OTPInput from '../../components/OTPInput';
 import logoSrc from '../../../assets/village_basket-removebg-preview.png';
 import almonds from '../../../assets/login/login_bg/almonds.png';
@@ -29,10 +31,39 @@ const productImages = [
   oil
 ];
 
+const LANGUAGES: Record<string, { label: string; nativeName: string; flag: string }> = {
+  en: { label: "English", nativeName: "English", flag: "🇬🇧" },
+  hi: { label: "Hindi", nativeName: "हिन्दी", flag: "🇮🇳" },
+  mr: { label: "Marathi", nativeName: "मराठी", flag: "🇮🇳" },
+  te: { label: "Telugu", nativeName: "తెలుగు", flag: "🇮🇳" },
+  ta: { label: "Tamil", nativeName: "தமிழ்", flag: "🇮🇳" },
+  kn: { label: "Kannada", nativeName: "ಕನ್ನಡ", flag: "🇮🇳" }
+};
+
+const LOCALIZED_TEXTS: Record<string, string> = {
+  taglineHeading: "Village Basket",
+  taglineSub: "Fresh from the farm, straight to your door",
+  verification: "Verification",
+  enterCode: "Enter code sent to",
+  enterMobile: "Enter mobile number",
+  continue: "Continue",
+  processing: "Processing...",
+  changeNo: "Change No.",
+  resendCode: "Resend Code",
+  resendIn: "Resend in",
+  sending: "Sending...",
+  newToVb: "New to Village Basket?",
+  signUp: "Sign Up",
+  selectLanguage: "Select Language",
+};
+
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { language: selectedLang, setLanguage } = useLanguage();
+  const { t } = usePageTranslation(LOCALIZED_TEXTS);
+
   const intendedCustomerType = (
     location.state?.accountType || location.state?.customerType || 'retail'
   ) as 'retail' | 'wholesale';
@@ -49,6 +80,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [timer, setTimer] = useState(120);
+  const [showLangModal, setShowLangModal] = useState<boolean>(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -149,6 +181,17 @@ export default function Login() {
         </svg>
       </button>
 
+      {/* ── LANGUAGE BUTTON ── */}
+      <button
+        onClick={() => setShowLangModal(true)}
+        className="vb-lang-btn"
+        aria-label="Select Language"
+        translate="no"
+      >
+        <span className="vb-lang-icon">🌐</span>
+        <span>{LANGUAGES[selectedLang]?.label || 'Language'}</span>
+      </button>
+
       {/* ── TOP PANEL : sliding products ── */}
       <div className="vb-top-panel">
         <ItemRow items={productImages.slice(0, 3)} className="vb-track-right" />
@@ -172,17 +215,15 @@ export default function Login() {
       {/* ── BOTTOM PANEL : form ── */}
       <div className={`vb-bottom-panel ${phase >= 3 ? 'vb-bottom-in' : ''}`}>
         <div className="vb-form-card">
-          {!showOTP && (
+          {!showOTP ? (
             <div className="vb-tagline">
-              <h1 className="vb-tagline-heading">Village Basket</h1>
-              <p className="vb-tagline-sub">Fresh from the farm, straight to your door</p>
+              <h1 className="vb-tagline-heading">{t('taglineHeading')}</h1>
+              <p className="vb-tagline-sub">{t('taglineSub')}</p>
             </div>
-          )}
-
-          {showOTP && (
+          ) : (
             <div className="vb-otp-header">
-              <h2 className="vb-otp-title">Verification</h2>
-              <p className="vb-otp-sub">Enter code sent to +91 {mobileNumber}</p>
+              <h2 className="vb-otp-title">{t('verification')}</h2>
+              <p className="vb-otp-sub">{t('enterCode')} +91 {mobileNumber}</p>
             </div>
           )}
 
@@ -196,7 +237,7 @@ export default function Login() {
                     type="tel"
                     value={mobileNumber}
                     onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                    placeholder="Enter mobile number"
+                    placeholder={t('enterMobile')}
                     className="vb-phone-input"
                     maxLength={10}
                     disabled={loading}
@@ -215,9 +256,9 @@ export default function Login() {
                   {loading ? (
                     <span className="vb-spinner-row">
                       <span className="vb-spinner" />
-                      Processing...
+                      {t('processing')}
                     </span>
-                  ) : 'Continue'}
+                  ) : t('continue')}
                 </button>
               </div>
             ) : (
@@ -233,15 +274,17 @@ export default function Login() {
                     onClick={() => { setShowOTP(false); setError(''); }}
                     disabled={loading}
                     className="vb-action-btn"
+                    style={{ fontFamily: 'inherit' }}
                   >
-                    Change No.
+                    {t('changeNo')}
                   </button>
                   <button
                     onClick={handleContinue}
                     disabled={loading || timer > 0}
                     className={`vb-action-btn vb-action-resend ${timer > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    style={{ fontFamily: 'inherit' }}
                   >
-                    {loading ? 'Sending...' : timer > 0 ? `Resend in ${formatTime(timer)}` : 'Resend Code'}
+                    {loading ? t('sending') : timer > 0 ? `${t('resendIn')} ${formatTime(timer)}` : t('resendCode')}
                   </button>
                 </div>
               </div>
@@ -249,11 +292,57 @@ export default function Login() {
           </div>
 
           <p className="vb-signup-line">
-            New to Village Basket?{' '}
+            {t('newToVb')}{' '}
             <button onClick={() => navigate('/user/signup')} className="vb-signup-link">
-              Sign Up
+              {t('signUp')}
             </button>
           </p>
+        </div>
+      </div>
+
+      {/* ── LANGUAGE SELECTION MODAL ── */}
+      <div 
+        className={`vb-modal-backdrop ${showLangModal ? 'vb-show' : ''}`}
+        onClick={() => setShowLangModal(false)}
+      >
+        <div 
+          className="vb-modal-content"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="vb-modal-header">
+            <h3 className="vb-modal-title">
+              <span>🌐</span> {t('selectLanguage')}
+            </h3>
+            <button 
+              className="vb-modal-close"
+              onClick={() => setShowLangModal(false)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="vb-lang-grid" translate="no">
+            {Object.entries(LANGUAGES).map(([code, info]) => (
+              <button
+                key={code}
+                className={`vb-lang-option ${selectedLang === code ? 'vb-selected' : ''}`}
+                onClick={() => {
+                  setLanguage(code);
+                  setShowLangModal(false);
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+                  <span style={{ fontSize: '1.25rem' }}>{info.flag}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <span className="vb-lang-native">{info.nativeName}</span>
+                    <span className="vb-lang-label">{info.label}</span>
+                  </div>
+                </div>
+                <span className="vb-lang-badge-dot" />
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -483,12 +572,204 @@ export default function Login() {
         .vb-signup-line { text-align: center; font-size: 0.75rem; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
         .vb-signup-link { border: none; background: none; color: #8B3D28; font-weight: 900; cursor: pointer; text-decoration: underline; }
 
+        .vb-lang-btn {
+          position: absolute;
+          top: 18px;
+          right: 18px;
+          z-index: 120;
+          height: 38px;
+          padding: 0 16px;
+          border: none;
+          border-radius: 20px;
+          background: rgba(255,255,255,0.92);
+          color: #8B3D28;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 700;
+          font-size: 0.85rem;
+          cursor: pointer;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+          font-family: inherit;
+        }
+        .vb-lang-btn:hover {
+          background: #fff;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 15px rgba(139,61,40,0.25);
+        }
+        .vb-lang-btn:active {
+          transform: translateY(1px);
+        }
+        .vb-lang-icon {
+          color: #8B3D28;
+          transition: transform 0.6s ease;
+        }
+        .vb-lang-btn:hover .vb-lang-icon {
+          transform: rotate(45deg);
+        }
+
+        /* ── LANGUAGE MODAL ── */
+        .vb-modal-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(122, 62, 38, 0.4);
+          backdrop-filter: blur(12px);
+          z-index: 200;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .vb-modal-backdrop.vb-show {
+          opacity: 1;
+          pointer-events: auto;
+        }
+        .vb-modal-content {
+          background: #FAF7F2;
+          width: 90%;
+          max-width: 440px;
+          border-radius: 24px;
+          padding: 28px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+          border: 1px solid rgba(139,61,40,0.1);
+          transform: translateY(40px) scale(0.95);
+          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          position: relative;
+        }
+        .vb-modal-backdrop.vb-show .vb-modal-content {
+          transform: translateY(0) scale(1);
+        }
+        
+        .vb-modal-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 20px;
+        }
+        
+        .vb-modal-title {
+          font-size: 1.2rem;
+          font-weight: 800;
+          color: #8B3D28;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        
+        .vb-modal-close {
+          border: none;
+          background: rgba(139,61,40,0.08);
+          color: #8B3D28;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .vb-modal-close:hover {
+          background: rgba(139,61,40,0.15);
+          transform: scale(1.05);
+        }
+        
+        .vb-lang-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+        @media (min-width: 400px) {
+          .vb-lang-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+        
+        .vb-lang-option {
+          border: 2px solid #eeeada;
+          background: #fff;
+          border-radius: 16px;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+          position: relative;
+          overflow: hidden;
+          text-align: left;
+          font-family: inherit;
+        }
+        .vb-lang-option:hover {
+          border-color: rgba(139,61,40,0.4);
+          background: #fffdf9;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(139,61,40,0.08);
+        }
+        
+        .vb-lang-option.vb-selected {
+          border-color: #8B3D28;
+          background: #FAF3EC;
+        }
+        
+        .vb-lang-native {
+          font-weight: 800;
+          font-size: 1.05rem;
+          color: #8B3D28;
+        }
+        
+        .vb-lang-label {
+          font-size: 0.78rem;
+          color: #888;
+          font-weight: 600;
+        }
+        
+        .vb-lang-badge-dot {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #8B3D28;
+          opacity: 0;
+          transform: scale(0);
+          transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .vb-lang-option.vb-selected .vb-lang-badge-dot {
+          opacity: 1;
+          transform: scale(1);
+        }
+
         @keyframes marqueeRight { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         @keyframes marqueeLeft { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes logoBounce {
           0%, 100% { transform: translate3d(0, 0, 0); }
           50% { transform: translate3d(0, -8px, 0); }
+        }
+
+        @media (max-width: 767px) {
+          .vb-modal-backdrop {
+            align-items: flex-end;
+          }
+          .vb-modal-content {
+            width: 100%;
+            max-width: 100%;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            padding: 32px 24px 40px;
+            transform: translateY(100%);
+            border-top-left-radius: 32px;
+            border-top-right-radius: 32px;
+          }
+          .vb-modal-backdrop.vb-show .vb-modal-content {
+            transform: translateY(0);
+          }
         }
 
         @media (min-width: 1024px) {

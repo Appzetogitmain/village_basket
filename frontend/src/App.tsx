@@ -11,6 +11,7 @@ import { LoadingProvider } from "./context/LoadingContext";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { DateTrackerProvider } from "./context/DateTrackerContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 import { AxiosLoadingInterceptor } from "./context/AxiosLoadingInterceptor";
 import IconLoader from "./components/loaders/IconLoader";
@@ -198,8 +199,9 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <SplashScreen />
-      <LoadingProvider>
+      <LanguageProvider>
+        <SplashScreen />
+        <LoadingProvider>
         <AxiosLoadingInterceptor>
           <SubscriptionProvider>
           <AuthProvider>
@@ -535,6 +537,7 @@ function App() {
           </SubscriptionProvider>
         </AxiosLoadingInterceptor>
       </LoadingProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }
