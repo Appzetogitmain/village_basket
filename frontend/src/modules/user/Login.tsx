@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { sendOTP, verifyOTP } from '../../services/api/auth/customerAuthService';
 import { useAuth } from '../../context/AuthContext';
@@ -75,12 +75,13 @@ export default function Login() {
   } : null;
 
   const [mobileNumber, setMobileNumber] = useState(location.state?.mobile || '');
-  const [showOTP, setShowOTP] = useState(false);
+  const [showOTP, setShowOTP] = useState(isSignUpMode);
   const [sessionId, setSessionId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [timer, setTimer] = useState(120);
   const [showLangModal, setShowLangModal] = useState<boolean>(false);
+  const hasSentOtp = useRef(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -106,6 +107,29 @@ export default function Login() {
     const t3 = setTimeout(() => setPhase(3), 2000);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
+
+  // Auto-send OTP if redirected from Sign Up
+  useEffect(() => {
+    if (isSignUpMode && mobileNumber && mobileNumber.length === 10 && !hasSentOtp.current) {
+      hasSentOtp.current = true;
+      const autoSendOTP = async () => {
+        setLoading(true);
+        setError('');
+        try {
+          const response = await sendOTP(mobileNumber, true, signUpDetails?.email);
+          if (response.sessionId) setSessionId(response.sessionId);
+          setShowOTP(true);
+          setTimer(120);
+        } catch (err: any) {
+          setError(err.response?.data?.message || 'Failed to initiate call. Please try again.');
+          setShowOTP(false); // Fallback to mobile input if sending fails
+        } finally {
+          setLoading(false);
+        }
+      };
+      autoSendOTP();
+    }
+  }, [isSignUpMode, mobileNumber, signUpDetails?.email]);
 
   const handleContinue = async () => {
     if (mobileNumber.length !== 10) return;

@@ -49,13 +49,8 @@ A. Homepage & Browsing Experience:
    - Intelligent Product Search: Fuzzy-matching product search with filtering options for categories, subcategories, price brackets, and brands.
    - Wishlist: Add products to a saved list with database synchronization.
    - Custom Store Directories: Specialized pages for specific store domains:
-     * Spiritual Store
-     * Pharmacy & Health Store
-     * E-Gift Cards Store
-     * Pet Care Store
-     * Sports Equipment Store
-     * Fashion & Basics Store
-     * Toy & Hobby Stores
+    
+    * Groccery Store 
    - Language Selector: Seamless, instant translations of UI strings (cached via IndexedDB/localStorage).
 
 B. Cart & Checkout System:
