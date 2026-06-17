@@ -1,0 +1,167 @@
+================================================================================
+VILLAGE BASKET - COMPLETE PROJECT FEATURES DOCUMENTATION
+================================================================================
+A Detailed Analysis of the Multi-Tenant Hyper-Local Marketplace Platform
+================================================================================
+
+This document provides a comprehensive analysis of the Village Basket codebase, mapping all modules, user roles, databases, workflows, and integrations.
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+1. Architectural Overview & Platform Flow
+2. Customer Sub-App Features (Web & Mobile Web)
+3. Seller Portal Features (Merchant Panel)
+4. Delivery Partner Sub-App Features (Logistics App)
+5. Administrative Control Panel Features (Super & Sub-Admin Panel)
+6. Database Schema & Data Models Matrix
+7. Key Technical Integrations & Implementations
+
+--------------------------------------------------------------------------------
+1. ARCHITECTURAL OVERVIEW & PLATFORM FLOW
+--------------------------------------------------------------------------------
+Village Basket is a multi-tenant, hyper-local marketplace platform designed for retail and wholesale grocery/e-commerce. It connects:
+
+- Customers: Browse shops/products, make purchases, manage wallets, and earn reward points.
+- Sellers: Manage catalogs, update inventories, process orders, and request payouts.
+- Delivery Partners: Accept deliveries, route via coordinates, verify via OTP, collect COD cash, and check wallets.
+- Administrators: Configure global settings, approve transactions, assign roles, and construct dynamic homepage modules.
+
+Core Flow:
+  [Customer App]   ===> Places Orders / Browses Categories / Spends Wallet
+         ||
+  [Seller Portal]  ===> Processes Order ==> Packages & Marks "Ready for Pickup"
+         ||
+  [Delivery App]   ===> Picks up from Merchant ==> Delivers to Customer (OTP Check)
+         ||
+  [Admin Dashboard] ===> Manages System Settings / Withdrawals / Home Customization
+
+All roles communicate with a centralized Express & TypeScript REST API Backend backed by a MongoDB database. External integrations handle SMS gateway alerts, Firebase push notifications, Razorpay online payments, and Google Cloud translations.
+
+--------------------------------------------------------------------------------
+2. CUSTOMER SUB-APP FEATURES
+--------------------------------------------------------------------------------
+The customer-facing application is optimized for browser and mobile PWA usage. It features:
+
+A. Homepage & Browsing Experience:
+   - Dynamic Layout CMS: Bestsellers, promotional strips, lowest price modules, and festival banners dynamically arranged by the admin.
+   - Shop By Store: Filter and browse products sold by specific local merchants.
+   - Intelligent Product Search: Fuzzy-matching product search with filtering options for categories, subcategories, price brackets, and brands.
+   - Wishlist: Add products to a saved list with database synchronization.
+   - Custom Store Directories: Specialized pages for specific store domains:
+     * Spiritual Store
+     * Pharmacy & Health Store
+     * E-Gift Cards Store
+     * Pet Care Store
+     * Sports Equipment Store
+     * Fashion & Basics Store
+     * Toy & Hobby Stores
+   - Language Selector: Seamless, instant translations of UI strings (cached via IndexedDB/localStorage).
+
+B. Cart & Checkout System:
+   - Live Cart Context: Adjust item quantities, remove items, and see calculations for savings and taxes instantly.
+   - Saved Address Book: Save multiple delivery addresses integrated with map pins (latitude/longitude coords).
+   - Delivery Slot Scheduler: Select preferred delivery times, choosing between "Instant" and "Scheduled" slots.
+   - Coupon Engine: Validate promo coupon codes to apply instant discounts.
+   - Optional Donations: Add custom donation amounts during checkout to support local community initiatives.
+   - Payment Methods: Choose from Cash on Delivery (COD), Wallet balance, UPI, or Online Card payments.
+
+C. Customer Dashboard & Account Manager:
+   - Profile Settings: Manage personal information, date of birth, privacy, and notification settings.
+   - Order History & Invoices: Track previous orders, view digital invoices, and use the "Order Again" button for immediate cart replication.
+   - Wallet System: View transactions history, credit balance, and refunds automatically added to the customer wallet.
+   - Loyalty Reward Program:
+     * Earn loyalty coins with every purchase.
+     * Browse the Reward Store to redeem coins for special gift items.
+     * Track past redemption orders.
+   - Account Deactivation: Perform a soft-delete of the account to wipe active sessions and deactivate the profile.
+
+--------------------------------------------------------------------------------
+3. SELLER PORTAL FEATURES
+--------------------------------------------------------------------------------
+A dedicated portal that enables local store owners to manage commercial operations.
+
+- Merchant Onboarding: Sign up with store names, addresses, FSSAI licenses, PAN cards, bank account details, and serviceable coordinates.
+- Store Configuration: Toggle store opening status (Open vs. Closed), upload logos, and set operating hours.
+- Catalog & Inventory:
+  - Add and modify product listings (prices, descriptions, media, variants).
+  - Map products to categories and subcategories.
+  - Apply specific tax (GST) rates to products.
+  - Monitor stock levels with automatic inventory deductions on orders.
+- Order Pipeline Manager:
+  - View incoming order requests.
+  - Process orders through stages: Accepted -> Packaged -> Ready for Pickup.
+  - Manage coordinates for multi-seller orders.
+- Customer Return Requests: Review customer returns, check uploaded images, and approve/reject refund claims.
+- Financial Wallet & Payout Requests:
+  - Check accumulated store earnings and balance.
+  - Submit bank withdrawal requests (enforcing minimum payout thresholds).
+  - Export CSV-formatted sales and transactional reports.
+
+--------------------------------------------------------------------------------
+4. DELIVERY PARTNER SUB-APP FEATURES
+--------------------------------------------------------------------------------
+A mobile-optimized workflow tailored for delivery personnel.
+
+- Availability Switch: Toggle status between Online/Offline to start or stop receiving delivery tasks.
+- Delivery Task Manager:
+  - Assigned Orders: Manage assigned, transit, and completed orders.
+  - Locations Tracker: View seller addresses in range on maps.
+  - Security Handshake: Verify successful delivery handovers via a permanent 4-digit customer-specific OTP.
+- Delivery Earnings & Wallet:
+  - View commissions earned per delivery.
+  - Monitor cash collected from COD orders pending admin settlement.
+  - Request earnings transfers to bank accounts.
+- WebView Export Fixes: Download CSV records for delivery history and wallets directly inside mobile wrappers.
+
+--------------------------------------------------------------------------------
+5. ADMINISTRATIVE CONTROL PANEL FEATURES
+--------------------------------------------------------------------------------
+The centralized configuration panel for platform operators and managers.
+
+A. Dashboard & Statistics:
+   - General Metrics: Live tracking of total sales volume, order counts, active customers, and pending withdrawal payouts.
+   - Graphical Analytics: Timeline sales charts, order volume trends, and sales mapped by geographic locations.
+
+B. Content Management & Catalog:
+   - Catalog Manager: Complete control over categories, subcategories, brands, tax groups, and bulk import/export of products.
+   - Dynamic Layout builder (CMS): Drag, edit, and re-order homepage banners, home sections, bestseller cards, lowest prices listings, promo strips, and festival modules.
+   - Global Settings: Set support emails, business contact numbers, default GST percentages, global delivery fees, and platform fees.
+
+C. Financial Management:
+   - Commission Calculations: Set and calculate global platform commissions vs. individual merchant commission rates.
+   - COD Cash Settlements: Approve cash collections submitted by delivery partners and check outstanding limits.
+   - Withdrawals processing: Approve or reject withdrawal requests submitted by sellers and delivery agents.
+
+D. Users & Access Management:
+   - Sub-Admin Control (RBAC): Super-admins can create sub-admin profiles and toggle Allowed Permissions for sidebars (e.g., restrict sub-admin to only view catalog and not financials).
+   - Geographical Zones: Draw and assign geographical zones for location-based administrative access and delivery control.
+   - Maintenance Mode: Toggle maintenance mode, displaying a custom downtime message to customers.
+   - FAQs & Policies: Update FAQs, customer policies, and delivery terms dynamically.
+
+--------------------------------------------------------------------------------
+6. DATABASE SCHEMA & DATA MODELS MATRIX
+--------------------------------------------------------------------------------
+Key MongoDB database models include:
+
+- Customer: Manages phone numbers, email registration, custom refCodes, permanent delivery Otp, rewardCoins, and wallet balance.
+- Seller: Stores merchant names, store addresses, GeoJSON location coordinates, serviceRadiusKm, wallet balance, and approval status.
+- Delivery: Records vehicle numbers, identity verification docs, online status, cash collected, and wallet balance.
+- Order: Houses order numbers, order types (Instant/Scheduled), deliverySlot configurations, payment methods/statuses, delivery assignments, and cancellation/return logs.
+- AppSettings: Handles payment gateway flags (Razorpay, Stripe), SMS gateway settings (MSG91, Twilio), distance-based shipping charges, and maintenance switches.
+- RewardItem: Defines the loyalty catalog items (name, description, coinsRequired, stock, active status).
+- WalletTransaction: Logs transactions (credits/debits) for customers, sellers, and delivery boys.
+- Category / SubCategory / Brand / Tax: Controls the catalog hierarchy, slugs, display orders, and tax configurations.
+
+--------------------------------------------------------------------------------
+7. KEY TECHNICAL INTEGRATIONS & IMPLEMENTATIONS
+--------------------------------------------------------------------------------
+- Google Cloud Translate with Free Fallback: A dual-engine translation system that localizes customer interfaces dynamically. It uses client-side IndexedDB caching to reduce API overhead.
+- Permanent Delivery OTP: Prevents cellular network delays during delivery verify stages by using a 4-digit code generated during customer registration.
+- Distance-Based Shipping Engine: Integrates Map Matrix APIs to compute delivery charges dynamically based on kilometers, base charges, and delivery partner coefficients.
+- FCM Push Notification Campaigns: Distributes target marketing push campaigns using saved FCM tokens registry.
+- Bulk Imports: Supports importing large CSV sheets to instantly populate product inventory lists.
+
+================================================================================
+* End of Document *
+================================================================================

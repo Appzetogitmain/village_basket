@@ -11,11 +11,11 @@ import { useLanguage } from '../../contexts/LanguageContext';
 
 const LANGUAGES: Record<string, { label: string; nativeName: string; flag: string }> = {
   en: { label: "English", nativeName: "English", flag: "🇬🇧" },
+  kn: { label: "Kannada", nativeName: "ಕನ್ನಡ", flag: "🇮🇳" },
   hi: { label: "Hindi", nativeName: "हिन्दी", flag: "🇮🇳" },
   mr: { label: "Marathi", nativeName: "मराठी", flag: "🇮🇳" },
   te: { label: "Telugu", nativeName: "తెలుగు", flag: "🇮🇳" },
-  ta: { label: "Tamil", nativeName: "தமிழ்", flag: "🇮🇳" },
-  kn: { label: "Kannada", nativeName: "ಕನ್ನಡ", flag: "🇮🇳" }
+  ta: { label: "Tamil", nativeName: "தமிழ்", flag: "🇮🇳" }
 };
 
 
