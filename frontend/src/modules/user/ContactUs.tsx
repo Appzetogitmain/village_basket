@@ -82,7 +82,7 @@ export default function ContactUs() {
                         </div>
                         <div>
                             <p className="text-xs font-semibold text-neutral-700">Phone</p>
-                            <p className="text-xs text-neutral-500">+91 1800-123-4567</p>
+                            <p className="text-xs text-neutral-500">+91 78299 03973</p>
                         </div>
                     </div>
                     <div className="bg-teal-50 rounded-xl p-4 border border-teal-100 flex flex-col items-center text-center gap-2">
