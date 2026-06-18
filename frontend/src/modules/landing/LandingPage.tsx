@@ -826,11 +826,13 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-black">✆</div>
-                  <p className="font-bold text-sm tracking-wide">+91 98765 43210</p>
+                  <p className="font-bold text-sm tracking-wide">+91 78299 03973</p>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-black">📍</div>
-                  <p className="font-bold text-sm tracking-wide">Headquarters, Farmers Lane, IN</p>
+                  <p className="font-bold text-sm tracking-wide text-left text-xs md:text-sm">
+                    Flat No. 252, Ground Floor, Mugabala, Near GHPS Mugabala, Bengaluru Rural, Karnataka - 562114
+                  </p>
                 </div>
               </div>
             </div>

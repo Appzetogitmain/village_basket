@@ -79,7 +79,7 @@ export default function DeliveryContact() {
                         </div>
                         <div>
                             <p className="text-[9px] font-black text-village-umber uppercase tracking-widest">Phone</p>
-                            <p className="text-[9px] text-stone-400 font-bold">+91 1800-123-4567</p>
+                            <p className="text-[9px] text-stone-400 font-bold">+91 78299 03973</p>
                         </div>
                     </div>
                 </div>
