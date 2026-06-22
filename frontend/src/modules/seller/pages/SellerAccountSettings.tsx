@@ -378,40 +378,96 @@ const SellerAccountSettings = () => {
             setSaveLoading(true);
             setError('');
 
-            const accountNameError = validateField('accountName', sellerData.accountName);
-            const bankNameError = validateField('bankName', sellerData.bankName);
-            const accountNumberError = validateField('accountNumber', sellerData.accountNumber);
-            const ifscError = validateField('ifsc', sellerData.ifsc);
-            const taxNumberError = validateField('taxNumber', sellerData.taxNumber);
-            const panCardError = validateField('panCard', sellerData.panCard);
-            
-            if (accountNameError || bankNameError || accountNumberError || ifscError || taxNumberError || panCardError) {
-                setFieldErrors(prev => ({
-                    ...prev,
-                    accountName: accountNameError,
-                    bankName: bankNameError,
-                    accountNumber: accountNumberError,
-                    ifsc: ifscError,
-                    taxNumber: taxNumberError,
-                    panCard: panCardError,
-                }));
-                setSaveLoading(false);
-                return;
+            // Profile validation if current tab is profile
+            if (activeTab === 'profile') {
+                if (!sellerData.sellerName?.trim()) {
+                    setError('Full Name is required');
+                    showToast('Full Name is required', 'error');
+                    setSaveLoading(false);
+                    return;
+                }
+                if (!sellerData.email?.trim()) {
+                    setError('Email Address is required');
+                    showToast('Email Address is required', 'error');
+                    setSaveLoading(false);
+                    return;
+                }
+                if (!sellerData.mobile?.trim()) {
+                    setError('Mobile Number is required');
+                    showToast('Mobile Number is required', 'error');
+                    setSaveLoading(false);
+                    return;
+                }
             }
 
-            // Validate location if address is being updated
-            if (sellerData.searchLocation && (!sellerData.latitude || !sellerData.longitude)) {
-                setError('Please select a valid location using the map picker');
-                setSaveLoading(false);
-                return;
+            // Store validation if current tab is store
+            if (activeTab === 'store') {
+                if (!sellerData.storeName?.trim()) {
+                    setError('Store Name is required');
+                    showToast('Store Name is required', 'error');
+                    setSaveLoading(false);
+                    return;
+                }
+                if (!sellerData.category?.trim()) {
+                    setError('Store Category is required');
+                    showToast('Store Category is required', 'error');
+                    setSaveLoading(false);
+                    return;
+                }
+                if (!sellerData.city?.trim()) {
+                    setError('City is required');
+                    showToast('City is required', 'error');
+                    setSaveLoading(false);
+                    return;
+                }
+
+                // Validate location if address is being updated
+                if (sellerData.searchLocation && (!sellerData.latitude || !sellerData.longitude)) {
+                    setError('Please select a valid location using the map picker');
+                    showToast('Please select a valid location using the map picker', 'error');
+                    setSaveLoading(false);
+                    return;
+                }
+            }
+
+            // Bank details validation if current tab is bank
+            if (activeTab === 'bank') {
+                const accountNameError = validateField('accountName', sellerData.accountName);
+                const bankNameError = validateField('bankName', sellerData.bankName);
+                const accountNumberError = validateField('accountNumber', sellerData.accountNumber);
+                const ifscError = validateField('ifsc', sellerData.ifsc);
+                const taxNumberError = validateField('taxNumber', sellerData.taxNumber);
+                const panCardError = validateField('panCard', sellerData.panCard);
+                
+                if (accountNameError || bankNameError || accountNumberError || ifscError || taxNumberError || panCardError) {
+                    setFieldErrors(prev => ({
+                        ...prev,
+                        accountName: accountNameError,
+                        bankName: bankNameError,
+                        accountNumber: accountNumberError,
+                        ifsc: ifscError,
+                        taxNumber: taxNumberError,
+                        panCard: panCardError,
+                    }));
+                    showToast('Please fix the errors in Bank & Tax details', 'error');
+                    setSaveLoading(false);
+                    return;
+                }
             }
 
             // Validate service radius
-            const radius = parseFloat(sellerData.serviceRadiusKm);
-            if (isNaN(radius) || radius < 0.1 || radius > 100) {
-                setError('Service radius must be between 0.1 and 100 kilometers');
-                setSaveLoading(false);
-                return;
+            let radius = parseFloat(sellerData.serviceRadiusKm);
+            if (activeTab === 'store') {
+                if (isNaN(radius) || radius < 0.1 || radius > 100) {
+                    setError('Service radius must be between 0.1 and 100 kilometers');
+                    showToast('Service radius must be between 0.1 and 100 kilometers', 'error');
+                    setSaveLoading(false);
+                    return;
+                }
+            } else {
+                if (isNaN(radius)) {
+                    radius = 10;
+                }
             }
 
             const updateData = {
@@ -450,11 +506,15 @@ const SellerAccountSettings = () => {
                 }
                 setError('');
                 setFieldErrors({});
+                showToast('Settings saved successfully', 'success');
             } else {
                 setError(response.message || 'Failed to update profile');
+                showToast(response.message || 'Failed to update profile', 'error');
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Error updating profile');
+            const msg = err.response?.data?.message || 'Error updating profile';
+            setError(msg);
+            showToast(msg, 'error');
         } finally {
             setSaveLoading(false);
         }
