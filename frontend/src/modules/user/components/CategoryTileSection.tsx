@@ -16,8 +16,10 @@ interface CategoryTile {
   type?: "subcategory" | "product" | "category" | "shop" | "seller";
 }
 
+import { ReactNode } from "react";
+
 interface CategoryTileSectionProps {
-  title: string;
+  title: ReactNode;
   tiles: CategoryTile[];
   columns?: 2 | 3 | 4 | 6 | 8; // Support all column options
   showProductCount?: boolean; // Show product count only for bestsellers

@@ -171,22 +171,33 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   </Link>
                   
                   {/* Delivery Location - Styled like the image */}
-                  <button
-                    onClick={() => navigate('/user/location')}
-                    className="flex items-center gap-3 group transition-all"
-                  >
-                    <div className={`w-10 h-10 rounded-2xl ${isScrolled ? 'bg-white/10' : 'bg-black/20 backdrop-blur-md'} flex items-center justify-center border border-white/10 group-hover:bg-[#4b7d5a] group-hover:border-[#4b7d5a] transition-all`}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-[#4b7d5a] group-hover:text-white transition-colors">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => navigate('/user/location')}
+                      className="flex items-center gap-3 group transition-all"
+                    >
+                      <div className={`w-10 h-10 rounded-2xl ${isScrolled ? 'bg-white/10' : 'bg-black/20 backdrop-blur-md'} flex items-center justify-center border border-white/10 group-hover:bg-[#4b7d5a] group-hover:border-[#4b7d5a] transition-all`}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-[#4b7d5a] group-hover:text-white transition-colors">
+                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+                        </svg>
+                      </div>
+                      <div className="flex flex-col text-left">
+                        <span className="text-[10px] font-black text-[#4b7d5a] uppercase tracking-tighter leading-none mb-1">Deliver to</span>
+                        <span className={`text-xs lg:text-sm font-bold max-w-[140px] lg:max-w-[200px] truncate leading-tight group-hover:text-[#4b7d5a] transition-colors ${isScrolled ? 'text-white' : 'text-village-umber'}`}>
+                          {userLocation?.address || userLocation?.city || 'Set Location'}
+                        </span>
+                      </div>
+                    </button>
+
+                    {/* ETA Badge on Desktop */}
+                    <div className="flex items-center gap-1.5 bg-[#FFF9F0] px-3 py-1.5 rounded-xl border border-[#F0D5C9] shadow-sm transform hover:scale-105 transition-all duration-300">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#8B3D28] animate-pulse"></span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF9933]">
+                        <path d="M13 2v9h6L11 22v-9H5l8-11z"/>
                       </svg>
+                      <span className="text-xs font-bold text-[#8B3D28] leading-none">10-12 min</span>
                     </div>
-                    <div className="flex flex-col text-left">
-                      <span className="text-[10px] font-black text-[#4b7d5a] uppercase tracking-tighter leading-none mb-1">Deliver to</span>
-                      <span className={`text-xs lg:text-sm font-bold max-w-[140px] lg:max-w-[200px] truncate leading-tight group-hover:text-[#4b7d5a] transition-colors ${isScrolled ? 'text-white' : 'text-village-umber'}`}>
-                        {userLocation?.address || userLocation?.city || 'Set Location'}
-                      </span>
-                    </div>
-                  </button>
+                  </div>
                 </div>
 
                 {/* Central Premium Search Bar */}
@@ -380,10 +391,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
               >
                 {/* Active Indicator Layer (Sliding Pill) */}
                 <div className="absolute inset-0 px-2 flex items-center justify-around pointer-events-none">
-                  {['home', 'orders', 'categories', 'account'].map((tab) => {
+                  {['home', 'orders', 'wishlist', 'categories', 'account'].map((tab) => {
                     const isTabActive =
                       (tab === 'home' && (isActive('/user') || isActive('/user/'))) ||
                       (tab === 'orders' && isActive('/user/order-again')) ||
+                      (tab === 'wishlist' && isActive('/user/wishlist')) ||
                       (tab === 'categories' && isCategoriesActive) ||
                       (tab === 'account' && isActive('/user/account'));
 
@@ -392,7 +404,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                         {isTabActive && (
                           <motion.div
                             layoutId="mobileActiveTab"
-                            className="w-[61px] h-[61px] bg-[#FFF9F0] shadow-2xl rounded-[18px]"
+                            className="w-[52px] h-[52px] bg-[#FFF9F0] shadow-2xl rounded-[15px]"
                             initial={false}
                             transition={{ type: "spring", stiffness: 400, damping: 30 }}
                           />
@@ -419,6 +431,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     </svg>
                   </motion.div>
                   <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isActive('/user/order-again') ? 'text-[#8B3D28]' : 'text-white/40'}`}>ORDERS</span>
+                </Link>
+
+                <Link to="/user/wishlist" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">
+                  <motion.div animate={{ scale: isActive('/user/wishlist') ? 1.05 : 1 }} transition={{ duration: 0.2 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill={isActive('/user/wishlist') ? '#8B3D28' : 'none'} stroke={isActive('/user/wishlist') ? '#8B3D28' : '#FFFFFF'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-300">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  </motion.div>
+                  <span className={`text-[9px] mt-1 font-black font-poppins tracking-tighter transition-colors duration-300 ${isActive('/user/wishlist') ? 'text-[#8B3D28]' : 'text-white/40'}`}>WISHLIST</span>
                 </Link>
 
                 <Link to="/user/categories" className="flex-1 h-full z-10 flex flex-col items-center justify-center relative touch-none no-underline">

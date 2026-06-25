@@ -18,6 +18,7 @@ import { useAuth } from '../../../context/AuthContext';
 import brandLogo from '@assets/village_basket-removebg-preview.png';
 import FestivalCategoryModule from './FestivalCategoryModule';
 import DateTrackerStrip from './DateTrackerStrip';
+import HomeBannersCarousel from './HomeBannersCarousel';
 
 
 gsap.registerPlugin(ScrollTrigger);
@@ -26,6 +27,7 @@ interface HomeHeroProps {
   activeTab?: string;
   onTabChange?: (tabId: string) => void;
   festivalModules?: any[];
+  promoBanners?: any[];
 }
 
 interface Tab {
@@ -41,7 +43,7 @@ const HOME_TAB: Tab = {
 };
 
 
-export default function HomeHero({ activeTab = 'all', onTabChange, festivalModules }: HomeHeroProps) {
+export default function HomeHero({ activeTab = 'all', onTabChange, festivalModules, promoBanners }: HomeHeroProps) {
   const [tabs, setTabs] = useState<Tab[]>([HOME_TAB]);
 
   useEffect(() => {
@@ -402,9 +404,18 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
         {/* Delivery Address Pill */}
         <div
           onClick={() => navigate('/user/location')}
-          className="flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2.5 py-1.5 border border-white/5 active:scale-[0.98] transition-all cursor-pointer relative z-20"
+          className="flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2 py-1.5 border border-white/5 active:scale-[0.98] transition-all cursor-pointer relative z-20"
         >
-          <div className="w-4 h-4 rounded-full bg-[#4b7d5a] flex items-center justify-center shadow-sm">
+          {/* ETA Badge */}
+          <div className="flex-shrink-0 flex items-center gap-1 bg-[#FFF9F0] px-2 py-0.5 rounded-full border border-[#F0D5C9] shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#8B3D28] animate-pulse"></span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF9933]">
+              <path d="M13 2v9h6L11 22v-9H5l8-11z"/>
+            </svg>
+            <span className="text-[9px] font-bold text-[#8B3D28] leading-none">10-12 min</span>
+          </div>
+
+          <div className="w-4 h-4 rounded-full bg-[#4b7d5a] flex items-center justify-center shadow-sm flex-shrink-0">
             <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
             </svg>
@@ -412,7 +423,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
           <span className="text-[9px] text-white/80 font-black truncate flex-1 uppercase tracking-tight">
             {locationDisplayText || 'Set delivery location'}
           </span>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-30">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 flex-shrink-0">
             <path d="M9 18l6-6-6-6" />
           </svg>
         </div>
@@ -448,6 +459,21 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
         <div className="pt-4">
           <DateTrackerStrip hideLegend={true} />
         </div>
+
+        {/* Home Carousel Banners */}
+        {promoBanners && promoBanners.length > 0 && (
+          <div
+            className="transition-all duration-300 overflow-hidden"
+            style={{
+              maxHeight: scrollProgress > 0.05 ? '0px' : '300px',
+              opacity: scrollProgress > 0.05 ? 0 : 1,
+              transform: `scale(${scrollProgress > 0.05 ? 0.95 : 1})`,
+              marginBottom: scrollProgress > 0.05 ? '0px' : '4px'
+            }}
+          >
+            <HomeBannersCarousel banners={promoBanners} />
+          </div>
+        )}
 
 
 

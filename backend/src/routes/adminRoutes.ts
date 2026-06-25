@@ -71,6 +71,9 @@ import * as bestsellerCardController from "../modules/admin/controllers/adminBes
 // Lowest Prices Controllers
 import * as lowestPricesController from "../modules/admin/controllers/adminLowestPricesController";
 
+// Home Banner Controllers
+import * as homeBannerController from "../modules/admin/controllers/adminHomeBannerController";
+
 // PromoStrip Controllers
 import * as promoStripController from "../modules/admin/controllers/adminPromoStripController";
 
@@ -385,6 +388,14 @@ router.post("/festival-modules", festivalModuleController.createFestivalModule);
 router.put("/festival-modules/:id", festivalModuleController.updateFestivalModule);
 router.delete("/festival-modules/:id", festivalModuleController.deleteFestivalModule);
 router.put("/festival-modules/reorder", festivalModuleController.reorderFestivalModules);
+
+// ==================== Home Banner Routes ====================
+router.get("/home-banners", homeBannerController.getHomeBanners);
+router.get("/home-banners/:id", homeBannerController.getHomeBannerById);
+router.post("/home-banners", homeBannerController.createHomeBanner);
+router.put("/home-banners/:id", homeBannerController.updateHomeBanner);
+router.delete("/home-banners/:id", homeBannerController.deleteHomeBanner);
+router.put("/home-banners/reorder", homeBannerController.reorderHomeBanners);
 
 export default router;
 

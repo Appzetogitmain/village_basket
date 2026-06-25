@@ -215,7 +215,7 @@ function isMockMode(): boolean {
  * Check if developer bypass OTP
  */
 function isDeveloperBypass(otp: string): boolean {
-  return (process.env.NODE_ENV !== 'production' || process.env.USE_MOCK_OTP === 'true') && otp === '999999';
+  return (process.env.NODE_ENV !== 'production' || process.env.USE_MOCK_OTP === 'true') && (otp === '999999' || otp === '9999');
 }
 
 // ==========================================

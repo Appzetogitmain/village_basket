@@ -10,6 +10,7 @@ import PromoStrip from "../../../models/PromoStrip";
 import BestsellerCard from "../../../models/BestsellerCard";
 import LowestPricesProduct from "../../../models/LowestPricesProduct";
 import FestivalModule from "../../../models/FestivalModule";
+import HomeBanner from "../../../models/HomeBanner";
 
 import mongoose from "mongoose";
 import { findSellersWithinRange } from "../../../utils/locationHelper";
@@ -707,6 +708,29 @@ export const getHomeContent = async (req: Request, res: Response) => {
       }))
     }));
 
+    // -> Home Banners (Carousel)
+    const bannerQuery: any = { isActive: true };
+    if (headerCatId) {
+      if (isMainHome) {
+        bannerQuery.$or = [
+          { headerCategoryId: headerCatId },
+          { headerCategoryId: { $exists: false } },
+          { headerCategoryId: null }
+        ];
+      } else {
+        bannerQuery.headerCategoryId = headerCatId;
+      }
+    } else {
+      bannerQuery.$or = [
+        { headerCategoryId: { $exists: false } },
+        { headerCategoryId: null }
+      ];
+    }
+
+    const homeBanners = await HomeBanner.find(bannerQuery)
+      .sort({ order: 1 })
+      .lean();
+
     res.status(200).json({
 
       success: true,
@@ -724,7 +748,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
         festivalModules: festivalModules,
         bestsellerCards: bestsellerCards,
 
-        promoBanners: []
+        promoBanners: homeBanners
       },
     });
   } catch (error: any) {

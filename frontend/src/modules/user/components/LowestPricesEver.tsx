@@ -347,8 +347,9 @@ export default function LowestPricesEver({ activeTab = 'all', products: adminPro
 
       {/* Premium Banner Section */}
       <div className="px-4 relative z-10 flex flex-col items-center mb-6 max-w-[1550px] mx-auto">
-        <div className="flex items-center justify-center gap-3 mb-1">
+        <div className="flex items-center justify-center gap-3 mb-1.5 flex-wrap">
           <div className="h-[1px] w-8 bg-[#8B3D28]/20"></div>
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D32F2F] shadow-[0_0_8px_rgba(211,47,47,0.6)] animate-pulse align-middle mr-1.5" />
           <span className="text-[10px] md:text-xs font-black text-[#4b7d5a] tracking-[0.2em] uppercase">Special Curated Deal</span>
           <div className="h-[1px] w-8 bg-[#8B3D28]/20"></div>
         </div>

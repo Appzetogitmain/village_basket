@@ -153,6 +153,7 @@ const AdminBestsellerCards = lazy(() => import("./modules/admin/pages/AdminBests
 const AdminPromoStrip = lazy(() => import("./modules/admin/pages/AdminPromoStrip"));
 const AdminFestivalModule = lazy(() => import("./modules/admin/pages/AdminFestivalModule"));
 const AdminLowestPrices = lazy(() => import("./modules/admin/pages/AdminLowestPrices"));
+const AdminHomeBanners = lazy(() => import("./modules/admin/pages/AdminHomeBanners"));
 
 const AdminShopByStore = lazy(() => import("./modules/admin/pages/AdminShopByStore"));
 const AdminAllOrders = lazy(() => import("./modules/admin/pages/AdminAllOrders"));
@@ -426,6 +427,7 @@ function App() {
                                         <Route path="promo-strip" element={<AdminPromoStrip />} />
                                         <Route path="festival-module" element={<AdminFestivalModule />} />
                                         <Route path="lowest-prices" element={<AdminLowestPrices />} />
+                                        <Route path="home-banners" element={<AdminHomeBanners />} />
 
                                         <Route path="shop-by-store" element={<AdminShopByStore />} />
                                         <Route path="orders/all" element={<AdminAllOrders />} />

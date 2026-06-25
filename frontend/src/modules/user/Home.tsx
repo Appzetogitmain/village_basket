@@ -18,6 +18,21 @@ import PageLoader from "../../components/PageLoader";
 
 import { useThemeContext } from "../../context/ThemeContext";
 
+const SECTION_DOT_COLORS = [
+  'bg-[#009688] shadow-[0_0_8px_rgba(0,150,136,0.6)]', // Teal
+  'bg-[#9C27B0] shadow-[0_0_8px_rgba(156,39,176,0.6)]', // Purple
+  'bg-[#4CAF50] shadow-[0_0_8px_rgba(76,175,80,0.6)]', // Green
+  'bg-[#2196F3] shadow-[0_0_8px_rgba(33,150,243,0.6)]', // Blue
+  'bg-[#E91E63] shadow-[0_0_8px_rgba(233,30,99,0.6)]', // Pink
+  'bg-[#FF9800] shadow-[0_0_8px_rgba(255,152,0,0.6)]', // Orange
+  'bg-[#795548] shadow-[0_0_8px_rgba(121,85,72,0.6)]', // Brown
+  'bg-[#607D8B] shadow-[0_0_8px_rgba(96,125,139,0.6)]'  // Blue Grey
+];
+
+const renderLiveDot = (colorAndShadowClass: string) => (
+  <span className={`inline-block w-2.5 h-2.5 rounded-full ${colorAndShadowClass} animate-pulse align-middle mr-2.5`} />
+);
+
 export default function Home() {
   const navigate = useNavigate();
   const { location } = useLocation();
@@ -196,6 +211,7 @@ export default function Home() {
         activeTab={activeTab} 
         onTabChange={setActiveTab} 
         festivalModules={homeData.festivalModules} 
+        promoBanners={homeData.promoBanners}
       />
 
 
@@ -231,8 +247,9 @@ export default function Home() {
         {/* Dynamic Home Sections - Render sections created by admin (For ALL tabs) */}
         {homeData.homeSections && homeData.homeSections.length > 0 && (
           <>
-            {homeData.homeSections.map((section: any) => {
+            {homeData.homeSections.map((section: any, idx: number) => {
               const columnCount = Number(section.columns) || 4;
+              const dotColors = SECTION_DOT_COLORS[idx % SECTION_DOT_COLORS.length];
 
               if (section.displayType === "products" && section.data && section.data.length > 0) {
                 const gridClass = {
@@ -249,8 +266,9 @@ export default function Home() {
                 return (
                   <div key={section.id} className="mt-6 mb-6 md:mt-8 md:mb-8">
                     {section.title && (
-                      <h2 className="text-xl md:text-4xl font-black text-village-umber mb-4 md:mb-10 px-4 md:px-6 lg:px-8 tracking-tighter font-poppins capitalize">
-                        {section.title}
+                      <h2 className="flex items-center flex-wrap gap-2 text-xl md:text-4xl font-black text-village-umber mb-4 md:mb-10 px-4 md:px-6 lg:px-8 tracking-tighter font-poppins capitalize">
+                        {renderLiveDot(dotColors)}
+                        <span>{section.title}</span>
                       </h2>
                     )}
                     <div className="px-4 md:px-6 lg:px-8">
@@ -272,10 +290,17 @@ export default function Home() {
                 );
               }
 
+              const categoryTitleNode = section.title ? (
+                <span className="flex items-center flex-wrap gap-2">
+                  {renderLiveDot(dotColors)}
+                  <span>{section.title}</span>
+                </span>
+              ) : "";
+
               return (
                 <CategoryTileSection
                   key={section.id}
-                  title={section.title}
+                  title={categoryTitleNode}
                   tiles={section.data || []}
                   columns={columnCount as 2 | 3 | 4 | 6 | 8}
                   showProductCount={false}
@@ -288,8 +313,9 @@ export default function Home() {
         {/* Bestsellers Section (Dynamic) */}
         {homeData.bestsellers && homeData.bestsellers.length > 0 && (
           <div className="mt-6 mb-6 md:mt-8 md:mb-8">
-            <h2 className="text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins">
-              Bestsellers
+            <h2 className="flex items-center flex-wrap gap-2 text-lg md:text-2xl font-bold text-village-umber mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight font-poppins">
+              {renderLiveDot('bg-[#F59E0B] shadow-[0_0_8px_rgba(245,158,11,0.6)]')}
+              <span>Bestsellers</span>
             </h2>
             <div className="px-4 md:px-6 lg:px-8 relative group">
               {/* Left Arrow - Web View Only */}
