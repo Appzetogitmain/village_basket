@@ -26,6 +26,20 @@ export interface VerifyOTPResponse {
   };
 }
 
+export interface CheckMobileResponse {
+  success: boolean;
+  message?: string;
+  data: { exists: boolean };
+}
+
+/**
+ * Check if mobile number is already registered
+ */
+export const checkMobile = async (mobile: string): Promise<CheckMobileResponse> => {
+  const response = await api.post<CheckMobileResponse>('/auth/customer/check-mobile', { mobile });
+  return response.data;
+};
+
 /**
  * Send SMS OTP to customer mobile number
  */

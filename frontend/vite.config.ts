@@ -1,12 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { compression } from 'vite-plugin-compression2'
 import { serveAssetsPlugin } from './vite-plugin-serve-assets'
 
 export default defineConfig({
   plugins: [
     react(),
     serveAssetsPlugin(),
+    compression({ algorithm: 'gzip', exclude: [/\.(gz)$/] }),
+    compression({ algorithm: 'brotliCompress', exclude: [/\.(br)$/, /\.(gz)$/] }),
   ],
   assetsInclude: ['**/*.jpg', '**/*.jpeg', '**/*.png', '**/*.webp'],
   server: {
@@ -22,12 +25,9 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: [
-      'react', 
-      'react-dom', 
-      'prop-types', 
-      'apexcharts', 
-      'react-apexcharts', 
-      'recharts'
+      'react',
+      'react-dom',
+      'prop-types',
     ],
   },
   build: {

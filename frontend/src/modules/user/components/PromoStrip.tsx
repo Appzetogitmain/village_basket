@@ -86,7 +86,7 @@ export default function PromoStrip({ activeTab = "all", homeData: externalHomeDa
             if (!categoryId) return;
 
             try {
-              const response = await getSubcategories(categoryId, { limit: 4 });
+              const response = await getSubcategories(categoryId, { limit: 4, skipLoader: true });
               if (response.success && response.data) {
                 const images = response.data
                   .filter((subcat) => subcat.subcategoryImage)

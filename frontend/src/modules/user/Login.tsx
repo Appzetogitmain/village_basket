@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { sendOTP, verifyOTP } from '../../services/api/auth/customerAuthService';
+import { sendOTP, verifyOTP, checkMobile } from '../../services/api/auth/customerAuthService';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { usePageTranslation } from '../../hooks/usePageTranslation';
@@ -46,6 +46,14 @@ const LOCALIZED_TEXTS: Record<string, string> = {
   verification: "Verification",
   enterCode: "Enter code sent to",
   enterMobile: "Enter mobile number",
+  fullName: "Full Name",
+  enterName: "Enter your name",
+  emailAddress: "Email Address",
+  enterEmail: "name@email.com",
+  retailer: "Retailer",
+  wholesaler: "Wholesaler",
+  completeProfile: "Complete Your Profile",
+  profileSub: "A few details to get you started",
   continue: "Continue",
   processing: "Processing...",
   changeNo: "Change No.",
@@ -56,6 +64,8 @@ const LOCALIZED_TEXTS: Record<string, string> = {
   signUp: "Sign Up",
   selectLanguage: "Select Language",
 };
+
+type AuthStep = 'mobile' | 'details' | 'otp';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -68,20 +78,21 @@ export default function Login() {
     location.state?.accountType || location.state?.customerType || 'retail'
   ) as 'retail' | 'wholesale';
 
-  const isSignUpMode = !!location.state?.isSignUp;
-  const signUpDetails = isSignUpMode ? {
-    name: location.state?.name,
-    email: location.state?.email
-  } : null;
-
+  const [step, setStep] = useState<AuthStep>('mobile');
+  const [isNewUser, setIsNewUser] = useState(false);
   const [mobileNumber, setMobileNumber] = useState(location.state?.mobile || '');
-  const [showOTP, setShowOTP] = useState(isSignUpMode);
+  const [signUpDetails, setSignUpDetails] = useState({
+    name: location.state?.name || '',
+    email: location.state?.email || '',
+    accountType: (location.state?.accountType === 'wholesale' ? 'wholesaler' : 'retailer') as 'retailer' | 'wholesaler',
+  });
   const [sessionId, setSessionId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [timer, setTimer] = useState(120);
   const [showLangModal, setShowLangModal] = useState<boolean>(false);
-  const hasSentOtp = useRef(false);
+
+  const showOTP = step === 'otp';
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -108,38 +119,42 @@ export default function Login() {
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
 
-  // Auto-send OTP if redirected from Sign Up
-  useEffect(() => {
-    if (isSignUpMode && mobileNumber && mobileNumber.length === 10 && !hasSentOtp.current) {
-      hasSentOtp.current = true;
-      const autoSendOTP = async () => {
-        setLoading(true);
-        setError('');
-        try {
-          const response = await sendOTP(mobileNumber, true, signUpDetails?.email);
-          if (response.sessionId) setSessionId(response.sessionId);
-          setShowOTP(true);
-          setTimer(120);
-        } catch (err: any) {
-          setError(err.response?.data?.message || 'Failed to initiate call. Please try again.');
-          setShowOTP(false); // Fallback to mobile input if sending fails
-        } finally {
-          setLoading(false);
-        }
-      };
-      autoSendOTP();
-    }
-  }, [isSignUpMode, mobileNumber, signUpDetails?.email]);
+  const sendOtpRequest = async (signUp: boolean, email?: string) => {
+    const response = await sendOTP(mobileNumber, signUp, email);
+    if (response.sessionId) setSessionId(response.sessionId);
+    setStep('otp');
+    setTimer(120);
+  };
 
-  const handleContinue = async () => {
+  const handleMobileContinue = async () => {
     if (mobileNumber.length !== 10) return;
     setLoading(true);
     setError('');
     try {
-      const response = await sendOTP(mobileNumber, isSignUpMode, signUpDetails?.email);
-      if (response.sessionId) setSessionId(response.sessionId);
-      setShowOTP(true);
-      setTimer(120); // Reset timer on resend
+      const check = await checkMobile(mobileNumber);
+      if (check.data.exists) {
+        setIsNewUser(false);
+        await sendOtpRequest(false);
+      } else {
+        setIsNewUser(true);
+        setStep('details');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDetailsContinue = async () => {
+    if (!signUpDetails.name.trim() || !signUpDetails.email.trim()) {
+      setError('Please enter your name and email.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await sendOtpRequest(true, signUpDetails.email.trim());
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to initiate call. Please try again.');
     } finally {
@@ -147,17 +162,35 @@ export default function Login() {
     }
   };
 
+  const handleContinue = async () => {
+    if (step === 'otp') {
+      setLoading(true);
+      setError('');
+      try {
+        await sendOtpRequest(isNewUser, signUpDetails.email.trim() || undefined);
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Failed to initiate call. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const handleOTPComplete = async (otp: string) => {
     setLoading(true);
     setError('');
     try {
+      const customerType = isNewUser
+        ? (signUpDetails.accountType === 'wholesaler' ? 'wholesale' : 'retail')
+        : intendedCustomerType;
+
       const response = await verifyOTP(
-        mobileNumber, 
-        otp, 
-        sessionId, 
-        intendedCustomerType,
-        signUpDetails?.name,
-        signUpDetails?.email
+        mobileNumber,
+        otp,
+        sessionId,
+        customerType,
+        isNewUser ? signUpDetails.name.trim() : undefined,
+        isNewUser ? signUpDetails.email.trim() : undefined
       );
       if (response.success && response.data) {
         login(response.data.token, {
@@ -239,10 +272,16 @@ export default function Login() {
       {/* ── BOTTOM PANEL : form ── */}
       <div className={`vb-bottom-panel ${phase >= 3 ? 'vb-bottom-in' : ''}`}>
         <div className="vb-form-card">
-          {!showOTP ? (
+          {!showOTP && step === 'mobile' ? (
             <div className="vb-tagline">
               <h1 className="vb-tagline-heading">{t('taglineHeading')}</h1>
               <p className="vb-tagline-sub">{t('taglineSub')}</p>
+            </div>
+          ) : !showOTP && step === 'details' ? (
+            <div className="vb-tagline">
+              <h1 className="vb-tagline-heading">{t('completeProfile')}</h1>
+              <p className="vb-tagline-sub">{t('profileSub')}</p>
+              <p className="vb-otp-sub" style={{ marginTop: '8px' }}>+91 {mobileNumber}</p>
             </div>
           ) : (
             <div className="vb-otp-header">
@@ -253,7 +292,7 @@ export default function Login() {
 
           {/* Input form */}
           <div className="vb-input-section">
-            {!showOTP ? (
+            {step === 'mobile' ? (
               <div className="vb-input-group">
                 <div className="vb-phone-row">
                   <div className="vb-prefix">+91</div>
@@ -273,7 +312,7 @@ export default function Login() {
                 )}
 
                 <button
-                  onClick={handleContinue}
+                  onClick={handleMobileContinue}
                   disabled={mobileNumber.length !== 10 || loading}
                   className={`vb-cta-btn ${mobileNumber.length === 10 && !loading ? 'vb-cta-active' : 'vb-cta-disabled'}`}
                 >
@@ -283,6 +322,80 @@ export default function Login() {
                       {t('processing')}
                     </span>
                   ) : t('continue')}
+                </button>
+              </div>
+            ) : step === 'details' ? (
+              <div className="vb-input-group">
+                <div className="vb-details-field">
+                  <label className="vb-field-label">{t('fullName')}</label>
+                  <input
+                    required
+                    type="text"
+                    value={signUpDetails.name}
+                    onChange={(e) => setSignUpDetails({ ...signUpDetails, name: e.target.value })}
+                    placeholder={t('enterName')}
+                    className="vb-detail-input"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="vb-details-field">
+                  <label className="vb-field-label">{t('emailAddress')}</label>
+                  <input
+                    required
+                    type="email"
+                    value={signUpDetails.email}
+                    onChange={(e) => setSignUpDetails({ ...signUpDetails, email: e.target.value })}
+                    placeholder={t('enterEmail')}
+                    className="vb-detail-input"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="vb-account-type-row">
+                  <button
+                    type="button"
+                    onClick={() => setSignUpDetails({ ...signUpDetails, accountType: 'retailer' })}
+                    className={`vb-account-type-btn ${signUpDetails.accountType === 'retailer' ? 'vb-account-type-active' : ''}`}
+                    disabled={loading}
+                  >
+                    {t('retailer')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSignUpDetails({ ...signUpDetails, accountType: 'wholesaler' })}
+                    className={`vb-account-type-btn ${signUpDetails.accountType === 'wholesaler' ? 'vb-account-type-active' : ''}`}
+                    disabled={loading}
+                  >
+                    {t('wholesaler')}
+                  </button>
+                </div>
+
+                {error && (
+                  <div className="vb-error-msg">{error}</div>
+                )}
+
+                <button
+                  onClick={handleDetailsContinue}
+                  disabled={loading || !signUpDetails.name.trim() || !signUpDetails.email.trim()}
+                  className={`vb-cta-btn ${signUpDetails.name.trim() && signUpDetails.email.trim() && !loading ? 'vb-cta-active' : 'vb-cta-disabled'}`}
+                >
+                  {loading ? (
+                    <span className="vb-spinner-row">
+                      <span className="vb-spinner" />
+                      {t('processing')}
+                    </span>
+                  ) : t('continue')}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setStep('mobile'); setError(''); }}
+                  disabled={loading}
+                  className="vb-action-btn"
+                  style={{ fontFamily: 'inherit' }}
+                >
+                  {t('changeNo')}
                 </button>
               </div>
             ) : (
@@ -295,7 +408,10 @@ export default function Login() {
 
                 <div className="vb-otp-actions">
                   <button
-                    onClick={() => { setShowOTP(false); setError(''); }}
+                    onClick={() => {
+                      setStep('mobile');
+                      setError('');
+                    }}
                     disabled={loading}
                     className="vb-action-btn"
                     style={{ fontFamily: 'inherit' }}
@@ -314,13 +430,6 @@ export default function Login() {
               </div>
             )}
           </div>
-
-          <p className="vb-signup-line">
-            {t('newToVb')}{' '}
-            <button onClick={() => navigate('/user/signup')} className="vb-signup-link">
-              {t('signUp')}
-            </button>
-          </p>
         </div>
       </div>
 
@@ -593,8 +702,39 @@ export default function Login() {
         .vb-action-btn { flex: 1; height: 46px; border-radius: 14px; border: 1.5px solid #eeeada; background: #fff; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; color: #666; cursor: pointer; }
         .vb-action-resend { color: #8B3D28; border-color: rgba(139,61,40,0.15); }
 
-        .vb-signup-line { text-align: center; font-size: 0.75rem; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
-        .vb-signup-link { border: none; background: none; color: #8B3D28; font-weight: 900; cursor: pointer; text-decoration: underline; }
+        .vb-details-field { display: flex; flex-direction: column; gap: 6px; }
+        .vb-field-label { font-size: 0.62rem; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 0.12em; margin-left: 4px; }
+        .vb-detail-input {
+          width: 100%;
+          height: 54px;
+          border: 2px solid #eeeada;
+          border-radius: 16px;
+          padding: 0 16px;
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #1a1a1a;
+          background: #fff;
+          outline: none;
+        }
+        .vb-detail-input:focus { border-color: rgba(139,61,40,0.35); }
+        .vb-account-type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .vb-account-type-btn {
+          height: 46px;
+          border-radius: 14px;
+          border: 2px solid #eeeada;
+          background: #fff;
+          font-weight: 900;
+          font-size: 0.68rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #999;
+          cursor: pointer;
+        }
+        .vb-account-type-active {
+          border-color: #8B3D28;
+          background: rgba(139,61,40,0.05);
+          color: #8B3D28;
+        }
 
         .vb-lang-btn {
           position: absolute;

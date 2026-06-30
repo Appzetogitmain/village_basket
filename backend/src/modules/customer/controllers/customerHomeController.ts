@@ -14,6 +14,7 @@ import HomeBanner from "../../../models/HomeBanner";
 
 import mongoose from "mongoose";
 import { findSellersWithinRange } from "../../../utils/locationHelper";
+import { cache } from "../../../utils/cache";
 
 // Helper function to fetch data for a home section based on its configuration
 async function fetchSectionData(
@@ -177,13 +178,21 @@ async function fetchSectionData(
 export const getHomeContent = async (req: Request, res: Response) => {
   const { headerCategorySlug, latitude, longitude } = req.query;
 
+  const userLat = latitude ? parseFloat(latitude as string) : null;
+  const userLng = longitude ? parseFloat(longitude as string) : null;
+  const roundedLat = userLat !== null && !isNaN(userLat) ? Math.round(userLat * 1000) / 1000 : 0;
+  const roundedLng = userLng !== null && !isNaN(userLng) ? Math.round(userLng * 1000) / 1000 : 0;
+  const cacheKey = `home-content-${headerCategorySlug || "all"}-${roundedLat}-${roundedLng}`;
+
+  const cachedResponse = cache.get<{ success: boolean; data: unknown }>(cacheKey);
+  if (cachedResponse) {
+    return res.status(200).json(cachedResponse);
+  }
+
   try {
     // 1. Find sellers within range for availability check
-    const userLat = latitude ? parseFloat(latitude as string) : null;
-    const userLng = longitude ? parseFloat(longitude as string) : null;
-
     let nearbySellerIds: mongoose.Types.ObjectId[] = [];
-    if (userLat !== null && userLng !== null) {
+    if (userLat !== null && userLng !== null && !isNaN(userLat) && !isNaN(userLng)) {
       nearbySellerIds = await findSellersWithinRange(userLat, userLng);
     }
 
@@ -731,8 +740,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
       .sort({ order: 1 })
       .lean();
 
-    res.status(200).json({
-
+    const responsePayload = {
       success: true,
       data: {
         categories: allCategories, // Category tiles (dynamic based on tab)
@@ -750,9 +758,13 @@ export const getHomeContent = async (req: Request, res: Response) => {
 
         promoBanners: homeBanners
       },
-    });
+    };
+
+    cache.set(cacheKey, responsePayload, 3 * 60 * 1000);
+
+    return res.status(200).json(responsePayload);
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Error fetching home content",
       error: error.message,

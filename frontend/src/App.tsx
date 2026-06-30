@@ -34,17 +34,14 @@ const GlobalRedirect = ({ type }: { type: 'product' | 'category' | 'order' }) =>
   return <Navigate to={target} replace />;
 };
 
-// Landing page - load immediately
-import LandingPage from "./modules/landing/LandingPage";
-
-// Critical routes - load immediately (Home, Cart, Checkout)
-import Home from "./modules/user/Home";
-import Cart from "./modules/user/Cart";
-import Checkout from "./modules/user/Checkout";
-import Wishlist from './modules/user/Wishlist';
-
-import CheckoutAddress from "./modules/user/CheckoutAddress";
-import ProductDetail from "./modules/user/ProductDetail";
+// Customer-critical routes — lazy loaded to shrink initial bundle
+const LandingPage = lazy(() => import("./modules/landing/LandingPage"));
+const Home = lazy(() => import("./modules/user/Home"));
+const Cart = lazy(() => import("./modules/user/Cart"));
+const Checkout = lazy(() => import("./modules/user/Checkout"));
+const Wishlist = lazy(() => import("./modules/user/Wishlist"));
+const CheckoutAddress = lazy(() => import("./modules/user/CheckoutAddress"));
+const ProductDetail = lazy(() => import("./modules/user/ProductDetail"));
 
 // Lazy load less critical routes for code splitting
 const Search = lazy(() => import("./modules/user/Search"));
@@ -56,7 +53,6 @@ const Categories = lazy(() => import("./modules/user/Categories"));
 const Category = lazy(() => import("./modules/user/Category"));
 const Invoice = lazy(() => import("./modules/user/Invoice"));
 const Login = lazy(() => import("./modules/user/Login"));
-const SignUp = lazy(() => import("./modules/user/SignUp"));
 
 const AboutUs = lazy(() => import("./modules/user/AboutUs"));
 const FAQ = lazy(() => import("./modules/user/FAQ"));
@@ -187,8 +183,6 @@ function App() {
   // Initialize push notifications on app load
   useEffect(() => {
     initializePushNotifications();
-
-    // Preload loader animations
     preloadAnimations();
 
     // Setup foreground notification handler
@@ -222,7 +216,7 @@ function App() {
                         <RouteLoaderTrigger />
                         <Routes>
                           {/* Landing Page */}
-                          <Route path="/" element={<LandingPage />} />
+                          <Route path="/" element={<Suspense fallback={null}><LandingPage /></Suspense>} />
                           
                           {/* Top-level redirects to nested /user routes */}
                           <Route path="/cart" element={<Navigate to="/user/cart" replace />} />
@@ -471,11 +465,7 @@ function App() {
                           />
                           <Route
                             path="/user/signup"
-                            element={
-                              <PublicRoute>
-                                <Suspense fallback={null}><SignUp /></Suspense>
-                              </PublicRoute>
-                            }
+                            element={<Navigate to="/user/login" replace />}
                           />
                           <Route path="/user/about-us" element={<AppLayout><Suspense fallback={null}><AboutUs /></Suspense></AppLayout>} />
                           <Route path="/user/faq" element={<AppLayout><Suspense fallback={null}><FAQ /></Suspense></AppLayout>} />

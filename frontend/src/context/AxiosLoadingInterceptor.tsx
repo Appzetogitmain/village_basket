@@ -5,8 +5,10 @@ import { useLoading } from './LoadingContext';
 // Routes that should NOT show the global loader (background/silent requests)
 const SILENT_ROUTES = [
   '/customer/location',
+  '/customer/home',
   '/fcm-tokens',
   '/customer/wishlist',
+  '/categories/',
 ];
 
 const isSilentRequest = (url?: string): boolean => {

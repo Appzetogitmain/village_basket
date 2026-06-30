@@ -52,11 +52,13 @@ app.get("/", (_req: Request, res: Response) => {
   });
 });
 
-// Debug middleware - log all incoming requests
-app.use((req: Request, _res: Response, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
+// Debug middleware - log requests in development only
+if (process.env.NODE_ENV !== "production") {
+  app.use((req: Request, _res: Response, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    next();
+  });
+}
 
 // API Routes
 app.use("/api/v1", routes);

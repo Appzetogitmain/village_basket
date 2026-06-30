@@ -8,6 +8,28 @@ import { generateToken } from "../../../services/jwtService";
 import { asyncHandler } from "../../../utils/asyncHandler";
 
 /**
+ * Check if a mobile number is already registered
+ */
+export const checkMobile = asyncHandler(async (req: Request, res: Response) => {
+  const { mobile } = req.body;
+
+  if (!mobile || !/^[0-9]{10,12}$/.test(mobile)) {
+    return res.status(400).json({
+      success: false,
+      message: "Valid 10-digit mobile number is required",
+    });
+  }
+
+  const normalizedMobile = mobile.slice(-10);
+  const customer = await Customer.findOne({ phone: normalizedMobile }).select("_id");
+
+  return res.status(200).json({
+    success: true,
+    data: { exists: !!customer },
+  });
+});
+
+/**
  * Send SMS OTP to customer mobile number
  * Returns session_id for verification
  */

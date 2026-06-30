@@ -31,7 +31,15 @@ export const getAnimationData = async (name: string): Promise<any> => {
 };
 
 export const preloadAnimations = () => {
-  ALLOWED_ANIMATIONS.forEach(name => {
-    getAnimationData(name);
-  });
+  const run = () => {
+    ALLOWED_ANIMATIONS.forEach(name => {
+      getAnimationData(name);
+    });
+  };
+
+  if (typeof requestIdleCallback !== 'undefined') {
+    requestIdleCallback(run, { timeout: 8000 });
+  } else {
+    setTimeout(run, 3000);
+  }
 };

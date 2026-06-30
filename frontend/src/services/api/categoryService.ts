@@ -109,13 +109,25 @@ export const getCategoryById = async (
  */
 export const getSubcategories = async (
   categoryId: string,
-  params?: GetSubcategoriesParams
+  params?: GetSubcategoriesParams & { skipLoader?: boolean }
 ): Promise<ApiResponse<SubCategory[]>> => {
-  const response = await api.get<ApiResponse<SubCategory[]>>(
-    `/categories/${categoryId}/subcategories`,
-    { params }
+  const { skipLoader, ...queryParams } = params || {};
+  const cacheKey = `subcategories-${categoryId}-${JSON.stringify(queryParams)}`;
+
+  return apiCache.getOrFetch(
+    cacheKey,
+    async () => {
+      const config: any = { params: queryParams };
+      if (skipLoader) config.skipLoader = true;
+
+      const response = await api.get<ApiResponse<SubCategory[]>>(
+        `/categories/${categoryId}/subcategories`,
+        config
+      );
+      return response.data;
+    },
+    10 * 60 * 1000
   );
-  return response.data;
 };
 
 /**

@@ -4,6 +4,9 @@ import { otpRateLimiter, loginRateLimiter } from "../middleware/rateLimiter";
 
 const router = Router();
 
+// Check if mobile is registered (unified login/signup flow)
+router.post("/check-mobile", customerAuthController.checkMobile);
+
 // Send SMS OTP route
 router.post("/send-sms-otp", otpRateLimiter, customerAuthController.sendSmsOtp);
 
