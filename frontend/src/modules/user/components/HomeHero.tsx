@@ -406,15 +406,6 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
           onClick={() => navigate('/user/location')}
           className="flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2 py-1.5 border border-white/5 active:scale-[0.98] transition-all cursor-pointer relative z-20"
         >
-          {/* ETA Badge */}
-          <div className="flex-shrink-0 flex items-center gap-1 bg-[#FFF9F0] px-2 py-0.5 rounded-full border border-[#F0D5C9] shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#8B3D28] animate-pulse"></span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF9933]">
-              <path d="M13 2v9h6L11 22v-9H5l8-11z"/>
-            </svg>
-            <span className="text-[9px] font-bold text-[#8B3D28] leading-none">10-12 min</span>
-          </div>
-
           <div className="w-4 h-4 rounded-full bg-[#4b7d5a] flex items-center justify-center shadow-sm flex-shrink-0">
             <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />

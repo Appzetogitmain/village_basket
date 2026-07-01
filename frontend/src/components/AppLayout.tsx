@@ -6,7 +6,6 @@ import { useLocation as useLocationContext } from '../hooks/useLocation';
 import LocationPermissionRequest from './LocationPermissionRequest';
 import { useThemeContext } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
-import { getActiveDeliverySlots } from '../services/api/admin/adminDeliverySlotService';
 import brandLogo from '@assets/village_basket-removebg-preview.png';
 import Footer from './Footer';
 
@@ -22,7 +21,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [categoriesRotation, setCategoriesRotation] = useState(0);
   const [prevCategoriesActive, setPrevCategoriesActive] = useState(false);
-  const [slotBadgeText, setSlotBadgeText] = useState('Slots Open');
   const { isLocationEnabled, isLocationLoading, location: userLocation } = useLocationContext();
   const [showLocationRequest, setShowLocationRequest] = useState(false);
   const [showLocationChangeModal, setShowLocationChangeModal] = useState(false);
@@ -71,49 +69,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
     const query = searchParams.get('q') || '';
     setSearchQuery(query);
   }, [searchParams]);
-
-  useEffect(() => {
-    const toMinutes = (value: string): number => {
-      const [h, m] = value.split(':').map(Number);
-      if (Number.isNaN(h) || Number.isNaN(m)) return 0;
-      return (h * 60) + m;
-    };
-
-    const updateSlotBadge = async () => {
-      try {
-        const res = await getActiveDeliverySlots();
-        const slots = res?.success ? res.data : [];
-        if (!slots.length) {
-          setSlotBadgeText('Slots Open');
-          return;
-        }
-
-        const now = new Date();
-        const nowMinutes = (now.getHours() * 60) + now.getMinutes();
-        const sortedSlots = [...slots].sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
-
-        const currentSlot = sortedSlots.find(slot => {
-          const start = toMinutes(slot.startTime);
-          const end = toMinutes(slot.endTime);
-          return nowMinutes >= start && nowMinutes <= end;
-        });
-
-        if (currentSlot) {
-          setSlotBadgeText(currentSlot.label || `${currentSlot.startTime} - ${currentSlot.endTime}`);
-          return;
-        }
-
-        const nextSlot = sortedSlots.find(slot => nowMinutes < toMinutes(slot.startTime));
-        const fallbackSlot = nextSlot || sortedSlots[0];
-        setSlotBadgeText(fallbackSlot.label || `${fallbackSlot.startTime} - ${fallbackSlot.endTime}`);
-      } catch (error) {
-        console.error('Failed to load slot badge data', error);
-        setSlotBadgeText('Slots Open');
-      }
-    };
-
-    updateSlotBadge();
-  }, []);
 
   // Handle search input change
   const handleSearchChange = (value: string) => {
@@ -233,15 +188,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
                         </span>
                       </div>
                     </button>
-
-                    {/* ETA Badge on Desktop */}
-                    <div className="flex items-center gap-1.5 bg-[#FFF9F0] px-3 py-1.5 rounded-xl border border-[#F0D5C9] shadow-sm transform hover:scale-105 transition-all duration-300">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#8B3D28] animate-pulse"></span>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF9933]">
-                        <path d="M13 2v9h6L11 22v-9H5l8-11z"/>
-                      </svg>
-                      <span className="text-xs font-bold text-[#8B3D28] leading-none">{slotBadgeText}</span>
-                    </div>
                   </div>
                 </div>
 
