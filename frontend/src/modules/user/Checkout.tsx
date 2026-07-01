@@ -97,6 +97,42 @@ export default function Checkout() {
   const [selectedSlot, setSelectedSlot] = useState<DeliverySlotSelection | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(false);
 
+  const getMinutesFromTime = (time: string): number => {
+    const [h, m] = (time || '').split(':').map(Number);
+    if (Number.isNaN(h) || Number.isNaN(m)) return -1;
+    return (h * 60) + m;
+  };
+
+  const isSameCalendarDate = (a: Date, b: Date): boolean =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
+
+  const isSlotExpiredForDate = (slot: { startTime: string; endTime: string }, date: Date | null): boolean => {
+    const effectiveDate = date ?? new Date();
+    const now = new Date();
+    const isToday = isSameCalendarDate(effectiveDate, now);
+    if (!isToday) return false;
+
+    const endMinutes = getMinutesFromTime(slot.endTime);
+    if (endMinutes < 0) return false;
+    const nowMinutes = (now.getHours() * 60) + now.getMinutes();
+    return nowMinutes > endMinutes;
+  };
+
+  const visibleSlots = useMemo(
+    () => availableSlots.filter(slot => !isSlotExpiredForDate(slot, selectedDeliveryDate)),
+    [availableSlots, selectedDeliveryDate]
+  );
+
+  useEffect(() => {
+    if (!selectedSlot) return;
+    const stillValid = visibleSlots.some(slot => slot._id === selectedSlot.slotId);
+    if (!stillValid) {
+      setSelectedSlot(null);
+    }
+  }, [selectedSlot, visibleSlots]);
+
 
   // Check if user has placeholder data (needs profile completion)
   const isPlaceholderUser = user?.name === 'User' || user?.email?.endsWith('@villagebasket.temp');
@@ -390,6 +426,12 @@ export default function Checkout() {
     // Check if delivery shift is selected
     if (!selectedSlot) {
       showGlobalToast('Please select a delivery slot', 'error');
+      return;
+    }
+
+    const selectedSlotDetails = availableSlots.find(slot => slot._id === selectedSlot.slotId);
+    if (!selectedSlotDetails || isSlotExpiredForDate(selectedSlotDetails, selectedDeliveryDate)) {
+      showGlobalToast('Selected slot is no longer available for this time. Please choose an active slot.', 'error');
       return;
     }
 
@@ -1075,13 +1117,15 @@ export default function Checkout() {
             <div className="w-4 h-4 border-2 border-[#8B3D28] border-t-transparent rounded-full animate-spin" />
             <span className="text-xs text-neutral-500">Loading available slots...</span>
           </div>
-        ) : availableSlots.length === 0 ? (
+        ) : visibleSlots.length === 0 ? (
           <div className="text-center py-4 bg-neutral-50 rounded-xl border border-neutral-200">
-            <p className="text-xs text-neutral-500 font-medium">No delivery slots available. We'll deliver at the earliest!</p>
+            <p className="text-xs text-neutral-500 font-medium">
+              No active slots available for the selected time. Please choose another date.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            {availableSlots.map(slot => {
+            {visibleSlots.map(slot => {
               const isSelected = selectedSlot?.slotId === slot._id;
               const getIcon = (name: string) => {
                 const n = (name || '').toLowerCase();
@@ -1099,6 +1143,8 @@ export default function Checkout() {
                     name: slot.name,
                     label: slot.label,
                     timeRange: slot.label,
+                    startTime: slot.startTime,
+                    endTime: slot.endTime,
                   })}
                   className={`p-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all ${isSelected
                     ? 'border-[#8B3D28] bg-[#8B3D28]/10 text-[#8B3D28]'
@@ -1121,7 +1167,7 @@ export default function Checkout() {
             })}
           </div>
         )}
-        {availableSlots.length > 0 && !selectedSlot && (
+        {visibleSlots.length > 0 && !selectedSlot && (
           <p className="text-[10px] text-amber-600 mt-2 font-medium">Please select a delivery time slot to proceed</p>
         )}
         {selectedSlot && (

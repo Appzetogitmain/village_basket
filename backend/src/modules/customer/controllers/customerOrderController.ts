@@ -15,6 +15,7 @@ import Payment from "../../../models/Payment";
 import Refund from "../../../models/Refund";
 import WalletTransaction from "../../../models/WalletTransaction";
 import Return from "../../../models/Return";
+import DeliverySlot from "../../../models/DeliverySlot";
 
 import {
     buildOrderPaymentSnapshot,
@@ -50,6 +51,44 @@ export const createOrder = async (req: Request, res: Response) => {
         const targetDate = new Date(deliveryDate);
         targetDate.setHours(0, 0, 0, 0);
         const calculatedOrderType = targetDate > today ? "SCHEDULED" : "INSTANT";
+
+        // Validate slot timing for same-day bookings (prevents booking past slots)
+        if (deliverySlot?.slotId) {
+            const selectedSlot = await DeliverySlot.findById(deliverySlot.slotId).lean();
+            if (!selectedSlot || !selectedSlot.isActive) {
+                if (session) await session.abortTransaction();
+                return res.status(400).json({
+                    success: false,
+                    message: "Selected delivery slot is not available",
+                });
+            }
+
+            const fmtDateIST = (d: Date) =>
+                new Intl.DateTimeFormat("en-CA", {
+                    timeZone: "Asia/Kolkata",
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                }).format(d);
+
+            const deliveryDateKey = fmtDateIST(deliveryDate);
+            const todayKey = fmtDateIST(new Date());
+
+            if (deliveryDateKey === todayKey) {
+                const [endHour, endMinute] = String(selectedSlot.endTime || "00:00").split(":").map(Number);
+                const nowInIST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+                const nowMinutes = (nowInIST.getHours() * 60) + nowInIST.getMinutes();
+                const slotEndMinutes = ((Number.isNaN(endHour) ? 0 : endHour) * 60) + (Number.isNaN(endMinute) ? 0 : endMinute);
+
+                if (nowMinutes > slotEndMinutes) {
+                    if (session) await session.abortTransaction();
+                    return res.status(400).json({
+                        success: false,
+                        message: "Selected delivery slot has already ended for today. Please choose another slot.",
+                    });
+                }
+            }
+        }
 
         // Log incoming request for debugging
         console.log("DEBUG: Order creation request:", {

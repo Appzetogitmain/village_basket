@@ -78,17 +78,50 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       console.log('[LocationContext] Checking initial permission status...');
 
       try {
-        // 1. Check sessionStorage for session-level permission
+        // 1. Restore persisted location first (survives browser/app restarts)
+        const cachedLocation = localStorage.getItem(LOCATION_STORAGE_KEY);
+        if (cachedLocation) {
+          try {
+            const parsedLocation = JSON.parse(cachedLocation);
+            const hasValidCoords =
+              typeof parsedLocation?.latitude === 'number' &&
+              typeof parsedLocation?.longitude === 'number' &&
+              !isNaN(parsedLocation.latitude) &&
+              !isNaN(parsedLocation.longitude);
+
+            if (hasValidCoords) {
+              console.log('[LocationContext] Restored cached location from localStorage:', parsedLocation.address);
+              setLocation(parsedLocation);
+              setIsLocationEnabled(true);
+              setLocationPermissionStatus('session_granted');
+              try {
+                // Keep session state aligned so same-session flows continue to work
+                sessionStorage.setItem(SESSION_PERMISSION_KEY, 'true');
+              } catch (e) {
+                console.warn('[LocationContext] Failed to save session flag while restoring cache:', e);
+              }
+              return;
+            }
+
+            // Corrupted cache: remove and continue to prompt flow
+            localStorage.removeItem(LOCATION_STORAGE_KEY);
+          } catch (e) {
+            console.error('[LocationContext] Failed to parse cached location:', e);
+            localStorage.removeItem(LOCATION_STORAGE_KEY);
+          }
+        }
+
+        // 2. Check sessionStorage for session-level permission
         const sessionGranted = sessionStorage.getItem(SESSION_PERMISSION_KEY);
 
         if (sessionGranted === 'true') {
           console.log('[LocationContext] Permission already granted in this session.');
 
-          // 2. Check for cached location in localStorage
-          const cachedLocation = localStorage.getItem(LOCATION_STORAGE_KEY);
-          if (cachedLocation) {
+          // Re-check cache in case another tab populated it very recently
+          const latestCachedLocation = localStorage.getItem(LOCATION_STORAGE_KEY);
+          if (latestCachedLocation) {
             try {
-              const parsedLocation = JSON.parse(cachedLocation);
+              const parsedLocation = JSON.parse(latestCachedLocation);
               console.log('[LocationContext] Using cached location from this session:', parsedLocation.address);
               setLocation(parsedLocation);
               setIsLocationEnabled(true);
