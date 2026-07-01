@@ -44,6 +44,47 @@ const USER_DATA_KEYS: Record<string, string> = {
   customer: "userData",
 };
 
+const safeGetStorage = (key: string): string | null => {
+  try {
+    const local = localStorage.getItem(key);
+    if (local) return local;
+  } catch (_e) {
+    // Ignore storage access errors (common in restricted webviews)
+  }
+
+  try {
+    return sessionStorage.getItem(key);
+  } catch (_e) {
+    return null;
+  }
+};
+
+const safeSetStorage = (key: string, value: string): void => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (_e) {
+    // Ignore and fallback
+  }
+  try {
+    sessionStorage.setItem(key, value);
+  } catch (_e) {
+    // Ignore
+  }
+};
+
+const safeRemoveStorage = (key: string): void => {
+  try {
+    localStorage.removeItem(key);
+  } catch (_e) {
+    // Ignore
+  }
+  try {
+    sessionStorage.removeItem(key);
+  } catch (_e) {
+    // Ignore
+  }
+};
+
 // Determine the role based on URL or current path
 const getRole = (url?: string): string => {
   const currentPath = window.location.pathname;
@@ -77,8 +118,7 @@ const getRole = (url?: string): string => {
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const role = getRole(config.url);
-    const tokenKey = AUTH_TOKEN_KEYS[role];
-    const token = localStorage.getItem(tokenKey);
+    const token = getAuthToken(role);
 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -117,8 +157,17 @@ api.interceptors.response.use(
           redirectPath = "/delivery/login";
         }
 
-        localStorage.removeItem(AUTH_TOKEN_KEYS[role]);
-        localStorage.removeItem(USER_DATA_KEYS[role]);
+        const failedToken = typeof hadToken === "string" && hadToken.startsWith("Bearer ")
+          ? hadToken.slice(7)
+          : null;
+        const currentStoredToken = getAuthToken(role);
+
+        // Ignore stale request 401s: if request used an old token, don't logout current session.
+        if (failedToken && currentStoredToken && failedToken !== currentStoredToken) {
+          return Promise.reject(error);
+        }
+
+        removeAuthToken(role);
         window.location.href = redirectPath;
       }
     }
@@ -129,29 +178,29 @@ api.interceptors.response.use(
 // Token management helpers
 export const setAuthToken = (token: string, role?: string) => {
   const userRole = role || getRole();
-  localStorage.setItem(AUTH_TOKEN_KEYS[userRole], token);
+  safeSetStorage(AUTH_TOKEN_KEYS[userRole], token);
 };
 
 export const setUserData = (userData: any, role?: string) => {
   const userRole = role || getRole();
-  localStorage.setItem(USER_DATA_KEYS[userRole], JSON.stringify(userData));
+  safeSetStorage(USER_DATA_KEYS[userRole], JSON.stringify(userData));
 };
 
 export const getAuthToken = (role?: string): string | null => {
   const userRole = role || getRole();
-  return localStorage.getItem(AUTH_TOKEN_KEYS[userRole]);
+  return safeGetStorage(AUTH_TOKEN_KEYS[userRole]);
 };
 
 export const getUserData = (role?: string): any | null => {
   const userRole = role || getRole();
-  const data = localStorage.getItem(USER_DATA_KEYS[userRole]);
+  const data = safeGetStorage(USER_DATA_KEYS[userRole]);
   return data ? JSON.parse(data) : null;
 };
 
 export const removeAuthToken = (role?: string) => {
   const userRole = role || getRole();
-  localStorage.removeItem(AUTH_TOKEN_KEYS[userRole]);
-  localStorage.removeItem(USER_DATA_KEYS[userRole]);
+  safeRemoveStorage(AUTH_TOKEN_KEYS[userRole]);
+  safeRemoveStorage(USER_DATA_KEYS[userRole]);
 };
 
 export default api;
