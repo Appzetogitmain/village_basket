@@ -19,6 +19,7 @@ import brandLogo from '@assets/village_basket-removebg-preview.png';
 import FestivalCategoryModule from './FestivalCategoryModule';
 import DateTrackerStrip from './DateTrackerStrip';
 import HomeBannersCarousel from './HomeBannersCarousel';
+import DeliveryEtaBadge from '../../../components/DeliveryEtaBadge';
 
 
 gsap.registerPlugin(ScrollTrigger);
@@ -369,16 +370,16 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
           </div>
         </div>
 
-        <div className="mb-2.5 relative z-20">
+        <div className="mb-3 relative z-20">
           <div
             onClick={handleSearchClick}
-            className="w-full bg-white rounded-xl px-3.5 py-2 flex items-center gap-2.5 shadow-[0_4px_12px_rgba(0,0,0,0.08)] cursor-pointer group active:scale-[0.98] transition-all"
+            className="w-full bg-white rounded-2xl px-4 py-3.5 flex items-center gap-3 shadow-[0_4px_16px_rgba(0,0,0,0.1)] cursor-pointer group active:scale-[0.98] transition-all min-h-[48px]"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B3D28" strokeWidth="3" strokeLinecap="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B3D28" strokeWidth="3" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <div className="flex-1 relative h-4 overflow-hidden">
+            <div className="flex-1 relative h-5 overflow-hidden">
               {searchSuggestions.map((suggestion, index) => {
                 const isActive = index === currentSearchIndex;
                 return (
@@ -386,7 +387,7 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
                     key={suggestion}
                     className={`absolute inset-0 flex items-center transition-all duration-500 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
                   >
-                    <span className="text-neutral-400 text-[12px] font-bold">Search &quot;{suggestion}&quot;</span>
+                    <span className="text-neutral-400 text-sm font-semibold">Search &quot;{suggestion}&quot;</span>
                   </div>
                 );
               })}
@@ -401,22 +402,25 @@ export default function HomeHero({ activeTab = 'all', onTabChange, festivalModul
           </div>
         </div>
 
-        {/* Delivery Address Pill */}
-        <div
-          onClick={() => navigate('/user/location')}
-          className="flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2 py-1.5 border border-white/5 active:scale-[0.98] transition-all cursor-pointer relative z-20"
-        >
-          <div className="w-4 h-4 rounded-full bg-[#4b7d5a] flex items-center justify-center shadow-sm flex-shrink-0">
-            <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+        {/* Delivery Address + Next Slot */}
+        <div className="flex flex-col gap-2 relative z-20">
+          <div
+            onClick={() => navigate('/user/location')}
+            className="flex w-full items-center gap-2 bg-black/10 backdrop-blur-sm rounded-lg px-2.5 py-2 border border-white/5 active:scale-[0.98] transition-all cursor-pointer"
+          >
+            <div className="w-4 h-4 rounded-full bg-[#4b7d5a] flex items-center justify-center shadow-sm flex-shrink-0">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+              </svg>
+            </div>
+            <span className="text-[9px] text-white/80 font-black truncate flex-1 uppercase tracking-tight">
+              {locationDisplayText || 'Set delivery location'}
+            </span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 flex-shrink-0">
+              <path d="M9 18l6-6-6-6" />
             </svg>
           </div>
-          <span className="text-[9px] text-white/80 font-black truncate flex-1 uppercase tracking-tight">
-            {locationDisplayText || 'Set delivery location'}
-          </span>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-30 flex-shrink-0">
-            <path d="M9 18l6-6-6-6" />
-          </svg>
+          <DeliveryEtaBadge variant="compact" className="w-full" />
         </div>
       </div>
 

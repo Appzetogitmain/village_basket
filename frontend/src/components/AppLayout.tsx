@@ -8,6 +8,7 @@ import { useThemeContext } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
 import brandLogo from '@assets/village_basket-removebg-preview.png';
 import Footer from './Footer';
+import DeliveryEtaBadge from './DeliveryEtaBadge';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -156,48 +157,52 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {/* Sticky Desktop Header - Dynamic Transition */}
           {showHeader && (
             <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 hidden md:block px-4 md:px-8 ${isScrolled ? 'bg-[#8B3D28]/95 backdrop-blur-md shadow-xl py-3 border-b border-white/5' : 'bg-transparent py-5'}`}>
-              <div className="max-w-[1550px] mx-auto flex items-center justify-between gap-6 lg:gap-12">
+              <div className="max-w-[1550px] mx-auto grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 lg:gap-x-4 min-w-0 w-full">
                 
-                {/* Logo & Location Side-by-Side */}
-                <div className="flex items-center gap-6 lg:gap-10">
+                {/* Logo + Location + ETA */}
+                <div className="flex items-center gap-2 lg:gap-3 min-w-0 max-w-[min(100%,420px)]">
                   <Link to="/user" className="flex-shrink-0 transition-all hover:scale-105 active:scale-95 duration-300">
-                    <div className={`${isScrolled ? 'bg-white' : 'bg-white shadow-xl'} rounded-2xl px-5 py-2 transition-all duration-500 border-2 border-white/10 flex items-center justify-center`}>
+                    <div className={`${isScrolled ? 'bg-white' : 'bg-white shadow-xl'} rounded-2xl px-3 lg:px-4 py-2 transition-all duration-500 border-2 border-white/10 flex items-center justify-center`}>
                       <img
                         src={brandLogo}
                         alt="Village Basket"
-                        className={`${isScrolled ? 'h-8 lg:h-9' : 'h-9 lg:h-11'} w-auto object-contain transition-all duration-500`}
+                        className={`${isScrolled ? 'h-8' : 'h-9 lg:h-10'} w-auto object-contain transition-all duration-500`}
                       />
                     </div>
                   </Link>
                   
-                  {/* Delivery Location - Styled like the image */}
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={() => navigate('/user/location')}
-                      className="flex items-center gap-3 group transition-all"
-                    >
-                      <div className={`w-10 h-10 rounded-2xl ${isScrolled ? 'bg-white/10' : 'bg-black/20 backdrop-blur-md'} flex items-center justify-center border border-white/10 group-hover:bg-[#4b7d5a] group-hover:border-[#4b7d5a] transition-all`}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-[#4b7d5a] group-hover:text-white transition-colors">
-                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
-                        </svg>
-                      </div>
-                      <div className="flex flex-col text-left">
-                        <span className="text-[10px] font-black text-[#4b7d5a] uppercase tracking-tighter leading-none mb-1">Deliver to</span>
-                        <span className={`text-xs lg:text-sm font-bold max-w-[140px] lg:max-w-[200px] truncate leading-tight group-hover:text-[#4b7d5a] transition-colors ${isScrolled ? 'text-white' : 'text-village-umber'}`}>
-                          {userLocation?.address || userLocation?.city || 'Set Location'}
-                        </span>
-                      </div>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => navigate('/user/location')}
+                    className="hidden lg:flex items-center gap-2 group transition-all min-w-0 max-w-[140px] xl:max-w-[200px]"
+                  >
+                    <div className={`w-8 h-8 xl:w-9 xl:h-9 rounded-xl flex-shrink-0 ${isScrolled ? 'bg-white/10' : 'bg-black/20 backdrop-blur-md'} flex items-center justify-center border border-white/10 group-hover:bg-[#4b7d5a] group-hover:border-[#4b7d5a] transition-all`}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-[#4b7d5a] group-hover:text-white transition-colors">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+                      </svg>
+                    </div>
+                    <div className="flex flex-col text-left min-w-0">
+                      <span className="text-[8px] xl:text-[9px] font-black text-[#4b7d5a] uppercase tracking-tighter leading-none mb-0.5">Deliver to</span>
+                      <span className={`text-[11px] xl:text-xs font-bold truncate leading-tight group-hover:text-[#4b7d5a] transition-colors ${isScrolled ? 'text-white' : 'text-village-umber'}`}>
+                        {userLocation?.address || userLocation?.city || 'Set Location'}
+                      </span>
+                    </div>
+                  </button>
+
+                  <div
+                    className={`hidden lg:block h-7 w-px flex-shrink-0 ${isScrolled ? 'bg-white/20' : 'bg-[#8B3D28]/15'}`}
+                    aria-hidden
+                  />
+
+                  <DeliveryEtaBadge isScrolled={isScrolled} className="hidden lg:flex flex-shrink-0 min-w-0" />
                 </div>
 
-                {/* Central Premium Search Bar */}
-                <div className="flex-1 max-w-3xl">
+                {/* Search — middle column, never overlaps nav */}
+                <div className="min-w-0 w-full px-1 lg:px-2">
                   <div 
                     onClick={() => navigate('/user/search')}
-                    className="relative w-full group cursor-pointer"
+                    className="relative w-full max-w-full group cursor-pointer"
                   >
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B3D28]/60 transition-colors group-hover:text-[#8B3D28]">
+                    <div className="absolute left-3 lg:left-4 top-1/2 -translate-y-1/2 text-[#8B3D28]/60 transition-colors group-hover:text-[#8B3D28]">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
                         <circle cx="11" cy="11" r="7" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -207,9 +212,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       type="text"
                       readOnly
                       placeholder='Search for "farm fresh vegetables"'
-                      className={`w-full bg-white text-village-umber rounded-2xl py-3 px-12 text-sm lg:text-base font-medium placeholder:text-village-umber/40 border border-transparent transition-all cursor-pointer group-hover:shadow-lg ${isScrolled ? 'shadow-md ring-1 ring-white/10' : 'shadow-xl'}`}
+                      className={`w-full max-w-full h-11 lg:h-12 xl:h-[52px] bg-white text-village-umber rounded-2xl py-0 pl-10 lg:pl-12 pr-10 lg:pr-12 text-sm lg:text-base xl:text-lg font-medium placeholder:text-village-umber/45 border border-transparent transition-all cursor-pointer group-hover:shadow-lg ${isScrolled ? 'shadow-md ring-1 ring-white/10' : 'shadow-xl'}`}
                     />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B3D28]/40">
+                    <div className="absolute right-3 lg:right-4 top-1/2 -translate-y-1/2 text-[#8B3D28]/40">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
                         <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
@@ -218,36 +223,36 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   </div>
                 </div>
 
-                {/* Desktop Menu - Styled like the image */}
-                <div className="flex items-center gap-1 lg:gap-4 ml-4">
+                {/* Desktop Menu — fixed width column, no overlap */}
+                <div className="flex items-center justify-end gap-0.5 lg:gap-1 flex-shrink-0 pl-1">
                   {/* Home */}
                   <Link
                     to="/user"
-                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user') || isActive('/user/') || isActive('/user/home') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
+                    className={`flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 lg:py-2.5 rounded-2xl transition-all ${isActive('/user') || isActive('/user/') || isActive('/user/home') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                       <polyline points="9 22 9 12 15 12 15 22" />
                     </svg>
-                    <span className="text-sm font-bold">Home</span>
+                    <span className="hidden xl:inline text-sm font-bold">Home</span>
                   </Link>
 
                   {/* Orders */}
                   <Link
                     to="/user/order-again"
-                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/order-again') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
+                    className={`flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 lg:py-2.5 rounded-2xl transition-all ${isActive('/user/order-again') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
                       <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                     </svg>
-                    <span className="text-sm font-bold">Orders</span>
+                    <span className="hidden xl:inline text-sm font-bold">Orders</span>
                   </Link>
 
                   {/* Categories */}
                   <Link
                     to="/user/categories"
-                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/categories') || location.pathname.startsWith('/user/category/') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
+                    className={`flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 lg:py-2.5 rounded-2xl transition-all ${isActive('/user/categories') || location.pathname.startsWith('/user/category/') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="7" height="7" />
@@ -255,25 +260,25 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       <rect x="14" y="14" width="7" height="7" />
                       <rect x="3" y="14" width="7" height="7" />
                     </svg>
-                    <span className="text-sm font-bold">Categories</span>
+                    <span className="hidden xl:inline text-sm font-bold">Categories</span>
                   </Link>
 
                   {/* Profile */}
                   <Link
                     to="/user/account"
-                    className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl transition-all ${isActive('/user/account') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg scale-105' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
+                    className={`flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 lg:py-2.5 rounded-2xl transition-all ${isActive('/user/account') ? 'bg-[#FFCC00] text-[#8B3D28] shadow-lg' : `hover:bg-white/10 ${isScrolled ? 'text-white/80 hover:text-white' : 'text-village-umber/80 hover:text-village-umber'}`}`}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                       <circle cx="12" cy="7" r="4" />
                     </svg>
-                    <span className="text-sm font-bold">Profile</span>
+                    <span className="hidden xl:inline text-sm font-bold">Profile</span>
                   </Link>
 
                   {/* Explore More */}
                   <Link
                     to="/"
-                    className="ml-2 flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#4b7d5a] text-white shadow-[0_4px_15px_rgba(75,125,90,0.3)] hover:shadow-[0_6px_20px_rgba(75,125,90,0.4)] hover:bg-[#3d664a] transition-all active:scale-95 group"
+                    className="hidden 2xl:flex ml-1 items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#4b7d5a] text-white shadow-[0_4px_15px_rgba(75,125,90,0.3)] hover:shadow-[0_6px_20px_rgba(75,125,90,0.4)] hover:bg-[#3d664a] transition-all active:scale-95 group"
                   >
                     <span className="text-[10px] font-black uppercase tracking-widest">Explore More</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 transition-transform">

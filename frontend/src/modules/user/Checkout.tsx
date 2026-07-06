@@ -28,6 +28,9 @@ import { calculateProductPrice } from '../../utils/priceUtils';
 import QuantityInput from '../../components/ui/QuantityInput';
 import RazorpayCheckout from '../../components/RazorpayCheckout';
 import ProductCard from '../user/components/ProductCard';
+import {
+  isSlotExpiredForDate,
+} from '../../utils/deliverySlotUtils';
 
 // const STORAGE_KEY = 'saved_address'; // Removed
 
@@ -96,29 +99,6 @@ export default function Checkout() {
   const [availableSlots, setAvailableSlots] = useState<Array<{ _id: string; name: string; label: string; startTime: string; endTime: string }>>([]);
   const [selectedSlot, setSelectedSlot] = useState<DeliverySlotSelection | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(false);
-
-  const getMinutesFromTime = (time: string): number => {
-    const [h, m] = (time || '').split(':').map(Number);
-    if (Number.isNaN(h) || Number.isNaN(m)) return -1;
-    return (h * 60) + m;
-  };
-
-  const isSameCalendarDate = (a: Date, b: Date): boolean =>
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate();
-
-  const isSlotExpiredForDate = (slot: { startTime: string; endTime: string }, date: Date | null): boolean => {
-    const effectiveDate = date ?? new Date();
-    const now = new Date();
-    const isToday = isSameCalendarDate(effectiveDate, now);
-    if (!isToday) return false;
-
-    const endMinutes = getMinutesFromTime(slot.endTime);
-    if (endMinutes < 0) return false;
-    const nowMinutes = (now.getHours() * 60) + now.getMinutes();
-    return nowMinutes > endMinutes;
-  };
 
   const visibleSlots = useMemo(
     () => availableSlots.filter(slot => !isSlotExpiredForDate(slot, selectedDeliveryDate)),
