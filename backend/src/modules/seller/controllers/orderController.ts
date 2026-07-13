@@ -160,7 +160,7 @@ export const getOrderById = asyncHandler(
     const orderItems = sellerItems;
 
     // Format order items for frontend
-    const formattedItems = orderItems.map(item => {
+    const formattedItems = orderItems.map((item, index) => {
       let unit = item.variation || 'N/A';
       let variationMatched = false;
 
@@ -197,7 +197,7 @@ export const getOrderById = asyncHandler(
       }
 
       return {
-        srNo: item._id.toString().slice(-4), // Use last 4 chars of ID as srNo
+        srNo: String(index + 1),
         product: item.productName || 'Unknown Product',
         soldBy: (item.seller as any)?.storeName || 'N/A',
         unit: unit,

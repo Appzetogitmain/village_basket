@@ -87,6 +87,7 @@ export const getNextDeliverySlotBadge = (
   };
 };
 
+/** Same-day slot is unbookable once its start time is reached. */
 export const isSlotExpiredForDate = (
   slot: Pick<DeliverySlotTime, 'startTime' | 'endTime'>,
   date: Date | null,
@@ -100,9 +101,9 @@ export const isSlotExpiredForDate = (
 
   if (!isToday) return false;
 
-  const endMinutes = getMinutesFromTime(slot.endTime);
-  if (endMinutes < 0) return false;
+  const startMinutes = getMinutesFromTime(slot.startTime);
+  if (startMinutes < 0) return false;
 
   const nowMinutes = (now.getHours() * 60) + now.getMinutes();
-  return nowMinutes > endMinutes;
+  return nowMinutes >= startMinutes;
 };

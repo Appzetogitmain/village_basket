@@ -97,8 +97,6 @@ export default function SellerOrderDetail() {
         // Refresh order details to show new delivery boy info
         const freshOrder = await getOrderById(orderDetail.id);
         if (freshOrder.success && freshOrder.data) {
-           setOrderDetail( ताजा => ({ ...freshOrder.data }));
-           // Or just simply:
            setOrderDetail(freshOrder.data);
         }
         
@@ -275,7 +273,7 @@ export default function SellerOrderDetail() {
     yPos += 12;
 
     // Table Rows
-    orderDetail.items.forEach((item) => {
+    orderDetail.items.forEach((item, index) => {
       checkPageBreak(15);
 
       doc.setFontSize(8);
@@ -284,7 +282,7 @@ export default function SellerOrderDetail() {
 
       xPos = margin;
       const rowData = [
-        item.srNo.toString(),
+        String(index + 1),
         item.product,
         `₹${item.price.toFixed(2)}`,
         `${item.tax.toFixed(2)} (${item.taxPercent.toFixed(2)}%)`,
@@ -623,9 +621,9 @@ export default function SellerOrderDetail() {
                 </tr>
               </thead>
               <tbody className="bg-white/90 backdrop-blur-md border-white/20 divide-y divide-neutral-200">
-                {orderDetail.items.map((item) => (
-                  <tr key={item.srNo}>
-                    <td className="px-4 py-3 text-sm text-neutral-900">{item.srNo}</td>
+                {orderDetail.items.map((item, index) => (
+                  <tr key={`${item.product}-${index}`}>
+                    <td className="px-4 py-3 text-sm text-neutral-900">{index + 1}</td>
                     <td className="px-4 py-3 text-sm text-neutral-900">{item.product}</td>
                     <td className="px-4 py-3 text-sm text-neutral-900">{formatUnit(item.unit, item.qty)}</td>
                     <td className="px-4 py-3 text-sm text-neutral-900">₹{item.price.toFixed(2)}</td>

@@ -99,10 +99,17 @@ export default function Checkout() {
   const [availableSlots, setAvailableSlots] = useState<Array<{ _id: string; name: string; label: string; startTime: string; endTime: string }>>([]);
   const [selectedSlot, setSelectedSlot] = useState<DeliverySlotSelection | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(false);
+  const [slotClock, setSlotClock] = useState(() => new Date());
+
+  // Re-evaluate slot availability as time advances (hide slots once they start)
+  useEffect(() => {
+    const id = window.setInterval(() => setSlotClock(new Date()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
 
   const visibleSlots = useMemo(
-    () => availableSlots.filter(slot => !isSlotExpiredForDate(slot, selectedDeliveryDate)),
-    [availableSlots, selectedDeliveryDate]
+    () => availableSlots.filter(slot => !isSlotExpiredForDate(slot, selectedDeliveryDate, slotClock)),
+    [availableSlots, selectedDeliveryDate, slotClock]
   );
 
   useEffect(() => {
@@ -411,7 +418,7 @@ export default function Checkout() {
 
     const selectedSlotDetails = availableSlots.find(slot => slot._id === selectedSlot.slotId);
     if (!selectedSlotDetails || isSlotExpiredForDate(selectedSlotDetails, selectedDeliveryDate)) {
-      showGlobalToast('Selected slot is no longer available for this time. Please choose an active slot.', 'error');
+      showGlobalToast('Selected slot has already started. Please choose a later slot.', 'error');
       return;
     }
 

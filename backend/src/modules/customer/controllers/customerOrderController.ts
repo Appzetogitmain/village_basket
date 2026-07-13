@@ -75,16 +75,17 @@ export const createOrder = async (req: Request, res: Response) => {
             const todayKey = fmtDateIST(new Date());
 
             if (deliveryDateKey === todayKey) {
-                const [endHour, endMinute] = String(selectedSlot.endTime || "00:00").split(":").map(Number);
+                const [startHour, startMinute] = String(selectedSlot.startTime || "00:00").split(":").map(Number);
                 const nowInIST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
                 const nowMinutes = (nowInIST.getHours() * 60) + nowInIST.getMinutes();
-                const slotEndMinutes = ((Number.isNaN(endHour) ? 0 : endHour) * 60) + (Number.isNaN(endMinute) ? 0 : endMinute);
+                const slotStartMinutes = ((Number.isNaN(startHour) ? 0 : startHour) * 60) + (Number.isNaN(startMinute) ? 0 : startMinute);
 
-                if (nowMinutes > slotEndMinutes) {
+                // Once a slot starts, it can no longer be booked for today
+                if (nowMinutes >= slotStartMinutes) {
                     if (session) await session.abortTransaction();
                     return res.status(400).json({
                         success: false,
-                        message: "Selected delivery slot has already ended for today. Please choose another slot.",
+                        message: "Selected delivery slot has already started for today. Please choose another slot.",
                     });
                 }
             }
