@@ -24,6 +24,10 @@ export default function GoogleMapsLocationPicker({
     const mapRef = useRef<google.maps.Map | null>(null);
     const [center, setCenter] = useState({ lat: initialLat, lng: initialLng });
     const isDragging = useRef(false);
+    // Only emit location after the user actually moves the map — avoids overwriting
+    // parent state with the default India center on first idle.
+    const hasUserDragged = useRef(false);
+    const isProgrammaticMove = useRef(false);
 
     const { isLoaded, loadError } = useJsApiLoader({
         id: GOOGLE_MAP_SCRIPT_ID,
@@ -31,19 +35,21 @@ export default function GoogleMapsLocationPicker({
         libraries: GOOGLE_MAPS_LIBRARIES
     });
 
-    // Update center when initial props change significantly
+    // Update center when initial props change significantly (e.g. live location)
     useEffect(() => {
         if (initialLat && initialLng) {
             const latDiff = Math.abs(center.lat - initialLat);
             const lngDiff = Math.abs(center.lng - initialLng);
             // Only update if change is significant (> 100m)
             if (latDiff > 0.001 || lngDiff > 0.001) {
+                isProgrammaticMove.current = true;
                 setCenter({ lat: initialLat, lng: initialLng });
                 if (mapRef.current) {
                     mapRef.current.panTo({ lat: initialLat, lng: initialLng });
                 }
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to external coord changes
     }, [initialLat, initialLng]);
 
     const onLoad = useCallback((map: google.maps.Map) => {
@@ -56,6 +62,7 @@ export default function GoogleMapsLocationPicker({
 
     const handleDragStart = useCallback(() => {
         isDragging.current = true;
+        hasUserDragged.current = true;
     }, []);
 
     const handleDragEnd = useCallback(() => {
@@ -64,68 +71,75 @@ export default function GoogleMapsLocationPicker({
     }, []);
 
     const handleIdle = useCallback(() => {
-        // Capture location when map becomes idle (after drag or animation)
-        if (!isDragging.current && mapRef.current) {
-            const newCenter = mapRef.current.getCenter();
-            if (newCenter) {
-                const lat = parseFloat(newCenter.lat().toFixed(6));
-                const lng = parseFloat(newCenter.lng().toFixed(6));
+        if (isDragging.current || !mapRef.current) return;
 
-                // Only update if there's a real change (or if we need to fetch address)
-                if (Math.abs(lat - center.lat) > 0.00001 || Math.abs(lng - center.lng) > 0.00001) {
-                    setCenter({ lat, lng });
+        const newCenter = mapRef.current.getCenter();
+        if (!newCenter) return;
 
-                    // Reverse Geocoding
-                    const geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                        if (status === 'OK' && results && results[0]) {
-                            const addressComponents = results[0].address_components;
-                            let street = '';
-                            let city = '';
-                            let state = '';
-                            let pincode = '';
-                            let landmark = '';
+        const lat = parseFloat(newCenter.lat().toFixed(6));
+        const lng = parseFloat(newCenter.lng().toFixed(6));
 
-                            // Parse address components
-                            addressComponents.forEach(component => {
-                                const types = component.types;
-                                if (types.includes('street_number')) {
-                                    street = component.long_name + ' ' + street;
-                                }
-                                if (types.includes('route')) {
-                                    street += component.long_name;
-                                }
-                                if (types.includes('locality')) {
-                                    city = component.long_name;
-                                }
-                                if (types.includes('administrative_area_level_1')) {
-                                    state = component.long_name;
-                                }
-                                if (types.includes('postal_code')) {
-                                    pincode = component.long_name;
-                                }
-                                // Landmarks
-                                if (types.includes('point_of_interest') || types.includes('establishment') || types.includes('premise')) {
-                                    landmark = component.long_name;
-                                } else if (!landmark && (types.includes('sublocality') || types.includes('sublocality_level_1'))) {
-                                    landmark = component.long_name;
-                                }
-                            });
-
-                            onLocationSelect(lat, lng, {
-                                street: street.trim(),
-                                city,
-                                state,
-                                pincode,
-                                landmark
-                            });
-                        } else {
-                            onLocationSelect(lat, lng);
-                        }
-                    });
-                }
-            }
+        // Parent drove the pan (live location / search) — sync center only
+        if (isProgrammaticMove.current) {
+            isProgrammaticMove.current = false;
+            setCenter({ lat, lng });
+            return;
         }
+
+        // Ignore initial idle / bounce without a real user drag
+        if (!hasUserDragged.current) return;
+
+        if (Math.abs(lat - center.lat) <= 0.00001 && Math.abs(lng - center.lng) <= 0.00001) {
+            return;
+        }
+
+        setCenter({ lat, lng });
+
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+            if (status === 'OK' && results && results[0]) {
+                const addressComponents = results[0].address_components;
+                let street = '';
+                let city = '';
+                let state = '';
+                let pincode = '';
+                let landmark = '';
+
+                addressComponents.forEach(component => {
+                    const types = component.types;
+                    if (types.includes('street_number')) {
+                        street = component.long_name + ' ' + street;
+                    }
+                    if (types.includes('route')) {
+                        street += component.long_name;
+                    }
+                    if (types.includes('locality')) {
+                        city = component.long_name;
+                    }
+                    if (types.includes('administrative_area_level_1')) {
+                        state = component.long_name;
+                    }
+                    if (types.includes('postal_code')) {
+                        pincode = component.long_name;
+                    }
+                    if (types.includes('point_of_interest') || types.includes('establishment') || types.includes('premise')) {
+                        landmark = component.long_name;
+                    } else if (!landmark && (types.includes('sublocality') || types.includes('sublocality_level_1'))) {
+                        landmark = component.long_name;
+                    }
+                });
+
+                onLocationSelect(lat, lng, {
+                    street: street.trim(),
+                    city,
+                    state,
+                    pincode,
+                    landmark
+                });
+            } else {
+                onLocationSelect(lat, lng);
+            }
+        });
     }, [center.lat, center.lng, onLocationSelect]);
 
     if (loadError) {
