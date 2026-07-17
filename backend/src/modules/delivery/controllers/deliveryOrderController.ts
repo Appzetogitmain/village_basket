@@ -7,6 +7,10 @@ import Seller from "../../../models/Seller";
 import { generateDeliveryOtp, verifyDeliveryOtp } from "../../../services/deliveryOtpService";
 import { processOrderStatusTransition } from "../../../services/orderService";
 import { completeDeliveryLifecycle } from "../../../services/codService";
+import {
+  deliveryBoyOrderFilter,
+  isOrderAssignedToDeliveryBoy,
+} from "../../../utils/deliveryAssignmentUtils";
 
 /**
  * Helper to map order items for response
@@ -30,7 +34,7 @@ export const getAllOrdersHistory = asyncHandler(async (req: Request, res: Respon
     const { page = 1, limit = 20, paymentStatus, paymentMethod, status } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const query: any = { deliveryBoy: deliveryId };
+    const query: any = { ...deliveryBoyOrderFilter(deliveryId!) };
     if (paymentStatus) query.paymentStatus = paymentStatus;
     if (paymentMethod) query.paymentMethod = paymentMethod;
     if (status) query.status = status;
@@ -43,19 +47,6 @@ export const getAllOrdersHistory = asyncHandler(async (req: Request, res: Respon
 
     const total = await Order.countDocuments(query);
 
-    // Batched Commission Fetch for Efficiency
-    const { default: Commission } = await import("../../../models/Commission");
-    const orderIds = orders.map(o => o._id);
-    const commissions = await Commission.find({
-        order: { $in: orderIds },
-        type: "DELIVERY_BOY"
-    });
-
-    const commissionMap = new Map();
-    commissions.forEach(c => {
-        commissionMap.set(c.order.toString(), c.commissionAmount);
-    });
-
     // Format orders for frontend
     const formattedOrders = orders.map(order => ({
         id: order._id,
@@ -67,7 +58,7 @@ export const getAllOrdersHistory = asyncHandler(async (req: Request, res: Respon
         address: `${order.deliveryAddress.address}, ${order.deliveryAddress.city}`,
         deliveryAddress: order.deliveryAddress,
         totalAmount: order.total,
-        deliveryEarning: commissionMap.get(order._id.toString()) || 0, // Add Earning
+        deliveryEarning: 0,
         items: mapOrderItems(order.items),
         createdAt: order.createdAt,
         estimatedDeliveryTime: order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'
@@ -97,7 +88,7 @@ export const getTodayOrders = asyncHandler(async (req: Request, res: Response) =
     todayEnd.setHours(23, 59, 59, 999);
 
     const orders = await Order.find({
-        deliveryBoy: deliveryId,
+        ...deliveryBoyOrderFilter(deliveryId!),
         $or: [
             { "deliverySlot.date": { $gte: todayStart, $lte: todayEnd } }, // Scheduled for today
             { createdAt: { $gte: todayStart, $lte: todayEnd } }, // Created today
@@ -138,7 +129,7 @@ export const getPendingOrders = asyncHandler(async (req: Request, res: Response)
 
     // Pending statuses: Ready for pickup, Out for delivery, Picked Up, Assigned, In Transit
     const orders = await Order.find({
-        deliveryBoy: deliveryId,
+        ...deliveryBoyOrderFilter(deliveryId!),
         status: { $in: ["Ready for pickup", "Picked up", "Assigned", "In Transit"] }
     })
         .populate("items")
@@ -165,6 +156,40 @@ export const getPendingOrders = asyncHandler(async (req: Request, res: Response)
 });
 
 /**
+ * Get delivered COD orders for cash settlement
+ */
+export const getUnpaidCodOrders = asyncHandler(async (req: Request, res: Response) => {
+    const deliveryId = req.user?.userId;
+
+    const orders = await Order.find({
+        ...deliveryBoyOrderFilter(deliveryId!),
+        status: "Delivered",
+        $or: [
+            { paymentMethod: "COD" },
+            { "payment.method": "cash" },
+        ],
+    })
+        .select("orderNumber total deliveredAt customerName paymentMethod paymentStatus createdAt")
+        .sort({ deliveredAt: -1, createdAt: -1 })
+        .limit(100);
+
+    const formattedOrders = orders.map((order) => ({
+        id: order._id,
+        orderId: order.orderNumber,
+        customerName: order.customerName,
+        totalAmount: order.total,
+        deliveredAt: order.deliveredAt || order.createdAt,
+        paymentMethod: order.paymentMethod,
+        paymentStatus: order.paymentStatus,
+    }));
+
+    return res.status(200).json({
+        success: true,
+        data: formattedOrders,
+    });
+});
+
+/**
  * Get Specific Order Details
  */
 export const getOrderDetails = asyncHandler(async (req: Request, res: Response) => {
@@ -175,13 +200,6 @@ export const getOrderDetails = asyncHandler(async (req: Request, res: Response) 
     if (!order) {
         return res.status(404).json({ success: false, message: "Order not found" });
     }
-
-    // Fetch Delivery Earning for this order
-    const { default: Commission } = await import("../../../models/Commission");
-    const commission = await Commission.findOne({
-        order: id,
-        type: "DELIVERY_BOY"
-    });
 
     const formattedOrder = {
         id: order._id,
@@ -195,7 +213,7 @@ export const getOrderDetails = asyncHandler(async (req: Request, res: Response) 
         totalAmount: order.total,
         createdAt: order.createdAt,
         distance: null,
-        deliveryEarning: commission ? commission.commissionAmount : 0,
+        deliveryEarning: 0,
         deliverySlot: order.deliverySlot || null,
         paymentMethod: order.paymentMethod,
         paymentStatus: order.paymentStatus,
@@ -221,7 +239,7 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
         return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    if (order.deliveryBoy?.toString() != deliveryId) {
+    if (!isOrderAssignedToDeliveryBoy(order, deliveryId!)) {
         return res.status(403).json({ success: false, message: "This order is not assigned to you" });
     }
 
@@ -318,7 +336,7 @@ export const getReturnOrders = asyncHandler(async (req: Request, res: Response) 
     const deliveryId = req.user?.userId;
 
     const orders = await Order.find({
-        deliveryBoy: deliveryId,
+        ...deliveryBoyOrderFilter(deliveryId!),
         status: { $in: ["Returned", "Cancelled", "Rejected"] }
     })
         .populate("items")
@@ -354,7 +372,7 @@ export const getScheduledOrders = asyncHandler(async (req: Request, res: Respons
     tomorrowStart.setHours(0, 0, 0, 0);
 
     const orders = await Order.find({
-        deliveryBoy: deliveryId,
+        ...deliveryBoyOrderFilter(deliveryId!),
         "deliverySlot.date": { $gte: tomorrowStart },
         status: { $nin: ["Delivered", "Cancelled", "Rejected", "Returned"] }
     })
@@ -396,7 +414,7 @@ export const getSellerLocationsForOrder = asyncHandler(async (req: Request, res:
         return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    if (order.deliveryBoy?.toString() !== deliveryId) {
+    if (!isOrderAssignedToDeliveryBoy(order, deliveryId!)) {
         return res.status(403).json({ success: false, message: "This order is not assigned to you" });
     }
 
@@ -439,7 +457,7 @@ export const sendDeliveryOtp = asyncHandler(async (req: Request, res: Response) 
         return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    if (order.deliveryBoy?.toString() !== deliveryId) {
+    if (!isOrderAssignedToDeliveryBoy(order, deliveryId!)) {
         return res.status(403).json({ success: false, message: "This order is not assigned to you" });
     }
 
@@ -500,7 +518,7 @@ export const verifyDeliveryOtpController = asyncHandler(async (req: Request, res
         return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    if (order.deliveryBoy?.toString() !== deliveryId) {
+    if (!isOrderAssignedToDeliveryBoy(order, deliveryId!)) {
         return res.status(403).json({ success: false, message: "This order is not assigned to you" });
     }
 
@@ -596,7 +614,7 @@ export const checkSellerProximity = asyncHandler(async (req: Request, res: Respo
         return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    if (order.deliveryBoy?.toString() !== deliveryId) {
+    if (!isOrderAssignedToDeliveryBoy(order, deliveryId!)) {
         return res.status(403).json({ success: false, message: "This order is not assigned to you" });
     }
 
@@ -646,7 +664,7 @@ export const confirmSellerPickup = asyncHandler(async (req: Request, res: Respon
         return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    if (order.deliveryBoy?.toString() !== deliveryId) {
+    if (!isOrderAssignedToDeliveryBoy(order, deliveryId!)) {
         return res.status(403).json({ success: false, message: "This order is not assigned to you" });
     }
 
@@ -779,7 +797,7 @@ export const checkCustomerProximity = asyncHandler(async (req: Request, res: Res
         return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    if (order.deliveryBoy?.toString() !== deliveryId) {
+    if (!isOrderAssignedToDeliveryBoy(order, deliveryId!)) {
         return res.status(403).json({ success: false, message: "This order is not assigned to you" });
     }
 
@@ -856,7 +874,7 @@ export const markContactlessDelivered = asyncHandler(async (req: Request, res: R
         return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    if (order.deliveryBoy?.toString() !== deliveryId) {
+    if (!isOrderAssignedToDeliveryBoy(order, deliveryId!)) {
         return res.status(403).json({ success: false, message: 'This order is not assigned to you' });
     }
 

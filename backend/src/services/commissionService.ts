@@ -437,72 +437,7 @@ export const distributeCommissions = async (orderId: string) => {
             }
         }
 
-        // 7. Handle Delivery Boy Commission (Lazy creation if missing)
-        if (order.deliveryBoy) {
-            const deliveryBoyId = order.deliveryBoy.toString();
-            let deliveryComm = await Commission.findOne({
-                order: orderId,
-                type: 'DELIVERY_BOY'
-            }).session(session);
-
-            if (!deliveryComm || deliveryComm.status === 'Pending') {
-                if (!deliveryComm) {
-                    console.log(`[Commission] Order ${order.orderNumber} - Creating missing commission for Delivery Boy ${deliveryBoyId}`);
-                    let commissionAmount = 0;
-                    let commissionRate = 0;
-                    let usedDistanceBased = false;
-
-                    try {
-                        const settings = await AppSettings.findOne().session(session);
-                        if (settings && 
-                            settings.deliveryConfig?.isDistanceBased === true && 
-                            order.deliveryDistanceKm > 0) {
-                            commissionRate = settings.deliveryConfig.deliveryBoyKmRate || 0;
-                            commissionAmount = order.deliveryDistanceKm * commissionRate;
-                            usedDistanceBased = true;
-                        }
-                    } catch (err) {
-                        console.error(`[Commission] Order ${order.orderNumber} - Error fetching settings for DB commission:`, err);
-                    }
-
-                    if (!usedDistanceBased) {
-                        commissionRate = await getDeliveryBoyCommissionRate(deliveryBoyId);
-                        commissionAmount = (order.subtotal * commissionRate) / 100;
-                    }
-
-                    const newDBComm = await Commission.create([{
-                        order: order._id,
-                        deliveryBoy: order.deliveryBoy,
-                        type: 'DELIVERY_BOY',
-                        orderAmount: usedDistanceBased ? (order.deliveryDistanceKm || 0) : order.subtotal,
-                        commissionRate,
-                        commissionAmount: Math.round(commissionAmount * 100) / 100,
-                        status: 'Paid',
-                        paidAt: new Date()
-                    }], { session });
-                    deliveryComm = newDBComm[0];
-                } else {
-                    deliveryComm.status = 'Paid';
-                    deliveryComm.paidAt = new Date();
-                    await deliveryComm.save({ session });
-                }
-
-                processedCommissions.push(deliveryComm);
-
-                const dbCreditResult = await creditWallet(
-                    deliveryBoyId,
-                    'DELIVERY_BOY',
-                    deliveryComm.commissionAmount,
-                    `Delivery earning for order ${order.orderNumber}`,
-                    orderId,
-                    deliveryComm._id.toString(),
-                    session
-                );
-                if (!dbCreditResult.success) {
-                    throw new Error(`Failed to credit delivery boy wallet: ${dbCreditResult.message}`);
-                }
-            }
-        }
+        // Delivery partners do not receive per-delivery earnings; skip commission credit.
 
         // 8. Mark Order as Processed (Idempotency Flag)
         (order as any).commissionsProcessed = true;
@@ -538,7 +473,20 @@ export const getCommissionSummary = async (
     userType: 'SELLER' | 'DELIVERY_BOY'
 ) => {
     try {
-        const query = userType === 'SELLER' ? { seller: userId } : { deliveryBoy: userId };
+        if (userType === 'DELIVERY_BOY') {
+            return {
+                success: true,
+                data: {
+                    total: 0,
+                    paid: 0,
+                    pending: 0,
+                    count: 0,
+                    commissions: [],
+                },
+            };
+        }
+
+        const query = { seller: userId };
 
         const commissions = await Commission.find(query).sort({ createdAt: -1 });
 

@@ -83,6 +83,11 @@ export interface IOrder extends Document {
   | "Delivered"
   | "Failed";
   assignedAt?: Date;
+  assignedDeliveryBoys?: Array<{
+    deliveryBoy: mongoose.Types.ObjectId;
+    assignedAt?: Date;
+    status?: "Assigned" | "Picked Up" | "In Transit" | "Delivered" | "Failed";
+  }>;
 
   // Tracking
   trackingNumber?: string;
@@ -338,6 +343,24 @@ const OrderSchema = new Schema<IOrder>(
     assignedAt: {
       type: Date,
     },
+    assignedDeliveryBoys: [
+      {
+        deliveryBoy: {
+          type: Schema.Types.ObjectId,
+          ref: "Delivery",
+          required: true,
+        },
+        assignedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        status: {
+          type: String,
+          enum: ["Assigned", "Picked Up", "In Transit", "Delivered", "Failed"],
+          default: "Assigned",
+        },
+      },
+    ],
 
     // Tracking
     trackingNumber: {

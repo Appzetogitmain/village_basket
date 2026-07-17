@@ -5,6 +5,7 @@ import Seller from '../models/Seller';
 import DeliveryTracking from '../models/DeliveryTracking';
 import mongoose from 'mongoose';
 import { notifySellersOfOrderUpdate } from './sellerNotificationService';
+import { addDeliveryBoyToOrder } from '../utils/deliveryAssignmentUtils';
 
 // Track order notification state
 export interface OrderNotificationState {
@@ -297,32 +298,6 @@ export async function notifyDeliveryBoysOfNewOrder(
             return;
         }
 
-        // --- FILTER BUSY DELIVERY BOYS ---
-        // Check if any of these delivery boys already have an active order
-        // Active = deliveryBoyStatus is Assigned, Picked Up, or In Transit
-        const busyDeliveryBoys = await Order.find({
-            deliveryBoy: { $in: nearbyDeliveryBoyIds },
-            deliveryBoyStatus: { $in: ['Assigned', 'Picked Up', 'In Transit'] },
-            // Double check status to be sure we don't count completed/cancelled ones just in case statuses are out of sync
-            status: { $nin: ['Delivered', 'Cancelled', 'Rejected', 'Returned'] }
-        }).distinct('deliveryBoy');
-
-        if (busyDeliveryBoys.length > 0) {
-            const busyIdsSet = new Set(busyDeliveryBoys.map(id => id.toString()));
-
-            const originalCount = nearbyDeliveryBoyIds.length;
-            nearbyDeliveryBoyIds = nearbyDeliveryBoyIds.filter(id => !busyIdsSet.has(id.toString()));
-
-            console.log(`ℹ️ Filtered out ${originalCount - nearbyDeliveryBoyIds.length} busy delivery boys. Active: ${nearbyDeliveryBoyIds.length}`);
-
-            if (nearbyDeliveryBoyIds.length === 0) {
-                console.log('⚠️ All nearby delivery boys are currently busy with other orders.');
-                // Optionally: could emit to admin or retry later
-                return;
-            }
-        }
-        // ---------------------------------
-
         // Prepare order data for notification
         const orderData = {
             orderId: order._id.toString(),
@@ -441,15 +416,17 @@ export async function handleOrderAcceptance(
             return { success: false, message: 'Order not found' };
         }
 
-        // Check if order already has a delivery boy assigned
+        // Check if order already has a different primary delivery boy assigned
         if (order.deliveryBoy && order.deliveryBoy.toString() !== normalizedDeliveryBoyId) {
             return { success: false, message: 'Order already assigned to another delivery boy' };
         }
 
         // Assign order to delivery boy
-        order.deliveryBoy = new mongoose.Types.ObjectId(normalizedDeliveryBoyId);
+        addDeliveryBoyToOrder(order, normalizedDeliveryBoyId);
         order.deliveryBoyStatus = 'Assigned';
-        order.assignedAt = new Date();
+        if (!order.assignedAt) {
+            order.assignedAt = new Date();
+        }
         order.status = 'Ready for pickup'; // Mark as ready for pickup when assigned
 
         await order.save();

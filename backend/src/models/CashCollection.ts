@@ -5,7 +5,7 @@ export interface ICashCollection extends Document {
     order: Types.ObjectId;
     amount: number;
     remark?: string;
-    status?: "Pending" | "Completed" | "Rejected";
+    status?: "Pending" | "Active" | "Completed" | "Rejected";
     initiatedBy?: "Admin" | "DeliveryBoy";
     collectedBy: Types.ObjectId;
     collectedAt: Date;
@@ -36,7 +36,7 @@ const cashCollectionSchema = new Schema<ICashCollection>(
         },
         status: {
             type: String,
-            enum: ["Pending", "Completed", "Rejected"],
+            enum: ["Pending", "Active", "Completed", "Rejected"],
             default: "Completed",
         },
         initiatedBy: {

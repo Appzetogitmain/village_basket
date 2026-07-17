@@ -12,6 +12,9 @@ import {
     getRazorpayCredentials,
     getRazorpayInstanceFromDb,
     verifyRazorpaySignatureFromDb,
+    isRazorpayAvailable,
+    isMockCodDepositEnabled,
+    isMockCodDepositOrder,
 } from '../../../services/codService';
 
 const ensureDeliveryWallet = async (deliveryBoyId: string) => {
@@ -180,6 +183,32 @@ export const getCommissions = async (req: Request, res: Response) => {
 };
 
 /**
+ * Get COD deposit configuration
+ */
+export const getDepositConfig = async (req: Request, res: Response) => {
+    try {
+        const razorpayEnabled = await isRazorpayAvailable();
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                razorpayEnabled,
+                mockDepositEnabled: isMockCodDepositEnabled() && !razorpayEnabled,
+            },
+        });
+    } catch (error: any) {
+        console.error('Error getting deposit config:', error);
+        return res.status(200).json({
+            success: true,
+            data: {
+                razorpayEnabled: false,
+                mockDepositEnabled: isMockCodDepositEnabled(),
+            },
+        });
+    }
+};
+
+/**
  * Create Razorpay order to deposit collected COD cash
  */
 export const createCashDepositOrder = async (req: Request, res: Response) => {
@@ -215,7 +244,7 @@ export const createCashDepositOrder = async (req: Request, res: Response) => {
         const razorpayOrder = await razorpay.orders.create({
             amount: Math.round(amount * 100),
             currency: 'INR',
-            receipt: `dep_${deliveryBoyId}_${Date.now()}`,
+            receipt: `dep_${Date.now().toString(36)}`,
             notes: {
                 type: 'cash_limit_deposit',
                 deliveryId: deliveryBoyId,
@@ -234,9 +263,35 @@ export const createCashDepositOrder = async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Error creating cash deposit order:', error);
-        return res.status(500).json({
+
+        if (
+            error?.statusCode === 401 &&
+            isMockCodDepositEnabled()
+        ) {
+            const mockOrderId = `mock_dep_${Date.now().toString(36)}`;
+            return res.status(200).json({
+                success: true,
+                data: {
+                    razorpayOrderId: mockOrderId,
+                    razorpayKey: 'mock',
+                    amount: Math.round(amount * 100),
+                    currency: 'INR',
+                    mock: true,
+                },
+            });
+        }
+
+        const razorpayMessage =
+            error?.error?.description ||
+            error?.description ||
+            error?.message;
+
+        return res.status(400).json({
             success: false,
-            message: error.message || 'Failed to create deposit order',
+            razorpayEnabled: false,
+            message:
+                razorpayMessage ||
+                'Online payment is unavailable. Please submit a manual cash handover.',
         });
     }
 };
@@ -259,11 +314,13 @@ export const verifyCashDeposit = async (req: Request, res: Response) => {
             });
         }
 
-        const signatureValid = await verifyRazorpaySignatureFromDb(
-            razorpayOrderId,
-            razorpayPaymentId,
-            razorpaySignature
-        );
+        const signatureValid = isMockCodDepositOrder(razorpayOrderId)
+            ? true
+            : await verifyRazorpaySignatureFromDb(
+                razorpayOrderId,
+                razorpayPaymentId,
+                razorpaySignature
+            );
 
         if (!signatureValid) {
             return res.status(400).json({

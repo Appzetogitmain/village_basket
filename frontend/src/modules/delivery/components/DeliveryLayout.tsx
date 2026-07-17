@@ -56,8 +56,9 @@ function DeliveryLayoutContent({ children }: DeliveryLayoutContentProps) {
 
   return (
     <div 
-      className={`flex flex-col min-h-screen transition-all duration-300 font-poppins`}
+      className="flex flex-col min-h-screen transition-all duration-300 font-poppins"
       style={{
+        fontFamily: "'Poppins', sans-serif",
         backgroundColor: 'var(--village-cream, #FAF7F2)',
         backgroundImage: `linear-gradient(rgba(250, 247, 242, 0.88), rgba(250, 247, 242, 0.88)), url('/assets/delivery_bg_pattern.png')`,
         backgroundRepeat: 'repeat',

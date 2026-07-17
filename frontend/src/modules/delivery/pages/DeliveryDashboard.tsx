@@ -229,40 +229,6 @@ export default function DeliveryDashboard() {
     </svg>
   );
 
-  const earningIcon = (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg">
-      <rect
-        x="2"
-        y="6"
-        width="20"
-        height="12"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="2"
-        fill="none"
-      />
-      <path
-        d="M6 10H18M6 14H14"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M16 12H20M18 10V14"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        fill="none"
-      />
-    </svg>
-  );
-
   if (loading) {
     return <VillageLoader message="Preparing Your Dashboard" />;
   }
@@ -289,7 +255,7 @@ export default function DeliveryDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent pb-32">
+    <div className="min-h-screen bg-transparent pb-32 font-poppins">
       {/* Header */}
       <DeliveryHeader />
 
@@ -434,17 +400,6 @@ export default function DeliveryDashboard() {
             onClick={() => navigate("/delivery/orders")}
           />
         </div>
-
-        {/* Today's Earning Summary Bar */}
-        <SummaryBar
-          leftIcon={earningIcon}
-          leftLabel="Today's Earning"
-          leftValue={`\u20B9 ${stats?.todayEarning || 0}`}
-          rightIcon={cashBalanceIcon}
-          rightLabel="Total Earnings"
-          rightValue={`\u20B9 ${stats?.totalEarning?.toFixed(2) || "0.00"}`}
-          accentColor="#4A7C59"
-        />
 
         {/* Today's Pending Order Section */}
         <div className="pt-2">

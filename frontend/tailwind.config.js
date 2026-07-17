@@ -42,6 +42,8 @@ export default {
         cream: '#FFF9F0',
       },
       fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
         outfit: ['Outfit', 'sans-serif'],
         nunito: ['Nunito', 'sans-serif'],
       },

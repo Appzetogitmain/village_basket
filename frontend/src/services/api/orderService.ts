@@ -55,6 +55,13 @@ export interface OrderDetail {
   customerPhone: string;
   deliveryBoyName: string;
   deliveryBoyPhone: string;
+  assignedDeliveryBoys?: Array<{
+    id: string;
+    name: string;
+    mobile: string;
+    status: string;
+    assignedAt?: string;
+  }>;
   items: OrderItem[];
   subtotal: number;
   tax: number;
@@ -119,16 +126,22 @@ export const updateOrderStatus = async (id: string, data: UpdateOrderStatusData)
 /**
  * Get available delivery boys
  */
-export const getAvailableDeliveryBoys = async (): Promise<ApiResponse<{ _id: string; name: string; mobile: string; isOnline: boolean }[]>> => {
-  const response = await api.get<ApiResponse<{ _id: string; name: string; mobile: string; isOnline: boolean }[]>>('/orders/delivery-boys');
+export const getAvailableDeliveryBoys = async (): Promise<ApiResponse<{ _id: string; name: string; mobile: string; isOnline: boolean; activeOrders?: number }[]>> => {
+  const response = await api.get<ApiResponse<{ _id: string; name: string; mobile: string; isOnline: boolean; activeOrders?: number }[]>>('/orders/delivery-boys');
   return response.data;
 };
 
 /**
- * Assign a delivery boy to an order
+ * Assign one or more delivery boys to an order
  */
-export const assignDeliveryBoy = async (orderId: string, deliveryBoyId: string): Promise<ApiResponse<{ id: string; status: string; deliveryBoy: string }>> => {
-  const response = await api.post<ApiResponse<{ id: string; status: string; deliveryBoy: string }>>(`/orders/${orderId}/assign-delivery`, { deliveryBoyId });
+export const assignDeliveryBoy = async (
+  orderId: string,
+  deliveryBoyIds: string[]
+): Promise<ApiResponse<{ id: string; status: string; deliveryBoy: string; newlyAssignedIds: string[] }>> => {
+  const response = await api.post<ApiResponse<{ id: string; status: string; deliveryBoy: string; newlyAssignedIds: string[] }>>(
+    `/orders/${orderId}/assign-delivery`,
+    { deliveryBoyIds }
+  );
   return response.data;
 };
 

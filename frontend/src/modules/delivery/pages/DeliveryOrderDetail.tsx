@@ -859,27 +859,6 @@ export default function DeliveryOrderDetail() {
                     </div>
                 </div>
 
-                {/* Delivery Earning Card - Show only if delivered or has earning */}
-                {(order.status === 'Delivered' || (order.deliveryEarning ? order.deliveryEarning > 0 : false)) && (
-                    <div className="bg-gradient-to-br from-[#4A7C59] to-[#3D664A] organic-radius p-4 shadow-lg shadow-[#4A7C59]/20 text-white relative overflow-hidden group">
-                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')]"></div>
-                        <div className="flex justify-between items-center relative z-10">
-                            <div className="flex flex-col">
-                                <p className="text-white/60 text-[8px] font-black uppercase tracking-[0.2em] mb-1">Your payout</p>
-                                <h3 className="text-2xl font-black tracking-tighter">{"\u20B9"} {order.deliveryEarning?.toFixed(2) || '0.00'}</h3>
-                            </div>
-                            <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm border border-white/10">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M6 3h12" />
-                                    <path d="M6 8h12" />
-                                    <path d="M6 13l8.5 8" />
-                                    <path d="M6 13h3a5 5 0 0 0 5-5 5 5 0 0 0-5-5" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
                 {/* Payment Information Card */}
                 <div className="village-card paper-texture organic-radius p-4 border-none shadow-sm overflow-hidden relative">
                     <div className="flex items-baseline justify-between mb-4">

@@ -282,6 +282,7 @@ export default function DeliverySignUp() {
     <div
       className="min-h-screen flex flex-col items-center justify-start pb-12 font-poppins relative"
       style={{
+        fontFamily: "'Poppins', sans-serif",
         backgroundColor: 'var(--village-cream, #FAF7F2)',
         backgroundImage: `linear-gradient(rgba(250, 247, 242, 0.88), rgba(250, 247, 242, 0.88)), url('/assets/delivery_bg_pattern.png')`,
         backgroundRepeat: 'repeat',

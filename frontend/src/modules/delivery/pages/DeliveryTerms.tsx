@@ -23,7 +23,7 @@ export default function DeliveryTerms() {
         },
         {
             title: "Payments",
-            content: "You earn money for every successful delivery. We may hold payments if there are serious issues like fake orders or customer complaints."
+            content: "Delivery partners are not paid per delivery. For COD orders, you collect cash from customers and deposit it with the platform as instructed."
         },
         {
             title: "Safety First",

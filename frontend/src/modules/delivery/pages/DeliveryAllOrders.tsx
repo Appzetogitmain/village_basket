@@ -132,9 +132,6 @@ export default function DeliveryAllOrders() {
                   <div className="text-right">
                     <p className="text-stone-300 text-[7px] font-black uppercase tracking-widest mb-1">TOTAL VALUATION</p>
                     <p className="text-village-umber text-sm font-black tracking-tighter italic">{"\u20B9"} {order.totalAmount}</p>
-                    {order.deliveryEarning > 0 && (
-                      <p className="text-[#4A7C59] text-[9px] font-black uppercase tracking-widest mt-1 opacity-80">+ {"\u20B9"}{order.deliveryEarning}</p>
-                    )}
                   </div>
                 </div>
               </div>

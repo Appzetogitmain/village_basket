@@ -32,6 +32,7 @@ router.get("/orders/today", deliveryOrderController.getTodayOrders);
 router.get("/orders/pending", deliveryOrderController.getPendingOrders);
 router.get("/orders/returns", deliveryOrderController.getReturnOrders);
 router.get("/orders/scheduled", deliveryOrderController.getScheduledOrders);
+router.get("/orders/unpaid-cod", deliveryOrderController.getUnpaidCodOrders);
 router.get("/orders/:id", deliveryOrderController.getOrderDetails); // Specific order details
 router.get("/orders/:id/seller-locations", deliveryOrderController.getSellerLocationsForOrder);
 router.put("/orders/:id/status", deliveryOrderController.updateOrderStatus);

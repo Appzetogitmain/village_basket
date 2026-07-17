@@ -63,7 +63,10 @@ export const getCashCollections = asyncHandler(
             total: collection.order?.total || 0,
             amount: collection.amount,
             remark: collection.remark,
-            status: collection.status || "Completed",
+            status:
+                collection.status === "Completed"
+                    ? "Active"
+                    : collection.status || "Active",
             initiatedBy: collection.initiatedBy || "Admin",
             collectedAt: collection.collectedAt,
             collectedBy: collection.collectedBy?.name || "Unknown",
@@ -272,7 +275,7 @@ export const approveCashCollection = asyncHandler(
             });
         }
 
-        if (collection.status === "Completed") {
+        if (collection.status === "Completed" || collection.status === "Active") {
             return res.status(400).json({
                 success: false,
                 message: "This collection is already approved",
@@ -321,7 +324,7 @@ export const approveCashCollection = asyncHandler(
         }
 
         // 4. Update the collection status
-        collection.status = "Completed";
+        collection.status = "Active";
         collection.collectedBy = req.user?.userId as any;
         collection.collectedAt = new Date();
         await collection.save();

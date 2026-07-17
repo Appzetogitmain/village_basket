@@ -159,45 +159,8 @@ export const getDashboardStats = asyncHandler(
       totalDeliveredCount: 0,
     };
 
-    // Calculate Earnings (Real Logic from Commission Collection)
-    const { default: Commission } = await import("../../../models/Commission");
-
-    const earningStats = await Commission.aggregate([
-      {
-        $match: {
-          deliveryBoy: objectId,
-          type: "DELIVERY_BOY",
-        },
-      },
-      {
-        $facet: {
-          today: [
-            {
-              $match: {
-                createdAt: { $gte: todayStart, $lte: todayEnd },
-              },
-            },
-            {
-              $group: {
-                _id: null,
-                total: { $sum: "$commissionAmount" },
-              },
-            },
-          ],
-          total: [
-            {
-              $group: {
-                _id: null,
-                total: { $sum: "$commissionAmount" },
-              },
-            },
-          ],
-        },
-      },
-    ]);
-
-    const todayEarning = earningStats[0]?.today[0]?.total || 0;
-    const totalEarning = earningStats[0]?.total[0]?.total || 0;
+    const todayEarning = 0;
+    const totalEarning = 0;
 
     // Fetch list of Pending Orders for the "Today's Pending Order" section
     const pendingOrdersList = await Order.find({
@@ -282,7 +245,7 @@ export const getHelpSupport = asyncHandler(
       {
         question: "How are my earnings calculated?",
         answer:
-          "You earn ₹25 per successful delivery. Additional bonuses may apply for special orders or peak hours.",
+          "Delivery partners are not paid per delivery. Your role is to collect COD cash (when applicable) and deposit it with the platform.",
       },
       {
         question: "How do I update my profile information?",

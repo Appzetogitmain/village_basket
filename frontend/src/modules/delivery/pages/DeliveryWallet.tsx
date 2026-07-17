@@ -8,12 +8,37 @@ import {
     requestDeliveryWithdrawal,
     getDeliveryWithdrawals,
     getDeliveryCommissions,
+    createDeliveryCashDepositOrder,
+    verifyDeliveryCashDeposit,
+    getDeliveryDepositConfig,
 } from "../../../services/api/deliveryWalletService";
+import { submitManualSettlement } from "../../../services/api/delivery/deliveryService";
 import VillageLoader from "../../../components/VillageLoader";
 import { useAuth } from "../../../context/AuthContext";
 import DeliveryGuestState from "../components/DeliveryGuestState";
 
 type Tab = "transactions" | "withdrawals" | "commissions";
+
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
+
+const loadRazorpayScript = () => {
+    return new Promise<boolean>((resolve) => {
+        if (window.Razorpay) {
+            resolve(true);
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+    });
+};
 
 // Icons
 const Icons = {
@@ -51,13 +76,15 @@ export default function DeliveryWallet() {
         pending: 0,
     });
     const [ledger, setLedger] = useState<any>(null);
+    const [depositConfig, setDepositConfig] = useState({
+        razorpayEnabled: false,
+        mockDepositEnabled: true,
+    });
     const [showPayoutModal, setShowPayoutModal] = useState(false);
-    const [unpaidOrders, setUnpaidOrders] = useState<any[]>([]);
-    const [selectedOrderId, setSelectedOrderId] = useState("");
     const [payoutAmount, setPayoutAmount] = useState("");
     const [payoutRemark, setPayoutRemark] = useState("");
-    const [fetchingUnpaid, setFetchingUnpaid] = useState(false);
     const [payoutInProgress, setPayoutInProgress] = useState(false);
+    const [manualSettlementInProgress, setManualSettlementInProgress] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -78,12 +105,13 @@ export default function DeliveryWallet() {
     const fetchWalletData = async () => {
         try {
             setLoading(true);
-            const [balanceRes, transactionsRes, withdrawalsRes, commissionsRes] =
+            const [balanceRes, transactionsRes, withdrawalsRes, commissionsRes, depositConfigRes] =
                 await Promise.all([
                     getDeliveryWalletBalance(),
                     getDeliveryWalletTransactions(),
                     getDeliveryWithdrawals(),
                     getDeliveryCommissions(),
+                    getDeliveryDepositConfig(),
                 ]);
 
             if (balanceRes.success) {
@@ -94,6 +122,9 @@ export default function DeliveryWallet() {
                 setTransactions(transactionsRes.data.transactions || []);
             if (withdrawalsRes.success) setWithdrawals(withdrawalsRes.data || []);
             if (commissionsRes.success) setCommissions(commissionsRes.data);
+            if (depositConfigRes.success) {
+                setDepositConfig(depositConfigRes.data);
+            }
         } catch (error: any) {
             showToast(
                 error.response?.data?.message || "Failed to load wallet data",
@@ -104,46 +135,168 @@ export default function DeliveryWallet() {
         }
     };
 
-    const handleOpenPayout = async () => {
+    const handleOpenPayout = () => {
+        const cashInHand = Number(ledger?.cashInHand || 0);
+        if (cashInHand <= 0) {
+            showToast("No cash in hand to settle", "error");
+            return;
+        }
+
+        setPayoutAmount(cashInHand.toFixed(2));
+        setPayoutRemark("");
         setShowPayoutModal(true);
+    };
+
+    const handleManualSettlement = async () => {
+        const amount = Number(payoutAmount);
+        const cashInHand = Number(ledger?.cashInHand || 0);
+
+        if (!amount || amount <= 0) {
+            showToast("Please enter a valid amount", "error");
+            return;
+        }
+
+        if (amount > cashInHand) {
+            showToast("Amount cannot exceed cash in hand", "error");
+            return;
+        }
+
         try {
-            setFetchingUnpaid(true);
-            const { getUnpaidCodOrders } = await import("../../../services/api/delivery/deliveryService");
-            const orders = await getUnpaidCodOrders();
-            setUnpaidOrders(orders || []);
-        } catch (err) {
-            console.error("Error fetching unpaid orders:", err);
+            setManualSettlementInProgress(true);
+            const response = await submitManualSettlement({
+                amount,
+                remark: payoutRemark.trim() || "Cash handover submitted by delivery partner",
+            });
+
+            if (response.success) {
+                showToast("Cash handover submitted to admin for approval", "success");
+                setShowPayoutModal(false);
+                setPayoutAmount("");
+                setPayoutRemark("");
+                fetchWalletData();
+            } else {
+                showToast(response.message || "Failed to submit cash handover", "error");
+            }
+        } catch (err: any) {
+            showToast(err.response?.data?.message || "Failed to submit cash handover", "error");
         } finally {
-            setFetchingUnpaid(false);
+            setManualSettlementInProgress(false);
         }
     };
 
-    const handleSubmitPayout = async () => {
-        if (!payoutAmount || Number(payoutAmount) <= 0) {
+    const handleRazorpayPayout = async () => {
+        const amount = Number(payoutAmount);
+        const cashInHand = Number(ledger?.cashInHand || 0);
+
+        if (!amount || amount <= 0) {
             showToast("Please enter a valid amount", "error");
+            return;
+        }
+
+        if (amount > cashInHand) {
+            showToast("Amount cannot exceed cash in hand", "error");
             return;
         }
 
         try {
             setPayoutInProgress(true);
-            const { submitManualSettlement } = await import("../../../services/api/delivery/deliveryService");
-            const res = await submitManualSettlement({
-                amount: Number(payoutAmount),
-                orderId: selectedOrderId || undefined,
-                remark: payoutRemark
-            });
 
-            if (res.success) {
-                showToast("Payout recorded successfully. Admin will verify it.", "success");
-                setShowPayoutModal(false);
-                setPayoutAmount("");
-                setSelectedOrderId("");
-                setPayoutRemark("");
-                fetchWalletData();
+            const orderResponse = await createDeliveryCashDepositOrder(amount);
+            if (!orderResponse.success) {
+                showToast(
+                    orderResponse.message || "Online payment unavailable. Use manual cash handover.",
+                    "error",
+                );
+                setPayoutInProgress(false);
+                return;
             }
+
+            const { razorpayOrderId, razorpayKey, mock } = orderResponse.data;
+
+            if (mock) {
+                const verifyResponse = await verifyDeliveryCashDeposit({
+                    amount,
+                    razorpayOrderId,
+                    razorpayPaymentId: `mock_pay_${Date.now()}`,
+                    razorpaySignature: "mock_signature",
+                });
+
+                if (verifyResponse.success) {
+                    showToast("Cash settlement recorded successfully.", "success");
+                    setShowPayoutModal(false);
+                    setPayoutAmount("");
+                    setPayoutRemark("");
+                    fetchWalletData();
+                } else {
+                    showToast(verifyResponse.message || "Settlement verification failed", "error");
+                }
+                setPayoutInProgress(false);
+                return;
+            }
+
+            const scriptLoaded = await loadRazorpayScript();
+            if (!scriptLoaded) {
+                showToast("Failed to load Razorpay checkout", "error");
+                setPayoutInProgress(false);
+                return;
+            }
+
+            const options = {
+                key: razorpayKey,
+                amount: Math.round(amount * 100),
+                currency: "INR",
+                name: "Village Basket",
+                description: "COD cash settlement to admin",
+                order_id: razorpayOrderId,
+                prefill: {
+                    name: user?.name || "",
+                    email: user?.email || "",
+                    contact: user?.phone || user?.mobile || "",
+                },
+                theme: {
+                    color: "#8B3D28",
+                },
+                handler: async (response: any) => {
+                    try {
+                        const verifyResponse = await verifyDeliveryCashDeposit({
+                            amount,
+                            razorpayOrderId: response.razorpay_order_id,
+                            razorpayPaymentId: response.razorpay_payment_id,
+                            razorpaySignature: response.razorpay_signature,
+                        });
+
+                        if (verifyResponse.success) {
+                            showToast("Payment successful. Cash settlement recorded.", "success");
+                            setShowPayoutModal(false);
+                            setPayoutAmount("");
+                            fetchWalletData();
+                        } else {
+                            showToast(verifyResponse.message || "Payment verification failed", "error");
+                        }
+                    } catch (err: any) {
+                        showToast(err.response?.data?.message || "Payment verification failed", "error");
+                    } finally {
+                        setPayoutInProgress(false);
+                    }
+                },
+                modal: {
+                    ondismiss: () => {
+                        setPayoutInProgress(false);
+                    },
+                },
+            };
+
+            const razorpay = new window.Razorpay(options);
+            razorpay.open();
         } catch (err: any) {
-            showToast(err.response?.data?.message || "Failed to record payout", "error");
-        } finally {
+            const message =
+                err.response?.data?.message || "Failed to initiate Razorpay payment";
+            showToast(
+                message.includes("Razorpay")
+                    ? `${message} You can submit a manual cash handover instead.`
+                    : message,
+                "error",
+            );
             setPayoutInProgress(false);
         }
     };
@@ -278,7 +431,7 @@ export default function DeliveryWallet() {
                             </div>
                         </div>
                         <p className="text-[9px] font-bold text-stone-400 uppercase tracking-tight leading-relaxed">
-                            This amount is collected from COD orders. Please deposit it to the Admin to settle your accounts.
+                            This amount is collected from COD orders. Settle it via Razorpay or submit a manual cash handover to admin.
                         </p>
                         {ledger?.cashInHand > 0 && (
                             <div className="mt-4 p-3 bg-white/50 rounded-xl border border-[#4A7C59]/10 text-[9px] font-black text-village-umber uppercase tracking-widest flex items-center gap-2">
@@ -482,8 +635,10 @@ export default function DeliveryWallet() {
 
                             <div className="flex items-center justify-between mb-8">
                                 <div>
-                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8B3D28] opacity-50 block mb-1">Financial Reconciliation</span>
-                                    <h2 className="text-2xl font-black text-village-umber tracking-tighter">Manual Payout</h2>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8B3D28] opacity-50 block mb-1">COD Settlement</span>
+                                    <h2 className="text-2xl font-black text-village-umber tracking-tighter">
+                                        {depositConfig.razorpayEnabled ? "Pay Out via Razorpay" : "Settle Cash in Hand"}
+                                    </h2>
                                 </div>
                                 <button onClick={() => setShowPayoutModal(false)} className="w-10 h-10 rounded-2xl bg-stone-200/50 flex items-center justify-center text-stone-400 group active:scale-90 transition-all">
                                     <Icons.X />
@@ -491,58 +646,79 @@ export default function DeliveryWallet() {
                             </div>
 
                             <div className="space-y-6">
-                                <div>
-                                    <label className="block text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3 ml-1">Order Context (Optional)</label>
-                                    <select
-                                        value={selectedOrderId}
-                                        onChange={(e) => {
-                                            const id = e.target.value;
-                                            setSelectedOrderId(id);
-                                            const order = unpaidOrders.find(o => o.id === id);
-                                            if (order) setPayoutAmount(String(order.totalAmount));
-                                        }}
-                                        disabled={fetchingUnpaid}
-                                        className="w-full bg-white border-2 border-stone-100 rounded-[1.5rem] px-6 py-4 text-xs font-black text-village-umber outline-none focus:border-[#8B3D28]/30 transition-all disabled:opacity-50"
-                                    >
-                                        <option value="">Lump Sum Settlement</option>
-                                        {unpaidOrders.map(order => (
-                                            <option key={order.id} value={order.id}>{order.orderId} - ₹{order.totalAmount}</option>
-                                        ))}
-                                    </select>
+                                <div className="rounded-[1.5rem] bg-white border-2 border-stone-100 px-6 py-4">
+                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 mb-2">Cash in Hand</p>
+                                    <p className="text-2xl font-black text-[#4A7C59] tracking-tighter">{"\u20B9"}{(ledger?.cashInHand || 0).toFixed(2)}</p>
                                 </div>
 
                                 <div>
-                                    <label className="block text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3 ml-1">Handed Over Amount</label>
+                                    <label className="block text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3 ml-1">Settlement Amount</label>
                                     <div className="relative group">
                                         <span className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl font-black text-stone-200 group-focus-within:text-[#8B3D28] transition-colors">{"\u20B9"}</span>
                                         <input
                                             type="number"
                                             value={payoutAmount}
                                             onChange={(e) => setPayoutAmount(e.target.value)}
+                                            max={ledger?.cashInHand || 0}
                                             className="w-full bg-white border-2 border-stone-100 rounded-[1.5rem] pl-12 pr-6 py-5 text-2xl font-black text-village-umber outline-none focus:border-[#8B3D28]/30 focus:ring-8 focus:ring-[#8B3D28]/5 transition-all"
                                             placeholder="0.00"
                                         />
                                     </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPayoutAmount(String(ledger?.cashInHand || 0))}
+                                        className="mt-3 text-[9px] font-black uppercase tracking-widest text-[#8B3D28]"
+                                    >
+                                        Use full cash in hand
+                                    </button>
                                 </div>
 
                                 <div>
-                                    <label className="block text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3 ml-1">Remark / Notes</label>
+                                    <label className="block text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] mb-3 ml-1">Remark (Optional)</label>
                                     <textarea
                                         value={payoutRemark}
                                         onChange={(e) => setPayoutRemark(e.target.value)}
-                                        className="w-full bg-white border-2 border-stone-100 rounded-[1.5rem] px-6 py-4 text-xs font-black text-village-umber outline-none focus:border-[#8B3D28]/30 transition-all min-h-[100px]"
-                                        placeholder="e.g. Handed over cash at office..."
+                                        className="w-full bg-white border-2 border-stone-100 rounded-[1.5rem] px-6 py-4 text-xs font-bold text-village-umber outline-none focus:border-[#8B3D28]/30 transition-all min-h-[90px]"
+                                        placeholder="Add handover details for admin"
                                     />
                                 </div>
 
+                                {(depositConfig.razorpayEnabled || depositConfig.mockDepositEnabled) && (
+                                    <button
+                                        onClick={handleRazorpayPayout}
+                                        disabled={payoutInProgress || manualSettlementInProgress || !payoutAmount}
+                                        className="w-full bg-[#8B3D28] text-white py-5 rounded-3xl font-black text-[11px] uppercase tracking-[0.25em] shadow-2xl shadow-[#8B3D28]/30 transition-all active:scale-[0.98] disabled:opacity-50 relative overflow-hidden group mt-4"
+                                    >
+                                        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
+                                        <span className="relative z-10">
+                                            {payoutInProgress
+                                                ? "PROCESSING..."
+                                                : depositConfig.razorpayEnabled
+                                                    ? "PAY WITH RAZORPAY"
+                                                    : "SETTLE CASH NOW"}
+                                        </span>
+                                    </button>
+                                )}
+
                                 <button
-                                    onClick={handleSubmitPayout}
-                                    disabled={payoutInProgress || !payoutAmount}
-                                    className="w-full bg-[#8B3D28] text-white py-5 rounded-3xl font-black text-[11px] uppercase tracking-[0.25em] shadow-2xl shadow-[#8B3D28]/30 transition-all active:scale-[0.98] disabled:opacity-50 relative overflow-hidden group mt-4"
+                                    onClick={handleManualSettlement}
+                                    disabled={manualSettlementInProgress || payoutInProgress || !payoutAmount}
+                                    className={`w-full py-4 rounded-3xl font-black text-[11px] uppercase tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-50 ${
+                                        depositConfig.razorpayEnabled
+                                            ? "bg-white text-village-umber border-2 border-stone-200"
+                                            : "bg-[#8B3D28] text-white shadow-2xl shadow-[#8B3D28]/30"
+                                    }`}
                                 >
-                                    <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('/assets/natural-paper.png')] group-hover:scale-110 transition-transform"></div>
-                                    <span className="relative z-10">{payoutInProgress ? "PROCESSING..." : "SUBMIT PAYOUT"}</span>
+                                    {manualSettlementInProgress ? "SUBMITTING..." : "SUBMIT MANUAL CASH HANDOVER"}
                                 </button>
+
+                                <p className="text-[8px] font-bold text-stone-400 uppercase tracking-[0.15em] text-center leading-relaxed">
+                                    {depositConfig.razorpayEnabled
+                                        ? "Razorpay settles instantly. Manual handover is sent to admin for approval."
+                                        : depositConfig.mockDepositEnabled
+                                            ? "Development mode: cash can be settled instantly without Razorpay."
+                                            : "Online payment is unavailable. Submit manual cash handover to admin."}
+                                </p>
                             </div>
                         </motion.div>
                     </div>

@@ -286,67 +286,32 @@ export const getProfile = asyncHandler(async (req: Request, res: Response) => {
 export const updateProfile = asyncHandler(
   async (req: Request, res: Response) => {
     const sellerId = (req as any).user.userId;
-    const updates = req.body;
+    const {
+      sellerName,
+      storeName,
+      category,
+      address,
+      city,
+      searchLocation,
+      latitude,
+      longitude,
+      serviceRadiusKm,
+      panCard,
+      taxName,
+      taxNumber,
+      accountName,
+      bankName,
+      branch,
+      accountNumber,
+      ifsc,
+      profile,
+      logo,
+      storeBanner,
+      storeDescription,
+      serviceableArea,
+    } = req.body;
 
-    // Prevent updating sensitive fields directly
-    const restrictedFields = [
-      "password",
-      "mobile",
-      "email",
-      "status",
-      "balance",
-    ];
-    restrictedFields.forEach((field) => delete updates[field]);
-
-    // Handle location update (convert lat/lng to GeoJSON)
-    if (updates.latitude && updates.longitude) {
-      const latitude = parseFloat(updates.latitude);
-      const longitude = parseFloat(updates.longitude);
-
-      if (!isNaN(latitude) && !isNaN(longitude)) {
-        // Update GeoJSON location for geospatial queries
-        updates.location = {
-          type: "Point",
-          coordinates: [longitude, latitude], // MongoDB GeoJSON: [longitude, latitude]
-        };
-        // Ensure string fields are also synchronized
-        updates.latitude = latitude.toString();
-        updates.longitude = longitude.toString();
-      }
-    }
-
-    // Handle serviceRadiusKm update
-    if (
-      updates.serviceRadiusKm !== undefined &&
-      updates.serviceRadiusKm !== null &&
-      updates.serviceRadiusKm !== ""
-    ) {
-      const radius =
-        typeof updates.serviceRadiusKm === "string"
-          ? parseFloat(updates.serviceRadiusKm)
-          : Number(updates.serviceRadiusKm);
-
-      if (!isNaN(radius) && radius >= 0.1 && radius <= 100) {
-        updates.serviceRadiusKm = radius; // Ensure it's saved as a number
-      } else {
-        return res.status(400).json({
-          success: false,
-          message: "Service radius must be between 0.1 and 100 kilometers",
-        });
-      }
-    } else if (
-      updates.serviceRadiusKm === "" ||
-      updates.serviceRadiusKm === null
-    ) {
-      // If empty string or null is sent, remove it from updates to keep existing value
-      delete updates.serviceRadiusKm;
-    }
-
-    const seller = await Seller.findByIdAndUpdate(sellerId, updates, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
-
+    const seller = await Seller.findById(sellerId);
     if (!seller) {
       return res.status(404).json({
         success: false,
@@ -354,10 +319,68 @@ export const updateProfile = asyncHandler(
       });
     }
 
+    if (sellerName !== undefined) seller.sellerName = sellerName;
+    if (storeName !== undefined) seller.storeName = storeName;
+    if (category !== undefined) seller.category = category;
+    if (address !== undefined) seller.address = address;
+    if (city !== undefined) seller.city = city;
+    if (searchLocation !== undefined) seller.searchLocation = searchLocation;
+    if (serviceableArea !== undefined) seller.serviceableArea = serviceableArea;
+    if (panCard !== undefined) seller.panCard = panCard;
+    if (taxName !== undefined) seller.taxName = taxName;
+    if (taxNumber !== undefined) seller.taxNumber = taxNumber;
+    if (accountName !== undefined) seller.accountName = accountName;
+    if (bankName !== undefined) seller.bankName = bankName;
+    if (branch !== undefined) seller.branch = branch;
+    if (accountNumber !== undefined) seller.accountNumber = accountNumber;
+    if (ifsc !== undefined) seller.ifsc = ifsc;
+    if (profile !== undefined) seller.profile = profile;
+    if (logo !== undefined) seller.logo = logo;
+    if (storeBanner !== undefined) seller.storeBanner = storeBanner;
+    if (storeDescription !== undefined) seller.storeDescription = storeDescription;
+
+    if (latitude !== undefined && longitude !== undefined) {
+      const parsedLatitude = parseFloat(latitude);
+      const parsedLongitude = parseFloat(longitude);
+
+      if (!isNaN(parsedLatitude) && !isNaN(parsedLongitude)) {
+        seller.latitude = parsedLatitude.toString();
+        seller.longitude = parsedLongitude.toString();
+        seller.location = {
+          type: "Point",
+          coordinates: [parsedLongitude, parsedLatitude],
+        };
+      }
+    }
+
+    if (
+      serviceRadiusKm !== undefined &&
+      serviceRadiusKm !== null &&
+      serviceRadiusKm !== ""
+    ) {
+      const radius =
+        typeof serviceRadiusKm === "string"
+          ? parseFloat(serviceRadiusKm)
+          : Number(serviceRadiusKm);
+
+      if (!isNaN(radius) && radius >= 0.1 && radius <= 100) {
+        seller.serviceRadiusKm = radius;
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Service radius must be between 0.1 and 100 kilometers",
+        });
+      }
+    }
+
+    await seller.save();
+
+    const updatedSeller = await Seller.findById(sellerId).select("-password");
+
     return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      data: seller,
+      data: updatedSeller,
     });
   },
 );

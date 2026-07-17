@@ -89,7 +89,7 @@ export default function DeliveryBottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/70 backdrop-blur-lg border-t border-village-umber/5 shadow-[0_-4px_12px_rgba(0,0,0,0.03)] z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/70 backdrop-blur-lg border-t border-village-umber/5 shadow-[0_-4px_12px_rgba(0,0,0,0.03)] z-50 font-poppins">
       <div className="flex justify-around items-center h-14 pb-env-bottom">
         {navItems.map((item) => (
           <Link

@@ -112,41 +112,6 @@ export const createBestEffortPaymentRecord = async (
   }
 };
 
-const addDeliveryEarningIfMissing = async (
-  deliveryBoyId: mongoose.Types.ObjectId,
-  order: IOrder,
-  session?: mongoose.ClientSession
-) => {
-  const amount = Number(order.shipping || 0);
-  if (amount <= 0) return;
-
-  const eventKey = `delivery_earning_${order._id.toString()}`;
-  await DeliveryWallet.updateOne(
-    {
-      deliveryBoy: deliveryBoyId,
-      processedEvents: { $ne: eventKey },
-    },
-    {
-      $inc: { totalBalance: amount },
-      $push: {
-        transactions: {
-          type: "earning",
-          amount,
-          status: "Completed",
-          orderId: order._id,
-          reference: eventKey,
-          metadata: {
-            deliveryFee: amount,
-          },
-          createdAt: new Date(),
-        },
-      },
-      $addToSet: { processedEvents: eventKey },
-    },
-    { session }
-  );
-};
-
 const addCodCashIfMissing = async (
   deliveryBoyId: mongoose.Types.ObjectId,
   order: IOrder,
@@ -312,11 +277,6 @@ export const completeDeliveryLifecycle = async (params: {
 
     if (order.deliveryBoy) {
       await ensureDeliveryWallet(order.deliveryBoy as mongoose.Types.ObjectId, session || undefined);
-      await addDeliveryEarningIfMissing(
-        order.deliveryBoy as mongoose.Types.ObjectId,
-        order,
-        session || undefined
-      );
       await addCodCashIfMissing(
         order.deliveryBoy as mongoose.Types.ObjectId,
         order,
@@ -353,35 +313,89 @@ export const getRazorpayCredentials = async (): Promise<{
   keyId: string;
   keySecret: string;
 }> => {
-  const settings = await AppSettings.findOne().select("paymentGateways");
-  const keyId = settings?.paymentGateways?.razorpay?.keyId;
-  const keySecret = settings?.paymentGateways?.razorpay?.keySecret;
-  const isEnabled = settings?.paymentGateways?.razorpay?.enabled;
+  const trim = (value?: string | null) =>
+    typeof value === "string" ? value.trim() : "";
 
-  if (isEnabled !== false && keyId && keySecret) {
-    return { keyId, keySecret };
+  const isValidRazorpayKey = (key: string) =>
+    /^rzp_(test|live)_[A-Za-z0-9]+$/.test(key);
+
+  const normalizeCredentialPair = (
+    keyId?: string | null,
+    keySecret?: string | null
+  ) => {
+    const id = trim(keyId);
+    const secret = trim(keySecret);
+    if (!id || !secret || !isValidRazorpayKey(id)) {
+      return null;
+    }
+    return { keyId: id, keySecret: secret };
+  };
+
+  const candidates: Array<{ keyId: string; keySecret: string } | null> = [
+    normalizeCredentialPair(
+      process.env.RAZORPAY_KEY_ID,
+      process.env.RAZORPAY_KEY_SECRET
+    ),
+  ];
+
+  const settings = await AppSettings.findOne().select("paymentGateways");
+  if (settings?.paymentGateways?.razorpay?.enabled !== false) {
+    candidates.push(
+      normalizeCredentialPair(
+        settings?.paymentGateways?.razorpay?.keyId,
+        settings?.paymentGateways?.razorpay?.keySecret
+      )
+    );
   }
 
   const razorpayMethod = await PaymentMethod.findOne({
     $or: [{ provider: { $regex: /razorpay/i } }, { name: { $regex: /razorpay/i } }],
   }).select("+apiKey +secretKey");
 
-  if (razorpayMethod?.apiKey && razorpayMethod?.secretKey) {
-    return {
-      keyId: razorpayMethod.apiKey,
-      keySecret: razorpayMethod.secretKey,
-    };
+  candidates.push(
+    normalizeCredentialPair(razorpayMethod?.apiKey, razorpayMethod?.secretKey)
+  );
+
+  const creds = candidates.find(Boolean);
+  if (!creds) {
+    throw new Error("Razorpay credentials not configured");
   }
 
-  if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
-    return {
-      keyId: process.env.RAZORPAY_KEY_ID,
-      keySecret: process.env.RAZORPAY_KEY_SECRET,
-    };
-  }
-
-  throw new Error("Razorpay credentials not configured in DB");
+  return creds;
 };
+
+let razorpayAvailabilityCache: { available: boolean; checkedAt: number } | null = null;
+
+export const isRazorpayAvailable = async (): Promise<boolean> => {
+  if (
+    razorpayAvailabilityCache &&
+    Date.now() - razorpayAvailabilityCache.checkedAt < 5 * 60 * 1000
+  ) {
+    return razorpayAvailabilityCache.available;
+  }
+
+  try {
+    const razorpay = await getRazorpayInstanceFromDb();
+    await razorpay.orders.create({
+      amount: 100,
+      currency: "INR",
+      receipt: `ping_${Date.now().toString(36)}`,
+    });
+    razorpayAvailabilityCache = { available: true, checkedAt: Date.now() };
+    return true;
+  } catch (error) {
+    console.warn("Razorpay unavailable:", error);
+    razorpayAvailabilityCache = { available: false, checkedAt: Date.now() };
+    return false;
+  }
+};
+
+export const isMockCodDepositEnabled = () =>
+  process.env.NODE_ENV !== "production" ||
+  process.env.ALLOW_MOCK_COD_DEPOSIT === "true";
+
+export const isMockCodDepositOrder = (razorpayOrderId: string) =>
+  isMockCodDepositEnabled() && razorpayOrderId.startsWith("mock_dep_");
 
 export const getRazorpayInstanceFromDb = async (): Promise<Razorpay> => {
   const creds = await getRazorpayCredentials();

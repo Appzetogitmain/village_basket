@@ -6,6 +6,7 @@ import Seller from "../../../models/Seller";
 import WalletTransaction from "../../../models/WalletTransaction";
 import Delivery from "../../../models/Delivery";
 import { Server as SocketIOServer } from "socket.io";
+import { addDeliveryBoyToOrder } from "../../../utils/deliveryAssignmentUtils";
 
 /**
  * Get seller's orders with filters, sorting, and pagination
@@ -147,7 +148,8 @@ export const getOrderById = asyncHandler(
     // Get order with populated data
     const order = await Order.findById(id)
       .populate("customer", "name email phone")
-      .populate("deliveryBoy", "name mobile email");
+      .populate("deliveryBoy", "name mobile email")
+      .populate("assignedDeliveryBoys.deliveryBoy", "name mobile email");
 
     if (!order) {
       return res.status(404).json({
@@ -229,6 +231,13 @@ export const getOrderById = asyncHandler(
       customerPhone: showCustomerDetails ? ((order.customer as any)?.phone || order.customerPhone || '') : '********' + ((order.customer as any)?.phone || order.customerPhone || '').slice(-2),
       deliveryBoyName: (order.deliveryBoy as any)?.name || '',
       deliveryBoyPhone: (order.deliveryBoy as any)?.mobile || '',
+      assignedDeliveryBoys: (order.assignedDeliveryBoys || []).map((entry: any) => ({
+        id: entry.deliveryBoy?._id?.toString() || entry.deliveryBoy?.toString() || '',
+        name: entry.deliveryBoy?.name || '',
+        mobile: entry.deliveryBoy?.mobile || '',
+        status: entry.status || 'Assigned',
+        assignedAt: entry.assignedAt,
+      })),
       items: formattedItems,
       subtotal: order.subtotal || 0,
       tax: order.tax || 0,
@@ -400,39 +409,64 @@ export const updateOrderStatus = asyncHandler(
 
 export const getDeliveryBoys = asyncHandler(
   async (_req: Request, res: Response) => {
-    // Find all delivery boys who currently have an active order
-    // Active delivery statuses: Assigned, Picked Up, In Transit
-    const busyDeliveryBoys = await Order.distinct("deliveryBoy", {
-      deliveryBoyStatus: { $in: ["Assigned", "Picked Up", "In Transit"] },
-      status: { $nin: ["Delivered", "Cancelled", "Returned", "Rejected"] }
-    });
-
-    // Only fetch delivery boys who are active, online, and not busy with an ongoing order
     const deliveryBoys = await Delivery.find({
       status: "Active",
       isOnline: true,
-      _id: { $nin: busyDeliveryBoys }
     }).select("name mobile email isOnline location");
+
+    const activeOrderCounts = await Order.aggregate([
+      {
+        $match: {
+          deliveryBoyStatus: { $in: ["Assigned", "Picked Up", "In Transit"] },
+          status: { $nin: ["Delivered", "Cancelled", "Returned", "Rejected"] },
+          deliveryBoy: { $exists: true, $ne: null },
+        },
+      },
+      {
+        $group: {
+          _id: "$deliveryBoy",
+          activeOrders: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const activeOrderMap = new Map(
+      activeOrderCounts.map((entry) => [entry._id.toString(), entry.activeOrders])
+    );
+
+    const formattedDeliveryBoys = deliveryBoys.map((boy) => ({
+      ...boy.toObject(),
+      activeOrders: activeOrderMap.get(boy._id.toString()) || 0,
+    }));
 
     return res.status(200).json({
       success: true,
       message: "Delivery boys fetched successfully",
-      data: deliveryBoys,
+      data: formattedDeliveryBoys,
     });
   }
 );
 
 /**
- * Manually assign a delivery boy by the seller
+ * Manually assign one or more delivery boys by the seller
  */
 export const assignDeliveryBoy = asyncHandler(
   async (req: Request, res: Response) => {
     const sellerId = (req as any).user.userId;
     const { id: orderId } = req.params;
-    const { deliveryBoyId } = req.body;
+    const { deliveryBoyId, deliveryBoyIds } = req.body;
 
-    if (!deliveryBoyId) {
-      return res.status(400).json({ success: false, message: "Delivery Boy ID is required" });
+    const idsToAssign: string[] = Array.isArray(deliveryBoyIds)
+      ? deliveryBoyIds.filter(Boolean)
+      : deliveryBoyId
+        ? [deliveryBoyId]
+        : [];
+
+    if (idsToAssign.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one Delivery Boy ID is required",
+      });
     }
 
     // Check if this seller has items in this order
@@ -454,10 +488,32 @@ export const assignDeliveryBoy = asyncHandler(
       });
     }
 
-    // Actually assign
-    order.deliveryBoy = deliveryBoyId;
-    order.deliveryBoyStatus = "Assigned";
-    order.assignedAt = new Date();
+    const deliveryPartners = await Delivery.find({
+      _id: { $in: idsToAssign },
+      status: "Active",
+    }).select("_id name");
+
+    if (deliveryPartners.length !== idsToAssign.length) {
+      return res.status(400).json({
+        success: false,
+        message: "One or more selected delivery partners are invalid or inactive",
+      });
+    }
+
+    const newlyAssignedIds: string[] = [];
+    for (const partnerId of idsToAssign) {
+      const wasAdded = addDeliveryBoyToOrder(order, partnerId);
+      if (wasAdded) {
+        newlyAssignedIds.push(partnerId);
+      }
+    }
+
+    if (newlyAssignedIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "All selected delivery partners are already assigned to this order",
+      });
+    }
 
     // Typically assigned implies it is ready for pickup
     if (order.status === 'Pending' || order.status === 'Received' || order.status === 'Accepted' || order.status === 'Processed') {
@@ -466,38 +522,39 @@ export const assignDeliveryBoy = asyncHandler(
 
     await order.save();
 
-    // Push notification to delivery boy and customer
+    // Push notification to delivery boys and customer
     try {
       const io: SocketIOServer = (req.app.get("io") as SocketIOServer);
-      if (io) {
-        // Format notifications payload
-        const notificationPayload = {
-          orderId: order._id.toString(),
-          orderNumber: order.orderNumber,
-          customerName: order.customerName,
-          deliveryAddress: {
-            address: order.deliveryAddress.address,
-            landmark: order.deliveryAddress.landmark,
-            city: order.deliveryAddress.city,
-            state: order.deliveryAddress.state,
-            pincode: order.deliveryAddress.pincode
-          },
-          total: order.total,
-          itemsCount: order.items?.length || 0
-        };
-
-        // Instead of broadcasting to all, alert just this one
-        io.to(`delivery-${deliveryBoyId}`).emit('order-assigned-manually', {
-          orderId,
-          message: `You have been manually assigned to order #${order.orderNumber}`,
-          orderData: notificationPayload
-        });
-      }
+      const notificationPayload = {
+        orderId: order._id.toString(),
+        orderNumber: order.orderNumber,
+        customerName: order.customerName,
+        deliveryAddress: {
+          address: order.deliveryAddress.address,
+          landmark: order.deliveryAddress.landmark,
+          city: order.deliveryAddress.city,
+          state: order.deliveryAddress.state,
+          pincode: order.deliveryAddress.pincode
+        },
+        total: order.total,
+        itemsCount: order.items?.length || 0
+      };
 
       const { sendTaskAvailableNotification } = await import("../../../services/notificationService");
-      await sendTaskAvailableNotification(deliveryBoyId, orderId, order.orderNumber);
-
       const { sendOrderStatusNotification } = await import("../../../services/notificationService");
+
+      for (const assignedId of newlyAssignedIds) {
+        if (io) {
+          io.to(`delivery-${assignedId}`).emit('order-assigned-manually', {
+            orderId,
+            message: `You have been manually assigned to order #${order.orderNumber}`,
+            orderData: notificationPayload
+          });
+        }
+
+        await sendTaskAvailableNotification(assignedId, orderId, order.orderNumber);
+      }
+
       await sendOrderStatusNotification(
         order.orderNumber,
         order._id.toString(),
@@ -511,11 +568,16 @@ export const assignDeliveryBoy = asyncHandler(
 
     return res.status(200).json({
       success: true,
-      message: "Delivery partner assigned successfully",
+      message:
+        newlyAssignedIds.length === 1
+          ? "Delivery partner assigned successfully"
+          : `${newlyAssignedIds.length} delivery partners assigned successfully`,
       data: {
         id: order._id,
         status: order.status,
-        deliveryBoy: deliveryBoyId,
+        deliveryBoy: order.deliveryBoy,
+        assignedDeliveryBoys: order.assignedDeliveryBoys,
+        newlyAssignedIds,
       },
     });
   }

@@ -80,6 +80,7 @@ export default function DeliveryLogin() {
     <div
       className="h-screen w-screen overflow-hidden flex flex-col items-center justify-center px-6 relative font-poppins"
       style={{
+        fontFamily: "'Poppins', sans-serif",
         backgroundColor: 'var(--village-cream, #FAF7F2)',
         backgroundImage: `linear-gradient(rgba(250, 247, 242, 0.88), rgba(250, 247, 242, 0.88)), url('/assets/delivery_bg_pattern.png')`,
         backgroundRepeat: 'repeat',

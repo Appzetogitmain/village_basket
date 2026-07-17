@@ -145,7 +145,7 @@ export default function AdminCashCollection() {
   const handleApprove = async (collection: any) => {
     if (collection.status !== 'Pending') return;
     
-    if (!window.confirm(`Are you sure you want to approve this collection of ₹${collection.amount} from ${collection.deliveryBoyName}?`)) {
+    if (!window.confirm(`Approve this collection of ₹${collection.amount} from ${collection.deliveryBoyName}? Status will change to Active.`)) {
         return;
     }
 
@@ -153,8 +153,15 @@ export default function AdminCashCollection() {
         const { default: api } = await import("../../../services/api/config");
         const response = await api.put(`/admin/cash-collections/${collection._id}/approve`);
         if (response.data.success) {
-            alert("Collection approved successfully");
-            window.location.reload(); 
+            setCashCollections((prev) =>
+              prev.map((item) =>
+                item._id === collection._id
+                  ? { ...item, status: "Active" }
+                  : item
+              )
+            );
+            setSuccessMessage("Collection approved. Status is now Active.");
+            setTimeout(() => setSuccessMessage(null), 3000);
         }
     } catch (error: any) {
         alert(error.response?.data?.message || "Failed to approve collection");
@@ -728,14 +735,19 @@ export default function AdminCashCollection() {
                     <td className="px-3 py-2 text-[10px] font-black">
                       <span 
                         onClick={() => handleApprove(collection)}
-                        className={`px-2 py-1 rounded-full uppercase tracking-tighter cursor-pointer ${
+                        title={collection.status === 'Pending' ? 'Click to approve' : undefined}
+                        className={`px-2 py-1 rounded-full uppercase tracking-tighter ${
                         collection.status === 'Pending' 
-                          ? 'bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200' 
+                          ? 'bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200 cursor-pointer' 
                           : collection.status === 'Rejected'
                             ? 'bg-red-100 text-red-700 border border-red-200'
                             : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
                       }`}>
-                        {collection.status || 'Completed'}
+                        {collection.status === 'Pending'
+                          ? 'Pending'
+                          : collection.status === 'Rejected'
+                            ? 'Rejected'
+                            : 'Active'}
                       </span>
                     </td>
                   </tr>

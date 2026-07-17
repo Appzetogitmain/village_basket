@@ -13,8 +13,8 @@ export default function SellerOrderDetail() {
   const [orderStatus, setOrderStatus] = useState<string>('Out For Delivery');
   
   // Delivery Boy states
-  const [availableDeliveryBoys, setAvailableDeliveryBoys] = useState<{ _id: string; name: string; mobile: string; isOnline: boolean }[]>([]);
-  const [selectedDeliveryBoy, setSelectedDeliveryBoy] = useState<string>('');
+  const [availableDeliveryBoys, setAvailableDeliveryBoys] = useState<{ _id: string; name: string; mobile: string; isOnline: boolean; activeOrders?: number }[]>([]);
+  const [selectedDeliveryBoys, setSelectedDeliveryBoys] = useState<string[]>([]);
   const [assigningLoading, setAssigningLoading] = useState(false);
 
   // Fetch order detail from API
@@ -82,17 +82,18 @@ export default function SellerOrderDetail() {
   };
 
   const handleAssignDeliveryBoy = async () => {
-    if (!orderDetail || !selectedDeliveryBoy) {
-      alert("Please select a delivery partner first");
+    if (!orderDetail || selectedDeliveryBoys.length === 0) {
+      alert("Please select at least one delivery partner");
       return;
     }
     
     setAssigningLoading(true);
     try {
-      const response = await assignDeliveryBoy(orderDetail.id, selectedDeliveryBoy);
+      const response = await assignDeliveryBoy(orderDetail.id, selectedDeliveryBoys);
       if (response.success) {
-        alert("Delivery partner manually assigned successfully!");
+        alert(response.message || "Delivery partner(s) assigned successfully!");
         setOrderStatus(response.data.status);
+        setSelectedDeliveryBoys([]);
         
         // Refresh order details to show new delivery boy info
         const freshOrder = await getOrderById(orderDetail.id);
@@ -108,6 +109,14 @@ export default function SellerOrderDetail() {
     } finally {
       setAssigningLoading(false);
     }
+  };
+
+  const toggleDeliveryBoySelection = (deliveryBoyId: string) => {
+    setSelectedDeliveryBoys((prev) =>
+      prev.includes(deliveryBoyId)
+        ? prev.filter((id) => id !== deliveryBoyId)
+        : [...prev, deliveryBoyId]
+    );
   };
 
   if (loading) {
@@ -407,6 +416,10 @@ export default function SellerOrderDetail() {
     return `${unit} x ${qty}`;
   };
 
+  const assignedPartnerIds = new Set(
+    orderDetail.assignedDeliveryBoys?.map((partner) => partner.id) || []
+  );
+
   return (
     <div className="min-h-screen bg-white/40 pb-8">
       {/* Order Action Section */}
@@ -510,28 +523,80 @@ export default function SellerOrderDetail() {
           {(orderStatus === 'Accepted' || orderStatus === 'Processed') && (
              <div className="mt-6 border-t border-neutral-200 pt-5 w-full">
                <h3 className="text-sm font-semibold text-neutral-800 mb-3">
-                  Assign Delivery Partner {orderDetail?.deliveryBoyName ? <span className="text-[#8B3D28] ml-1 text-xs"> (Currently: {orderDetail.deliveryBoyName})</span> : ''}
+                  Assign Delivery Partner(s)
+                  {orderDetail?.assignedDeliveryBoys && orderDetail.assignedDeliveryBoys.length > 0 && (
+                    <span className="text-[#8B3D28] ml-1 text-xs">
+                      ({orderDetail.assignedDeliveryBoys.length} assigned)
+                    </span>
+                  )}
                </h3>
-               <div className="flex flex-col sm:flex-row gap-3 items-center">
-                 <select
-                   value={selectedDeliveryBoy}
-                   onChange={(e) => setSelectedDeliveryBoy(e.target.value)}
-                   className="flex-1 w-full px-4 py-2 border border-neutral-300 rounded-lg text-sm text-neutral-900 bg-white/90 focus:outline-none focus:ring-2 focus:ring-[#8B3D28]"
-                 >
-                   <option value="">Select a Delivery Partner...</option>
-                   {availableDeliveryBoys.map((boy) => (
-                     <option key={boy._id} value={boy._id}>
-                       {boy.name} ({boy.mobile}) {boy.isOnline ? '🟢 Online' : '⚪ Offline'}
-                     </option>
+
+               {orderDetail?.assignedDeliveryBoys && orderDetail.assignedDeliveryBoys.length > 0 && (
+                 <div className="mb-4 flex flex-wrap gap-2">
+                   {orderDetail.assignedDeliveryBoys.map((partner) => (
+                     <span
+                       key={partner.id}
+                       className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-800 border border-orange-200"
+                     >
+                       {partner.name} ({partner.mobile})
+                     </span>
                    ))}
-                 </select>
+                 </div>
+               )}
+
+               <div className="flex flex-col gap-3">
+                 <div className="max-h-48 overflow-y-auto border border-neutral-200 rounded-lg bg-white/90 p-2 space-y-1">
+                   {availableDeliveryBoys.length === 0 ? (
+                     <p className="text-sm text-neutral-500 px-2 py-3">No online delivery partners available</p>
+                   ) : (
+                     availableDeliveryBoys.map((boy) => {
+                       const isAlreadyAssigned = assignedPartnerIds.has(boy._id);
+                       const isSelected = selectedDeliveryBoys.includes(boy._id);
+                       return (
+                         <label
+                           key={boy._id}
+                           className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors ${
+                             isAlreadyAssigned
+                               ? 'bg-neutral-100 opacity-60 cursor-not-allowed'
+                               : isSelected
+                                 ? 'bg-orange-50 border border-orange-200'
+                                 : 'hover:bg-neutral-50'
+                           }`}
+                         >
+                           <input
+                             type="checkbox"
+                             checked={isSelected}
+                             disabled={isAlreadyAssigned}
+                             onChange={() => toggleDeliveryBoySelection(boy._id)}
+                             className="rounded border-neutral-300 text-[#8B3D28] focus:ring-[#8B3D28]"
+                           />
+                           <span className="text-sm text-neutral-900 flex-1">
+                             {boy.name} ({boy.mobile}) {boy.isOnline ? '🟢 Online' : '⚪ Offline'}
+                             {(boy.activeOrders ?? 0) > 0 && (
+                               <span className="ml-2 text-xs text-neutral-500">
+                                 · {boy.activeOrders} active order{boy.activeOrders === 1 ? '' : 's'}
+                               </span>
+                             )}
+                             {isAlreadyAssigned && (
+                               <span className="ml-2 text-xs text-green-700 font-medium">Already assigned</span>
+                             )}
+                           </span>
+                         </label>
+                       );
+                     })
+                   )}
+                 </div>
                  
                  <button
                    onClick={handleAssignDeliveryBoy}
-                   disabled={!selectedDeliveryBoy || assigningLoading}
+                   disabled={selectedDeliveryBoys.length === 0 || assigningLoading}
                    className="w-full sm:w-auto bg-[#e67e22] hover:bg-[#d35400] disabled:opacity-50 text-white px-6 py-2 rounded-lg transition-colors font-medium shadow-sm whitespace-nowrap"
                  >
-                   {assigningLoading ? 'Assigning...' : 'Assign Partner'}
+                   {assigningLoading
+                     ? 'Assigning...'
+                     : selectedDeliveryBoys.length > 1
+                       ? `Assign ${selectedDeliveryBoys.length} Partners`
+                       : 'Assign Partner'}
                  </button>
                </div>
              </div>

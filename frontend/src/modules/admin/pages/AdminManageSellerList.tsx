@@ -111,6 +111,25 @@ export default function AdminManageSellerList() {
     const [isUpdatingCommission, setIsUpdatingCommission] = useState(false);
     const [tempCommission, setTempCommission] = useState<number>(0);
     const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
+    const [isSavingProfile, setIsSavingProfile] = useState(false);
+    const [profileForm, setProfileForm] = useState({
+        sellerName: '',
+        storeName: '',
+        email: '',
+        mobile: '',
+        category: '',
+        address: '',
+        city: '',
+        serviceableArea: '',
+        panCard: '',
+        taxName: '',
+        taxNumber: '',
+        accountName: '',
+        bankName: '',
+        branch: '',
+        accountNumber: '',
+        ifsc: '',
+    });
 
     // Fetch sellers from backend
     useEffect(() => {
@@ -245,7 +264,108 @@ export default function AdminManageSellerList() {
             setEditingSeller(seller);
             setNewRadius(seller.serviceRadiusKm || 10);
             setTempCommission(seller.commission || 0);
+            setProfileForm({
+                sellerName: seller.sellerName || seller.name || '',
+                storeName: seller.storeName || '',
+                email: seller.email || '',
+                mobile: seller.mobile || seller.phone || '',
+                category: seller.category || seller.categories?.[0] || '',
+                address: seller.address || '',
+                city: seller.city || '',
+                serviceableArea: seller.serviceableArea || '',
+                panCard: seller.panCard || '',
+                taxName: seller.taxName || '',
+                taxNumber: seller.taxNumber || '',
+                accountName: seller.accountName || '',
+                bankName: seller.bankName || '',
+                branch: seller.branch || '',
+                accountNumber: seller.accountNumber || '',
+                ifsc: seller.ifsc || '',
+            });
             setIsEditModalOpen(true);
+        }
+    };
+
+    const handleProfileFieldChange = (field: keyof typeof profileForm, value: string) => {
+        setProfileForm((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
+
+    const applyUpdatedSeller = (updatedSeller: SellerType) => {
+        const mappedSeller = mapSellerToFrontend(updatedSeller);
+        setEditingSeller(mappedSeller);
+        setSellers((prev) => prev.map((seller) => (
+            seller._id === mappedSeller._id ? mappedSeller : seller
+        )));
+        setProfileForm({
+            sellerName: mappedSeller.sellerName || mappedSeller.name || '',
+            storeName: mappedSeller.storeName || '',
+            email: mappedSeller.email || '',
+            mobile: mappedSeller.mobile || mappedSeller.phone || '',
+            category: mappedSeller.category || mappedSeller.categories?.[0] || '',
+            address: mappedSeller.address || '',
+            city: mappedSeller.city || '',
+            serviceableArea: mappedSeller.serviceableArea || '',
+            panCard: mappedSeller.panCard || '',
+            taxName: mappedSeller.taxName || '',
+            taxNumber: mappedSeller.taxNumber || '',
+            accountName: mappedSeller.accountName || '',
+            bankName: mappedSeller.bankName || '',
+            branch: mappedSeller.branch || '',
+            accountNumber: mappedSeller.accountNumber || '',
+            ifsc: mappedSeller.ifsc || '',
+        });
+        setNewRadius(mappedSeller.serviceRadiusKm || 10);
+        setTempCommission(mappedSeller.commission || 0);
+    };
+
+    const handleSaveProfile = async () => {
+        if (!editingSeller) return;
+
+        if (!profileForm.sellerName.trim() || !profileForm.storeName.trim() || !profileForm.email.trim() || !profileForm.mobile.trim()) {
+            setError('Seller name, store name, email, and mobile are required.');
+            setTimeout(() => setError(''), 3000);
+            return;
+        }
+
+        try {
+            setIsSavingProfile(true);
+            setError('');
+            const response = await updateSeller(editingSeller._id, {
+                sellerName: profileForm.sellerName.trim(),
+                storeName: profileForm.storeName.trim(),
+                email: profileForm.email.trim(),
+                mobile: profileForm.mobile.trim(),
+                category: profileForm.category.trim(),
+                address: profileForm.address.trim(),
+                city: profileForm.city.trim(),
+                serviceableArea: profileForm.serviceableArea.trim(),
+                panCard: profileForm.panCard.trim(),
+                taxName: profileForm.taxName.trim(),
+                taxNumber: profileForm.taxNumber.trim(),
+                accountName: profileForm.accountName.trim(),
+                bankName: profileForm.bankName.trim(),
+                branch: profileForm.branch.trim(),
+                accountNumber: profileForm.accountNumber.trim(),
+                ifsc: profileForm.ifsc.trim(),
+            });
+
+            if (response.success && response.data) {
+                applyUpdatedSeller(response.data);
+                setSuccessMessage('Seller profile updated successfully');
+                setTimeout(() => setSuccessMessage(''), 3000);
+            } else {
+                setError(response.message || 'Failed to update seller profile');
+                setTimeout(() => setError(''), 3000);
+            }
+        } catch (err: any) {
+            console.error('Error updating seller profile:', err);
+            setError(err.response?.data?.message || 'Failed to update seller profile');
+            setTimeout(() => setError(''), 3000);
+        } finally {
+            setIsSavingProfile(false);
         }
     };
 
@@ -255,16 +375,17 @@ export default function AdminManageSellerList() {
         try {
             setIsUpdatingRadius(true);
             const response = await updateSeller(editingSeller._id, { serviceRadiusKm: newRadius });
-            if (response.success) {
-                setEditingSeller({ ...editingSeller, serviceRadiusKm: newRadius });
-                // Also update the seller in the main list
-                setSellers(sellers.map(s => s._id === editingSeller._id ? { ...s, serviceRadiusKm: newRadius } : s));
+            if (response.success && response.data) {
+                applyUpdatedSeller(response.data);
                 setSuccessMessage('Service radius updated successfully');
                 setTimeout(() => setSuccessMessage(''), 3000);
+            } else {
+                setError(response.message || 'Failed to update service radius');
+                setTimeout(() => setError(''), 3000);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error updating radius:', error);
-            setError('Failed to update service radius');
+            setError(error.response?.data?.message || 'Failed to update service radius');
             setTimeout(() => setError(''), 3000);
         } finally {
             setIsUpdatingRadius(false);
@@ -277,16 +398,17 @@ export default function AdminManageSellerList() {
         try {
             setIsUpdatingCommission(true);
             const response = await updateSeller(editingSeller._id, { commission: tempCommission });
-            if (response.success) {
-                setEditingSeller({ ...editingSeller, commission: tempCommission });
-                // Also update the seller in the main list
-                setSellers(sellers.map(s => s._id === editingSeller._id ? { ...s, commission: tempCommission } : s));
+            if (response.success && response.data) {
+                applyUpdatedSeller(response.data);
                 setSuccessMessage('Commission updated successfully');
                 setTimeout(() => setSuccessMessage(''), 3000);
+            } else {
+                setError(response.message || 'Failed to update commission');
+                setTimeout(() => setError(''), 3000);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error updating commission:', error);
-            setError('Failed to update commission');
+            setError(error.response?.data?.message || 'Failed to update commission');
             setTimeout(() => setError(''), 3000);
         } finally {
             setIsUpdatingCommission(false);
@@ -299,16 +421,17 @@ export default function AdminManageSellerList() {
         try {
             setIsUpdatingSettings(true);
             const response = await updateSeller(editingSeller._id, { [field]: value });
-            if (response.success) {
-                setEditingSeller({ ...editingSeller, [field]: value });
-                // Also update the seller in the main list
-                setSellers(sellers.map(s => s._id === editingSeller._id ? { ...s, [field]: value } : s));
+            if (response.success && response.data) {
+                applyUpdatedSeller(response.data);
                 setSuccessMessage(`${field === 'requireProductApproval' ? 'Product Approval' : 'View Customer Details'} setting updated`);
                 setTimeout(() => setSuccessMessage(''), 3000);
+            } else {
+                setError(response.message || 'Failed to update setting');
+                setTimeout(() => setError(''), 3000);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error updating setting:', error);
-            setError('Failed to update setting');
+            setError(error.response?.data?.message || 'Failed to update setting');
             setTimeout(() => setError(''), 3000);
         } finally {
             setIsUpdatingSettings(false);
@@ -866,31 +989,61 @@ export default function AdminManageSellerList() {
 
                                 {/* Basic Information */}
                                 <div className="bg-neutral-50 rounded-lg px-3 py-2">
-                                    <h4 className="text-sm font-semibold text-neutral-700 mb-3">Basic Information</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h4 className="text-sm font-semibold text-neutral-700">Basic Information</h4>
+                                        <button
+                                            onClick={handleSaveProfile}
+                                            disabled={isSavingProfile}
+                                            className="px-4 py-2 bg-[#8B3D28] text-white rounded text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            {isSavingProfile ? 'Saving...' : 'Save Profile'}
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-2">
                                         <div>
                                             <label className="text-xs text-neutral-500">Seller Name</label>
-                                            <p className="text-sm font-medium text-neutral-900">{editingSeller.name}</p>
+                                            <input
+                                                type="text"
+                                                value={profileForm.sellerName}
+                                                onChange={(e) => handleProfileFieldChange('sellerName', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Store Name</label>
-                                            <p className="text-sm font-medium text-neutral-900">{editingSeller.storeName}</p>
+                                            <input
+                                                type="text"
+                                                value={profileForm.storeName}
+                                                onChange={(e) => handleProfileFieldChange('storeName', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Email</label>
-                                            <p className="text-sm font-medium text-neutral-900">{editingSeller.email}</p>
+                                            <input
+                                                type="email"
+                                                value={profileForm.email}
+                                                onChange={(e) => handleProfileFieldChange('email', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Phone</label>
-                                            <p className="text-sm font-medium text-neutral-900">{editingSeller.phone}</p>
+                                            <input
+                                                type="tel"
+                                                value={profileForm.mobile}
+                                                onChange={(e) => handleProfileFieldChange('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
                                         </div>
                                         <div>
-                                            <label className="text-xs text-neutral-500">Categories</label>
-                                            <p className="text-sm font-medium text-neutral-900">
-                                                {editingSeller.categories && editingSeller.categories.length > 0 
-                                                    ? editingSeller.categories.join(', ') 
-                                                    : editingSeller.category || 'N/A'}
-                                            </p>
+                                            <label className="text-xs text-neutral-500">Category</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.category}
+                                                onChange={(e) => handleProfileFieldChange('category', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
                                         </div>
                                          <div>
                                             <label className="text-xs text-neutral-500">Commission (%)</label>
@@ -919,18 +1072,33 @@ export default function AdminManageSellerList() {
                                 {/* Address Information */}
                                 <div className="bg-neutral-50 rounded-lg px-3 py-2">
                                     <h4 className="text-sm font-semibold text-neutral-700 mb-3">Address Information</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-2">
                                         <div className="md:col-span-2">
                                             <label className="text-xs text-neutral-500">Address</label>
-                                            <p className="text-sm font-medium text-neutral-900">{editingSeller.address || 'N/A'}</p>
+                                            <textarea
+                                                value={profileForm.address}
+                                                onChange={(e) => handleProfileFieldChange('address', e.target.value)}
+                                                rows={3}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28] resize-none"
+                                            />
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">City</label>
-                                            <p className="text-sm font-medium text-neutral-900">{editingSeller.city || 'N/A'}</p>
+                                            <input
+                                                type="text"
+                                                value={profileForm.city}
+                                                onChange={(e) => handleProfileFieldChange('city', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
                                         </div>
                                         <div>
                                             <label className="text-xs text-neutral-500">Serviceable Area</label>
-                                            <p className="text-sm font-medium text-neutral-900">{editingSeller.serviceableArea || 'N/A'}</p>
+                                            <input
+                                                type="text"
+                                                value={profileForm.serviceableArea}
+                                                onChange={(e) => handleProfileFieldChange('serviceableArea', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
                                         </div>
                                         {editingSeller.searchLocation && editingSeller.searchLocation !== editingSeller.address && (
                                             <div className="md:col-span-2">
@@ -1002,70 +1170,90 @@ export default function AdminManageSellerList() {
                                 </div>
 
                                 {/* Tax Information */}
-                                {(editingSeller.panCard || editingSeller.taxName || editingSeller.taxNumber) && (
-                                    <div className="bg-neutral-50 rounded-lg px-3 py-2">
-                                        <h4 className="text-sm font-semibold text-neutral-700 mb-3">Tax Information</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
-                                            {editingSeller.panCard && (
-                                                <div>
-                                                    <label className="text-xs text-neutral-500">PAN Card</label>
-                                                    <p className="text-sm font-medium text-neutral-900">{editingSeller.panCard}</p>
-                                                </div>
-                                            )}
-                                            {editingSeller.taxName && (
-                                                <div>
-                                                    <label className="text-xs text-neutral-500">Tax Name</label>
-                                                    <p className="text-sm font-medium text-neutral-900">{editingSeller.taxName}</p>
-                                                </div>
-                                            )}
-                                            {editingSeller.taxNumber && (
-                                                <div className="md:col-span-2">
-                                                    <label className="text-xs text-neutral-500">Tax Number</label>
-                                                    <p className="text-sm font-medium text-neutral-900">{editingSeller.taxNumber}</p>
-                                                </div>
-                                            )}
+                                <div className="bg-neutral-50 rounded-lg px-3 py-2">
+                                    <h4 className="text-sm font-semibold text-neutral-700 mb-3">Tax Information</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-2">
+                                        <div>
+                                            <label className="text-xs text-neutral-500">PAN Card</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.panCard}
+                                                onChange={(e) => handleProfileFieldChange('panCard', e.target.value.toUpperCase())}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-neutral-500">Tax Name</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.taxName}
+                                                onChange={(e) => handleProfileFieldChange('taxName', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="text-xs text-neutral-500">Tax Number</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.taxNumber}
+                                                onChange={(e) => handleProfileFieldChange('taxNumber', e.target.value.toUpperCase())}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
                                         </div>
                                     </div>
-                                )}
+                                </div>
 
                                 {/* Bank Information */}
-                                {(editingSeller.accountName || editingSeller.bankName || editingSeller.accountNumber) && (
-                                    <div className="bg-neutral-50 rounded-lg px-3 py-2">
-                                        <h4 className="text-sm font-semibold text-neutral-700 mb-3">Bank Information</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gapx-3 py-2">
-                                            {editingSeller.accountName && (
-                                                <div>
-                                                    <label className="text-xs text-neutral-500">Account Name</label>
-                                                    <p className="text-sm font-medium text-neutral-900">{editingSeller.accountName}</p>
-                                                </div>
-                                            )}
-                                            {editingSeller.bankName && (
-                                                <div>
-                                                    <label className="text-xs text-neutral-500">Bank Name</label>
-                                                    <p className="text-sm font-medium text-neutral-900">{editingSeller.bankName}</p>
-                                                </div>
-                                            )}
-                                            {editingSeller.branch && (
-                                                <div>
-                                                    <label className="text-xs text-neutral-500">Branch</label>
-                                                    <p className="text-sm font-medium text-neutral-900">{editingSeller.branch}</p>
-                                                </div>
-                                            )}
-                                            {editingSeller.accountNumber && (
-                                                <div>
-                                                    <label className="text-xs text-neutral-500">Account Number</label>
-                                                    <p className="text-sm font-medium text-neutral-900">{editingSeller.accountNumber}</p>
-                                                </div>
-                                            )}
-                                            {editingSeller.ifsc && (
-                                                <div>
-                                                    <label className="text-xs text-neutral-500">IFSC Code</label>
-                                                    <p className="text-sm font-medium text-neutral-900">{editingSeller.ifsc}</p>
-                                                </div>
-                                            )}
+                                <div className="bg-neutral-50 rounded-lg px-3 py-2">
+                                    <h4 className="text-sm font-semibold text-neutral-700 mb-3">Bank Information</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-2">
+                                        <div>
+                                            <label className="text-xs text-neutral-500">Account Name</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.accountName}
+                                                onChange={(e) => handleProfileFieldChange('accountName', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-neutral-500">Bank Name</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.bankName}
+                                                onChange={(e) => handleProfileFieldChange('bankName', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-neutral-500">Branch</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.branch}
+                                                onChange={(e) => handleProfileFieldChange('branch', e.target.value)}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-neutral-500">Account Number</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.accountNumber}
+                                                onChange={(e) => handleProfileFieldChange('accountNumber', e.target.value.replace(/\D/g, '').slice(0, 15))}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-neutral-500">IFSC Code</label>
+                                            <input
+                                                type="text"
+                                                value={profileForm.ifsc}
+                                                onChange={(e) => handleProfileFieldChange('ifsc', e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11))}
+                                                className="mt-1 w-full px-3 py-2 border border-neutral-300 rounded text-sm focus:ring-[#8B3D28] focus:border-[#8B3D28]"
+                                            />
                                         </div>
                                     </div>
-                                )}
+                                </div>
 
                                 {/* Settings */}
                                 <div className="bg-neutral-50 rounded-lg px-3 py-2">
@@ -1133,6 +1321,13 @@ export default function AdminManageSellerList() {
 
                         {/* Modal Footer */}
                         <div className="px-4 py-2.5 border-t border-neutral-200 flex justify-end gap-2">
+                            <button
+                                onClick={handleSaveProfile}
+                                disabled={isSavingProfile}
+                                className="px-4 py-2 bg-[#8B3D28] hover:opacity-90 text-white rounded text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSavingProfile ? 'Saving...' : 'Save Profile'}
+                            </button>
                             <button
                                 onClick={handleCloseEditModal}
                                 className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 text-neutral-700 rounded text-sm font-medium transition-colors"

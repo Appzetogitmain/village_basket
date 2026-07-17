@@ -51,6 +51,47 @@ const getReadableLocation = (data: any) => {
     return '';
 };
 
+const mapProfileResponseToState = (data: any) => {
+    const locationCoords = data.location?.coordinates || [];
+    const readableLocation = getReadableLocation(data);
+    const latitude = data.latitude || (locationCoords[1]?.toString() || '');
+    const longitude = data.longitude || (locationCoords[0]?.toString() || '');
+
+    return {
+        ...data,
+        latitude,
+        longitude,
+        searchLocation: readableLocation,
+        address: readableLocation || data.address || '',
+        serviceRadiusKm: (data.serviceRadiusKm || 10).toString(),
+    };
+};
+
+const buildProfileUpdatePayload = (data: any, serviceRadiusKm: number) => ({
+    sellerName: data.sellerName?.trim(),
+    storeName: data.storeName?.trim(),
+    category: data.category?.trim(),
+    address: data.address?.trim(),
+    city: data.city?.trim(),
+    searchLocation: data.searchLocation?.trim(),
+    latitude: data.latitude,
+    longitude: data.longitude,
+    serviceRadiusKm,
+    panCard: data.panCard?.trim(),
+    taxName: data.taxName?.trim(),
+    taxNumber: data.taxNumber?.trim(),
+    accountName: data.accountName?.trim(),
+    bankName: data.bankName?.trim(),
+    branch: data.branch?.trim(),
+    accountNumber: data.accountNumber?.trim(),
+    ifsc: data.ifsc?.trim(),
+    profile: data.profile,
+    logo: data.logo,
+    storeBanner: data.storeBanner,
+    storeDescription: data.storeDescription?.trim(),
+    serviceableArea: data.serviceableArea?.trim(),
+});
+
 const SellerAccountSettings = () => {
     const { user, updateUser } = useAuth();
     const [searchParams] = useSearchParams();
@@ -119,6 +160,39 @@ const SellerAccountSettings = () => {
         };
     }, []);
 
+    const syncAuthUser = (data: any, readableLocation?: string) => {
+        if (!updateUser || !user) return;
+
+        const resolvedAddress = readableLocation
+            || (isCoordinateString(data.address) ? '' : data.address);
+
+        updateUser({
+            ...user,
+            id: data._id || user.id,
+            userType: 'Seller',
+            name: data.sellerName || user.name,
+            sellerName: data.sellerName,
+            email: data.email,
+            phone: data.mobile,
+            storeName: data.storeName,
+            city: data.city,
+            address: resolvedAddress,
+            latitude: data.latitude,
+            longitude: data.longitude,
+            logo: data.logo,
+            profile: data.profile,
+            status: data.status,
+        });
+    };
+
+    const applyProfileData = (data: any) => {
+        const mapped = mapProfileResponseToState(data);
+        setSellerData(mapped);
+        setEditingSnapshot(mapped);
+        syncAuthUser(data, mapped.searchLocation || mapped.address);
+        return mapped;
+    };
+
     const fetchCategories = async () => {
         try {
             const res = await getCategories();
@@ -133,63 +207,26 @@ const SellerAccountSettings = () => {
             setLoading(true);
             const response = await getSellerProfile();
             if (response.success) {
-                const data = response.data;
-                // Map location data to state
-                const locationCoords = data.location?.coordinates || [];
-                const readableLocation = getReadableLocation(data);
-                const latitude = data.latitude || (locationCoords[1]?.toString() || '');
-                const longitude = data.longitude || (locationCoords[0]?.toString() || '');
-                setSellerData({
-                    ...data,
-                    latitude,
-                    longitude,
-                    searchLocation: readableLocation,
-                    address: readableLocation || data.address || '',
-                    serviceRadiusKm: (data.serviceRadiusKm || 10).toString(),
-                });
-                setEditingSnapshot({
-                    ...data,
-                    latitude,
-                    longitude,
-                    searchLocation: readableLocation,
-                    address: readableLocation || data.address || '',
-                    serviceRadiusKm: (data.serviceRadiusKm || 10).toString(),
-                });
-
-                if (updateUser) {
-                    updateUser({
-                        ...user,
-                        ...data,
-                        latitude,
-                        longitude,
-                        address: readableLocation || (isCoordinateString(data.address) ? '' : data.address),
-                        id: data._id || user?.id
-                    });
-                }
+                const mapped = applyProfileData(response.data);
 
                 // If old data stores only coordinates, resolve and show exact address.
-                if (!readableLocation && latitude && longitude) {
-                    const latNum = parseFloat(latitude);
-                    const lngNum = parseFloat(longitude);
+                if (!mapped.searchLocation && mapped.latitude && mapped.longitude) {
+                    const latNum = parseFloat(mapped.latitude);
+                    const lngNum = parseFloat(mapped.longitude);
                     if (!Number.isNaN(latNum) && !Number.isNaN(lngNum)) {
                         const resolvedAddress = await reverseGeocodeLatLng(latNum, lngNum);
                         if (resolvedAddress) {
-                            setSellerData(prev => ({ ...prev, searchLocation: resolvedAddress, address: resolvedAddress }));
-                            if (updateUser) {
-                                updateUser({
-                                    ...user,
-                                    ...data,
-                                    latitude,
-                                    longitude,
-                                    address: resolvedAddress,
-                                    id: data._id || user?.id
-                                });
-                            }
+                            setSellerData(prev => ({
+                                ...prev,
+                                searchLocation: resolvedAddress,
+                                address: resolvedAddress,
+                            }));
                             setEditingSnapshot((prev: any) => prev ? ({
                                 ...prev,
                                 searchLocation: resolvedAddress,
                                 address: resolvedAddress,
                             }) : prev);
+                            syncAuthUser(response.data, resolvedAddress);
                         }
                     }
                 }
@@ -421,8 +458,14 @@ const SellerAccountSettings = () => {
                     return;
                 }
 
-                // Validate location if address is being updated
-                if (sellerData.searchLocation && (!sellerData.latitude || !sellerData.longitude)) {
+                // Validate location only when it was changed during this edit session
+                const locationChanged = editingSnapshot && (
+                    sellerData.searchLocation !== editingSnapshot.searchLocation
+                    || sellerData.latitude !== editingSnapshot.latitude
+                    || sellerData.longitude !== editingSnapshot.longitude
+                );
+
+                if (locationChanged && sellerData.searchLocation && (!sellerData.latitude || !sellerData.longitude)) {
                     setError('Please select a valid location using the map picker');
                     showToast('Please select a valid location using the map picker', 'error');
                     setSaveLoading(false);
@@ -470,40 +513,12 @@ const SellerAccountSettings = () => {
                 }
             }
 
-            const updateData = {
-                ...sellerData,
-                serviceRadiusKm: radius,
-            };
+            const updateData = buildProfileUpdatePayload(sellerData, radius);
 
             const response = await updateSellerProfile(updateData);
             if (response.success) {
                 setIsEditing(false);
-                const data = response.data;
-                const locationCoords = data.location?.coordinates || [];
-                const readableLocation = getReadableLocation(data);
-                setSellerData({
-                    ...data,
-                    latitude: data.latitude || (locationCoords[1]?.toString() || ''),
-                    longitude: data.longitude || (locationCoords[0]?.toString() || ''),
-                    searchLocation: readableLocation,
-                    address: readableLocation || data.address || '',
-                    serviceRadiusKm: (data.serviceRadiusKm || 10).toString(),
-                });
-                setEditingSnapshot({
-                    ...data,
-                    latitude: data.latitude || (locationCoords[1]?.toString() || ''),
-                    longitude: data.longitude || (locationCoords[0]?.toString() || ''),
-                    searchLocation: readableLocation,
-                    address: readableLocation || data.address || '',
-                    serviceRadiusKm: (data.serviceRadiusKm || 10).toString(),
-                });
-                if (updateUser) {
-                    updateUser({
-                        ...user,
-                        ...data,
-                        id: data._id || user?.id
-                    });
-                }
+                applyProfileData(response.data);
                 setError('');
                 setFieldErrors({});
                 showToast('Settings saved successfully', 'success');
@@ -743,8 +758,14 @@ const SellerAccountSettings = () => {
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                     <InputGroup label="Full Name" name="sellerName" value={sellerData.sellerName} onChange={handleInputChange} disabled={!isEditing} autoComplete="name" />
-                                                    <InputGroup label="Email Address" name="email" value={sellerData.email} onChange={handleInputChange} disabled={!isEditing} type="email" autoComplete="email" />
-                                                    <InputGroup label="Mobile Number" name="mobile" value={sellerData.mobile} onChange={handleInputChange} disabled={!isEditing} type="tel" autoComplete="tel" />
+                                                    <div className="space-y-1.5">
+                                                        <InputGroup label="Email Address" name="email" value={sellerData.email} onChange={handleInputChange} disabled={true} type="email" autoComplete="email" />
+                                                        {isEditing && <p className="text-xs text-gray-400 ml-1">Email cannot be changed from here. Contact support if you need to update it.</p>}
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <InputGroup label="Mobile Number" name="mobile" value={sellerData.mobile} onChange={handleInputChange} disabled={true} type="tel" autoComplete="tel" />
+                                                        {isEditing && <p className="text-xs text-gray-400 ml-1">Mobile number is linked to your login and cannot be changed here.</p>}
+                                                    </div>
 
                                                     <div className="space-y-1.5">
                                                         <label className="text-xs font-black text-neutral-700 uppercase tracking-wider ml-1">Password</label>

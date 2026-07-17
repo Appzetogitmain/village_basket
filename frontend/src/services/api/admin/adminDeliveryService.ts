@@ -94,7 +94,7 @@ export interface CashCollection {
   remark?: string;
   collectedAt: string;
   collectedBy: string;
-  status?: "Pending" | "Approved" | "Rejected" | "Completed";
+  status?: "Pending" | "Active" | "Approved" | "Rejected" | "Completed";
 }
 
 export interface CreateCashCollectionData {

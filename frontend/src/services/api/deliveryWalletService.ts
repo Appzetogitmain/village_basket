@@ -73,6 +73,25 @@ export const getDeliveryCommissions = async () => {
 };
 
 /**
+ * Get COD deposit configuration
+ */
+export const getDeliveryDepositConfig = async () => {
+    try {
+        const response = await api.get('/delivery/wallet/deposit/config');
+        return response.data;
+    } catch (error: any) {
+        console.error('Error getting deposit config:', error);
+        return {
+            success: true,
+            data: {
+                razorpayEnabled: false,
+                mockDepositEnabled: true,
+            },
+        };
+    }
+};
+
+/**
  * Create Razorpay order for COD cash deposit settlement
  */
 export const createDeliveryCashDepositOrder = async (amount: number) => {

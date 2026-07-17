@@ -6,6 +6,7 @@ import {
     requestWithdrawal,
     getWithdrawals,
     getCommissions,
+    getDepositConfig,
     createCashDepositOrder,
     verifyCashDeposit,
     submitManualSettlement,
@@ -30,6 +31,7 @@ router.get('/withdrawals', getWithdrawals);
 router.get('/commissions', getCommissions);
 
 // COD cash settlement
+router.get('/deposit/config', getDepositConfig);
 router.post('/deposit/create-order', createCashDepositOrder);
 router.post('/deposit/verify', verifyCashDeposit);
 router.post('/manual-settlement', submitManualSettlement);
