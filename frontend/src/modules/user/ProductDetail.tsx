@@ -12,6 +12,7 @@ import { useLocation } from '../../hooks/useLocation';
 import { useLoading } from '../../context/LoadingContext';
 import Button from '../../components/ui/button';
 import Badge from '../../components/ui/badge';
+import QuantityInput from '../../components/ui/QuantityInput';
 import ProductCard from "./components/ProductCard";
 import { getProductById } from '../../services/api/customerProductService';
 import WishlistButton from '../../components/WishlistButton';
@@ -636,9 +637,18 @@ export default function ProductDetail() {
                           >
                             −
                           </button>
-                          <span className="text-lg font-black text-village-umber min-w-[2rem] text-center">
-                            {inCartQty}
-                          </span>
+                          <QuantityInput
+                            value={inCartQty}
+                            min={0}
+                            max={variantStock || 999}
+                            onChange={(val) => {
+                              const productId = product.id || product._id;
+                              const variantId = selectedVariant?._id;
+                              updateQuantity(productId, val, variantId, variantTitle);
+                            }}
+                            onClampMax={(max) => showToast(`Only ${max} available`, 'error')}
+                            className="text-lg font-black text-village-umber w-12 text-center font-poppins bg-transparent border-none focus:outline-none underline decoration-village-umber/30 underline-offset-4"
+                          />
                           <button
                             onClick={() => {
                               const productId = product.id || product._id;
@@ -1197,14 +1207,18 @@ export default function ProductDetail() {
                     >
                       <span>−</span>
                     </motion.button>
-                    <motion.span
-                      key={inCartQty}
-                      initial={{ scale: 1.2, y: -2 }}
-                      animate={{ scale: 1, y: 0 }}
-                      className="text-xs font-black text-village-umber min-w-[1.25rem] text-center"
-                    >
-                      {inCartQty}
-                    </motion.span>
+                    <QuantityInput
+                      value={inCartQty}
+                      min={0}
+                      max={variantStock || 999}
+                      onChange={(val) => {
+                        const productId = product.id || product._id;
+                        const variantId = selectedVariant?._id;
+                        updateQuantity(productId, val, variantId, variantTitle);
+                      }}
+                      onClampMax={(max) => showToast(`Only ${max} available`, 'error')}
+                      className="text-xs font-black text-village-umber w-8 text-center font-poppins bg-transparent border-none focus:outline-none underline decoration-village-umber/30 underline-offset-2"
+                    />
                     <motion.button
                       whileTap={{ scale: 0.9 }}
                       onClick={() => {

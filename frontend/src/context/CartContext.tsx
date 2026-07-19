@@ -58,6 +58,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const pendingOperationsRef = useRef<Set<string>>(new Set());
+  const queuedQuantityRef = useRef<Map<string, number>>(new Map());
+  const itemsRef = useRef<ExtendedCartItem[]>(items);
   const fetchIdRef = useRef(0);
   const locationDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastFetchedLocationRef = useRef<{ lat?: number; lng?: number }>({});
@@ -66,6 +68,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const isWholesale = user?.customerType === 'wholesale';
   const { location } = useLocation();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
 
   // Helper to map API cart items to internal CartItem structure
   const mapApiItemsToState = (apiItems: any[]): ExtendedCartItem[] => {
@@ -384,117 +390,157 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const updateQuantity = async (productId: string, quantity: number, variantId?: string, variantTitle?: string) => {
     if (!productId) return;
 
-    // Create a unique operation key for this product/variant combination
-    const operationKey = variantId ? `${productId}-${variantId}` : (variantTitle ? `${productId}-${variantTitle}` : productId);
+    const normalizedProductId = String(productId);
+    const normalizedVariantId = variantId ? String(variantId) : undefined;
+    const normalizedVariantTitle = variantTitle ? String(variantTitle) : undefined;
+    const normalizeText = (value: any) => String(value || '').trim().toLowerCase();
 
-    // Prevent concurrent operations on the same product
+    const operationKey = normalizedVariantId
+      ? `${normalizedProductId}-${normalizedVariantId}`
+      : (normalizedVariantTitle ? `${normalizedProductId}-${normalizedVariantTitle}` : normalizedProductId);
+
+    // Keep latest typed quantity; drop intermediate in-flight races
+    queuedQuantityRef.current.set(operationKey, quantity);
     if (pendingOperationsRef.current.has(operationKey)) {
       return;
     }
     pendingOperationsRef.current.add(operationKey);
 
-    // Find item matching product ID and variant (if variant info provided)
-    const itemToUpdate = items.find(item => {
+    const idsEqual = (a: any, b: any) => {
+      if (a == null || b == null) return false;
+      return String(a) === String(b);
+    };
+
+    const matchesItem = (item: ExtendedCartItem) => {
       if (!item?.product) return false;
       const itemProductId = item.product.id || item.product._id;
-      if (itemProductId !== productId) return false;
+      if (!idsEqual(itemProductId, normalizedProductId)) return false;
 
-      // If variant info provided, match by variant
-      if (variantId || variantTitle) {
-        const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
-        const itemVariantTitle = (item.product as any).variantTitle || (item.product as any).pack;
-        return itemVariantId === variantId || itemVariantTitle === variantTitle;
+      const itemVariantId =
+        (item.product as any).variantId ||
+        (item.product as any).selectedVariant?._id ||
+        item.variant;
+      const itemVariantTitle =
+        (item.product as any).variantTitle ||
+        (item.product as any).pack ||
+        item.variant;
+
+      if (!normalizedVariantId && !normalizedVariantTitle) {
+        return !itemVariantId && !(item.product as any).variantTitle;
       }
 
-      // If no variant info, match items without variants
-      const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
-      const itemVariantTitle = (item.product as any).variantTitle;
-      return !itemVariantId && !itemVariantTitle;
-    });
+      return (
+        (normalizedVariantId != null && idsEqual(itemVariantId, normalizedVariantId)) ||
+        (normalizedVariantTitle != null && normalizeText(itemVariantTitle) === normalizeText(normalizedVariantTitle)) ||
+        (normalizedVariantId != null && normalizeText(itemVariantTitle) === normalizeText(normalizedVariantId)) ||
+        (normalizedVariantTitle != null && idsEqual(itemVariantId, normalizedVariantTitle))
+      );
+    };
 
-    // Wholesale MOQ check: If decreasing below MOQ, force removal (jump to 0) 
-    // This allows wholesalers to remove items they no longer want without getting stuck at the MOQ.
-    let finalQuantity = quantity;
-    if (isWholesale && itemToUpdate && quantity > 0) {
-      // Find variation-specific MOQ if applicable
-      const variantKey = (itemToUpdate.product as any).variantId;
-      let minQty = itemToUpdate.product.minWholesaleQuantity || 1;
+    const findTargetItem = (snapshot: ExtendedCartItem[]) => {
+      const direct = snapshot.find(matchesItem);
+      if (direct) return direct;
 
-      if (variantKey && itemToUpdate.product.variations?.length) {
-        const variation = itemToUpdate.product.variations.find((v: any) => 
-          (v._id && v._id.toString() === variantKey.toString()) || 
-          v._id === variantKey || 
-          v.id === variantKey || 
-          v.name === variantKey || 
-          v.value === variantKey || 
-          v.title === variantKey
-        );
-        if (variation && (variation as any).minWholesaleQuantity) {
-          minQty = (variation as any).minWholesaleQuantity;
+      // Fallback: product has a single cart line (common on home cards)
+      const sameProduct = snapshot.filter(
+        (item) => item?.product && idsEqual(item.product.id || item.product._id, normalizedProductId)
+      );
+      return sameProduct.length === 1 ? sameProduct[0] : undefined;
+    };
+
+    try {
+      while (queuedQuantityRef.current.has(operationKey)) {
+        const nextQuantity = queuedQuantityRef.current.get(operationKey)!;
+        queuedQuantityRef.current.delete(operationKey);
+
+        const snapshot = itemsRef.current;
+        const itemToUpdate = findTargetItem(snapshot);
+
+        if (!itemToUpdate) {
+          console.warn('updateQuantity: cart item not found', {
+            productId: normalizedProductId,
+            variantId: normalizedVariantId,
+            variantTitle: normalizedVariantTitle,
+          });
+          continue;
         }
-      }
 
-      if (quantity < minQty) {
-        finalQuantity = 0; // Force total removal
-      }
-    }
+        let finalQuantity = nextQuantity;
+        if (isWholesale && nextQuantity > 0) {
+          const variantKey = (itemToUpdate.product as any).variantId;
+          let minQty = itemToUpdate.product.minWholesaleQuantity || 1;
 
-    if (finalQuantity <= 0) {
-      // Release lock before calling another locked function
-      pendingOperationsRef.current.delete(operationKey);
-      await removeFromCart(productId, variantId || variantTitle);
-      return;
-    }
-
-    const previousItems = [...items];
-    setItems((prevItems) =>
-      prevItems.filter(item => item?.product).map((item) => {
-        const itemProductId = item.product.id || item.product._id;
-        if (itemProductId !== productId) return item;
-
-        // If variant info provided, match by variant
-        if (variantId || variantTitle) {
-          const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
-          const itemVariantTitle = (item.product as any).variantTitle || (item.product as any).pack;
-          if (itemVariantId === variantId || itemVariantTitle === variantTitle) {
-            return { ...item, quantity };
+          if (variantKey && itemToUpdate.product.variations?.length) {
+            const variation = itemToUpdate.product.variations.find((v: any) =>
+              (v._id && v._id.toString() === variantKey.toString()) ||
+              v._id === variantKey ||
+              v.id === variantKey ||
+              v.name === variantKey ||
+              v.value === variantKey ||
+              v.title === variantKey
+            );
+            if (variation && (variation as any).minWholesaleQuantity) {
+              minQty = (variation as any).minWholesaleQuantity;
+            }
           }
-        } else {
-          // If no variant info, match items without variants
-          const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
-          const itemVariantTitle = (item.product as any).variantTitle;
-          if (!itemVariantId && !itemVariantTitle) {
-            return { ...item, quantity };
+
+          if (nextQuantity < minQty) {
+            finalQuantity = 0;
           }
         }
-        return item;
-      })
-    );
 
-    // Only sync to API if user is authenticated and item has CartItemID
-    if (isAuthenticated && user?.userType === 'Customer' && itemToUpdate?.id) {
-      try {
-        const response = await apiUpdateCartItem(
-          itemToUpdate.id,
-          quantity,
-          location?.latitude,
-          location?.longitude
-        );
-        if (response && response.data && response.data.items) {
-          setItems(mapApiItemsToState(response.data.items));
-          setEstimatedFee(response.data.estimatedDeliveryFee);
-          setPlatformFee(response.data.platformFee);
-          setFreeDeliveryThreshold(response.data.freeDeliveryThreshold);
+        if (finalQuantity <= 0) {
+          pendingOperationsRef.current.delete(operationKey);
+          queuedQuantityRef.current.delete(operationKey);
+          await removeFromCart(
+            normalizedProductId,
+            normalizedVariantId || normalizedVariantTitle || itemToUpdate.variant || (itemToUpdate.product as any).variantId
+          );
+          return;
         }
-      } catch (error) {
-        console.error("Update quantity failed", error);
-        setItems(previousItems);
-      } finally {
-        // Remove from pending operations
-        pendingOperationsRef.current.delete(operationKey);
+
+        const previousItems = [...itemsRef.current];
+        const targetId = itemToUpdate.id;
+        const optimisticItems = previousItems
+          .filter(item => item?.product)
+          .map((item) => {
+            const isTarget = targetId
+              ? item.id === targetId
+              : item === itemToUpdate || matchesItem(item);
+            return isTarget ? { ...item, quantity: finalQuantity } : item;
+          });
+
+        itemsRef.current = optimisticItems;
+        setItems(optimisticItems);
+
+        if (isAuthenticated && user?.userType === 'Customer' && itemToUpdate.id) {
+          try {
+            const response = await apiUpdateCartItem(
+              itemToUpdate.id,
+              finalQuantity,
+              location?.latitude,
+              location?.longitude
+            );
+            if (response?.data?.items && !queuedQuantityRef.current.has(operationKey)) {
+              const mapped = mapApiItemsToState(response.data.items);
+              itemsRef.current = mapped;
+              setItems(mapped);
+              setEstimatedFee(response.data.estimatedDeliveryFee);
+              setPlatformFee(response.data.platformFee);
+              setFreeDeliveryThreshold(response.data.freeDeliveryThreshold);
+            }
+          } catch (error: any) {
+            console.error('Update quantity failed', error);
+            const message = error?.response?.data?.message || error?.message;
+            if (message) showToast(message, 'error');
+            if (!queuedQuantityRef.current.has(operationKey)) {
+              itemsRef.current = previousItems;
+              setItems(previousItems);
+            }
+          }
+        }
       }
-    } else {
-      // For unregistered users, remove from pending operations immediately
+    } finally {
       pendingOperationsRef.current.delete(operationKey);
     }
   };

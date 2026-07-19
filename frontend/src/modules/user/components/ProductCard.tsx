@@ -104,22 +104,43 @@ export default function ProductCard({
 
     // If product has variations, the card defaults to the first one
     if (product.variations && product.variations.length > 0) {
-      const itemVariantId = getIdStr((item.product as any).variantId || (item.product as any).selectedVariant?._id);
-      const itemVariantValue = String((item.product as any).variantTitle || (item.product as any).pack || item.variant || "");
-      
-      // Match by ID OR by value/title (name) to be extra robust
-      return (defaultVarId && itemVariantId === defaultVarId) || 
-             (defaultVarTitle && itemVariantValue === defaultVarTitle) ||
-             (defaultVarId && itemVariantValue === defaultVarId); // Case where ID was stored in 'variation' field as string
+      const itemVariantId = getIdStr(
+        (item.product as any).variantId ||
+        (item.product as any).selectedVariant?._id ||
+        item.variant
+      );
+      const itemVariantValue = String(
+        (item.product as any).variantTitle || (item.product as any).pack || item.variant || ''
+      ).trim().toLowerCase();
+      const defaultTitle = String(defaultVarTitle || '').trim().toLowerCase();
+
+      // Match by ID OR by value/title (case-insensitive)
+      return (defaultVarId && itemVariantId === defaultVarId) ||
+             (defaultTitle && itemVariantValue === defaultTitle) ||
+             (defaultVarId && itemVariantValue === defaultVarId.toLowerCase());
     }
     return true;
   });
 
   const currentStock = product.variations && product.variations.length > 0 
-    ? (defaultVariation?.stock ?? 0) 
+    ? (defaultVariation?.stock ?? product.stock ?? 0) 
     : (product.stock ?? 0);
+  const qtyMax = currentStock > 0 ? currentStock : 999;
   const inCartQty = cartItem?.quantity || 0;
-  const canIncrease = inCartQty < currentStock;
+  const canIncrease = inCartQty < (currentStock > 0 ? currentStock : Infinity);
+
+  const commitCartQuantity = (val: number) => {
+    const productId = getIdStr((product as any).id || product._id);
+    const cartVariantId = cartItem
+      ? getIdStr((cartItem.product as any).variantId || (cartItem as any).variant)
+      : null;
+    const cartVariantTitle = cartItem
+      ? String((cartItem.product as any).variantTitle || (cartItem.product as any).pack || (cartItem as any).variant || '')
+      : null;
+    const variant = cartVariantId || defaultVarId || defaultVarTitle || undefined;
+    const variantTitle = cartVariantTitle || defaultVarTitle || undefined;
+    updateQuantity(productId, val, variant, variantTitle || undefined);
+  };
 
   // Get Price and MRP using utility
   const { displayPrice, mrp, discount } = calculateProductPrice(product, undefined, user?.customerType);
@@ -360,13 +381,10 @@ export default function ProductCard({
                     <QuantityInput
                       value={currentQty}
                       min={0}
-                      onChange={(val) => {
-                        const productId = getIdStr((product as any).id || product._id);
-                        const variant = defaultVarId || defaultVarTitle || undefined;
-                        const variantTitle = defaultVarTitle || undefined;
-                        updateQuantity(productId, val, variant, variantTitle);
-                      }}
-                      className="text-white font-bold w-6 text-center bg-transparent border-none focus:outline-none text-xs"
+                      max={qtyMax}
+                      onChange={commitCartQuantity}
+                      onClampMax={(max) => showToast(`Only ${max} available`, 'error')}
+                      className="text-white font-black w-8 text-center font-poppins bg-transparent border-none focus:outline-none text-xs underline decoration-white/50 underline-offset-2"
                     />
                     <button
                       onClick={handleIncrease}
@@ -456,13 +474,10 @@ export default function ProductCard({
                   <QuantityInput
                     value={currentQty}
                     min={0}
-                    onChange={(val) => {
-                      const productId = getIdStr((product as any).id || product._id);
-                      const variant = defaultVarId || defaultVarTitle || undefined;
-                      const variantTitle = defaultVarTitle || undefined;
-                      updateQuantity(productId, val, variant, variantTitle);
-                    }}
-                    className="text-[11px] md:text-sm font-black text-[#4b7d5a] w-8 text-center bg-transparent border-none focus:outline-none"
+                    max={qtyMax}
+                    onChange={commitCartQuantity}
+                    onClampMax={(max) => showToast(`Only ${max} available`, 'error')}
+                    className="text-[11px] md:text-sm font-black text-[#4b7d5a] w-10 md:w-12 text-center font-poppins bg-transparent border-none focus:outline-none underline decoration-[#4b7d5a]/40 underline-offset-2"
                   />
                   <button
                     onClick={handleIncrease}

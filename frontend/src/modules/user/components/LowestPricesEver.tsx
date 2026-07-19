@@ -9,6 +9,8 @@ import { useCart } from '../../../context/CartContext';
 import { Product } from '../../../types/domain';
 import { useWishlist } from '../../../hooks/useWishlist';
 import VariationSelectionModal from './VariationSelectionModal';
+import QuantityInput from '../../../components/ui/QuantityInput';
+import { useToast } from '../../../context/ToastContext';
 
 interface LowestPricesEverProps {
   activeTab?: string;
@@ -36,6 +38,7 @@ const ProductCard = memo(({
 }) => {
   const navigate = useNavigate();
   const { isWishlisted, toggleWishlist } = useWishlist(product.id);
+  const { showToast } = useToast();
   const [isVariationModalOpen, setIsVariationModalOpen] = useState(false);
   const addButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -179,7 +182,14 @@ const ProductCard = memo(({
                     }}
                     className="w-6 h-6 rounded-lg bg-white text-[#4b7d5a] shadow-sm flex items-center justify-center font-bold"
                   >−</button>
-                  <span className="text-[11px] font-black text-[#4b7d5a] w-8 text-center">{inCartQty}</span>
+                  <QuantityInput
+                    value={inCartQty}
+                    min={0}
+                    max={product.stock ?? 999}
+                    onChange={(val) => onUpdateQuantity(product.id, val)}
+                    onClampMax={(max) => showToast(`Only ${max} available`, 'error')}
+                    className="text-[11px] md:text-sm font-black text-[#4b7d5a] w-10 text-center font-poppins bg-transparent border-none focus:outline-none underline decoration-[#4b7d5a]/40 underline-offset-2"
+                  />
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
