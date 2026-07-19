@@ -91,7 +91,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           categoryId: String(item.product.category || ''),
           description: item.product.description,
           minWholesaleQuantity: item.product.minWholesaleQuantity,
-          variantId: item.variation // Preserving variation ID/value
+          variantId: item.variation, // Preserving variation ID/value
+          variantTitle: item.variationTitle || item.product.pack || item.variation,
         },
         quantity: item.quantity,
         variant: item.variation // Also preserve it here for order placement

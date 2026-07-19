@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface QuantityInputProps {
   value: number;
@@ -11,6 +11,12 @@ interface QuantityInputProps {
   onClampMax?: (max: number, attempted: number) => void;
 }
 
+const isCoarsePointer = () =>
+  typeof window !== 'undefined' &&
+  (window.matchMedia?.('(pointer: coarse)').matches ||
+    'ontouchstart' in window ||
+    (navigator?.maxTouchPoints ?? 0) > 0);
+
 const QuantityInput: React.FC<QuantityInputProps> = ({
   value,
   onChange,
@@ -22,6 +28,7 @@ const QuantityInput: React.FC<QuantityInputProps> = ({
 }) => {
   const [localValue, setLocalValue] = useState<string>(value.toString());
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isFocused) {
@@ -71,35 +78,60 @@ const QuantityInput: React.FC<QuantityInputProps> = ({
     commitValue(localValue);
   };
 
-  const stopBubble = (e: React.SyntheticEvent) => {
+  // Only stop click bubble (card navigation). Do NOT stop pointerdown/mousedown —
+  // that blocks focus/caret in Flutter WebView and many mobile browsers.
+  const stopClickBubble = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
   };
 
   return (
     <input
-      type="text"
+      ref={inputRef}
+      // tel opens a reliable numeric keypad in Android/iOS WebViews
+      type="tel"
       inputMode="numeric"
       pattern="[0-9]*"
+      enterKeyHint="done"
+      autoComplete="off"
+      autoCorrect="off"
+      spellCheck={false}
       aria-label="Quantity"
       value={localValue}
       onChange={handleChange}
       onFocus={(e) => {
         setIsFocused(true);
-        e.target.select();
+        // select-all often breaks editing inside Flutter WebView / mobile WebKit
+        if (!isCoarsePointer()) {
+          e.target.select();
+        }
       }}
       onBlur={handleBlur}
       onKeyDown={(e) => {
-        stopBubble(e);
+        e.stopPropagation();
         if (e.key === 'Enter') {
           e.preventDefault();
           (e.target as HTMLInputElement).blur();
         }
       }}
+      onClick={stopClickBubble}
+      onTouchEnd={(e) => {
+        // Help stubborn WebViews take focus on the qty field
+        stopClickBubble(e);
+        const el = inputRef.current;
+        if (el && document.activeElement !== el) {
+          el.focus();
+        }
+      }}
       className={className}
-      style={style}
-      onClick={stopBubble}
-      onMouseDown={stopBubble}
-      onPointerDown={stopBubble}
+      style={{
+        // >=16px prevents iOS zoom that can steal focus in WebViews
+        fontSize: style.fontSize || '16px',
+        touchAction: 'manipulation',
+        WebkitUserSelect: 'text',
+        userSelect: 'text',
+        WebkitTouchCallout: 'default',
+        ...style,
+      }}
     />
   );
 };

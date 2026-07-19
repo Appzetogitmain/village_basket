@@ -184,29 +184,57 @@ export default function ProductDetail() {
   };
 
   // Get quantity in cart - check by product ID and variant if available
-  const cartItem = product
-    ? cart.items.find(
-      (item) => {
-        if (!item?.product) return false;
-        const itemProductId = item.product.id || item.product._id;
-        const productId = product.id || product._id;
+  const cartItem = (() => {
+    if (!product) return null;
 
-        if (itemProductId !== productId) return false;
+    const idsEqual = (a: any, b: any) => {
+      if (a == null || b == null) return false;
+      return String(a) === String(b);
+    };
+    const normalizeText = (value: any) => String(value || '').trim().toLowerCase();
+    const productId = product.id || product._id;
+    const selectedVarId = selectedVariant
+      ? (selectedVariant._id || (selectedVariant as any).id)
+      : null;
 
-        // If variant exists, match by variant
-        if (selectedVariant) {
-          const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
-          const itemVariantTitle = (item.product as any).variantTitle || (item.product as any).pack;
-          return itemVariantId === selectedVariant._id || itemVariantTitle === variantTitle;
-        }
+    const sameProductItems = cart.items.filter((item) => {
+      if (!item?.product) return false;
+      return idsEqual(item.product.id || item.product._id, productId);
+    });
 
-        // If no variant, check that item also has no variant
-        const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
-        const itemVariantTitle = (item.product as any).variantTitle;
-        return !itemVariantId && !itemVariantTitle;
+    if (sameProductItems.length === 0) return null;
+
+    // Prefer exact variant match (id / title / cart variation field)
+    const exact = sameProductItems.find((item) => {
+      const itemVariantId =
+        (item.product as any).variantId ||
+        (item.product as any).selectedVariant?._id ||
+        item.variant;
+      const itemVariantTitle =
+        (item.product as any).variantTitle ||
+        (item.product as any).pack ||
+        item.variant;
+
+      if (selectedVarId || variantTitle) {
+        return (
+          (selectedVarId != null && idsEqual(itemVariantId, selectedVarId)) ||
+          (variantTitle != null && normalizeText(itemVariantTitle) === normalizeText(variantTitle)) ||
+          (selectedVarId != null && normalizeText(itemVariantTitle) === normalizeText(selectedVarId)) ||
+          (variantTitle != null && idsEqual(itemVariantId, variantTitle))
+        );
       }
-    )
-    : null;
+
+      return !itemVariantId && !(item.product as any).variantTitle;
+    });
+
+    if (exact) return exact;
+
+    // Home cards often add the default/first variation; detail may label pack differently
+    // ("1 UNIT" vs "1 PCS"). If there is only one line for this product, treat it as a match.
+    if (sameProductItems.length === 1) return sameProductItems[0];
+
+    return null;
+  })();
   const inCartQty = cartItem?.quantity || 0;
 
   const currentProductId = product?.id || product?._id;
@@ -628,9 +656,13 @@ export default function ProductDetail() {
                         </div>
                         <div className="flex items-center gap-4 bg-stone-100/50 rounded-lg p-1">
                           <button
+                            type="button"
                             onClick={() => {
-                              const productId = product.id || product._id;
-                              const variantId = selectedVariant?._id;
+                              const productId = String(product.id || product._id);
+                              const variantId =
+                                (cartItem as any)?.variant ||
+                                (cartItem?.product as any)?.variantId ||
+                                selectedVariant?._id;
                               updateQuantity(productId, inCartQty - 1, variantId, variantTitle);
                             }}
                             className="w-10 h-10 flex items-center justify-center text-village-umber font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-stone-200/50 text-xl bg-white"
@@ -642,17 +674,24 @@ export default function ProductDetail() {
                             min={0}
                             max={variantStock || 999}
                             onChange={(val) => {
-                              const productId = product.id || product._id;
-                              const variantId = selectedVariant?._id;
+                              const productId = String(product.id || product._id);
+                              const variantId =
+                                (cartItem as any)?.variant ||
+                                (cartItem?.product as any)?.variantId ||
+                                selectedVariant?._id;
                               updateQuantity(productId, val, variantId, variantTitle);
                             }}
                             onClampMax={(max) => showToast(`Only ${max} available`, 'error')}
-                            className="text-lg font-black text-village-umber w-12 text-center font-poppins bg-transparent border-none focus:outline-none underline decoration-village-umber/30 underline-offset-4"
+                            className="font-black text-village-umber w-14 text-center font-poppins bg-transparent border-none focus:outline-none underline decoration-village-umber/30 underline-offset-4"
                           />
                           <button
+                            type="button"
                             onClick={() => {
-                              const productId = product.id || product._id;
-                              const variantId = selectedVariant?._id;
+                              const productId = String(product.id || product._id);
+                              const variantId =
+                                (cartItem as any)?.variant ||
+                                (cartItem?.product as any)?.variantId ||
+                                selectedVariant?._id;
                               if (inCartQty < variantStock) {
                                 updateQuantity(productId, inCartQty + 1, variantId, variantTitle);
                               }
@@ -1189,49 +1228,56 @@ export default function ProductDetail() {
                   </button>
                 </motion.div>
               ) : (
-                <div className="flex flex-col items-end gap-1.5">
-                  <motion.div
-                    key="stepper"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="flex items-center gap-2.5 bg-stone-50 border border-stone-200/50 rounded-xl px-1.5 py-1 h-9 shadow-inner">
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
+                <div key="stepper" className="flex flex-col items-end gap-1.5">
+                  <div
+                    className="flex items-center gap-2.5 bg-stone-50 border border-stone-200/50 rounded-xl px-1.5 py-1 h-10 shadow-inner"
+                  >
+                    <button
+                      type="button"
                       onClick={() => {
-                        const productId = product.id || product._id;
-                        const variantId = selectedVariant?._id;
+                        const productId = String(product.id || product._id);
+                        const variantId =
+                          (cartItem as any)?.variant ||
+                          (cartItem?.product as any)?.variantId ||
+                          selectedVariant?._id;
                         updateQuantity(productId, inCartQty - 1, variantId, variantTitle);
                       }}
-                      className="w-6 h-6 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-stone-200/50 p-0 leading-none text-sm bg-white"
+                      className="w-8 h-8 flex items-center justify-center text-[#8B3D28] font-bold hover:bg-white rounded-lg shadow-sm transition-all border border-stone-200/50 p-0 leading-none text-sm bg-white"
                     >
                       <span>−</span>
-                    </motion.button>
+                    </button>
                     <QuantityInput
                       value={inCartQty}
                       min={0}
                       max={variantStock || 999}
                       onChange={(val) => {
-                        const productId = product.id || product._id;
-                        const variantId = selectedVariant?._id;
+                        const productId = String(product.id || product._id);
+                        const variantId =
+                          (cartItem as any)?.variant ||
+                          (cartItem?.product as any)?.variantId ||
+                          selectedVariant?._id;
                         updateQuantity(productId, val, variantId, variantTitle);
                       }}
                       onClampMax={(max) => showToast(`Only ${max} available`, 'error')}
-                      className="text-xs font-black text-village-umber w-8 text-center font-poppins bg-transparent border-none focus:outline-none underline decoration-village-umber/30 underline-offset-2"
+                      className="font-black text-village-umber w-12 min-w-[3rem] text-center font-poppins bg-transparent border-none focus:outline-none underline decoration-village-umber/30 underline-offset-2"
                     />
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
+                    <button
+                      type="button"
                       onClick={() => {
-                        const productId = product.id || product._id;
-                        const variantId = selectedVariant?._id;
+                        const productId = String(product.id || product._id);
+                        const variantId =
+                          (cartItem as any)?.variant ||
+                          (cartItem?.product as any)?.variantId ||
+                          selectedVariant?._id;
                         updateQuantity(productId, inCartQty + 1, variantId, variantTitle);
                       }}
-                      className="w-6 h-6 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-umber"
+                      className="w-8 h-8 flex items-center justify-center text-white font-bold rounded-lg shadow-sm transition-all p-0 leading-none text-sm bg-village-umber"
                     >
                       <span>+</span>
-                    </motion.button>
-                  </motion.div>
+                    </button>
+                  </div>
                   <button 
+                    type="button"
                     onClick={() => navigate('/user/checkout')}
                     className="text-[10px] font-black text-village-green uppercase tracking-[0.1em] flex items-center gap-1 active:scale-95 transition-transform"
                   >
