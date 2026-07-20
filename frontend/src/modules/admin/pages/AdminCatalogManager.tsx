@@ -431,7 +431,6 @@ export default function AdminCatalogManager() {
               )}
             </div>
           )}
-          onAdd={selectedSubCategoryId ? () => navigate("/admin/product/add") : undefined}
         />
       </div>
 
