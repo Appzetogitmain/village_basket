@@ -6,6 +6,27 @@ import {
   getAddresses,
   updateAddress,
 } from "../../services/api/customerAddressService";
+import { OrderAddress } from "../../types/order";
+
+function addressToOrderAddress(addr: Address): OrderAddress & { type?: Address["type"]; isDefault?: boolean } {
+  const parts = (addr.address || "").split(", ").filter(Boolean);
+  return {
+    name: addr.fullName,
+    phone: addr.phone,
+    flat: parts[0] || "",
+    street: parts.slice(1).join(", ") || parts[0] || "",
+    city: addr.city,
+    state: addr.state,
+    pincode: addr.pincode,
+    landmark: addr.landmark || "",
+    latitude: addr.latitude,
+    longitude: addr.longitude,
+    id: addr._id,
+    _id: addr._id,
+    type: addr.type,
+    isDefault: addr.isDefault,
+  };
+}
 
 const iconStyle = "w-5 h-5 text-amber-600 flex-shrink-0";
 
@@ -102,6 +123,15 @@ export default function AddressBook() {
     } finally {
       setBusyId(null);
     }
+  };
+
+  const handleEdit = (addr: Address) => {
+    navigate("/user/checkout/address", {
+      state: {
+        editAddress: addressToOrderAddress(addr),
+        returnTo: "/user/address-book",
+      },
+    });
   };
 
   const defaultBadge = useMemo(
@@ -252,6 +282,25 @@ export default function AddressBook() {
                             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                           </svg>
                           {addr.isDefault ? "Default" : "Set default"}
+                        </button>
+                        <button
+                          onClick={() => handleEdit(addr)}
+                          className="flex items-center gap-1 text-sm font-black hover:text-[#722F1E] font-poppins uppercase tracking-tighter"
+                          disabled={isBusy}
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 20h9" />
+                            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                          </svg>
+                          Edit
                         </button>
                         <button
                           onClick={() => handleDelete(addr._id)}

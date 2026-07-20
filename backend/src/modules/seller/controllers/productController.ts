@@ -6,6 +6,45 @@ import Category from "../../../models/Category";
 import Seller from "../../../models/Seller";
 import { asyncHandler } from "../../../utils/asyncHandler";
 
+type SellerVisibilityInfo = {
+  status?: "Approved" | "Pending" | "Rejected";
+  requireProductApproval?: boolean;
+} | null;
+
+/**
+ * Approved sellers' products are visible on the customer app immediately.
+ * Other sellers follow the requireProductApproval setting on create.
+ */
+function applyProductVisibilityRules(
+  data: Record<string, any>,
+  seller: SellerVisibilityInfo,
+  mode: "create" | "update"
+) {
+  if (seller?.status === "Approved") {
+    data.status = "Active";
+    data.requiresApproval = false;
+    if (mode === "create") {
+      data.publish = true;
+    }
+    return;
+  }
+
+  if (mode !== "create") {
+    return;
+  }
+
+  if (seller?.requireProductApproval) {
+    data.publish = false;
+    data.status = "Pending";
+    data.requiresApproval = true;
+    return;
+  }
+
+  data.publish = data.publish ?? true;
+  data.status = "Active";
+  data.requiresApproval = false;
+}
+
 /**
  * Create a new product
  */
@@ -100,17 +139,11 @@ export const createProduct = asyncHandler(
       }
     }
 
-    // 6. Set product status based on seller settings
-    const seller = await Seller.findById(sellerId);
-    if (seller?.requireProductApproval) {
-      newProductData.publish = false;
-      newProductData.status = "Pending";
-      newProductData.requiresApproval = true;
-    } else {
-      newProductData.publish = true;
-      newProductData.status = "Active";
-      newProductData.requiresApproval = false;
-    }
+    // 6. Set product status based on seller approval
+    const seller = await Seller.findById(sellerId).select(
+      "status requireProductApproval"
+    );
+    applyProductVisibilityRules(newProductData, seller, "create");
 
     // Set default values for other required fields if not provided
     if (!newProductData.popular) newProductData.popular = false;
@@ -398,9 +431,30 @@ export const updateProduct = asyncHandler(
       updateData.shopId = null;
     }
 
+    const isAdmin = (req as any).user?.userType === "Admin";
+
+    let visibilitySeller = await Seller.findById(sellerId).select(
+      "status requireProductApproval"
+    );
+
+    if (isAdmin) {
+      const existingProduct = await Product.findById(id).select("seller");
+      if (existingProduct?.seller) {
+        visibilitySeller = await Seller.findById(existingProduct.seller).select(
+          "status requireProductApproval"
+        );
+      }
+      if (updateData.publish === true) {
+        updateData.status = "Active";
+        updateData.requiresApproval = false;
+      }
+    }
+
+    applyProductVisibilityRules(updateData, visibilitySeller, "update");
+
     // Use findOne and then save to trigger pre-save hooks
     const query: any = { _id: id };
-    if ((req as any).user?.userType !== "Admin") {
+    if (!isAdmin) {
       query.seller = sellerId;
     }
     const product = await Product.findOne(query);

@@ -20,7 +20,12 @@ export default function EGiftStore() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await getProducts({ category: 'egift' });
+        const response = await getProducts({
+          category: 'egift',
+          ...(userLocation?.latitude && userLocation?.longitude
+            ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+            : {}),
+        });
         setProducts(response.data as unknown as Product[]);
       } catch (error) {
         console.error('Failed to fetch egift products:', error);
@@ -30,7 +35,7 @@ export default function EGiftStore() {
     };
 
     fetchProducts();
-  }, []);
+  }, [userLocation]);
 
   return (
     <div className="min-h-screen bg-transparent">

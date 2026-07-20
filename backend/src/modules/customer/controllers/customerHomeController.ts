@@ -13,14 +13,19 @@ import FestivalModule from "../../../models/FestivalModule";
 import HomeBanner from "../../../models/HomeBanner";
 
 import mongoose from "mongoose";
-import { findSellersWithinRange } from "../../../utils/locationHelper";
+import { findSellersWithinRange, isSellerInNearbyList } from "../../../utils/locationHelper";
 import { cache } from "../../../utils/cache";
 
 // Helper function to fetch data for a home section based on its configuration
 async function fetchSectionData(
   section: any,
-  nearbySellerIds?: mongoose.Types.ObjectId[]
+  nearbySellerIds?: mongoose.Types.ObjectId[],
+  filterByLocation: boolean = false
 ): Promise<any[]> {
+  const isSellerInRange = (sellerId: unknown) => {
+    if (!filterByLocation) return true;
+    return isSellerInNearbyList(sellerId, nearbySellerIds || []);
+  };
   try {
     const { categories, subCategories, products, displayType, limit } = section;
 
@@ -38,12 +43,11 @@ async function fetchSectionData(
       const productMap = new Map(manualProducts.map((p: any) => [p._id.toString(), p]));
       const sortedProducts = products
         .map((id: any) => productMap.get(id.toString()))
-        .filter(Boolean);
+        .filter(Boolean)
+        .filter((p: any) => !filterByLocation || isSellerInRange(p.seller));
 
       return sortedProducts.map((p: any) => {
-        const isAvailable = nearbySellerIds && nearbySellerIds.length > 0 && p.seller
-          ? nearbySellerIds.some(id => id.toString() === p.seller.toString())
-          : false;
+        const isAvailable = filterByLocation ? isSellerInRange(p.seller) : true;
 
         return {
           id: p._id.toString(),
@@ -113,6 +117,10 @@ async function fetchSectionData(
         if (subCategoryIds.length > 0) query.subcategory = { $in: subCategoryIds };
       }
 
+      if (filterByLocation) {
+        query.seller = { $in: nearbySellerIds || [] };
+      }
+
       const products = await Product.find(query)
         .sort({ createdAt: -1 })
         .limit(limit || 8)
@@ -120,9 +128,7 @@ async function fetchSectionData(
         .lean();
 
       return products.map((p: any) => {
-        const isAvailable = nearbySellerIds && nearbySellerIds.length > 0 && p.seller
-          ? nearbySellerIds.some(id => id.toString() === p.seller.toString())
-          : false;
+        const isAvailable = filterByLocation ? isSellerInRange(p.seller) : true;
 
         return {
           id: p._id.toString(),
@@ -182,7 +188,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
   const userLng = longitude ? parseFloat(longitude as string) : null;
   const roundedLat = userLat !== null && !isNaN(userLat) ? Math.round(userLat * 1000) / 1000 : 0;
   const roundedLng = userLng !== null && !isNaN(userLng) ? Math.round(userLng * 1000) / 1000 : 0;
-  const cacheKey = `home-content-${headerCategorySlug || "all"}-${roundedLat}-${roundedLng}`;
+  const cacheKey = `home-content-v2-${headerCategorySlug || "all"}-${roundedLat}-${roundedLng}`;
 
   const cachedResponse = cache.get<{ success: boolean; data: unknown }>(cacheKey);
   if (cachedResponse) {
@@ -192,8 +198,10 @@ export const getHomeContent = async (req: Request, res: Response) => {
   try {
     // 1. Find sellers within range for availability check
     let nearbySellerIds: mongoose.Types.ObjectId[] = [];
-    if (userLat !== null && userLng !== null && !isNaN(userLat) && !isNaN(userLng)) {
-      nearbySellerIds = await findSellersWithinRange(userLat, userLng);
+    const hasUserLocation =
+      userLat !== null && userLng !== null && !isNaN(userLat) && !isNaN(userLng);
+    if (hasUserLocation) {
+      nearbySellerIds = await findSellersWithinRange(userLat!, userLng!);
     }
 
     // 2. Header Category Identification
@@ -305,7 +313,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
     const baseProductQuery: any = {
       status: "Active",
       publish: true,
-      ...(nearbySellerIds.length > 0 ? { seller: { $in: nearbySellerIds } } : {}),
+      ...(hasUserLocation ? { seller: { $in: nearbySellerIds } } : {}),
       // Only restrict base query by header if we are NOT on the main HOME tab
       ...(!isMainHome && headerCatId ? { headerCategoryId: headerCatId } : {})
     };
@@ -375,6 +383,12 @@ export const getHomeContent = async (req: Request, res: Response) => {
         variations: p.variations
       };
     }).filter(Boolean);
+
+    if (hasUserLocation) {
+      formattedLowestPrices = formattedLowestPrices.filter((p: any) =>
+        isSellerInNearbyList(p.seller, nearbySellerIds)
+      );
+    }
 
     // If manual selection is empty, fallback to automated discount-based products for this header
     if (formattedLowestPrices.length === 0) {
@@ -459,8 +473,8 @@ export const getHomeContent = async (req: Request, res: Response) => {
       shopType = "seller";
     }
 
-    // 3. Final fallback: If still no shops, show global approved sellers
-    if (rawShops.length === 0) {
+    // 3. Final fallback: show global approved sellers only when location is unknown
+    if (rawShops.length === 0 && !hasUserLocation) {
       rawShops = await Seller.find({ status: "Approved" })
         .limit(12)
         .sort({ createdAt: -1 })
@@ -556,7 +570,9 @@ export const getHomeContent = async (req: Request, res: Response) => {
           title: card.title || card.subCategoryId?.subcategoryName || card.subCategoryId?.name || "Offer",
           badge: card.badge || `Save ${card.discountPercentage || 0}%`,
         })),
-        featuredProducts: dbPromoStrip.featuredProducts.map((p: any) => ({
+        featuredProducts: dbPromoStrip.featuredProducts
+          .filter((p: any) => !hasUserLocation || isSellerInNearbyList(p.seller, nearbySellerIds))
+          .map((p: any) => ({
           ...p,
           id: p._id.toString(),
           name: p.productName,
@@ -596,7 +612,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
 
     const dynamicSections = await Promise.all(
       homeSections.map(async (section: any) => {
-        const sectionData = await fetchSectionData(section, nearbySellerIds);
+        const sectionData = await fetchSectionData(section, nearbySellerIds, hasUserLocation);
         return {
           id: section._id.toString(),
           title: section.title,
@@ -647,6 +663,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
             _id: { $in: card.products },
             status: "Active",
             publish: true,
+            ...(hasUserLocation ? { seller: { $in: nearbySellerIds } } : {}),
           })
             .select("mainImage productName")
             .lean();
@@ -668,7 +685,7 @@ export const getHomeContent = async (req: Request, res: Response) => {
             _id: { $nin: existingIds },
             status: "Active",
             publish: true,
-            ...(nearbySellerIds.length > 0 ? { seller: { $in: nearbySellerIds } } : {}),
+            ...(hasUserLocation ? { seller: { $in: nearbySellerIds } } : {}),
           })
             .sort({ popular: -1, rating: -1 })
             .limit(remainingLimit)

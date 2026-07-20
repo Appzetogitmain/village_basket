@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getProducts } from '../../../services/api/customerProductService';
+import { useLocation } from '../../../hooks/useLocation';
 
 interface FeaturedCard {
   id: string;
@@ -43,6 +44,7 @@ const featuredCards: FeaturedCard[] = [
 ];
 
 export default function FeaturedThisWeek() {
+  const { location: userLocation } = useLocation();
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
   const [newlyLaunchedProducts, setNewlyLaunchedProducts] = useState<any[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -50,7 +52,12 @@ export default function FeaturedThisWeek() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await getProducts({ limit: 6 });
+        const res = await getProducts({
+          limit: 6,
+          ...(userLocation?.latitude && userLocation?.longitude
+            ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+            : {}),
+        });
         if (res.success && res.data) {
           setNewlyLaunchedProducts(res.data);
         }
@@ -68,7 +75,7 @@ export default function FeaturedThisWeek() {
       }
     };
     fetchProducts();
-  }, []);
+  }, [userLocation]);
 
   useEffect(() => {
     if (newlyLaunchedProducts.length > 1) {

@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import Seller from "../../../models/Seller";
 import { asyncHandler } from "../../../utils/asyncHandler";
+import {
+  activateApprovedSellerProducts,
+  deleteSellerProducts,
+} from "../../../utils/sellerProductLifecycle";
 
 /**
  * Get all sellers (Admin only)
@@ -87,10 +91,18 @@ export const updateSellerStatus = asyncHandler(
       });
     }
 
+    let activatedProducts = 0;
+    if (status === "Approved") {
+      activatedProducts = await activateApprovedSellerProducts(id);
+    }
+
     return res.status(200).json({
       success: true,
       message: `Seller status updated to ${status}`,
       data: seller,
+      ...(activatedProducts > 0 && {
+        meta: { activatedProducts },
+      }),
     });
   }
 );
@@ -247,6 +259,10 @@ export const updateSeller = asyncHandler(
 
     await seller.save();
 
+    if (seller.status === "Approved") {
+      await activateApprovedSellerProducts(id);
+    }
+
     const updatedSeller = await Seller.findById(id).select("-password");
 
     return res.status(200).json({
@@ -264,7 +280,7 @@ export const deleteSeller = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const seller = await Seller.findByIdAndDelete(id);
+    const seller = await Seller.findById(id);
 
     if (!seller) {
       return res.status(404).json({
@@ -273,9 +289,17 @@ export const deleteSeller = asyncHandler(
       });
     }
 
+    const { productsDeleted, inventoryDeleted } = await deleteSellerProducts(id);
+
+    await Seller.findByIdAndDelete(id);
+
     return res.status(200).json({
       success: true,
       message: "Seller deleted successfully",
+      data: {
+        productsDeleted,
+        inventoryDeleted,
+      },
     });
   }
 );

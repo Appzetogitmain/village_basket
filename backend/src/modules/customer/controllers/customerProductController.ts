@@ -3,7 +3,7 @@ import Product from "../../../models/Product";
 import Category from "../../../models/Category";
 import SubCategory from "../../../models/SubCategory";
 import mongoose from "mongoose";
-import { findSellersWithinRange } from "../../../utils/locationHelper";
+import { findSellersWithinRange, isSellerInNearbyList } from "../../../utils/locationHelper";
 
 // Get products with filtering options (public)
 export const getProducts = async (req: Request, res: Response) => {
@@ -39,17 +39,9 @@ export const getProducts = async (req: Request, res: Response) => {
     const userLat = latitude ? parseFloat(latitude as string) : null;
     const userLng = longitude ? parseFloat(longitude as string) : null;
 
-    const nearbySellerIds: mongoose.Types.ObjectId[] = [];
     if (userLat && userLng && !isNaN(userLat) && !isNaN(userLng)) {
-      // Find sellers within user's location range
-      const nearby = await findSellersWithinRange(userLat, userLng);
-      nearbySellerIds.push(...nearby);
-
-      // Only strictly filter by seller location if we're on the main "all products" page
-      // If we're on a specific category page, we'll show all but prioritize/highlight nearby later if needed
-      if (!category && !subcategory && !search && nearbySellerIds.length > 0) {
-        query.seller = { $in: nearbySellerIds };
-      }
+      const nearbySellerIds = await findSellersWithinRange(userLat, userLng);
+      query.seller = { $in: nearbySellerIds };
     }
 
     // Helper to resolve category/subcategory ID from slug or ID
@@ -283,19 +275,22 @@ export const getProductById = async (req: Request, res: Response) => {
       }
     }
 
-    // Check location availability if coordinates are provided
     if (
       userLat &&
       userLng &&
       !isNaN(userLat) &&
       !isNaN(userLng) &&
-      sellerId &&
-      seller?.location
+      sellerId
     ) {
       const nearbySellerIds = await findSellersWithinRange(userLat, userLng);
-      isAvailableAtLocation = nearbySellerIds.some(
-        (id) => id.toString() === sellerId!.toString()
-      );
+      isAvailableAtLocation = isSellerInNearbyList(sellerId, nearbySellerIds);
+
+      if (!isAvailableAtLocation) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not available in your area",
+        });
+      }
     }
 
     // Find similar products (by category)

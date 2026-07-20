@@ -24,6 +24,7 @@ export default function CheckoutAddress() {
 
   // Get address from navigation state if editing
   const editAddress = (location.state as any)?.editAddress as OrderAddress | undefined;
+  const returnTo = (location.state as any)?.returnTo as string | undefined;
 
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
   const [address, setAddress] = useState<OrderAddress>({
@@ -35,6 +36,8 @@ export default function CheckoutAddress() {
     pincode: editAddress?.pincode || '',
     state: editAddress?.state || '',
     landmark: editAddress?.landmark || '',
+    id: editAddress?.id || editAddress?._id,
+    _id: editAddress?._id || editAddress?.id,
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof OrderAddress, string>>>({});
@@ -167,6 +170,10 @@ export default function CheckoutAddress() {
         pincode: editAddress.pincode || '',
         state: editAddress.state || '',
         landmark: editAddress.landmark || '',
+        id: editAddress.id || editAddress._id,
+        _id: editAddress._id || editAddress.id,
+        latitude: editAddress.latitude,
+        longitude: editAddress.longitude,
       });
 
       if (editAddress.latitude && editAddress.longitude) {
@@ -176,7 +183,7 @@ export default function CheckoutAddress() {
 
       // Try to set address type based on editAddress if it has one
       if ((editAddress as any).type) {
-        setAddressType((editAddress as any).type.toLowerCase());
+        setAddressType(String((editAddress as any).type).toLowerCase() as typeof addressType);
       }
     }
   }, [editAddress]);
@@ -452,6 +459,11 @@ export default function CheckoutAddress() {
     setIsSaving(true);
 
     try {
+      const addressId = editAddress?.id || editAddress?._id || address.id || address._id;
+      const existingAddr = addressId
+        ? savedAddresses.find((a) => a._id === addressId)
+        : undefined;
+
       const payload = {
         fullName: address.name,
         phone: address.phone,
@@ -462,13 +474,11 @@ export default function CheckoutAddress() {
         pincode: address.pincode,
         landmark: address.landmark,
         type: addressType.charAt(0).toUpperCase() + addressType.slice(1) as 'Home' | 'Work' | 'Hotel' | 'Other',
-        isDefault: true,
+        isDefault: existingAddr?.isDefault ?? (editAddress as any)?.isDefault ?? !addressId,
         address: `${address.flat}, ${address.street}`,
         latitude: finalLat,
         longitude: finalLng,
       };
-
-      const addressId = editAddress?.id || editAddress?._id || address.id || address._id;
       let response;
       if (addressId) {
         response = await updateAddress(addressId, payload);
@@ -497,9 +507,9 @@ export default function CheckoutAddress() {
         console.warn('Failed to sync app location after save:', err);
       }
 
-      showToast('Address saved successfully', 'success');
+      showToast(addressId ? 'Address updated successfully' : 'Address saved successfully', 'success');
       setIsSaving(false);
-      navigate('/user/checkout', { replace: true });
+      navigate(returnTo || '/user/checkout', { replace: true });
     } catch (error: any) {
       console.error('Error saving address:', error);
       setIsSaving(false);
@@ -530,7 +540,9 @@ export default function CheckoutAddress() {
                 <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            <h1 className="text-base font-black text-neutral-900 font-poppins uppercase tracking-tight">Enter complete address</h1>
+            <h1 className="text-base font-black text-neutral-900 font-poppins uppercase tracking-tight">
+              {editAddress ? 'Edit address' : 'Enter complete address'}
+            </h1>
           </div>
           <button
             onClick={() => navigate(-1)}
@@ -886,7 +898,7 @@ export default function CheckoutAddress() {
             : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
             }`}
         >
-          {isSaving ? 'Saving...' : 'Save & Proceed'}
+          {isSaving ? 'Saving...' : editAddress ? 'Update address' : 'Save & Proceed'}
         </button>
       </div>
     </div>

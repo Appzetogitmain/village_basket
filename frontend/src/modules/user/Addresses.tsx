@@ -1,8 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAddresses, deleteAddress, Address } from '../../services/api/customerAddressService';
+import { OrderAddress } from '../../types/order';
 import Button from '../../components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+
+function addressToOrderAddress(addr: Address): OrderAddress & { type?: Address['type']; isDefault?: boolean } {
+    const parts = (addr.address || '').split(', ').filter(Boolean);
+    return {
+        name: addr.fullName,
+        phone: addr.phone,
+        flat: parts[0] || '',
+        street: parts.slice(1).join(', ') || parts[0] || '',
+        city: addr.city,
+        state: addr.state,
+        pincode: addr.pincode,
+        landmark: addr.landmark || '',
+        latitude: addr.latitude,
+        longitude: addr.longitude,
+        id: addr._id,
+        _id: addr._id,
+        type: addr.type,
+        isDefault: addr.isDefault,
+    };
+}
 
 export default function Addresses() {
     const navigate = useNavigate();
@@ -37,6 +58,15 @@ export default function Addresses() {
         } catch (error) {
             console.error('Failed to delete address:', error);
         }
+    };
+
+    const handleEdit = (addr: Address) => {
+        navigate('/user/checkout/address', {
+            state: {
+                editAddress: addressToOrderAddress(addr),
+                returnTo: '/user/addresses',
+            },
+        });
     };
 
     return (
@@ -99,7 +129,10 @@ export default function Addresses() {
                                     >
                                         Delete
                                     </button>
-                                    <button className="text-xs font-black text-[#8B3D28] hover:text-[#722F1E] uppercase tracking-widest font-poppins">
+                                    <button
+                                        onClick={() => handleEdit(addr)}
+                                        className="text-xs font-black text-[#8B3D28] hover:text-[#722F1E] uppercase tracking-widest font-poppins"
+                                    >
                                         Edit
                                     </button>
                                 </div>

@@ -8,6 +8,7 @@ import WishlistButton from '../../components/WishlistButton';
 import { calculateProductPrice } from '../../utils/priceUtils';
 import { getVariationColor } from '../../utils/variationUtils';
 import ProductCard from './components/ProductCard';
+import { useLocation } from '../../hooks/useLocation';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -39,6 +40,7 @@ export default function OrderAgain() {
   const { orders } = useOrders();
   const { cart, addToCart, updateQuantity } = useCart();
   const navigate = useNavigate();
+  const { location: userLocation } = useLocation();
   const [addedOrders, setAddedOrders] = useState<Set<string>>(new Set());
 
   const handleOrderAgain = (order: any, e: React.MouseEvent) => {
@@ -68,7 +70,13 @@ export default function OrderAgain() {
   useEffect(() => {
     const fetchBestsellers = async () => {
       try {
-        const response = await getProducts({ sort: 'popular', limit: 6 });
+        const response = await getProducts({
+          sort: 'popular',
+          limit: 6,
+          ...(userLocation?.latitude && userLocation?.longitude
+            ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+            : {}),
+        });
         if (response.success && response.data) {
           const mapped = (response.data as any[]).map(p => ({
             ...p,
@@ -91,7 +99,7 @@ export default function OrderAgain() {
       }
     };
     fetchBestsellers();
-  }, []);
+  }, [userLocation]);
 
   const hasOrders = orders && orders.length > 0;
 

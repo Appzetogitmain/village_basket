@@ -20,7 +20,12 @@ export default function FashionStore() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await getProducts({ category: 'fashion' });
+        const response = await getProducts({
+          category: 'fashion',
+          ...(userLocation?.latitude && userLocation?.longitude
+            ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+            : {}),
+        });
         setProducts(response.data as unknown as Product[]);
       } catch (error) {
         console.error('Failed to fetch fashion products:', error);
@@ -30,7 +35,7 @@ export default function FashionStore() {
     };
 
     fetchProducts();
-  }, []);
+  }, [userLocation]);
 
   return (
     <div className="min-h-screen bg-transparent">

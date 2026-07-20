@@ -1045,6 +1045,11 @@ export const updateProduct = asyncHandler(
     const { id } = req.params;
     const updateData = req.body;
 
+    if (updateData.publish === true) {
+      updateData.status = "Active";
+      updateData.requiresApproval = false;
+    }
+
     // Validate variations if provided
     if (updateData.variations && updateData.variations.length > 0) {
       updateData.variations = updateData.variations.map((v: any) => ({

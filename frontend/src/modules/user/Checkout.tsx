@@ -228,6 +228,11 @@ export default function Checkout() {
       const cartItem = items[0];
       try {
         let response;
+        const locationParams =
+          userLocation?.latitude && userLocation?.longitude
+            ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+            : {};
+
         if (cartItem && cartItem.product) {
           // Try to fetch by category of the first item
           let catId = '';
@@ -240,12 +245,12 @@ export default function Checkout() {
           }
 
           if (catId) {
-            response = await getProducts({ category: catId, limit: 10 });
+            response = await getProducts({ category: catId, limit: 10, ...locationParams });
           } else {
-            response = await getProducts({ limit: 10, sort: 'popular' });
+            response = await getProducts({ limit: 10, sort: 'popular', ...locationParams });
           }
         } else {
-          response = await getProducts({ limit: 10, sort: 'popular' });
+          response = await getProducts({ limit: 10, sort: 'popular', ...locationParams });
         }
 
         if (response && response.data) {
@@ -279,7 +284,7 @@ export default function Checkout() {
       }
     };
     fetchSimilar();
-  }, [cart?.items?.length]);
+  }, [cart?.items?.length, userLocation]);
 
   if (cartLoading || ((cart?.items?.length || 0) === 0 && !showOrderSuccess)) {
     return (

@@ -29,7 +29,12 @@ export default function SpiritualStore() {
       try {
         setLoading(true);
         // Assuming 'spiritual' is the correct category ID in your database
-        const response = await getProducts({ category: 'spiritual' });
+        const response = await getProducts({
+          category: 'spiritual',
+          ...(userLocation?.latitude && userLocation?.longitude
+            ? { latitude: userLocation.latitude, longitude: userLocation.longitude }
+            : {}),
+        });
         // Correctly casting or mapping the response data
         setProducts(response.data as unknown as Product[]);
       } catch (error) {
@@ -40,7 +45,7 @@ export default function SpiritualStore() {
     };
 
     fetchProducts();
-  }, []);
+  }, [userLocation]);
 
   return (
     <div className="min-h-screen bg-transparent">

@@ -156,6 +156,42 @@ export default function Category() {
     fetchProducts();
   }, [selectedSubcategory]);
 
+  // Refetch products when user location changes
+  const isFirstLocationChange = useRef(true);
+  useEffect(() => {
+    if (isFirstLocationChange.current) { isFirstLocationChange.current = false; return; }
+    if (!id || !category) return;
+
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const loc = locationRef.current;
+        const params: any = { category: category._id || id };
+        if (selectedSubcategory !== "all") params.subcategory = selectedSubcategory;
+        if (loc?.latitude && loc?.longitude) {
+          params.latitude = loc.latitude;
+          params.longitude = loc.longitude;
+        }
+        const response = await getProducts(params);
+        if (response.success) {
+          const uniqueProducts = Array.from(
+            new Map(response.data.map((p: any) => [p._id || p.id, p])).values()
+          );
+          setProducts(uniqueProducts.map((p: any) => ({
+            ...p,
+            tags: Array.isArray(p.tags) ? p.tags : [],
+            nameParts: p.name ? p.name.toLowerCase().split(" ") : [],
+          })));
+        }
+      } catch (_) {
+        setError("Network error while loading products.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [userLocation?.latitude, userLocation?.longitude]);
+
   // Apply sorting and filtering to products
   const categoryProducts = useMemo(() => {
     let result = [...products];

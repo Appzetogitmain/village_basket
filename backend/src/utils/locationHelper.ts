@@ -1,15 +1,8 @@
 import mongoose from "mongoose";
 import Seller from "../models/Seller";
 
-/** Max km used for $geoNear pre-filter (per-seller radius applied after) */
-const GEO_NEAR_MAX_KM = 100;
-
 /**
  * Helper function to calculate distance between two coordinates (Haversine formula)
- * @param lat1 Latitude of point 1
- * @param lon1 Longitude of point 1
- * @param lat2 Latitude of point 2
- * @param lon2 Longitude of point 2
  * @returns Distance in kilometers
  */
 export function calculateDistance(
@@ -18,68 +11,107 @@ export function calculateDistance(
   lat2: number,
   lon2: number
 ): number {
-  const R = 6371; // Earth radius in kilometers
+  const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
-    Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
-function resolveSellerCoords(seller: {
-  location?: { coordinates?: number[] };
-  latitude?: string;
-  longitude?: string;
-}): { lat: number; lng: number } | null {
-  if (seller.location?.coordinates?.length === 2) {
-    return {
-      lng: seller.location.coordinates[0],
-      lat: seller.location.coordinates[1],
-    };
-  }
-  if (seller.latitude && seller.longitude) {
-    const lat = parseFloat(seller.latitude);
-    const lng = parseFloat(seller.longitude);
-    if (!isNaN(lat) && !isNaN(lng)) {
-      return { lat, lng };
-    }
-  }
-  return null;
-}
-
-async function findSellersWithinRangeFallback(
-  userLat: number,
-  userLng: number
-): Promise<mongoose.Types.ObjectId[]> {
-  const sellers = await Seller.find({}).select("_id location serviceRadiusKm latitude longitude");
-  const nearbySellerIds: mongoose.Types.ObjectId[] = [];
-
-  for (const seller of sellers) {
-    const coords = resolveSellerCoords(seller);
-    if (coords) {
-      const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
-      const serviceRadius = seller.serviceRadiusKm || 10;
-      if (distance <= serviceRadius) {
-        nearbySellerIds.push(seller._id as mongoose.Types.ObjectId);
-      }
-    } else {
-      nearbySellerIds.push(seller._id as mongoose.Types.ObjectId);
-    }
-  }
-
-  return nearbySellerIds;
+function parseCoordinate(value: unknown): number | null {
+  if (value === undefined || value === null || value === "") return null;
+  const parsed = typeof value === "number" ? value : parseFloat(String(value));
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 /**
- * Find sellers whose service radius covers the user's location
- * @param userLat User's latitude
- * @param userLng User's longitude
- * @returns Array of seller IDs within range
+ * Prefer seller string lat/lng (used in admin maps/forms) over GeoJSON,
+ * since GeoJSON can be missing or out of sync.
+ */
+export function resolveSellerCoords(seller: {
+  location?: { coordinates?: number[] };
+  latitude?: string | number;
+  longitude?: string | number;
+}): { lat: number; lng: number } | null {
+  const latFromString = parseCoordinate(seller.latitude);
+  const lngFromString = parseCoordinate(seller.longitude);
+
+  if (
+    latFromString !== null &&
+    lngFromString !== null &&
+    latFromString >= -90 &&
+    latFromString <= 90 &&
+    lngFromString >= -180 &&
+    lngFromString <= 180
+  ) {
+    return { lat: latFromString, lng: lngFromString };
+  }
+
+  const coords = seller.location?.coordinates;
+  if (!coords || coords.length !== 2) return null;
+
+  const c0 = parseCoordinate(coords[0]);
+  const c1 = parseCoordinate(coords[1]);
+  if (c0 === null || c1 === null) return null;
+
+  // GeoJSON is [lng, lat]. Some records were saved as [lat, lng].
+  const asGeoJson = { lat: c1, lng: c0 };
+  const asSwapped = { lat: c0, lng: c1 };
+
+  const geoJsonValid =
+    asGeoJson.lat >= -90 &&
+    asGeoJson.lat <= 90 &&
+    asGeoJson.lng >= -180 &&
+    asGeoJson.lng <= 180;
+  const swappedValid =
+    asSwapped.lat >= -90 &&
+    asSwapped.lat <= 90 &&
+    asSwapped.lng >= -180 &&
+    asSwapped.lng <= 180;
+
+  if (geoJsonValid && !swappedValid) return asGeoJson;
+  if (swappedValid && !geoJsonValid) return asSwapped;
+  if (geoJsonValid) return asGeoJson;
+  if (swappedValid) return asSwapped;
+
+  return null;
+}
+
+export function getSellerIdString(sellerRef: unknown): string | null {
+  if (!sellerRef) return null;
+  if (typeof sellerRef === "string") return sellerRef;
+  if (sellerRef instanceof mongoose.Types.ObjectId) return sellerRef.toString();
+
+  if (typeof sellerRef === "object") {
+    const obj = sellerRef as { _id?: unknown };
+    if (obj._id) {
+      return obj._id instanceof mongoose.Types.ObjectId
+        ? obj._id.toString()
+        : String(obj._id);
+    }
+  }
+
+  return String(sellerRef);
+}
+
+export function isSellerInNearbyList(
+  sellerRef: unknown,
+  nearbySellerIds: mongoose.Types.ObjectId[]
+): boolean {
+  const sellerId = getSellerIdString(sellerRef);
+  if (!sellerId) return false;
+  return nearbySellerIds.some((id) => id.toString() === sellerId);
+}
+
+/**
+ * Find sellers whose service radius covers the user's location.
+ * Uses Haversine on string lat/lng when available (same source as admin maps).
  */
 export async function findSellersWithinRange(
   userLat: number,
@@ -94,76 +126,32 @@ export async function findSellersWithinRange(
   }
 
   try {
-    const nearbySellerIds: mongoose.Types.ObjectId[] = [];
-    const processedIds = new Set<string>();
-
-    const addId = (id: mongoose.Types.ObjectId) => {
-      const key = id.toString();
-      if (!processedIds.has(key)) {
-        processedIds.add(key);
-        nearbySellerIds.push(id);
-      }
-    };
-
-    // 1. Geo-indexed sellers via $geoNear (avoids full collection scan)
-    try {
-      const geoResults = await Seller.aggregate([
-        {
-          $geoNear: {
-            near: { type: "Point", coordinates: [userLng, userLat] },
-            distanceField: "distMeters",
-            maxDistance: GEO_NEAR_MAX_KM * 1000,
-            spherical: true,
-            query: {
-              location: { $exists: true, $ne: null },
-              "location.coordinates.0": { $exists: true },
-            },
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            serviceRadiusKm: 1,
-            distKm: { $divide: ["$distMeters", 1000] },
-          },
-        },
-      ]);
-
-      for (const seller of geoResults) {
-        const serviceRadius = seller.serviceRadiusKm || 10;
-        if (seller.distKm <= serviceRadius) {
-          addId(seller._id);
-        }
-      }
-
-      for (const seller of geoResults) {
-        processedIds.add(seller._id.toString());
-      }
-    } catch {
-      return findSellersWithinRangeFallback(userLat, userLng);
-    }
-
-    // 2. Sellers without geo index data (string lat/lng or no location)
-    const remainingSellers = await Seller.find({
-      _id: { $nin: Array.from(processedIds) },
-    })
+    const sellers = await Seller.find({})
       .select("_id location serviceRadiusKm latitude longitude")
       .lean();
 
-    for (const seller of remainingSellers) {
-      const coords = resolveSellerCoords(seller as {
-        location?: { coordinates?: number[] };
-        latitude?: string;
-        longitude?: string;
-      });
-      if (coords) {
-        const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
-        const serviceRadius = seller.serviceRadiusKm || 10;
-        if (distance <= serviceRadius) {
-          addId(seller._id as mongoose.Types.ObjectId);
+    const nearbySellerIds: mongoose.Types.ObjectId[] = [];
+
+    for (const seller of sellers) {
+      const coords = resolveSellerCoords(
+        seller as {
+          location?: { coordinates?: number[] };
+          latitude?: string | number;
+          longitude?: string | number;
         }
-      } else {
-        addId(seller._id as mongoose.Types.ObjectId);
+      );
+
+      if (!coords) {
+        // Sellers without coordinates remain visible everywhere
+        nearbySellerIds.push(seller._id as mongoose.Types.ObjectId);
+        continue;
+      }
+
+      const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
+      const serviceRadius = seller.serviceRadiusKm || 10;
+
+      if (distance <= serviceRadius) {
+        nearbySellerIds.push(seller._id as mongoose.Types.ObjectId);
       }
     }
 

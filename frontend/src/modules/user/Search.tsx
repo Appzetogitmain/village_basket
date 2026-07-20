@@ -107,7 +107,12 @@ export default function Search() {
         return;
       }
 
-      const cacheKey = `search-${searchQuery.trim().toLowerCase()}`;
+      const loc = locationRef.current;
+      const locKey =
+        loc?.latitude && loc?.longitude
+          ? `${loc.latitude.toFixed(3)}-${loc.longitude.toFixed(3)}`
+          : "no-loc";
+      const cacheKey = `search-${searchQuery.trim().toLowerCase()}-${locKey}`;
       const cached = apiCache.getSync<Product[]>(cacheKey);
       if (cached) { setSearchResults(cached); return; }
 
@@ -131,7 +136,7 @@ export default function Search() {
     };
 
     fetchProducts();
-  }, [searchQuery]);
+  }, [searchQuery, location?.latitude, location?.longitude]);
 
   // Fetch trending/home content — cached, only when no search query
   useEffect(() => {
