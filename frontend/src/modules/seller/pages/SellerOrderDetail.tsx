@@ -217,7 +217,7 @@ export default function SellerOrderDetail() {
     doc.setFont('helvetica', 'normal');
     doc.text('From: Village Basket', margin, yPos);
     yPos += 6;
-    doc.text('Phone: 8956656429', margin, yPos);
+    doc.text('Phone: 7829903973', margin, yPos);
     yPos += 6;
     doc.text('Email: info@villagebasket.com', margin, yPos);
     yPos += 6;
@@ -629,7 +629,7 @@ export default function SellerOrderDetail() {
               </div>
               <div className="text-sm text-neutral-600 space-y-1">
                 <div>
-                  <span className="font-medium">Phone:</span> 8956656429
+                  <span className="font-medium">Phone:</span> 7829903973
                 </div>
                 <div>
                   <span className="font-medium">Email:</span> info@villagebasket.com
