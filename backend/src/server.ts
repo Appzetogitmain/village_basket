@@ -1,8 +1,9 @@
+// Must load env BEFORE any other app imports that read process.env at module scope
+import "dotenv/config";
 import express, { Application, Request, Response } from "express";
 import { createServer } from "http";
 import cors from "cors";
 import compression from "compression";
-import dotenv from "dotenv";
 import dns from "dns";
 
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -14,10 +15,6 @@ import { ensureDefaultAdmin } from "./utils/ensureDefaultAdmin";
 
 import { initializeSocket } from "./socket/socketService";
 import { initializeFirebaseAdmin } from "./services/firebaseAdmin";
-
-
-// Load environment variables
-dotenv.config();
 
 const app: Application = express();
 const httpServer = createServer(app);
