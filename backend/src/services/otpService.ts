@@ -1,7 +1,10 @@
 import axios from 'axios';
 import Otp from '../models/Otp';
 
-const SMS_INDIA_HUB_API_URL = 'http://cloud.smsindiahub.in/vendorsms/pushsms.aspx';
+const SMS_INDIA_HUB_API_URLS = [
+  'https://cloud.smsindiahub.in/vendorsms/pushsms.aspx',
+  'http://cloud.smsindiahub.in/vendorsms/pushsms.aspx',
+];
 const API_TIMEOUT = 30000;
 
 /**
@@ -187,36 +190,56 @@ async function sendSmsViaApi(mobile: string, message: string): Promise<SmsIndiaH
     sid: senderId,
     dltTemplateId: dltTemplateId || '(not set)',
     auth: apiKey ? 'APIKey' : 'user/password',
+    appName: getSmsConfig().appName,
     messagePreview: message.replace(/\d{4,6}/g, '****'),
+    hasTemplateEnv: Boolean(getSmsConfig().messageTemplate),
   });
 
-  const response = await axios.get(SMS_INDIA_HUB_API_URL, {
+  const requestConfig = {
     params,
-    paramsSerializer: (p) =>
+    paramsSerializer: (p: Record<string, string>) =>
       Object.keys(p)
         .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(p[key])}`)
         .join('&'),
     timeout: API_TIMEOUT,
     // Gateway returns JSON with Content-Type: text/html
-    transformResponse: [(data) => data],
-    responseType: 'text',
+    transformResponse: [(data: string) => data] as any,
+    responseType: 'text' as const,
     validateStatus: () => true,
-  });
+  };
 
-  if (response.status >= 400) {
-    throw new Error(`SMS India HUB HTTP ${response.status}: ${String(response.data).slice(0, 200)}`);
+  let lastError: Error | null = null;
+
+  for (const apiUrl of SMS_INDIA_HUB_API_URLS) {
+    try {
+      const response = await axios.get(apiUrl, requestConfig);
+
+      if (response.status >= 400) {
+        lastError = new Error(
+          `SMS India HUB HTTP ${response.status} via ${apiUrl}: ${String(response.data).slice(0, 200)}`
+        );
+        console.warn('[SMS]', lastError.message);
+        continue;
+      }
+
+      const parsed = parseSmsResponse(response.data);
+      const accepted = handleSmsResponse(parsed);
+
+      console.log('[SMS] Gateway accepted message', {
+        url: apiUrl,
+        ErrorCode: accepted.ErrorCode,
+        JobId: accepted.JobId,
+        MessageId: accepted.MessageData?.[0]?.MessageId,
+      });
+
+      return accepted;
+    } catch (err: any) {
+      lastError = err instanceof Error ? err : new Error(String(err?.message || err));
+      console.warn('[SMS] Attempt failed', { url: apiUrl, error: lastError.message });
+    }
   }
 
-  const parsed = parseSmsResponse(response.data);
-  const accepted = handleSmsResponse(parsed);
-
-  console.log('[SMS] Gateway accepted message', {
-    ErrorCode: accepted.ErrorCode,
-    JobId: accepted.JobId,
-    MessageId: accepted.MessageData?.[0]?.MessageId,
-  });
-
-  return accepted;
+  throw lastError || new Error('Failed to reach SMS India HUB from this server');
 }
 
 /**
@@ -289,11 +312,14 @@ function isDeveloperBypass(otp: string): boolean {
 
 function buildSuccessResponse(mobile: string, otp: string, mode: 'real' | 'mock' | 'bypass'): OtpResponse {
   const exposeOtp =
-    process.env.NODE_ENV !== 'production' && process.env.DEV_EXPOSE_OTP === 'true';
+    process.env.DEV_EXPOSE_OTP === 'true' &&
+    (process.env.NODE_ENV !== 'production' || process.env.ALLOW_PROD_OTP_DEBUG === 'true');
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`[OTP] ${mode.toUpperCase()} | mobile=${mobile.slice(-10)} | otp=${otp}`);
-  }
+  // Always log mode on server so production debugging is possible (OTP only when expose enabled)
+  console.log(
+    `[OTP] mode=${mode.toUpperCase()} mobile=${mobile.slice(-10)}` +
+      (exposeOtp ? ` otp=${otp}` : '')
+  );
 
   return {
     success: true,

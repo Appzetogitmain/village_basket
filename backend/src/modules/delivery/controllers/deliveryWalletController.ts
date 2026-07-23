@@ -185,7 +185,7 @@ export const getCommissions = async (req: Request, res: Response) => {
 /**
  * Get COD deposit configuration
  */
-export const getDepositConfig = async (req: Request, res: Response) => {
+export const getDepositConfig = async (_req: Request, res: Response) => {
     try {
         const razorpayEnabled = await isRazorpayAvailable();
 
@@ -268,13 +268,14 @@ export const createCashDepositOrder = async (req: Request, res: Response) => {
             error?.statusCode === 401 &&
             isMockCodDepositEnabled()
         ) {
+            const fallbackAmount = Number(req.body?.amount || 0);
             const mockOrderId = `mock_dep_${Date.now().toString(36)}`;
             return res.status(200).json({
                 success: true,
                 data: {
                     razorpayOrderId: mockOrderId,
                     razorpayKey: 'mock',
-                    amount: Math.round(amount * 100),
+                    amount: Math.round(fallbackAmount * 100),
                     currency: 'INR',
                     mock: true,
                 },
