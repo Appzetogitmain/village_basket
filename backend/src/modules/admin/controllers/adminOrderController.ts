@@ -302,6 +302,45 @@ export const assignDeliveryBoy = asyncHandler(
       { upsert: true, new: true }
     );
 
+    // Notify delivery partner via socket + push (same as seller manual assign)
+    try {
+      const io = req.app.get("io") as SocketIOServer | undefined;
+      const notificationPayload = {
+        orderId: order._id.toString(),
+        orderNumber: order.orderNumber,
+        customerName: order.customerName,
+        deliveryAddress: {
+          address: order.deliveryAddress?.address,
+          landmark: order.deliveryAddress?.landmark,
+          city: order.deliveryAddress?.city,
+          state: order.deliveryAddress?.state,
+          pincode: order.deliveryAddress?.pincode,
+        },
+        total: order.total,
+        itemsCount: order.items?.length || 0,
+      };
+
+      const { sendTaskAvailableNotification } = await import(
+        "../../../services/notificationService"
+      );
+
+      if (io) {
+        io.to(`delivery-${deliveryBoyId}`).emit("order-assigned-manually", {
+          orderId: id,
+          message: `You have been manually assigned to order #${order.orderNumber}`,
+          orderData: notificationPayload,
+        });
+      }
+
+      await sendTaskAvailableNotification(
+        deliveryBoyId,
+        id,
+        order.orderNumber
+      );
+    } catch (notifyError) {
+      console.error("Error notifying delivery boy on admin assign:", notifyError);
+    }
+
     const updatedOrder = await Order.findById(id)
       .populate("customer", "name email phone")
       .populate("deliveryBoy", "name mobile email")

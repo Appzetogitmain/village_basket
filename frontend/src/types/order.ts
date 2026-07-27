@@ -57,6 +57,7 @@ export interface Order {
   deliveryShift?: DeliveryShift;
   deliverySlot?: DeliverySlotSelection;
   walletAmountUsed?: number;
+  deliveryOtp?: string;
 }
 
 
