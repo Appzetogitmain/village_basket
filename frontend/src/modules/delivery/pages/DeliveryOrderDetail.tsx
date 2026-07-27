@@ -117,6 +117,17 @@ export default function DeliveryOrderDetail() {
     const [otpSending, setOtpSending] = useState(false);
     const [otpVerifying, setOtpVerifying] = useState(false);
     const locationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const locationPermissionDeniedRef = useRef(false);
+    const socketRef = useRef<any>(null);
+    const locationWatchIdRef = useRef<number | null>(null);
+    const lastHttpLocationSyncRef = useRef(0);
+    const deliveryBoyLocationRef = useRef<{ lat: number; lng: number } | undefined>(undefined);
+    const sellerProximityIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const customerProximityIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const sellerProximityInFlightRef = useRef(false);
+    const customerProximityInFlightRef = useRef(false);
+    const customerWithinRangeRef = useRef(false);
+    const PROXIMITY_POLL_MS = 15000;
     const [deliveryBoyLocation, setDeliveryBoyLocation] = useState<{ lat: number; lng: number } | undefined>(undefined);
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
     const [routeInfo, setRouteInfo] = useState<{ distance: string; duration: string } | null>(null);
@@ -132,21 +143,22 @@ export default function DeliveryOrderDetail() {
     // New state for customer proximity
     const [customerProximity, setCustomerProximity] = useState<{ withinRange: boolean; distance: number } | null>(null);
     const [getOtpEnabled, setGetOtpEnabled] = useState(false);
+    const [socketConnected, setSocketConnected] = useState(false);
 
-    const fetchOrder = async () => {
+    const fetchOrder = async (silent = false) => {
         if (!id) return;
         if (!isDeliveryUser) {
             setLoading(false);
             return;
         }
         try {
-            setLoading(true);
+            if (!silent) setLoading(true);
             const data = await getOrderDetails(id);
             setOrder(data);
         } catch (err: any) {
             setError(err.message || 'Failed to load order details');
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
@@ -171,13 +183,11 @@ export default function DeliveryOrderDetail() {
         fetchSellerLocations();
     }, [id, order?.status]);
 
-    // Clean up when component unmounts
-    useEffect(() => {
-        return () => {
-            if (locationIntervalRef.current) {
-                clearInterval(locationIntervalRef.current);
-            }
-        };
+    // Clean up legacy interval on unmount (watchPosition cleared in its own effect)
+    useEffect(() => () => {
+        if (locationIntervalRef.current) {
+            clearInterval(locationIntervalRef.current);
+        }
     }, []);
 
 
@@ -208,7 +218,7 @@ export default function DeliveryOrderDetail() {
 
             const result = await verifyDeliveryOtp(id, otpValue, paymentDetails);
             alert(result.message || 'OTP verified successfully. Order marked as delivered.');
-            await fetchOrder(); // Refresh order data
+            await fetchOrder(true); // Refresh order data
             setShowOtpInput(false);
             setOtpValue('');
         } catch (err: any) {
@@ -252,7 +262,7 @@ export default function DeliveryOrderDetail() {
                 ? { paymentCollectedBy, customerTip }
                 : undefined;
             await markContactlessDelivered(id, paymentDetails);
-            await fetchOrder();
+            await fetchOrder(true);
         } catch (err: any) {
             alert(err.message || 'Failed to mark as delivered');
         } finally {
@@ -271,7 +281,7 @@ export default function DeliveryOrderDetail() {
             setPickupLoading(prev => ({ ...prev, [sellerId]: true }));
             const result = await confirmSellerPickup(id, sellerId, deliveryBoyLocation.lat, deliveryBoyLocation.lng);
             alert(result.message || 'Pickup confirmed successfully');
-            await fetchOrder(); // Refresh order data
+            await fetchOrder(true); // Refresh without unmounting map/location tracking
         } catch (err: any) {
             alert(err.message || 'Failed to confirm pickup');
         } finally {
@@ -279,129 +289,192 @@ export default function DeliveryOrderDetail() {
         }
     };
 
-    // Check proximity to sellers (runs periodically)
+    // Check proximity to sellers (poll on interval; location read from ref to avoid re-running on every GPS tick)
     useEffect(() => {
-        const checkSellersProximity = async () => {
-            if (!id || !deliveryBoyLocation || !sellerLocations.length) return;
-            if (order?.status === 'Out for Delivery' || order?.status === 'Delivered') return;
-
-            const proximityChecks: Record<string, { withinRange: boolean; distance: number }> = {};
-
-            for (const seller of sellerLocations) {
-                try {
-                    const response = await checkSellerProximity(
-                        id,
-                        seller.sellerId,
-                        deliveryBoyLocation.lat,
-                        deliveryBoyLocation.lng
-                    );
-                    if (response.success && response.data) {
-                        proximityChecks[seller.sellerId] = {
-                            withinRange: response.data.withinRange,
-                            distance: response.data.distanceMeters
-                        };
-                    }
-                } catch (error) {
-                    console.error(`Failed to check proximity for seller ${seller.sellerId}:`, error);
-                }
+        const clearSellerInterval = () => {
+            if (sellerProximityIntervalRef.current) {
+                clearInterval(sellerProximityIntervalRef.current);
+                sellerProximityIntervalRef.current = null;
             }
-
-            setSellerProximity(proximityChecks);
         };
 
-        if (sellerLocations.length > 0 && deliveryBoyLocation) {
-            checkSellersProximity();
-            const interval = setInterval(checkSellersProximity, 4000); // Check every 4 seconds
-            return () => clearInterval(interval);
-        }
-    }, [id, deliveryBoyLocation, sellerLocations, order?.status]);
+        const shouldCheckSellers =
+            !!id &&
+            sellerLocations.length > 0 &&
+            !!order?.status &&
+            order.status !== 'Out for Delivery' &&
+            order.status !== 'Delivered' &&
+            order.status !== 'Picked up';
 
-    // Check proximity to customer (runs periodically)
-    useEffect(() => {
-        const checkCustomerProx = async () => {
-            if (!id || !deliveryBoyLocation) return;
-            if (order?.status !== 'Picked up') return;
+        if (!shouldCheckSellers) {
+            clearSellerInterval();
+            return;
+        }
+
+        const checkSellersProximity = async () => {
+            const location = deliveryBoyLocationRef.current;
+            if (!id || !location || sellerProximityInFlightRef.current) return;
+
+            sellerProximityInFlightRef.current = true;
+            const proximityChecks: Record<string, { withinRange: boolean; distance: number }> = {};
 
             try {
-                const response = await checkCustomerProximity(id, deliveryBoyLocation.lat, deliveryBoyLocation.lng);
+                for (const seller of sellerLocations) {
+                    try {
+                        const response = await checkSellerProximity(
+                            id,
+                            seller.sellerId,
+                            location.lat,
+                            location.lng
+                        );
+                        if (response.success && response.data) {
+                            proximityChecks[seller.sellerId] = {
+                                withinRange: response.data.withinRange,
+                                distance: response.data.distanceMeters
+                            };
+                        }
+                    } catch (error) {
+                        console.error(`Failed to check proximity for seller ${seller.sellerId}:`, error);
+                    }
+                }
+
+                setSellerProximity(proximityChecks);
+            } finally {
+                sellerProximityInFlightRef.current = false;
+            }
+        };
+
+        checkSellersProximity();
+        sellerProximityIntervalRef.current = setInterval(checkSellersProximity, PROXIMITY_POLL_MS);
+
+        return clearSellerInterval;
+    }, [id, sellerLocations, order?.status]);
+
+    // Check proximity to customer (poll on interval; stop once within range)
+    useEffect(() => {
+        const clearCustomerInterval = () => {
+            if (customerProximityIntervalRef.current) {
+                clearInterval(customerProximityIntervalRef.current);
+                customerProximityIntervalRef.current = null;
+            }
+        };
+
+        customerWithinRangeRef.current = false;
+        setGetOtpEnabled(false);
+
+        if (!id || order?.status !== 'Picked up') {
+            clearCustomerInterval();
+            return;
+        }
+
+        const checkCustomerProx = async () => {
+            const location = deliveryBoyLocationRef.current;
+            if (!id || !location || customerProximityInFlightRef.current || customerWithinRangeRef.current) {
+                return;
+            }
+
+            customerProximityInFlightRef.current = true;
+            try {
+                const response = await checkCustomerProximity(id, location.lat, location.lng);
                 if (response.success && response.data) {
                     setCustomerProximity({
                         withinRange: response.data.withinRange,
                         distance: response.data.distanceMeters
                     });
                     setGetOtpEnabled(response.data.withinRange);
+
+                    if (response.data.withinRange) {
+                        customerWithinRangeRef.current = true;
+                        clearCustomerInterval();
+                    }
                 }
             } catch (error) {
                 console.error('Failed to check customer proximity:', error);
+            } finally {
+                customerProximityInFlightRef.current = false;
             }
         };
 
-        if (deliveryBoyLocation && order?.status === 'Picked up') {
-            checkCustomerProx();
-            const interval = setInterval(checkCustomerProx, 4000); // Check every 4 seconds
-            return () => clearInterval(interval);
+        checkCustomerProx();
+        customerProximityIntervalRef.current = setInterval(checkCustomerProx, PROXIMITY_POLL_MS);
+
+        return clearCustomerInterval;
+    }, [id, order?.status]);
+
+    const applyDeliveryLocation = useCallback((latitude: number, longitude: number) => {
+        const newLocation = { lat: latitude, lng: longitude };
+        deliveryBoyLocationRef.current = newLocation;
+        setDeliveryBoyLocation(newLocation);
+        setLastUpdate(new Date());
+        locationPermissionDeniedRef.current = false;
+        setLocationError(null);
+
+        const socket = socketRef.current;
+        if (socket?.connected && id) {
+            socket.emit('update-location', {
+                orderId: id,
+                latitude,
+                longitude,
+            });
         }
-    }, [id, deliveryBoyLocation, order?.status]);
 
-    // Track if location permission was denied
-    const locationPermissionDeniedRef = useRef<boolean>(false);
+        const now = Date.now();
+        if (id && now - lastHttpLocationSyncRef.current > 30000) {
+            lastHttpLocationSyncRef.current = now;
+            updateDeliveryLocation(id, latitude, longitude).catch(() => undefined);
+        }
+    }, [id]);
 
-    // Get delivery boy's current location
-    useEffect(() => {
-        const getCurrentLocation = () => {
-            if (!navigator.geolocation) {
-                console.warn('Geolocation is not supported by this browser');
-                return;
-            }
-
-            if (locationPermissionDeniedRef.current) {
-                // Don't retry if permission was denied
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    setDeliveryBoyLocation({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    });
-                    locationPermissionDeniedRef.current = false; // Reset on success
-                    setLocationError(null);
-                },
-                (error: GeolocationPositionError) => {
-                    // Handle different error types
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            locationPermissionDeniedRef.current = true;
-                            setLocationError('Location permission denied. Please enable location access in your browser settings to track delivery.');
-                            console.warn('Location permission denied. Please enable location access in your browser settings.');
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            setLocationError('Location information unavailable. Please check your device settings.');
-                            console.warn('Location information unavailable. Please check your device settings.');
-                            break;
-                        case error.TIMEOUT:
-                            setLocationError('Location request timed out. Please try again.');
-                            console.warn('Location request timed out. Please try again.');
-                            break;
-                        default:
-                            setLocationError(`Error getting location: ${error.message}`);
-                            console.warn('Error getting location:', error.message);
-                            break;
-                    }
-                },
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-            );
-        };
-
-        getCurrentLocation();
+    const handleLocationError = useCallback((error: GeolocationPositionError) => {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                locationPermissionDeniedRef.current = true;
+                setLocationError('Location permission denied. Please enable location access in your browser settings to track delivery.');
+                break;
+            case error.POSITION_UNAVAILABLE:
+                setLocationError('Location information unavailable. Please check your device settings.');
+                break;
+            case error.TIMEOUT:
+                setLocationError('Location request timed out. Retrying...');
+                break;
+            default:
+                setLocationError(`Error getting location: ${error.message}`);
+                break;
+        }
     }, []);
 
+    // Continuous GPS tracking (independent of socket — map must update even if socket is down)
+    useEffect(() => {
+        if (!id || !order || !isDeliveryUser) return;
 
+        const shouldTrack = order.status &&
+            order.status !== 'Delivered' &&
+            order.status !== 'Cancelled' &&
+            order.status !== 'Returned';
 
-    // Socket.io connection
-    const socketRef = useRef<any>(null);
-    const [socketConnected, setSocketConnected] = useState(false);
+        if (!shouldTrack || !navigator.geolocation) return;
+
+        const onPosition = (position: GeolocationPosition) => {
+            applyDeliveryLocation(position.coords.latitude, position.coords.longitude);
+        };
+
+        locationWatchIdRef.current = navigator.geolocation.watchPosition(
+            onPosition,
+            handleLocationError,
+            {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 20000,
+            }
+        );
+
+        return () => {
+            if (locationWatchIdRef.current !== null) {
+                navigator.geolocation.clearWatch(locationWatchIdRef.current);
+                locationWatchIdRef.current = null;
+            }
+        };
+    }, [id, order?.status, isDeliveryUser, applyDeliveryLocation, handleLocationError]);
 
     // Initialize Socket
     useEffect(() => {
@@ -418,7 +491,8 @@ export default function DeliveryOrderDetail() {
                 if (!isMounted) return;
 
                 const baseURL = getSocketBaseURL();
-                const token = getAuthToken();
+                const token = getAuthToken('delivery');
+                const deliveryBoyId = user?.id || user?._id;
 
                 socket = io(baseURL, {
                     auth: { token },
@@ -432,6 +506,19 @@ export default function DeliveryOrderDetail() {
                     if (isMounted) {
                         console.log('✅ Delivery Socket Connected:', socket.id);
                         setSocketConnected(true);
+
+                        if (deliveryBoyId) {
+                            socket.emit('join-delivery-room', String(deliveryBoyId));
+                        }
+
+                        const latest = deliveryBoyLocationRef.current;
+                        if (latest && id) {
+                            socket.emit('update-location', {
+                                orderId: id,
+                                latitude: latest.lat,
+                                longitude: latest.lng,
+                            });
+                        }
                     }
                 });
 
@@ -456,7 +543,7 @@ export default function DeliveryOrderDetail() {
                         // Update order status locally
                         setOrder((prev: any) => prev ? { ...prev, status: 'Cancelled' } : null);
                         // Optional: Navigate back or force re-fetch
-                        fetchOrder();
+                        fetchOrder(true);
                     }
                 });
 
@@ -476,74 +563,10 @@ export default function DeliveryOrderDetail() {
                 socketRef.current = null;
             }
         };
-    }, []);
+    }, [id, user?.id, user?._id]);
 
     // Helper to get socket (for use in other effects)
     const getSocket = useCallback(() => socketRef.current, []);
-
-
-    // Update delivery boy location from geolocation updates (Socket)
-    useEffect(() => {
-        if (!id || !order) return;
-
-        const shouldTrack = order.status && order.status !== 'Delivered' && order.status !== 'Cancelled' && order.status !== 'Returned';
-        const socket = socketRef.current;
-
-        if (shouldTrack && socketConnected && socket) {
-            const updateLocation = async () => {
-                if (!navigator.geolocation) return;
-                if (locationPermissionDeniedRef.current) return;
-
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const newLocation = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                        };
-                        setDeliveryBoyLocation(newLocation);
-                        setLastUpdate(new Date());
-
-                        // Emit via Socket
-                        socket.emit('update-location', {
-                            orderId: id,
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude
-                        });
-
-                        locationPermissionDeniedRef.current = false;
-                    },
-                    (error: GeolocationPositionError) => {
-                        // ... error handling ...
-                        if (error.code === error.PERMISSION_DENIED) {
-                            if (!locationPermissionDeniedRef.current) {
-                                locationPermissionDeniedRef.current = true;
-                                console.warn('Location permission denied.');
-                            }
-                        }
-                    },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                );
-            };
-
-            // Initial update
-            updateLocation();
-
-            // Interval (4 seconds)
-            locationIntervalRef.current = setInterval(updateLocation, 4000);
-
-            return () => {
-                if (locationIntervalRef.current) {
-                    clearInterval(locationIntervalRef.current);
-                    locationIntervalRef.current = null;
-                }
-            };
-        } else {
-            if (locationIntervalRef.current) {
-                clearInterval(locationIntervalRef.current);
-                locationIntervalRef.current = null;
-            }
-        }
-    }, [id, order?.status, socketConnected]);
 
 
     if (loading) {
@@ -582,7 +605,7 @@ export default function DeliveryOrderDetail() {
             setLoading(true);
             await updateOrderStatus(id, newStatus);
             // Always refetch formatted order so deliveryAddress lat/lng stay available for routing
-            await fetchOrder();
+            await fetchOrder(true);
         } catch (err: any) {
             alert(err.message || "Failed to update status");
         } finally {

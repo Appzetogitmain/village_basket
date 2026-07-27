@@ -1,3 +1,5 @@
+import { DeliverySlotSelection } from '../types/order';
+
 export interface DeliverySlotTime {
   _id?: string;
   name: string;
@@ -107,3 +109,33 @@ export const isSlotExpiredForDate = (
   const nowMinutes = (now.getHours() * 60) + now.getMinutes();
   return nowMinutes >= startMinutes;
 };
+
+export function isEarlyMorningSlot(slot?: DeliverySlotSelection | null): boolean {
+  if (!slot) return false;
+
+  if (slot.startTime && slot.endTime) {
+    return slot.startTime >= '05:00' && slot.endTime <= '10:00';
+  }
+
+  if (slot.timeRange) {
+    const range = slot.timeRange.toLowerCase();
+    const amMatches = range.match(/(\d+)\s*am/g);
+    if (amMatches && amMatches.length === 2) {
+      const startHour = parseInt(amMatches[0], 10);
+      const endHour = parseInt(amMatches[1], 10);
+      return startHour >= 5 && endHour <= 10;
+    }
+  }
+
+  return false;
+}
+
+export function shouldShowDeliveryOtp(
+  status: string,
+  deliveryOtp?: string,
+  deliverySlot?: DeliverySlotSelection | null
+): boolean {
+  if (!deliveryOtp) return false;
+  if (isEarlyMorningSlot(deliverySlot)) return false;
+  return !['Delivered', 'Cancelled', 'Returned', 'Rejected'].includes(status);
+}

@@ -765,20 +765,27 @@ export const getMyOrders = async (req: Request, res: Response) => {
 
         const skip = (Number(page) - 1) * Number(limit);
 
-        const orders = await Order.find(query)
-            .populate({
-                path: 'items',
-                populate: { path: 'product', select: 'productName mainImage retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice' }
-            })
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(Number(limit));
+        const [orders, total, customer] = await Promise.all([
+            Order.find(query)
+                .populate({
+                    path: 'items',
+                    populate: { path: 'product', select: 'productName mainImage retailPrice retailDiscPrice wholesalePrice wholesaleDiscPrice' }
+                })
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(Number(limit)),
+            Order.countDocuments(query),
+            Customer.findById(userId).select('deliveryOtp'),
+        ]);
 
-        const total = await Order.countDocuments(query);
+        const permanentDeliveryOtp = customer?.deliveryOtp;
+        const finalStatuses = new Set(['Delivered', 'Cancelled', 'Returned', 'Rejected']);
 
         // Transform orders to match frontend Order type
         const transformedOrders = orders.map(order => {
             const orderObj = order.toObject();
+            const includeDeliveryOtp = !finalStatuses.has(orderObj.status);
+
             return {
                 ...orderObj,
                 id: orderObj._id.toString(),
@@ -790,7 +797,10 @@ export const getMyOrders = async (req: Request, res: Response) => {
                 },
                 // Keep original fields for backward compatibility
                 subtotal: orderObj.subtotal,
-                address: orderObj.deliveryAddress
+                address: orderObj.deliveryAddress,
+                deliveryOtp: includeDeliveryOtp
+                    ? (orderObj.deliveryOtp || permanentDeliveryOtp)
+                    : undefined,
             };
         });
 
