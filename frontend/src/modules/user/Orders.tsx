@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useOrders } from '../../hooks/useOrders';
+import OrderDeliveryOtpBadge from '../../components/OrderDeliveryOtpBadge';
+import { shouldShowDeliveryOtp } from '../../utils/deliverySlotUtils';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -28,8 +31,12 @@ const formatDate = (dateString: string) => {
 };
 
 export default function Orders() {
-  const { orders } = useOrders();
+  const { orders, refreshOrders } = useOrders();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    refreshOrders();
+  }, [refreshOrders]);
 
   return (
     <div className="pb-24 min-h-screen">
@@ -100,6 +107,9 @@ export default function Orders() {
                       <span className="text-[8px] font-black text-village-umber uppercase tracking-tight">Scheduled:</span>
                       <span className="text-[8px] font-bold text-[#8B3D28] uppercase">{new Date(order.deliverySlot.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
                     </div>
+                  )}
+                  {shouldShowDeliveryOtp(order.status, order.deliveryOtp, order.deliverySlot) && (
+                    <OrderDeliveryOtpBadge otp={order.deliveryOtp!} compact />
                   )}
                 </div>
                 <div className="flex items-center gap-1">

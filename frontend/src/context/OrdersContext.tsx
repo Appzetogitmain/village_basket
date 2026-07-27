@@ -3,6 +3,7 @@ import {
   ReactNode,
   useEffect,
   useRef,
+  useCallback,
 } from "react";
 import { useAuth } from "./AuthContext";
 import { Order } from "../types/order";
@@ -54,7 +55,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
 
   const { isAuthenticated, user, updateUser } = useAuth();
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     // Ensure userType is set - if user is authenticated but userType is missing, assume Customer
     // This handles cases where user was logged in before userType was added to the login flow
     const userType =
@@ -79,7 +80,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated, user?.userType, user]);
 
   const prevAuthRef = useRef(false);
 
@@ -99,7 +100,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     }
     prevAuthRef.current = isAuthenticated;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, user?.id, fetchOrders]);
 
   const addOrder = async (order: Order): Promise<{ id: string; orderNumber: string } | undefined> => {
     try {
@@ -224,6 +225,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
         getOrderById,
         fetchOrderById,
         updateOrderStatus,
+        refreshOrders: fetchOrders,
         loading,
       }}>
       {children}
