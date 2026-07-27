@@ -23,6 +23,8 @@ interface GoogleMapsTrackingProps {
     routeDestination?: Location // Destination for route (seller shop or customer)
     routeWaypoints?: Location[] // Intermediate waypoints for the route
     destinationName?: string // Name of the destination for the overlay
+    /** Written address used to geocode when lat/lng are missing */
+    destinationAddress?: string
     onRouteInfoUpdate?: (info: {
         distance: string;
         duration: string;
@@ -51,6 +53,7 @@ export default function GoogleMapsTracking({
     routeDestination,
     routeWaypoints = [],
     destinationName,
+    destinationAddress,
     onRouteInfoUpdate,
     lastUpdate
 }: GoogleMapsTrackingProps) {
@@ -70,6 +73,21 @@ export default function GoogleMapsTracking({
     } | null>(null)
     const [routeError, setRouteError] = useState<string | null>(null)
     const [isGPSWeak, setIsGPSWeak] = useState<boolean>(false)
+    const [geocodedDestination, setGeocodedDestination] = useState<Location | null>(null)
+
+    const isValidCoord = (loc?: Location | null) =>
+        !!loc &&
+        Number.isFinite(loc.lat) &&
+        Number.isFinite(loc.lng) &&
+        !(loc.lat === 0 && loc.lng === 0)
+
+    const effectiveCustomerLocation = isValidCoord(customerLocation)
+        ? customerLocation
+        : (geocodedDestination || customerLocation)
+
+    const effectiveRouteDestination = isValidCoord(routeDestination)
+        ? routeDestination
+        : (geocodedDestination || routeDestination)
 
     // Check for weak GPS signal (no updates for > 45 seconds)
     useEffect(() => {
@@ -100,20 +118,51 @@ export default function GoogleMapsTracking({
         libraries: GOOGLE_MAPS_LIBRARIES
     })
 
+    // Geocode written address when destination coordinates are missing
+    useEffect(() => {
+        if (!isLoaded || !window.google?.maps?.Geocoder) return
+        if (isValidCoord(customerLocation) || isValidCoord(routeDestination)) {
+            setGeocodedDestination(null)
+            return
+        }
+        if (!destinationAddress || destinationAddress.replace(/[,\s]/g, '').length < 5) return
+
+        let cancelled = false
+        const geocoder = new window.google.maps.Geocoder()
+        geocoder.geocode({ address: destinationAddress }, (results: any, status: string) => {
+            if (cancelled) return
+            if (status === 'OK' && results?.[0]?.geometry?.location) {
+                const loc = results[0].geometry.location
+                setGeocodedDestination({ lat: loc.lat(), lng: loc.lng() })
+                setRouteError(null)
+            } else {
+                console.warn('Geocode failed for destination address:', status, destinationAddress)
+                setGeocodedDestination(null)
+                if (showRoute) {
+                    setRouteError('Customer pin missing. Showing map without route.')
+                }
+            }
+        })
+
+        return () => {
+            cancelled = true
+        }
+    }, [isLoaded, customerLocation, routeDestination, destinationAddress, showRoute])
+
     // Combine storeLocation with sellerLocations
     const allSellers = storeLocation ? [storeLocation, ...sellerLocations] : sellerLocations;
 
     // Center will be updated dynamically based on deliveryLocation
-    const center = deliveryLocation || (allSellers.length > 0 ? {
-        lat: (allSellers[0].lat + customerLocation.lat) / 2,
-        lng: (allSellers[0].lng + customerLocation.lng) / 2
-    } : customerLocation)
+    const center = deliveryLocation || (allSellers.length > 0 && isValidCoord(effectiveCustomerLocation) ? {
+        lat: (allSellers[0].lat + effectiveCustomerLocation.lat) / 2,
+        lng: (allSellers[0].lng + effectiveCustomerLocation.lng) / 2
+    } : (isValidCoord(effectiveCustomerLocation) ? effectiveCustomerLocation : (deliveryLocation || { lat: 20.5937, lng: 78.9629 })))
 
     const path = [
         ...allSellers,
         ...(deliveryLocation ? [deliveryLocation] : []),
-        customerLocation
-    ].filter(loc => loc && (loc.lat !== 0 || loc.lng !== 0))
+        ...(isValidCoord(effectiveCustomerLocation) ? [effectiveCustomerLocation] : [])
+    ].filter(loc => loc && isValidCoord(loc))
 
     // Auto-center and fit bounds when location or route changes
     useEffect(() => {
@@ -129,9 +178,9 @@ export default function GoogleMapsTracking({
         }
 
         // Add route points if visible
-        if (showRoute && routeOrigin && routeDestination) {
+        if (showRoute && routeOrigin && effectiveRouteDestination && isValidCoord(effectiveRouteDestination)) {
             bounds.extend(routeOrigin);
-            bounds.extend(routeDestination);
+            bounds.extend(effectiveRouteDestination);
             routeWaypoints.forEach(wp => bounds.extend(wp));
             hasPoints = true;
         } else {
@@ -144,8 +193,10 @@ export default function GoogleMapsTracking({
                 bounds.extend(s);
                 hasPoints = true;
             });
-            bounds.extend(customerLocation);
-            hasPoints = true;
+            if (isValidCoord(effectiveCustomerLocation)) {
+                bounds.extend(effectiveCustomerLocation);
+                hasPoints = true;
+            }
         }
 
         if (hasPoints) {
@@ -175,7 +226,7 @@ export default function GoogleMapsTracking({
                 setTimeout(() => mapRef.current._setProgrammaticChange(false), 500);
             }
         }
-    }, [isLoaded, deliveryLocation, showRoute, routeOrigin, routeDestination, routeWaypoints, storeLocation, sellerLocations, customerLocation, userHasInteracted, isFullScreen]);
+    }, [isLoaded, deliveryLocation, showRoute, routeOrigin, effectiveRouteDestination, routeWaypoints, storeLocation, sellerLocations, effectiveCustomerLocation, userHasInteracted, isFullScreen]);
 
     const handleRecenter = () => {
         setUserHasInteracted(false);
@@ -188,14 +239,14 @@ export default function GoogleMapsTracking({
             } else {
                 const bounds = new window.google.maps.LatLngBounds();
                 if (deliveryLocation) bounds.extend(deliveryLocation);
-                if (showRoute && routeOrigin && routeDestination) {
+                if (showRoute && routeOrigin && effectiveRouteDestination && isValidCoord(effectiveRouteDestination)) {
                     bounds.extend(routeOrigin);
-                    bounds.extend(routeDestination);
+                    bounds.extend(effectiveRouteDestination);
                     routeWaypoints.forEach(wp => bounds.extend(wp));
                 } else {
                     if (storeLocation) bounds.extend(storeLocation);
                     sellerLocations.forEach(s => bounds.extend(s));
-                    bounds.extend(customerLocation);
+                    if (isValidCoord(effectiveCustomerLocation)) bounds.extend(effectiveCustomerLocation);
                 }
                 mapRef.current.fitBounds(bounds, { top: 50, bottom: 50, left: 50, right: 50 });
                 hasInitialBoundsFitted.current = true;
@@ -248,7 +299,7 @@ export default function GoogleMapsTracking({
         }
 
         // Validate origin and destination
-        if (!origin || !destination || !origin.lat || !origin.lng || !destination.lat || !destination.lng) {
+        if (!isValidCoord(origin) || !isValidCoord(destination)) {
             console.log('⚠️ Cannot calculate route: invalid origin or destination', { origin, destination })
             return
         }
@@ -371,16 +422,14 @@ export default function GoogleMapsTracking({
 
     // Handle route calculation when routeOrigin and routeDestination are provided
     useEffect(() => {
-        if (showRoute && routeOrigin && routeDestination && isLoaded && mapRef.current) {
-            // Recalculate route when origin, destination or waypoints change
-            calculateAndDisplayRoute(routeOrigin, routeDestination, routeWaypoints)
-        } else if (!showRoute && directionsRendererRef.current) {
-            // Clear route if showRoute is false
+        if (showRoute && routeOrigin && isValidCoord(effectiveRouteDestination) && isLoaded && mapRef.current) {
+            calculateAndDisplayRoute(routeOrigin, effectiveRouteDestination!, routeWaypoints)
+        } else if ((!showRoute || !isValidCoord(effectiveRouteDestination)) && directionsRendererRef.current) {
             directionsRendererRef.current.setMap(null)
             directionsRendererRef.current = null
             setRouteInfo(null)
         }
-    }, [showRoute, routeOrigin, routeDestination, routeWaypoints, isLoaded, calculateAndDisplayRoute])
+    }, [showRoute, routeOrigin, effectiveRouteDestination, routeWaypoints, isLoaded, calculateAndDisplayRoute])
 
     // Interpolation State
     const [animatedDeliveryLocation, setAnimatedDeliveryLocation] = useState<Location | undefined>(deliveryLocation);
@@ -537,7 +586,7 @@ export default function GoogleMapsTracking({
             </div>
 
             {routeError && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
+                <div className="absolute top-14 left-1/2 -translate-x-1/2 z-20 w-max max-w-[92%]">
                     <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-2 rounded-full text-xs font-medium shadow-lg flex items-center gap-2">
                         <span>⚠️</span>
                         {routeError}
@@ -546,8 +595,8 @@ export default function GoogleMapsTracking({
             )}
 
             {/* Warning when customer location is missing */}
-            {isTracking && (!customerLocation || customerLocation.lat === 0) && (
-                <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 w-max max-w-[90%]">
+            {isTracking && !isValidCoord(effectiveCustomerLocation) && (
+                <div className="absolute top-14 left-1/2 -translate-x-1/2 z-20 w-max max-w-[92%]">
                     <div className="bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-lg text-xs font-medium shadow-lg flex flex-col items-center gap-1 text-center">
                         <div className="flex items-center gap-2">
                              <span>📍</span>
@@ -579,11 +628,10 @@ export default function GoogleMapsTracking({
                     ]
                 }}
             >
-                {/* Customer Marker */}
                 {/* Customer Marker - Only show if valid location */}
-                {customerLocation && (customerLocation.lat !== 0 || customerLocation.lng !== 0) && (
+                {isValidCoord(effectiveCustomerLocation) && (
                 <Marker
-                    position={customerLocation}
+                    position={effectiveCustomerLocation!}
                     icon={{
                         url: `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><text x="8" y="32" font-size="32">📍</text></svg>')}`,
                         scaledSize: window.google?.maps?.Size ? new window.google.maps.Size(40, 40) : undefined

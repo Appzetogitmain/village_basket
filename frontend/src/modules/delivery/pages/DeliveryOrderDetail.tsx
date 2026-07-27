@@ -580,12 +580,9 @@ export default function DeliveryOrderDetail() {
         if (!id) return;
         try {
             setLoading(true);
-            const updatedOrder = await updateOrderStatus(id, newStatus);
-            if (updatedOrder && updatedOrder.data) {
-                setOrder(updatedOrder.data);
-            } else {
-                await fetchOrder();
-            }
+            await updateOrderStatus(id, newStatus);
+            // Always refetch formatted order so deliveryAddress lat/lng stay available for routing
+            await fetchOrder();
         } catch (err: any) {
             alert(err.message || "Failed to update status");
         } finally {
@@ -603,12 +600,42 @@ export default function DeliveryOrderDetail() {
     const nextStatus = getNextStatus();
     const isMapVisible = order.status === 'Out for Delivery' || order.status === 'Picked up' || (sellerLocations.length > 0 && order.status !== 'Delivered');
     const showSellerLocations = sellerLocations.length > 0 && order.status !== 'Picked up' && order.status !== 'Out for Delivery' && order.status !== 'Delivered';
-    const showCustomerLocation = order.status === 'Picked up';
 
-    // Check if we have valid customer coordinates
-    const customerLat = order.deliveryAddress?.latitude || order.address?.latitude;
-    const customerLng = order.deliveryAddress?.longitude || order.address?.longitude;
-    const hasValidCustomerLocation = !!(customerLat && customerLng && customerLat !== 0 && customerLng !== 0);
+    // Parse customer coordinates robustly (API may return numbers or strings)
+    const parseCoord = (value: unknown): number | null => {
+        if (value === undefined || value === null || value === '') return null;
+        const n = typeof value === 'number' ? value : parseFloat(String(value));
+        if (!Number.isFinite(n)) return null;
+        return n;
+    };
+
+    const customerLat = parseCoord(order.deliveryAddress?.latitude);
+    const customerLng = parseCoord(order.deliveryAddress?.longitude);
+    const hasValidCustomerLocation = !!(
+        customerLat !== null &&
+        customerLng !== null &&
+        !(customerLat === 0 && customerLng === 0)
+    );
+
+    const customerDestinationAddress = [
+        order.deliveryAddress?.address,
+        order.deliveryAddress?.city,
+        order.deliveryAddress?.state,
+        order.deliveryAddress?.pincode,
+    ].filter(Boolean).join(', ') || (typeof order.address === 'string' ? order.address : '');
+
+    const customerMapLocation = {
+        lat: hasValidCustomerLocation ? customerLat! : 0,
+        lng: hasValidCustomerLocation ? customerLng! : 0,
+    };
+
+    // After pickup, always attempt route to customer (geocode fallback if coords missing)
+    const shouldShowRouteToCustomer = order.status === 'Picked up' && !!deliveryBoyLocation;
+    const shouldShowRouteToSeller =
+        !!deliveryBoyLocation &&
+        sellerLocations.length > 0 &&
+        order.status !== 'Delivered' &&
+        order.status !== 'Picked up';
 
     return (
         <div className="min-h-screen bg-transparent pb-32 relative font-poppins">
@@ -664,24 +691,21 @@ export default function DeliveryOrderDetail() {
                                     name: s.storeName
                                 }))
                         }
-                        customerLocation={{
-                            lat: order.deliveryAddress?.latitude || order.address?.latitude || 0,
-                            lng: order.deliveryAddress?.longitude || order.address?.longitude || 0
-                        }}
+                        customerLocation={customerMapLocation}
                         deliveryLocation={deliveryBoyLocation || undefined}
                         isTracking={!!deliveryBoyLocation}
-                        showRoute={!!deliveryBoyLocation && (
-                            (order.status === 'Picked up' && hasValidCustomerLocation) ||
-                            (sellerLocations.length > 0 && order.status !== 'Delivered' && order.status !== 'Picked up')
-                        )}
+                        showRoute={shouldShowRouteToCustomer || shouldShowRouteToSeller}
                         routeOrigin={deliveryBoyLocation || undefined}
                         routeDestination={
-                            order.status === 'Picked up' ? (hasValidCustomerLocation ? {
-                                lat: customerLat!,
-                                lng: customerLng!
-                            } : undefined)
+                            order.status === 'Picked up'
+                                ? (hasValidCustomerLocation
+                                    ? { lat: customerLat!, lng: customerLng! }
+                                    : undefined)
                                 : sellerLocations.length > 0
-                                    ? { lat: sellerLocations[sellerLocations.length - 1].latitude, lng: sellerLocations[sellerLocations.length - 1].longitude }
+                                    ? {
+                                        lat: sellerLocations[sellerLocations.length - 1].latitude,
+                                        lng: sellerLocations[sellerLocations.length - 1].longitude,
+                                      }
                                     : undefined
                         }
                         routeWaypoints={
@@ -691,7 +715,13 @@ export default function DeliveryOrderDetail() {
                                     : []
                         }
                         destinationName={
-                            order.status === 'Picked up' ? order.address?.split(',')[0] : sellerLocations.length > 0 ? sellerLocations[0].storeName : undefined
+                            order.status === 'Picked up'
+                                ? (order.deliveryAddress?.address?.split(',')[0] ||
+                                    (typeof order.address === 'string' ? order.address.split(',')[0] : 'Customer'))
+                                : sellerLocations.length > 0 ? sellerLocations[0].storeName : undefined
+                        }
+                        destinationAddress={
+                            order.status === 'Picked up' ? customerDestinationAddress : undefined
                         }
                         onRouteInfoUpdate={setRouteInfo}
                         lastUpdate={lastUpdate}

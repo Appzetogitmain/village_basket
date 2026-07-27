@@ -419,6 +419,7 @@ export default function SellerOrderDetail() {
   const assignedPartnerIds = new Set(
     orderDetail.assignedDeliveryBoys?.map((partner) => partner.id) || []
   );
+  const canAssignDeliveryPartners = !['Delivered', 'Cancelled', 'Returned', 'Rejected'].includes(orderStatus);
 
   return (
     <div className="min-h-screen bg-white/40 pb-8">
@@ -520,10 +521,10 @@ export default function SellerOrderDetail() {
           </div>
           
           {/* Manual Delivery Boy Assignment Section */}
-          {(orderStatus === 'Accepted' || orderStatus === 'Processed') && (
+          {canAssignDeliveryPartners && (
              <div className="mt-6 border-t border-neutral-200 pt-5 w-full">
                <h3 className="text-sm font-semibold text-neutral-800 mb-3">
-                  Assign Delivery Partner(s)
+                  Assign / Re-assign Delivery Partner(s)
                   {orderDetail?.assignedDeliveryBoys && orderDetail.assignedDeliveryBoys.length > 0 && (
                     <span className="text-[#8B3D28] ml-1 text-xs">
                       ({orderDetail.assignedDeliveryBoys.length} assigned)

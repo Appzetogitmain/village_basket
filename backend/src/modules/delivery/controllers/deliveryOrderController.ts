@@ -325,7 +325,24 @@ export const updateOrderStatus = asyncHandler(async (req: Request, res: Response
     return res.status(200).json({
         success: true,
         message: `Order status updated to ${status}`,
-        data: order
+        data: {
+            id: order._id,
+            orderId: order.orderNumber,
+            customerName: order.customerName,
+            customerPhone: order.customerPhone,
+            address: `${order.deliveryAddress?.address || ''}, ${order.deliveryAddress?.city || ''}`,
+            deliveryAddress: order.deliveryAddress,
+            status: order.status,
+            items: mapOrderItems(order.items),
+            totalAmount: order.total,
+            createdAt: order.createdAt,
+            distance: null,
+            deliveryEarning: 0,
+            deliverySlot: order.deliverySlot || null,
+            paymentMethod: order.paymentMethod,
+            paymentStatus: order.paymentStatus,
+            sellerPickups: order.sellerPickups || [],
+        },
     });
 });
 
