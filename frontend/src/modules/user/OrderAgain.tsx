@@ -9,6 +9,8 @@ import { calculateProductPrice } from '../../utils/priceUtils';
 import { getVariationColor } from '../../utils/variationUtils';
 import ProductCard from './components/ProductCard';
 import { useLocation } from '../../hooks/useLocation';
+import OrderDeliveryOtpBadge from '../../components/OrderDeliveryOtpBadge';
+import { shouldShowDeliveryOtp } from '../../utils/deliverySlotUtils';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -37,7 +39,7 @@ const getStatusColor = (status: string) => {
 };
 
 export default function OrderAgain() {
-  const { orders } = useOrders();
+  const { orders, refreshOrders } = useOrders();
   const { cart, addToCart, updateQuantity } = useCart();
   const navigate = useNavigate();
   const { location: userLocation } = useLocation();
@@ -66,6 +68,10 @@ export default function OrderAgain() {
   };
 
   const [bestsellerProducts, setBestsellerProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    refreshOrders();
+  }, [refreshOrders]);
 
   useEffect(() => {
     const fetchBestsellers = async () => {
@@ -153,6 +159,9 @@ export default function OrderAgain() {
                       <span className="text-[10px] md:text-xs font-bold text-neutral-400 mt-1">
                         {formatDate(order.createdAt)}
                       </span>
+                      {shouldShowDeliveryOtp(order.status, order.deliveryOtp, order.deliverySlot) && (
+                        <OrderDeliveryOtpBadge otp={order.deliveryOtp!} />
+                      )}
                     </div>
 
                     <div className="flex flex-col items-end">
