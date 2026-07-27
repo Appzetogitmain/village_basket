@@ -484,9 +484,6 @@ export default function GoogleMapsTracking({
         cancelAnimationFrame(animationRef.current!);
         animationRef.current = requestAnimationFrame(animate);
 
-        // Update ref for next comparison
-        lastDeliveryLocationRef.current = deliveryLocation;
-
         return () => {
             if (animationRef.current) cancelAnimationFrame(animationRef.current);
         };
