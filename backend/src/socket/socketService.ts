@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { handleOrderAcceptance, handleOrderRejection } from '../services/orderNotificationService';
 import Order from '../models/Order';
 import DeliveryTracking from '../models/DeliveryTracking';
+import { isOrderAssignedToDeliveryBoy } from '../utils/deliveryAssignmentUtils';
 
 // In-memory cache for order destinations (lat, lng) to avoid DB reads on every update
 // Key: orderId, Value: { latitude, longitude }
@@ -262,9 +263,8 @@ export const initializeSocket = (httpServer: HttpServer) => {
             if (!deliveryBoyId || !orderId || !latitude || !longitude) return;
 
             try {
-                // 1. Verify Delivery Boy is assigned to this order
-                const order = await Order.findOne({ _id: orderId, deliveryBoy: deliveryBoyId }).select('deliveryAddress status');
-                if (!order) {
+                const order = await Order.findById(orderId).select('deliveryAddress status deliveryBoy assignedDeliveryBoys');
+                if (!order || !isOrderAssignedToDeliveryBoy(order, deliveryBoyId)) {
                     console.warn(`⚠️ Unauthorized location update attempt from ${deliveryBoyId} for order ${orderId}`);
                     return;
                 }

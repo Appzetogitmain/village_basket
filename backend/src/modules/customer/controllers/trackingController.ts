@@ -5,6 +5,7 @@ import Order from "../../../models/Order";
 import OrderItem from "../../../models/OrderItem";
 import Seller from "../../../models/Seller";
 import Delivery from "../../../models/Delivery";
+import { isOrderAssignedToDeliveryBoy } from "../../../utils/deliveryAssignmentUtils";
 
 /**
  * Get tracking information for an order
@@ -80,12 +81,9 @@ export const updateDeliveryLocation = asyncHandler(
     }
 
     // Verify order is assigned to this delivery partner
-    const order = await Order.findOne({
-      _id: orderId,
-      deliveryBoy: deliveryBoyId,
-    });
+    const order = await Order.findById(orderId);
 
-    if (!order) {
+    if (!order || !deliveryBoyId || !isOrderAssignedToDeliveryBoy(order, deliveryBoyId)) {
       return res.status(404).json({
         success: false,
         message: "Order not found or not assigned to you",
